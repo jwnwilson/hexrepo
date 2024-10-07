@@ -6,10 +6,10 @@
 version: '3'
 services:
   api:
-    container_name: company_api
+    container_name: example_api
     env_file:
       - environment/docker.env
-    image: "company-api"
+    image: "example-api"
     build: 
       args:
         CONTEXT: local
@@ -24,10 +24,9 @@ services:
       - 0.0.0.0:8000:8000
     depends_on:
       - postgres_db
-      - firestore_emulator
 
   postgres_db:
-    container_name: company_db
+    container_name: example_db
     restart: unless-stopped
     image: postgres:15
     volumes:
@@ -35,7 +34,7 @@ services:
       - ./scripts:/code/scripts
       - postgres_db:/var/lib/postgresql/data
     environment:
-      - POSTGRES_MULTIPLE_DATABASES=company_db
+      - POSTGRES_MULTIPLE_DATABASES=example_db,test_db
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password
     env_file:
@@ -44,31 +43,6 @@ services:
       - "0.0.0.0:5432:5432"
     expose:
       - "5432"
-
-  postgres_db_test:
-    container_name: company_db_test
-    image: postgres:15
-    volumes:
-      - ./scripts/create-multiple-postgresql-databases.sh:/docker-entrypoint-initdb.d/create-multiple-postgresql-databases.sh
-      - ./scripts:/code/scripts
-    environment:
-      - POSTGRES_MULTIPLE_DATABASES=company_db
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=password
-      - GCP_PROJECT_ID=ocula-platform-dev
-    ports:
-      - "0.0.0.0:5435:5432"
-    expose:
-      - "5432"
-
-  firestore_emulator:
-    container_name: company_firestore_test
-    image: mtlynch/firestore-emulator
-    environment:
-      - FIRESTORE_PROJECT_ID=dummy-project-id
-      - PORT=8200
-    ports:
-      - 0.0.0.0:8200:8200
 
 volumes:
   postgres_db:
