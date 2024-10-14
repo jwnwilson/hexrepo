@@ -3,12 +3,7 @@ from sqlalchemy.orm import Session
 
 from ..interfaces.db import UOW
 
-from .models.example import CompanyRepository
-from .models.scorecard_config import ScorecardConfigRepository
-from .models.category import CategoryRepository
-from .models.product_taxonomy import ProductTaxRepository
-from .models.generative import GenConfigRepository
-from .models.feature_flag import FeatureFlagRepository
+from .models.example import ExampleRepository
 
 
 class SqlUOW(UOW):
@@ -21,11 +16,11 @@ class SqlUOW(UOW):
 
     # Used for testing
     def create_all(self):
-        from .models.base import Base
+        from .models.base_model import Base
 
         Base.metadata.create_all(self._session.get_bind())
 
     def drop_all(self):
-        from .models.base import Base
+        from .models.base_model import Base
 
         Base.metadata.drop_all(self._session.get_bind())

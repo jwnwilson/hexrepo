@@ -2,16 +2,7 @@
 
 .DEFAULT_GOAL = help
 
-help:
-	@echo "---------------HELP-----------------"
-	@echo "To setup the project type make setup"
-	@echo "To test the project type make test"
-	@echo "------------------------------------"
-VENV := .venv
-MKFILE_DIR := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
-VENV_DIR = $(MKFILE_DIR)$(VENV)
-
-local_run: db_upgrade local_server
+run: db_upgrade local_server
 build: check_for_sa_creds build_docker
 test: db_test_stop db_test_start pytest db_test_stop
 
@@ -63,13 +54,6 @@ pytest:
 	. $(VENV_DIR)/bin/activate; \
 	pytest
 
-db_test_start:
-	docker compose run --service-ports -d postgres_db_test
-	docker compose run --service-ports -d firestore_emulator
-
-db_test_stop:
-	docker compose stop postgres_db_test firestore_emulator
-
 coverage:
 	@echo "Running unit tests"	
 	. $(VENV_DIR)/bin/activate; \
@@ -84,18 +68,3 @@ lint:
 clean:
 	find . -type f -name '*.py[co]' -delete -o -type d -name __pycache__ -delete
 
-check_for_sa_creds:
-	[ -f creds.json ] || \
-	(gcloud auth application-default login && \
-	export GCP_PROJECT_NUMBER=574107810202 && \
-	python python/tooling/get_sa_creds_file.py)
-
-save_docs:
-	# Note: requires server to be running locally
-	curl http://127.0.0.1:8000/openapi.json -o openapi.json
-
-migrate_firestore_data:
-	(gcloud auth application-default login && \
-	export FF_ENABLE_FIRESTORE=true && \
-	python python/tooling/migrate_firestore_data.py)
-	
