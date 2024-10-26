@@ -18,17 +18,17 @@ build:
 	docker compose build 
 
 # DB management
-db_delete_data:
+db_delete_data: down
 	docker compose run postgres_db bash -c "rm -rf /var/lib/postgresql/data/*"
 
-db_upgrade:
+db_upgrade: down
 	source $(VENV_DIR)/bin/activate && \
 	docker compose run api bash -c "alembic upgrade head"
 
-db_downgrade:
+db_downgrade: down
 	docker compose run api bash -c "alembic downgrade -1"
 
-db_create_migration:
+db_create_migration: down
 	docker compose run api bash -c "alembic revision --autogenerate -m \"DB migration\""
 
 # Local Development
