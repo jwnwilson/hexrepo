@@ -1,13 +1,12 @@
 import os
 from collections.abc import Generator
 
-from app.adapter.db import SQLALchemyAdapter
-from app.ports.db import DbAdapter
+from app.adaptor.db.interface import UOW
 
 DB_URL = os.environ["DB_URL"]
 
 
-def get_db() -> Generator[DbAdapter, None, None]:
-    adapter = SQLALchemyAdapter(DB_URL)
-    with adapter.transaction():
-        yield adapter
+def get_uow() -> Generator[UOW, None, None]:
+    uow = UOW(db_url=DB_URL)
+    with uow.transaction():
+        yield uow

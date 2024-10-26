@@ -1,22 +1,22 @@
-from app.ports.db.model.property_model import PropteryDTO
+from app.adaptor.db.sql.models.example import ExampleDTO
 
 from ....crud import CrudRouter
-from ....dependencies import get_db
+from ....dependencies import get_uow
 
 
-class CreatePropertyDTO(PropteryDTO):
+class CreateExampleDTO(ExampleDTO):
     pass
 
 
-class UpdatePropertyDTO(PropteryDTO):
+class UpdateExampleDTO(ExampleDTO):
     pass
 
 
 router_v1 = CrudRouter(
-    db_dependency=get_db,
+    db_dependency=get_uow,
     respository="example",
     methods=["CREATE", "READ", "UPDATE", "DELETE"],
-    response_schema=PropteryDTO,
-    create_schema=CreatePropertyDTO,
-    update_schema=UpdatePropertyDTO,
+    response_schema=ExampleDTO,
+    create_schema=CreateExampleDTO,
+    update_schema=UpdateExampleDTO,
 ).router

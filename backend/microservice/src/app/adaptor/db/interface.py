@@ -49,8 +49,8 @@ class Repository(ABC):
 
 
 class UOW(ABC):
-    def __init__(self, session: Session, required_filters: Optional[Dict] = None):
-        self._session: Session = session
+    def __init__(self, db_url: str, required_filters: Optional[Dict] = None):
+        self._db_url: str = db_url
         self._required_filters: Optional[Dict] = required_filters
 
     def set_required_filters(self, required_filters: Dict):

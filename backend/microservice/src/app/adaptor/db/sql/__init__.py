@@ -1,2 +1,2 @@
-from .uow import SQLRepositories
+from .uow import UOW
 from .session import DatabaseSessionManager

@@ -8,11 +8,13 @@ services:
   api:
     container_name: example_api
     env_file:
-      - environment/docker.env
+      - env/docker.env
     image: "example-api"
     build: 
       args:
         CONTEXT: local
+      context: .
+      dockerfile: infra/docker/gcp.Dockerfile
     # Run this contain as if it's in the terminal, useful for debugging
     tty: true
     # Mount local files into the container so we can update files inside the container
@@ -38,7 +40,7 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password
     env_file:
-      - environment/docker.env
+      - env/docker.env
     ports:
       - "0.0.0.0:5432:5432"
     expose:

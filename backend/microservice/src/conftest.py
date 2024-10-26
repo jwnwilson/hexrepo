@@ -1,49 +1,37 @@
 import os
 from collections.abc import Generator
+import pytest
+from fastapi.testclient import TestClient
+
+from src.app.adaptor.db.interface import UOW
+from src.app.adaptor.db.sql.uow import SqlUOW
 
 # Silence SQLALchemy deprecation warning until we can upgrade
 os.environ["SQLALCHEMY_SILENCE_UBER_WARNING"] = "1"
 
-import pytest
-from fastapi.testclient import TestClient
-
-from app.adapter.db import SQLALchemyAdapter
-from app.ports.db import DbAdapter
-
 # Create local file db
 SQLALCHEMY_DATABASE_URL = "sqlite:///test.db"
 
-
 @pytest.fixture
-def db_adapter() -> DbAdapter:
+def uow() -> Generator[UOW, None, None]:
     """
-    Return db adapter without DB session
+    Return db adaptor with initialised DB & DB session.
     """
-    return SQLALchemyAdapter(
-        SQLALCHEMY_DATABASE_URL,
-        engine_args={"connect_args": {"check_same_thread": False}},
-    )
-
-
-@pytest.fixture
-def db(db_adapter: DbAdapter) -> Generator[DbAdapter, None, None]:
-    """
-    Return db adapter with initialised DB & DB session.
-    """
+    uow = SqlUOW(db_url=SQLALCHEMY_DATABASE_URL)
     # Create tables
-    db_adapter.init_db()
+    uow.init_db()
     # Create DB session
-    with db_adapter.transaction() as session:
-        yield db_adapter
+    with uow.transaction() as session:
+        yield uow
 
 
 @pytest.fixture
-def client(db):
-    from app.adapter.fastapi import app
-    from app.adapter.fastapi.dependencies import get_db
+def client(uow):
+    from app.interactor.api.fastapi import app
+    from app.interactor.api.fastapi.dependencies import get_uow
 
-    def get_db_override():
-        yield db
+    def get_uow_override():
+        yield uow
 
-    app.dependency_overrides[get_db] = get_db_override
+    app.dependency_overrides[get_uow] = get_uow_override
     return TestClient(app)

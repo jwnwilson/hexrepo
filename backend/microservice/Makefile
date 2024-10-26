@@ -1,10 +1,9 @@
 .PHONY: venv test lint
-
 .DEFAULT_GOAL = help
 
-run: db_upgrade local_server
-build: check_for_sa_creds build_docker
-test: db_test_stop db_test_start pytest db_test_stop
+VENV := .venv
+MKFILE_DIR := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
+VENV_DIR = $(MKFILE_DIR)$(VENV)
 
 # Setup commands
 venv:
@@ -14,8 +13,6 @@ venv:
 	export SYSTEM_VERSION_COMPAT=1 && \
 	pip install poetry && \
 	poetry install
-	@echo "Installing pre commit hook..."
-	source $(VENV_DIR)/bin/activate && pre-commit install --install-hooks
 
 build:
 	docker compose build 
@@ -41,13 +38,16 @@ db:
 run:
 	docker compose up
 
+down:
+	docker compose down
+
 # Host API locally, loading local env file
-run_local: db
+run_local: db down
 	source $(VENV_DIR)/bin/activate && \
-	uvicorn app.adaptor.into.api.app:app --reload --env-file environment/local.env
+	PYTHONPATH=src uvicorn app.interactor.api.fastapi.main:app --reload --env-file env/local.env
 
 # Testing commands
-pytest:
+test:
 	@echo "Running unit tests"
 	. $(VENV_DIR)/bin/activate; \
 	pytest

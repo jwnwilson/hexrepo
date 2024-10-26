@@ -7,7 +7,7 @@ from sqlalchemy.engine.base import Connection, Engine
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy import event
 
-from app.config import config
+from app import config
 
 
 class DatabaseSessionManager:
@@ -84,9 +84,3 @@ class DatabaseSessionManager:
             return list(self._query_counts.values())[0]
         else:
             raise RuntimeError("No DB session initialized")
-
-
-def get_db():
-    session_manager = DatabaseSessionManager()
-    with session_manager.session() as session:
-        yield session

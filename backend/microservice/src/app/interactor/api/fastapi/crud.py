@@ -3,7 +3,7 @@ from typing import Any, Callable, List, Optional, Type
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 
-from app.ports.db import DbAdapter, Repository
+from app.adaptor.db.interface import UOW, Repository
 
 
 class PaginatedData(BaseModel):
@@ -83,9 +83,9 @@ class CrudRouter:
     def create(self) -> Callable:
         def create_record(
             obj_in: self.create_schema,  # type: ignore
-            db: DbAdapter = Depends(self.db_dependency),
+            uow: UOW = Depends(self.db_dependency),
         ) -> self.response_schema:  # type: ignore
-            repositry: Repository = getattr(db, self.repository)
+            repositry: Repository = getattr(uow, self.repository)
             return repositry.create(obj_in)
 
         return create_record
@@ -93,18 +93,18 @@ class CrudRouter:
     def read(self) -> Callable:
         def read_record(
             id: str,
-            db: DbAdapter = Depends(self.db_dependency),
+            uow: UOW = Depends(self.db_dependency),
         ) -> self.response_schema:  # type: ignore
-            repositry: Repository = getattr(db, self.repository)
+            repositry: Repository = getattr(uow, self.repository)
             return repositry.read(id)
 
         return read_record
 
     def read_multi(self) -> Callable:
         def read_multiple_records(
-            db: DbAdapter = Depends(self.db_dependency),
+            uow: UOW = Depends(self.db_dependency),
         ) -> PaginatedData:  # type: ignore
-            repositry: Repository = getattr(db, self.repository)
+            repositry: Repository = getattr(uow, self.repository)
             return repositry.read_multi()
 
         return read_multiple_records
@@ -113,9 +113,9 @@ class CrudRouter:
         def update_record(
             id: str,
             obj_in: self.update_schema,  # type: ignore
-            db: DbAdapter = Depends(self.db_dependency),
+            uow: UOW = Depends(self.db_dependency),
         ) -> self.response_schema:  # type: ignore
-            repositry: Repository = getattr(db, self.repository)
+            repositry: Repository = getattr(uow, self.repository)
             return repositry.update(id, obj_in)
 
         return update_record
@@ -123,9 +123,9 @@ class CrudRouter:
     def delete(self) -> Callable:
         def delete_record(
             id: str,
-            db: DbAdapter = Depends(self.db_dependency),
+            uow: UOW = Depends(self.db_dependency),
         ):
-            repositry: Repository = getattr(db, self.repository)
+            repositry: Repository = getattr(uow, self.repository)
             return repositry.delete(id)
 
         return delete_record
