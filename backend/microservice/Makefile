@@ -42,7 +42,7 @@ down:
 	docker compose down
 
 # Host API locally, loading local env file
-run_local: db down
+run_local: down db
 	source $(VENV_DIR)/bin/activate && \
 	PYTHONPATH=src uvicorn app.interactor.api.fastapi.main:app --reload --env-file env/local.env
 
