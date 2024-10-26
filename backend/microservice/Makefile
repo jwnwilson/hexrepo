@@ -1,4 +1,4 @@
-.PHONY: venv_setup test lint
+.PHONY: venv test lint
 
 .DEFAULT_GOAL = help
 
@@ -7,19 +7,17 @@ build: check_for_sa_creds build_docker
 test: db_test_stop db_test_start pytest db_test_stop
 
 # Setup commands
-venv_setup:
+venv:
 	@echo "Creating virtual environment..."
 	python3.12 -m venv $(VENV); \
 	source $(VENV_DIR)/bin/activate && \
 	export SYSTEM_VERSION_COMPAT=1 && \
 	pip install poetry && \
-	gcloud auth login && \
-	poetry self add keyrings.google-artifactregistry-auth && \
 	poetry install
 	@echo "Installing pre commit hook..."
 	source $(VENV_DIR)/bin/activate && pre-commit install --install-hooks
 
-build_docker:
+build:
 	docker compose build 
 
 # DB management
@@ -44,7 +42,7 @@ run:
 	docker compose up
 
 # Host API locally, loading local env file
-local_server:
+run_local: db
 	source $(VENV_DIR)/bin/activate && \
 	uvicorn app.adaptor.into.api.app:app --reload --env-file environment/local.env
 
@@ -60,10 +58,7 @@ coverage:
 	pytest --cov-report html	
 
 lint:
-	@echo "Linting"
-	. $(VENV_DIR)/bin/activate; \
-	black python/
-	flake8 python/
+	bash ./scripts/lint.sh
 
 clean:
 	find . -type f -name '*.py[co]' -delete -o -type d -name __pycache__ -delete
