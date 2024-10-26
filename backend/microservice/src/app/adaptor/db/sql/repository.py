@@ -25,14 +25,12 @@ class SQLRepository(Repository):
     model_dto: ModelDTOType = BaseModel
 
     def __init__(self, session_manager: DatabaseSessionManager, required_filters: Optional[Dict] = None):
-        self._session_manager = session_manager
+        self._session_manager: DatabaseSessionManager = session_manager
         self._required_filters = required_filters
 
     @property
     def session(self) -> Session:
-        if not self._session_manager._session:
-            raise SessionNotInitialised
-        return self._session_manager._session
+        return self._session_manager.session
 
     def _create_engine(self):
         logger.debug("Setting up a new database engine.")

@@ -12,15 +12,10 @@ class SqlUOW(UOW):
         self._required_filters: Optional[Dict] = required_filters
         self.session_manager: DatabaseSessionManager = DatabaseSessionManager(self._db_url)
 
-    # Add transaction context manager
     @contextlib.contextmanager
     def transaction(self) -> Generator[DatabaseSessionManager, None, None]:
-        with self.session_manager.session():
+        with self.session_manager.transaction():
             yield self.session_manager
-
-    @property
-    def session(self):
-        return self.session_manager._session
 
     @property
     def example(self) -> ExampleRepository:

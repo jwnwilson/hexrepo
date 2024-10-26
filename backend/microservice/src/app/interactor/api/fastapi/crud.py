@@ -1,15 +1,16 @@
-from typing import Any, Callable, List, Optional, Type
+from typing import Callable, List, Type, TypeVar
 
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 
 from app.adaptor.db.interface import UOW, Repository
 
+ModelDTO = TypeVar("ModelDTO", bound=BaseModel)
 
 class PaginatedData(BaseModel):
-    data: Any
+    results: list[ModelDTO]
     total: int
-    page: int
+    page_size: int
     page_number: int
 
 
@@ -104,7 +105,6 @@ class CrudRouter:
         def read_multiple_records(
             uow: UOW = Depends(self.db_dependency),
         ) -> PaginatedData:  # type: ignore
-            breakpoint()
             repositry: Repository = getattr(uow, self.repository)
             return repositry.read_multi()
 

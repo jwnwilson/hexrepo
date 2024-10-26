@@ -27,10 +27,16 @@ class DatabaseSessionManager:
 
     def close(self):
         if self._engine is None:
-            raise Exception("DatabaseSessionManager is not initialized")
+            raise RuntimeError("DatabaseSessionManager is not initialized")
         self._engine.dispose()
         self._engine = None
         self._sessionmaker = None
+
+    @property
+    def session(self) -> Session:
+        if self._session is None:
+            raise RuntimeError("DatabaseSessionManager is not initialized")
+        return self._session
 
     @contextlib.contextmanager
     def connect(self) -> Iterator[Connection]:
@@ -45,7 +51,7 @@ class DatabaseSessionManager:
                 raise
 
     @contextlib.contextmanager
-    def session(self) -> Iterator[Session]:
+    def transaction(self) -> Iterator[Session]:
         if self._sessionmaker is None:
             raise Exception("DatabaseSessionManager is not initialized")
         

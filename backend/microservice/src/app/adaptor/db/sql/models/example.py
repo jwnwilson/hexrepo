@@ -4,7 +4,7 @@ from pydantic import UUID4
 from sqlalchemy import UUID, Column, Integer, String, Text, Table, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship, joinedload
 
-from ..base_repository import SQLRepository
+from ..repository import SQLRepository
 from .base_model import Base
 from app.domain.example import ExampleDTO
 
