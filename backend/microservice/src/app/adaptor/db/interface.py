@@ -1,5 +1,5 @@
 from abc import ABC
-from typing import Any, Dict, Optional, TypeVar, Generic
+from typing import Any, Dict, Generator, Optional, TypeVar, Generic
 
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
@@ -55,6 +55,9 @@ class UOW(ABC):
 
     def set_required_filters(self, required_filters: Dict):
         self._required_filters = required_filters
+
+    def transaction(self) -> Generator[Session, None, None]:
+        raise NotImplementedError
 
     @property
     def example(self) -> Repository:

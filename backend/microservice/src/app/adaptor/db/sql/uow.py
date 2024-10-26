@@ -1,5 +1,5 @@
 import contextlib
-from typing import Dict, Optional
+from typing import Dict, Generator, Optional
 
 from ..interface import UOW
 from .session import DatabaseSessionManager
@@ -10,26 +10,22 @@ class SqlUOW(UOW):
     def __init__(self, db_url: str, required_filters: Optional[Dict] = None):
         self._db_url: str = db_url
         self._required_filters: Optional[Dict] = required_filters
-        self._session = None
-        self._session_manager: DatabaseSessionManager = DatabaseSessionManager(self._db_url)
+        self.session_manager: DatabaseSessionManager = DatabaseSessionManager(self._db_url)
 
     # Add transaction context manager
     @contextlib.contextmanager
-    def transaction(self):
-        with self._session_manager.session() as session:
-            self._session = session
-            yield session
+    def transaction(self) -> Generator[DatabaseSessionManager, None, None]:
+        with self.session_manager.session():
+            yield self.session_manager
 
     @property
     def session(self):
-        if not self._sesion_manager and not self._session:
-            raise RuntimeError("Session not initialised")
-        return self._session
+        return self.session_manager.session
 
     @property
     def example(self) -> ExampleRepository:
         return ExampleRepository(
-            session=self.session, required_filters=self._required_filters
+            session=self.session_manager.session, required_filters=self._required_filters
         )
 
     # Used for testing

@@ -7,7 +7,7 @@ from sqlalchemy.engine.base import Connection, Engine
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy import event
 
-from app import config
+from app.config import config
 
 
 class DatabaseSessionManager:
@@ -23,6 +23,7 @@ class DatabaseSessionManager:
         self._engine: Engine = create_engine(host, **self._engine_args)
         self._sessionmaker = sessionmaker(autocommit=False, bind=self._engine)
         self._query_counts = {}
+        self._session: Optional[Session] = None
 
     def close(self):
         if self._engine is None:
@@ -47,18 +48,22 @@ class DatabaseSessionManager:
     def session(self) -> Iterator[Session]:
         if self._sessionmaker is None:
             raise Exception("DatabaseSessionManager is not initialized")
+        
+        if self._session:
+            return self._session
 
-        session: Session = self._sessionmaker()
-        with self.count_queries(session.connection()):
+        self._session = self._sessionmaker()
+        with self.count_queries(self._session.connection()):
             try:
-                yield session
-                session.commit()
+                yield self._session
+                self._session.commit()
             except Exception:
-                session.rollback()
+                self._session.rollback()
                 raise
             finally:
-                session.close()
+                self._session.close()
                 self.close()
+        self._session = None
 
     @contextlib.contextmanager
     def count_queries(self, conn):
