@@ -20,12 +20,12 @@ class SqlUOW(UOW):
 
     @property
     def session(self):
-        return self.session_manager.session
+        return self.session_manager._session
 
     @property
     def example(self) -> ExampleRepository:
         return ExampleRepository(
-            session=self.session_manager.session, required_filters=self._required_filters
+            session_manager=self.session_manager, required_filters=self._required_filters
         )
 
     # Used for testing

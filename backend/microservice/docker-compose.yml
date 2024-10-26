@@ -19,7 +19,7 @@ services:
     tty: true
     # Mount local files into the container so we can update files inside the container
     volumes:
-      - ./python:/code/python
+      - ./src:/code/src
     expose:
       - "8000"
     ports:

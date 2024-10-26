@@ -11,6 +11,7 @@ from sqlalchemy.orm.collections import InstrumentedList
 from app.adaptor.db.interface import PaginatedData, Repository
 from ..exception import IntegrityError, RecordNotFound, SessionNotInitialised
 from .models.base_model import Base
+from .session import DatabaseSessionManager
 
 BaseSQLModel = Base
 ModelDTOType = type[BaseModel]
@@ -19,18 +20,19 @@ logger = logging.getLogger()
 
 
 class SQLRepository(Repository):
+    # Refactor me to remove inhertance and fix bugs
     model: Any = BaseSQLModel
     model_dto: ModelDTOType = BaseModel
 
-    def __init__(self, session: Session, required_filters: Optional[Dict] = None):
-        self._session = session
+    def __init__(self, session_manager: DatabaseSessionManager, required_filters: Optional[Dict] = None):
+        self._session_manager = session_manager
         self._required_filters = required_filters
 
     @property
     def session(self) -> Session:
-        if not self._session:
+        if not self._session_manager._session:
             raise SessionNotInitialised
-        return self._session
+        return self._session_manager._session
 
     def _create_engine(self):
         logger.debug("Setting up a new database engine.")
