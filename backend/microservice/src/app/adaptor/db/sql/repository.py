@@ -2,14 +2,14 @@ import logging
 from typing import Any, Dict, Optional, TypeVar
 
 from pydantic import UUID4, BaseModel
-from sqlalchemy import asc, desc, func, select
+from sqlalchemy import UUID, Select, asc, desc, func, select
 from sqlalchemy.exc import IntegrityError as SQLIntegrityError
 from sqlalchemy.exc import MultipleResultsFound
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.collections import InstrumentedList
 
 from app.adaptor.db.interface import PaginatedData, Repository
-from ..exception import IntegrityError, RecordNotFound, SessionNotInitialised
+from ..exception import IntegrityError, RecordNotFound
 from .models.base_model import Base
 from .session import DatabaseSessionManager
 
@@ -19,32 +19,46 @@ ModelDTO = TypeVar("ModelDTO", bound=BaseModel)
 logger = logging.getLogger()
 
 
+class Query():
+    def __init__(self, model: BaseSQLModel, model_dto: ModelDTOType):
+        self.model: BaseSQLModel = model
+        self.model_dto: ModelDTOType = model_dto
+
+    def query(self) -> Select:
+        # Query to return list of entities
+        return select(self.model)
+    
+    def query_by_id(self, id: UUID) -> Select:
+        # Query to retun a single entity by id
+        return self.query().where(self.model.id == id)
+    
+    def query_total(self) -> int:
+        # Query to return total number of entities
+        return select(func.count()).select_from(self.model)
+    
+    def parse_dto(self, dto: ModelDTOType) -> ModelDTO:
+        # logic to query and add relationship data to dto
+        pass
+
+
 class SQLRepository(Repository):
     # Refactor me to remove inhertance and fix bugs
     model: Any = BaseSQLModel
     model_dto: ModelDTOType = BaseModel
 
-    def __init__(self, session_manager: DatabaseSessionManager, required_filters: Optional[Dict] = None):
+    def __init__(self, session_manager: DatabaseSessionManager, required_filters: Optional[Dict] = None, query_logic: Optional[Query] = None):
         self._session_manager: DatabaseSessionManager = session_manager
         self._required_filters = required_filters
+        self._query_logic = query_logic or Query(self.model, self.model_dto)
 
     @property
     def session(self) -> Session:
         return self._session_manager.session
 
-    def _create_engine(self):
-        logger.debug("Setting up a new database engine.")
-        return self._create_engine(self.database_uri, **self.engine_args)
-
-    def _get_query(self):
-        return select(self.model)
-
-    def _get_query_by_id(self, id):
-        return self._get_query().where(self.model.id == id)
-
     def _query_one_or_none_by_id(self, id) -> Any:
         try:
-            results = self.session.execute(self._get_query_by_id(id)).one_or_none()
+            query = self._query_logic.query_by_id(id)
+            results = self.session.execute(query).one_or_none()
         # Should this be logged here, or allowed to bomb out the request with a 500?
         except MultipleResultsFound:
             logger.warning(
@@ -58,7 +72,7 @@ class SQLRepository(Repository):
 
     def _query_one_or_none_by_multiple_fields(self, **kwargs) -> Any:
         try:
-            query = self._get_query()
+            query: Select = self._query_logic.query()
             for k, v in kwargs.items():
                 query = query.where(getattr(self.model, k) == v)
             results = self.session.execute(query).one_or_none()
