@@ -1,15 +1,20 @@
+from pydantic import BaseModel
 from app.adaptor.db.sql.models.example import ExampleDTO
 
 from ....crud import CrudRouter
 from ....dependencies import get_uow
 
 
-class CreateExampleDTO(ExampleDTO):
-    pass
+class CreateExampleDTO(BaseModel):
+    name: str
+    url: str
+    location: str
 
 
-class UpdateExampleDTO(ExampleDTO):
-    pass
+class UpdateExampleDTO(BaseModel):
+    name: str
+    url: str
+    location: str
 
 
 router_v1 = CrudRouter(
