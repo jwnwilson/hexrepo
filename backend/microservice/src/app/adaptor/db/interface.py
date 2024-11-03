@@ -1,6 +1,7 @@
 from abc import ABC
 import contextlib
 from typing import Any, Dict, Generator, Optional, TypeVar, Generic
+from uuid import UUID
 
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
@@ -16,21 +17,21 @@ class PaginatedData(BaseModel, Generic[ModelDTO]):
 
 
 class Repository(ABC):
-    def create(self, obj_in: Any) -> Any:
+    def create(self, obj_in: ModelDTO) -> Any:
         raise NotImplementedError
 
-    def read(self, id: Any) -> ModelDTO | None:  # type: ignore
+    def read(self, id: UUID) -> ModelDTO | None:  # type: ignore
         raise NotImplementedError
 
-    def update(self, id: Any) -> ModelDTO | None:  # type: ignore
+    def update(self, id: UUID) -> ModelDTO | None:  # type: ignore
         raise NotImplementedError
 
-    def delete(self, id: Any) -> ModelDTO | None:  # type: ignore
+    def delete(self, id: UUID) -> ModelDTO | None:  # type: ignore
         raise NotImplementedError
 
     def read_multi(
         self,
-        filters: Any = None,
+        filters: Optional[Dict] = None,
         page_size: int = 100,
         page_number: int = 1,
         order_by: str = "-created_at",
@@ -39,7 +40,7 @@ class Repository(ABC):
     ) -> PaginatedData:
         raise NotImplementedError
 
-    def get_offset(self, page_size, page_number):
+    def get_offset(self, page_size: int, page_number: int):
         return (page_number - 1) * page_size
 
     def paginate(self, query, page_number, page_size):
