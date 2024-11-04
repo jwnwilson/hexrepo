@@ -16,6 +16,10 @@ class SqlUOW(UOW):
     def transaction(self) -> Generator[DatabaseSessionManager, None, None]:
         with self.session_manager.transaction():
             yield self.session_manager
+            
+    @property
+    def session(self):
+        return self.session_manager.session
 
     @property
     def example(self) -> ExampleRepository:
@@ -27,9 +31,9 @@ class SqlUOW(UOW):
     def create_all(self):
         from .models.base_model import Base
 
-        Base.metadata.create_all(self._session.get_bind())
+        Base.metadata.create_all(self.session.get_bind())
 
     def drop_all(self):
         from .models.base_model import Base
 
-        Base.metadata.drop_all(self._session.get_bind())
+        Base.metadata.drop_all(self.session.get_bind())

@@ -3,8 +3,8 @@ from collections.abc import Generator
 import pytest
 from fastapi.testclient import TestClient
 
-from src.app.adaptor.db.interface import UOW
-from src.app.adaptor.db.sql.uow import SqlUOW
+from app.adaptor.db.interface import UOW
+from app.adaptor.db.sql.uow import SqlUOW
 
 # Silence SQLALchemy deprecation warning until we can upgrade
 os.environ["SQLALCHEMY_SILENCE_UBER_WARNING"] = "1"
@@ -19,10 +19,16 @@ def uow() -> Generator[UOW, None, None]:
     """
     uow = SqlUOW(db_url=SQLALCHEMY_DATABASE_URL)
     # Create tables
-    uow.init_db()
+    uow.create_all()
     # Create DB session
     with uow.transaction() as session:
         yield uow
+
+
+@pytest.fixture(scope="function", autouse=True)
+def create_tables(uow: UOW):
+    uow.drop_all()
+    uow.create_all()
 
 
 @pytest.fixture

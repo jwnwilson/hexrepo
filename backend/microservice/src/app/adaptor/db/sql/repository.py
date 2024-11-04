@@ -85,30 +85,7 @@ class SQLRepository(Repository):
 
     def _model_to_dto(self, row):
         return self.model_dto(**row.__dict__)
-
-    def create(self, obj_in: ModelDTO) -> ModelDTO:
-        db_obj: BaseSQLModel = self.query.parse_dto(obj_in)
-        try:
-            self.session.add(db_obj)
-            self.session.flush()
-        except SQLIntegrityError as err:
-            logger.warning(
-                f"DB integrity Error creating: {self.__class__.__name__}, er: {err}"
-            )
-            self.session.rollback()
-            raise IntegrityError(err.orig)
-        self.session.refresh(db_obj)
-        return self._model_to_dto(db_obj)
-
-    def read(self, id: UUID4) -> ModelDTO:
-        query_result = self._query_single(id)
-        try:
-            return self._model_to_dto(query_result)
-        except IndexError:
-            raise RecordNotFound(
-                f"Model: {self.model.__name__}, Record: {id}, not found"
-            )
-
+    
     def _filter(
         self,
         query: Select,
@@ -134,6 +111,54 @@ class SQLRepository(Repository):
             return query
         else:
             return query
+    
+    def _update_db_model_attrs(self, db_obj: BaseSQLModel, obj_in: ModelDTO, merge_objects: bool):
+        """Update db_obj with new data from obj_in, if merge_objects is True, merge the dictionary
+        attrs and replace the existing data with the new data.
+
+        Args:
+            db_obj (BaseSQLModel): existing db model to update
+            obj_in (ModelDTO): new data
+            merge_objects (bool): if true merge data, if false replace data
+        """
+        # Merge new data with existing data
+        for key, value in obj_in.model_dump(exclude_unset=True).items():
+            # Avoid updating relationships as they are handled in parse_dto
+            if type(getattr(db_obj, key)) is InstrumentedList:
+                continue
+            current_value = getattr(db_obj, key, None)
+            is_object_attr = isinstance(current_value, dict) and isinstance(
+                value, dict
+            )
+            # Merge the existing dict with new data - favours new data
+            if is_object_attr and merge_objects:
+                merged_value = {**current_value, **value}
+                setattr(db_obj, key, merged_value)
+            else:
+                setattr(db_obj, key, getattr(obj_in, key))
+
+    def create(self, obj_in: ModelDTO) -> ModelDTO:
+        db_obj: BaseSQLModel = self.query.parse_dto(obj_in)
+        try:
+            self.session.add(db_obj)
+            self.session.flush()
+        except SQLIntegrityError as err:
+            logger.warning(
+                f"DB integrity Error creating: {self.__class__.__name__}, er: {err}"
+            )
+            self.session.rollback()
+            raise IntegrityError(err.orig)
+        self.session.refresh(db_obj)
+        return self._model_to_dto(db_obj)
+
+    def read(self, id: UUID4) -> ModelDTO:
+        query_result = self._query_single(id)
+        try:
+            return self._model_to_dto(query_result)
+        except IndexError:
+            raise RecordNotFound(
+                f"Model: {self.model.__name__}, Record: {id}, not found"
+            )
 
     def read_multi(
         self,
@@ -152,23 +177,6 @@ class SQLRepository(Repository):
         return PaginatedData(
             results=results, total=total, page_size=page_size, page_number=page_number
         )
-    
-    def _update_db_model_attrs(self, db_obj: BaseSQLModel, obj_in: ModelDTO, merge_objects: bool):
-        # Merge new data with existing data
-        for key, value in obj_in.model_dump(exclude_unset=True).items():
-            # Avoid updating relationships as they are handled in parse_dto
-            if type(getattr(db_obj, key)) is InstrumentedList:
-                continue
-            current_value = getattr(db_obj, key, None)
-            is_object_attr = isinstance(current_value, dict) and isinstance(
-                value, dict
-            )
-            # Merge the existing dict with new data - favours new data
-            if is_object_attr and merge_objects:
-                merged_value = {**current_value, **value}
-                setattr(db_obj, key, merged_value)
-            else:
-                setattr(db_obj, key, getattr(obj_in, key))
 
     def update(self, id: UUID4, obj_in: ModelDTO, merge_objects=False) -> ModelDTO:
         existing_obj: BaseSQLModel = self._query_single(id)

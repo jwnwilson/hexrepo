@@ -19,7 +19,7 @@ class UpdateExampleDTO(BaseModel):
 
 router_v1 = CrudRouter(
     db_dependency=get_uow,
-    respository="example",
+    repository="example",
     methods=["CREATE", "READ", "UPDATE", "DELETE"],
     response_schema=ExampleDTO,
     create_schema=CreateExampleDTO,

@@ -14,7 +14,28 @@ class PaginatedData(BaseModel):
     page_number: int
 
 
-class CrudRouter:
+class CrudRouter(APIRouter):
+    """
+    Dynamically create Create Read Update and Delete methods for our repositories
+
+    Lots of concepts and ideas stolen from this project:
+    https://github.com/awtkns/fastapi-crudrouter
+
+    Has the ability to be overriden with regular router functons e.g.
+
+    router_v1 = CrudRouter(
+        repo_dependency=get_repos,
+        repository="company",
+        methods=["CREATE", "READ", "UPDATE", "DELETE"],
+        response_schema=CompanyDTO,
+        create_schema=CreateCompanyDTO,
+        update_schema=UpdateCompanyDTO,
+    )
+
+    @router_v1.get("/")
+    def override_read_multi():
+        return "test"
+    """
     response_schema: Type[BaseModel]
     create_schema: Type[BaseModel]
     update_schema: Type[BaseModel]
@@ -22,14 +43,14 @@ class CrudRouter:
     def __init__(
         self,
         db_dependency: Callable,
-        respository: str,
+        repository: str,
         response_schema: Type[BaseModel],
         methods: List[str],
         create_schema: Type[BaseModel],
         update_schema: Type[BaseModel],
     ):
         self.db_dependency: Callable = db_dependency
-        self.repository: str = respository
+        self.repository: str = repository
         self.methods = methods or ["READ"]
 
         self.response_schema: Type[BaseModel] = response_schema
