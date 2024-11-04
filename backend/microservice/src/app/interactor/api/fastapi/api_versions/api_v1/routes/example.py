@@ -1,3 +1,4 @@
+from typing import Optional
 from pydantic import BaseModel
 from app.adaptor.db.sql.models.example import ExampleDTO
 
@@ -12,9 +13,9 @@ class CreateExampleDTO(BaseModel):
 
 
 class UpdateExampleDTO(BaseModel):
-    name: str
-    url: str
-    location: str
+    name: Optional[str] = None
+    url: Optional[str] = None
+    location: Optional[str] = None
 
 
 router_v1 = CrudRouter(
@@ -24,4 +25,4 @@ router_v1 = CrudRouter(
     response_schema=ExampleDTO,
     create_schema=CreateExampleDTO,
     update_schema=UpdateExampleDTO,
-).router
+)

@@ -8,7 +8,7 @@ api_router_v1 = APIRouter()
 api_router_v1.include_router(
     healthcheck_router,
     tags=["Healthcheck"],
-    prefix="/heathcheck",
+    prefix="/healthcheck",
 )
 api_router_v1.include_router(
     example_router,

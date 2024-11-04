@@ -5,6 +5,7 @@ from fastapi.testclient import TestClient
 
 from app.adaptor.db.interface import UOW
 from app.adaptor.db.sql.uow import SqlUOW
+from app.domain.example import ExampleDTO
 
 # Silence SQLALchemy deprecation warning until we can upgrade
 os.environ["SQLALCHEMY_SILENCE_UBER_WARNING"] = "1"
@@ -18,8 +19,6 @@ def uow() -> Generator[UOW, None, None]:
     Return db adaptor with initialised DB & DB session.
     """
     uow = SqlUOW(db_url=SQLALCHEMY_DATABASE_URL)
-    # Create tables
-    uow.create_all()
     # Create DB session
     with uow.transaction() as session:
         yield uow
@@ -41,3 +40,18 @@ def client(uow):
 
     app.dependency_overrides[get_uow] = get_uow_override
     return TestClient(app)
+
+
+@pytest.fixture
+def example_data():
+    return {
+        "name": "test",
+        "url": "https://test.com",
+        "location": "test location",
+    }
+
+
+@pytest.fixture
+def created_example(client: TestClient, example_data) -> ExampleDTO:
+    response = client.post("/api/v1/example/", json=example_data)
+    return ExampleDTO(**response.json())

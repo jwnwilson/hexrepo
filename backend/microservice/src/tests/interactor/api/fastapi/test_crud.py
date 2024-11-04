@@ -1,7 +1,7 @@
 from datetime import datetime
 from uuid import UUID
 
-from fastapi import FastAPI
+from fastapi import APIRouter, FastAPI
 from fastapi.testclient import TestClient
 import pytest
 from pydantic import BaseModel
@@ -85,24 +85,6 @@ class MockUOW:
     @property
     def session(self):
         return Mock()
-
-
-@pytest.fixture
-def client():
-    def get_repos():
-        return MockUOW()
-
-    router = CrudRouter(
-        db_dependency=get_repos,
-        repository="repository",
-        response_schema=MockResponseSchema,
-        methods=["CREATE", "READ", "UPDATE", "DELETE"],
-        create_schema=MockCreateSchema,
-        update_schema=MockUpdateSchema,
-    )
-    app = FastAPI()
-    app.include_router(router)
-    return TestClient(app)
 
 
 @pytest.fixture
