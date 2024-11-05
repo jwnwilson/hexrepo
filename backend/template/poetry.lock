@@ -920,7 +920,7 @@ sqlalchemy = ["sqlalchemy (>=1.4.29)"]
 [[package]]
 name = "psycopg2"
 version = "2.9.10"
-description = "psycopg2 - Python-PostgreSQL Database Adapter"
+description = "psycopg2 - Python-PostgreSQL Database Adaptor"
 optional = false
 python-versions = ">=3.8"
 files = [

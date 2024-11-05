@@ -21,4 +21,4 @@ RUN poetry config repositories.${REPO} $CODEARTIFACT_REPOSITORY_URL && \
 ADD ./src ${LAMBDA_TASK_ROOT}/src
 
 ENV PYTHONPATH ${LAMBDA_TASK_ROOT}/app
-CMD ["src.app.adapter.into.fastapi.lambda.handler"]
+CMD ["src.app.adaptor.into.fastapi.lambda.handler"]

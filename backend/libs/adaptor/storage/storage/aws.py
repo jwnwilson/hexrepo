@@ -4,33 +4,43 @@ from typing import List
 
 import boto3
 
-from .interface import StorageAdapter, StorageData, UploadUrlData, StorageConfig
+from .interface import StorageAdaptor, StorageData, UploadUrlData, StorageConfig
 from .config import config
 
 logger = logging.getLogger(__name__)
 
 
-class S3Adapter(StorageAdapter):
+class S3Adaptor(StorageAdaptor):
     def __init__(self, storage_config: StorageConfig) -> None:
-        self.bucket_name = config["bucket"]
+        self.bucket_name = config.aws_bucket
         self.s3 = boto3.resource("s3")
         self.client = boto3.client("s3")
         self.bucket = self.s3.Bucket(self.bucket_name)
-        self.user = config.get("user", "")
+        self.user = storage_config.auth.get("user")
         self.upload_prefix = storage_config.aws_upload_prefix
+        self.upload_user_access_id = storage_config.auth.get("upload_user_access_id")
+        self.upload_user_secret_key = storage_config.auth.get("upload_user_secret_key")
+        self.public_url_timeout = config.public_url_timeout
+        self._upload_client = None
+
+        if not self.user:
+            raise RuntimeError("Auth user is not set")
+        if not self.upload_prefix:
+            raise RuntimeError("Upload prefix is not set")
+        if not self.upload_user_access_id:
+            raise RuntimeError("Upload access id is not set")
+        if not self.upload_user_secret_key:
+            raise RuntimeError("Upload secret key is not set")
 
         self.url_prefix = (
-            f"https://{self.bucket_name}.s3-{config.AWS_DEFAULT_REGION}.amazonaws.com/"
+            f"https://{self.bucket_name}.s3-{config.aws_default_region}.amazonaws.com/"
         )
-        self.upload_user_access_id = (
-            f"/{self.upload_prefix}/upload_access_id_{config.environment}"
-        )
-        self.upload_user_secret_key = (
-            f"/{self.upload_prefix}/upload_secret_key_{config.environment}"
-        )
-        self.public_url_timeout = 3600
 
-    def _get_upload_client(self):
+    @property
+    def upload_client(self):
+        if self._upload_client:
+            return self._upload_client
+        
         client = boto3.client("ssm")
         access_id = client.get_parameter(
             Name=self.upload_user_access_id, WithDecryption=True
@@ -43,6 +53,7 @@ class S3Adapter(StorageAdapter):
             aws_access_key_id=access_id["Parameter"]["Value"],
             aws_secret_access_key=secret_key["Parameter"]["Value"],
         )
+        self._upload_client = s3_client
 
         return s3_client
 
@@ -54,21 +65,18 @@ class S3Adapter(StorageAdapter):
         return key
 
     def get_public_url(self, storage_path: str) -> str:
-        key = self.generate_key(self.user, storage_path)
-        public_url: str = self._get_upload_client().generate_presigned_url(
+        public_url: str = self.upload_client.generate_presigned_url(
             "get_object",
-            Params={"Bucket": self.bucket_name, "Key": key},
+            Params={"Bucket": self.bucket_name, "Key": storage_path},
             ExpiresIn=self.public_url_timeout,
         )
         return public_url
 
-    def create_folder(self, path):
-        path = self.generate_key(self.user, path)
+    def create_folder(self, path: str):
         self.client.put_object(Bucket=self.bucket_name, Body="", Key=path)
 
     def upload_url(self, path: str) -> UploadUrlData:
-        path = self.generate_key(self.user, path)
-        upload_data = self._get_upload_client().generate_presigned_post(
+        upload_data = self.upload_client.generate_presigned_post(
             Bucket=self.bucket_name, Key=path, ExpiresIn=self.public_url_timeout
         )
         return UploadUrlData(
@@ -78,7 +86,7 @@ class S3Adapter(StorageAdapter):
     def list(
         self, path: str, include_files=True, include_folders=True, as_urls=False
     ) -> List[str]:
-        prefix = self.generate_key(self.user, path)
+        prefix: str = path
         objs = self.client.list_objects_v2(
             Bucket=self.bucket_name, Prefix=prefix, Delimiter="/"
         )
@@ -94,7 +102,6 @@ class S3Adapter(StorageAdapter):
         return sorted(results)
 
     def save(self, source_path: str, target_path: str) -> StorageData:
-        target_path = self.generate_key(self.user, target_path)
         logger.info(
             f"Saving file: {source_path} to s3 bucket: {self.bucket_name}, key: {target_path}"
         )
@@ -108,3 +115,6 @@ class S3Adapter(StorageAdapter):
         target_dir = "/".join(target_path.split("/")[:-1])
         os.makedirs(target_dir, exist_ok=True)
         self.client.download_file(self.bucket_name, source_path, target_path)
+
+    def delete(self, path: str):
+        self.client.delete_object(Bucket=self.bucket_name, Key=path)

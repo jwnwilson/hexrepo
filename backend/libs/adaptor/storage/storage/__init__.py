@@ -1,2 +1,2 @@
-from .interface import StorageAdapter
-from .aws import AWSStorage
+from .interface import StorageAdaptor
+from .aws import S3Adaptor
