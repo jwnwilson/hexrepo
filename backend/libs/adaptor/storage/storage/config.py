@@ -17,9 +17,7 @@ class Config(BaseSettings):
     public_url_timeout: int = 3600
 
     # AWS storage config
-    aws_default_region: Optional[str] = os.environ.get("AWS_DEFAULT_REGION", "eu-west-1")
-    aws_bucket: Optional[str] = os.environ.get(["AWS_BUCKET"])
-    
+    aws_default_region: Optional[str] = os.environ.get("AWS_DEFAULT_REGION", "eu-west-1")    
 
 
 config = Config()  # type: ignore

@@ -12,14 +12,14 @@ logger = logging.getLogger(__name__)
 
 class S3Adaptor(StorageAdaptor):
     def __init__(self, storage_config: StorageConfig) -> None:
-        self.bucket_name = config.aws_bucket
+        self.bucket_name = storage_config.aws_bucket
         self.s3 = boto3.resource("s3")
         self.client = boto3.client("s3")
         self.bucket = self.s3.Bucket(self.bucket_name)
-        self.user = storage_config.auth.get("user")
+        self.user = storage_config.aws_auth.get("user")
         self.upload_prefix = storage_config.aws_upload_prefix
-        self.upload_user_access_id = storage_config.auth.get("upload_user_access_id")
-        self.upload_user_secret_key = storage_config.auth.get("upload_user_secret_key")
+        self.upload_user_access_id = storage_config.aws_auth.get("upload_user_access_id")
+        self.upload_user_secret_key = storage_config.aws_auth.get("upload_user_secret_key")
         self.public_url_timeout = config.public_url_timeout
         self._upload_client = None
 
@@ -118,3 +118,4 @@ class S3Adaptor(StorageAdaptor):
 
     def delete(self, path: str):
         self.client.delete_object(Bucket=self.bucket_name, Key=path)
+        logger.info(f"Deleted file: {path} from s3 bucket: {self.bucket_name}")

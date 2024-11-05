@@ -14,7 +14,8 @@ class UploadUrlData(BaseModel):
 
 
 class StorageConfig(BaseModel):
-    auth: dict
+    aws_auth: dict
+    aws_bucket: str
     aws_upload_prefix: Optional[str] = None
 
 

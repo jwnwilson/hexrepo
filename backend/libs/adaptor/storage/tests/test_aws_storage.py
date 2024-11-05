@@ -1,23 +1,29 @@
 import pytest 
 from storage.aws import S3Adaptor
+from storage.interface import StorageConfig
 
 
 @pytest.fixture
-def aws_config():
-    return {
-        "bucket": "test-bucket",
-        "aws_upload_prefix": "test-upload-prefix"
-    }
+def aws_config() -> StorageConfig:
+    return StorageConfig(
+        aws_auth={
+            "user": "test-user",
+            "upload_user_access_id": "test-access-id",
+            "upload_user_secret_key": "test-secret"
+        },
+        aws_bucket="test-bucket",
+        aws_upload_prefix="test-upload-prefix"
+    )
 
 
 @pytest.fixture
-def clear_test_folder(aws_config):
+def clear_test_folder(aws_config: StorageConfig):
     storage_adaptor = S3Adaptor(storage_config=aws_config)
-    storage_adaptor.delete_folder("test_folder")
+    storage_adaptor.delete("test_folder")
 
 
 @pytest.mark.e2e
-def test_aws_storage_e2e(aws_config, clear_test_folder):
+def test_aws_storage_e2e(aws_config: StorageConfig, clear_test_folder):
     # Assert credentials are set
     storage_adaptor = S3Adaptor(aws_config)
 
