@@ -5,30 +5,28 @@ from typing import List
 import boto3
 
 from .interface import StorageAdapter, StorageData, UploadUrlData, StorageConfig
-
-ENVIRONMENT = os.environ.get("ENVIRONMENT", "")
-AWS_DEFAULT_REGION = os.environ.get("AWS_DEFAULT_REGION", "eu-west-1")
+from .config import config
 
 logger = logging.getLogger(__name__)
 
 
 class S3Adapter(StorageAdapter):
-    def __init__(self, config: StorageConfig) -> None:
+    def __init__(self, storage_config: StorageConfig) -> None:
         self.bucket_name = config["bucket"]
         self.s3 = boto3.resource("s3")
         self.client = boto3.client("s3")
         self.bucket = self.s3.Bucket(self.bucket_name)
         self.user = config.get("user", "")
-        self.upload_prefix = config.get("upload_prefix", "")
+        self.upload_prefix = storage_config.aws_upload_prefix
 
         self.url_prefix = (
-            f"https://{self.bucket_name}.s3-{AWS_DEFAULT_REGION}.amazonaws.com/"
+            f"https://{self.bucket_name}.s3-{config.AWS_DEFAULT_REGION}.amazonaws.com/"
         )
         self.upload_user_access_id = (
-            f"/{self.upload_prefix}/upload_access_id_{ENVIRONMENT}"
+            f"/{self.upload_prefix}/upload_access_id_{config.environment}"
         )
         self.upload_user_secret_key = (
-            f"/{self.upload_prefix}/upload_secret_key_{ENVIRONMENT}"
+            f"/{self.upload_prefix}/upload_secret_key_{config.environment}"
         )
         self.public_url_timeout = 3600
 

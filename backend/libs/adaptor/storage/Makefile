@@ -14,3 +14,22 @@ venv:
 	pip install poetry && \
 	poetry install
 
+test:
+	@echo "Running tests..."
+	. $(VENV_DIR)/bin/activate; \
+	pytest
+
+lint:
+	@echo "Linting"
+	. $(VENV_DIR)/bin/activate; \
+	black python/
+	flake8 python/
+
+clean:
+	find . -type f -name '*.py[co]' -delete -o -type d -name __pycache__ -delete
+
+publish:
+	@echo "Publishing package..."
+	. $(VENV_DIR)/bin/activate; \
+	poetry publish --build
+
