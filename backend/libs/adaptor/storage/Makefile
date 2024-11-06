@@ -31,5 +31,7 @@ clean:
 publish:
 	@echo "Publishing package..."
 	. $(VENV_DIR)/bin/activate; \
+	poetry config repositories.foo https://pypi.example.org/legacy/
+	poetry config http-basic.foo $(USERNAME) $(PASSWORD)
 	poetry publish --build
 
