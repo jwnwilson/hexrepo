@@ -73,7 +73,9 @@ class S3Adaptor(StorageAdaptor):
         return public_url
 
     def create_folder(self, path: str):
-        self.client.put_object(Bucket=self.bucket_name, Body="", Key=path)
+        if not path.endswith("/"):
+            path = path + "/"
+        self.client.put_object(Bucket=self.bucket_name, Key=path)
 
     def upload_url(self, path: str) -> UploadUrlData:
         upload_data = self.upload_client.generate_presigned_post(
@@ -88,7 +90,7 @@ class S3Adaptor(StorageAdaptor):
     ) -> List[str]:
         prefix: str = path
         objs = self.client.list_objects_v2(
-            Bucket=self.bucket_name, Prefix=prefix, Delimiter="/"
+            Bucket=self.bucket_name, Prefix=prefix
         )
         results: List[str] = []
         if include_files:
