@@ -2,12 +2,12 @@
 
 - Setup backend
     - create better cli tools for the following
-    - Setup re-usable lib
     - Setup easy lib development
         https://github.com/python-poetry/poetry/issues/9611
+    - Add db adpator logic
+    - Update db template with db adaptor
     - Setup lib deployment to infra
     - Add create project script
-    - Add create library script
     - Add storage libs for gcp, aws, azure
     - Setup async tasks
     - Setup IaaC

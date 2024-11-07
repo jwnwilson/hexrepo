@@ -16,12 +16,15 @@ def create_be_library():
     # CD to libs/src/adaptor or libs/src/interactor folder
     os.chdir(f"backend/libs/src/{library_type}")
     # Run cookie cutter command to copy template
-    cookiecutter("../../template")
+    cookiecutter("../../../templates/library")
 
 
 @app.command()
 def create_be_project():
-    pass
+    # CD to projects folder
+    os.chdir(f"backend/projects")
+    # Run cookie cutter command to copy template
+    cookiecutter("../../../templates/project")
 
 
 @app.command()
