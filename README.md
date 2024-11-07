@@ -5,6 +5,7 @@
     - Setup easy lib development
         https://github.com/python-poetry/poetry/issues/9611
     - Add db adpator logic
+        - Need a way to add adpator folders to project for models and alembic models
     - Update db template with db adaptor
     - Setup lib deployment to infra
     - Add create project script
