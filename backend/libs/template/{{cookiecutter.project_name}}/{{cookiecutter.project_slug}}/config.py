@@ -13,11 +13,7 @@ class Config(BaseSettings):
     These parameters can be configured
     with environment variables.
     """
-    environment: str = os.environ.get("environment", "dev") 
-    public_url_timeout: int = 3600
-
-    # AWS storage config
-    aws_default_region: Optional[str] = os.environ.get("AWS_DEFAULT_REGION", "eu-west-1")    
+    environment: str = os.environ.get("environment", "dev")    
 
 
 config = Config()  # type: ignore

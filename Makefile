@@ -14,10 +14,11 @@ venv:
 	pip install poetry && \
 	poetry install
 
-create_project:
+create_be_project:
 	@echo "Creating project..."
 	poetry new $(PROJECT_NAME)
 
-create_library:
+create_be_library:
 	@echo "Creating library..."
-	poetry new $(LIBRARY_NAME)	
+	. $(VENV_DIR)/bin/activate; \
+	python cli.py create-be-library
