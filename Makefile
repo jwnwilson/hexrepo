@@ -14,10 +14,12 @@ venv:
 	pip install poetry && \
 	poetry install
 
+# Add a check to run venv if it hasn't been run
 create_be_project:
 	@echo "Creating project..."
 	poetry new $(PROJECT_NAME)
 
+# Add a check to run venv if it hasn't been run
 create_be_library:
 	@echo "Creating library..."
 	. $(VENV_DIR)/bin/activate; \
