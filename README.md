@@ -1,6 +1,7 @@
 # To Do
 
 - Setup backend
+    - create better cli tools for the following
     - Setup re-usable lib
     - Setup easy lib development
     - Setup lib deployment to infra
