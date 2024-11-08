@@ -29,6 +29,11 @@ def create_be_project():
 
 @app.command()
 def add_be_library():
+    # Install library locally in poetry dev group
+
+    # Install library from repo if available
+
+    # Call library install hook
     pass
 
 

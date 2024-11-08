@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Dict, Optional, TypeVar
+from typing import Any, Dict, Optional
 
 from pydantic import UUID4, BaseModel
 from sqlalchemy import UUID, Row, Select, asc, desc, func, select
@@ -8,7 +8,7 @@ from sqlalchemy.exc import MultipleResultsFound
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.collections import InstrumentedList
 
-from app.adaptor.db.interface import PaginatedData, Repository
+from ..interface import PaginatedData, Repository
 from ..exception import IntegrityError, RecordNotFound
 from .session import DatabaseSessionManager
 from .interface import Query, BaseSQLModel, ModelDTOType, ModelDTO
