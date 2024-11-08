@@ -4,6 +4,5 @@
     "project_short_description": "A short description of the project",
     "full_name": "Your name",
     "email": "Your address email (you@example.com)",
-    "release_date": "{% now 'local' %}",
     "version": "0.0.0"
 }

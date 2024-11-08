@@ -1,1 +1,1 @@
-# To Do
+# {{cookiecutter.project_name}} Project

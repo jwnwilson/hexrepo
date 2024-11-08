@@ -1,14 +1,16 @@
 # To Do
 
 - Setup backend
+    - Add create project script
+        - Add sql and storage library to it
     - Add db adpator logic  
         - Need a way to add adpator folders to project for models and alembic models
+        - Add [aws],[gcp],[azure] install options
     - Setup easy lib development
-        https://github.com/python-poetry/poetry/issues/9611
+        - https://github.com/python-poetry/poetry/issues/9611
     
     - Update db template with db adaptor
     - Setup lib deployment to infra
-    - Add create project script
     - Add storage libs for gcp, aws, azure
     - Setup async tasks
     - Setup IaaC

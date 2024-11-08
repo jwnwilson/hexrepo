@@ -6,10 +6,10 @@
 version: '3'
 services:
   api:
-    container_name: example_api
+    container_name: {{cookiecutter.project_slug}}
     env_file:
       - env/docker.env
-    image: "example-api"
+    image: "{{cookiecutter.project_slug}}"
     build: 
       args:
         CONTEXT: local
@@ -28,7 +28,7 @@ services:
       - postgres_db
 
   postgres_db:
-    container_name: example_db
+    container_name: {{cookiecutter.project_slug}}_db
     restart: unless-stopped
     image: postgres:15
     volumes:
@@ -36,7 +36,7 @@ services:
       - ./scripts:/code/scripts
       - postgres_db:/var/lib/postgresql/data
     environment:
-      - POSTGRES_MULTIPLE_DATABASES=example_db,test_db
+      - POSTGRES_MULTIPLE_DATABASES={{cookiecutter.project_slug}}_db,test_db
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password
     env_file:
