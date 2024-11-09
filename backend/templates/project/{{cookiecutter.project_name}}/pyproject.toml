@@ -17,11 +17,7 @@ psycopg2 = "^2.9.10"
 alembic = "^1.13.3"
 gevent = "^24.10.3"
 
-[tool.poetry.group.prod.dependencies]
-monorepo-storage = "0.1.0"
-
 [tool.poetry.group.dev.dependencies]
-monorepo-storage = { path = "../libs/src/adaptor/storage", develop = true, optional = true }
 pytest = "^8.3.3"
 mypy = "^1.13.0"
 black = "^24.10.0"

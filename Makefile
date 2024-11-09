@@ -17,7 +17,8 @@ venv:
 # Add a check to run venv if it hasn't been run
 create_be_project:
 	@echo "Creating project..."
-	poetry new $(PROJECT_NAME)
+	. $(VENV_DIR)/bin/activate; \
+	python cli.py create-be-project
 
 # Add a check to run venv if it hasn't been run
 create_be_library:

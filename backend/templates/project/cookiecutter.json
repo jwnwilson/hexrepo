@@ -5,6 +5,12 @@
     "full_name": "Your name",
     "email": "Your address email (you@example.com)",
     "version": "0.0.0",
-    "cloud_provider": "aws",
-    "libraries": "adaptor/db,adaptor/storage"
+    "cloud_provider": [
+        "aws",
+        "azure",
+        "gcp"
+    ],
+    "feature_sql": true,
+    "feature_nosql": false,
+    "feature_storage": true
 }
