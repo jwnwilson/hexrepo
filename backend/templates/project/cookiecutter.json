@@ -4,5 +4,7 @@
     "project_short_description": "A short description of the project",
     "full_name": "Your name",
     "email": "Your address email (you@example.com)",
-    "version": "0.0.0"
+    "version": "0.0.0",
+    "cloud_provider": "aws",
+    "libraries": "adaptor/db,adaptor/storage"
 }

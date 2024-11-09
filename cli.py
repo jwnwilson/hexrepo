@@ -24,7 +24,7 @@ def create_be_project():
     # CD to projects folder
     os.chdir(f"backend/projects")
     # Run cookie cutter command to copy template
-    cookiecutter("../../../templates/project")
+    cookiecutter("../templates/project")
 
 
 @app.command()
