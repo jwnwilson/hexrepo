@@ -14,7 +14,7 @@ def copy_boilerplate_code_to_project(project_path: str):
     # Need to ensure this is run from the lib path
     for source in copy_folders_files:
         destination = copy_folders_files[source]
-        logger.infio(f"Copying {source} to {project_path}/{destination}")
+        logger.info(f"Copying {source} to {project_path}/{destination}")
         os.system(f"cp -r {source} {project_path}/{destination}")
         
 

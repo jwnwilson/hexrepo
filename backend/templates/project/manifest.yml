@@ -1,0 +1,13 @@
+features:
+  - name: sql
+    enabled: {{cookiecutter.sql|lower}}
+    resources:
+      - src/app/adaptor/db/sql
+  - name: nosql
+    enabled: {{cookiecutter.nosql|lower}}
+    resources:
+      - src/app/adaptor/db/nosql
+  - name: storage
+    enabled: {{cookiecutter.storage|lower}}
+    resources:
+      - src/app/adaptor/storage
