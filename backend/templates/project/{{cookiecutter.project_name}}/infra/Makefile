@@ -10,22 +10,13 @@ TF_VAR_aws_region=${AWS_DEFAULT_REGION}
 { % endif %}
 
 init:
-	cd tf && terraform init -input=false
+	cd tf/{{cookiecutter.cloud_provider}}  && terraform init -input=false
 
 plan:
-	cd tf && terraform plan -out tfapply
+	cd tf/{{cookiecutter.cloud_provider}}  && terraform plan -out tfapply
 
 apply:
-	cd tf && terraform apply -auto-approve tfapply
+	cd tf/{{cookiecutter.cloud_provider}}  && terraform apply -auto-approve tfapply
 
 destroy:
-	cd tf && terraform destroy
-
-init_pipeline:
-	cd tf_pipeline && terraform init
-
-apply_pipeline:
-	cd tf_pipeline && terraform apply
-
-destroy_pipeline:
-	cd tf_pipeline && terraform destroy
+	cd tf/{{cookiecutter.cloud_provider}}  && terraform destroy

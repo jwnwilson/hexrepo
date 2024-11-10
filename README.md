@@ -1,21 +1,18 @@
 # To Do
 
 - Setup backend
+    - Setup infra for libs
+    - Setup infra for projects
     - Add db adpator logic  
-         
         - Add aws, gcp, azure options to library installs
-    - Setup easy lib development
+    - Setup easy lib development with prod groups
         - https://github.com/python-poetry/poetry/issues/9611
     - Add ability to update project from template
-        - Use cruft to update projects from template?
-    
-    - Update db template with db adaptor
-    - Setup lib deployment to infra
+        - Use cruft to update projects from template?    
     - Add storage libs for gcp, aws, azure
     - Setup async tasks
     - Setup IaaC
     - Setup pipeline
-    - Automate via cookie cutter
 
 - Setup Frontend
     - Setup micro fe
