@@ -1,10 +1,12 @@
 from abc import ABC
 import contextlib
-from typing import Any, Dict, Generator, Optional, TypeVar, Generic
+from typing import Any, Dict, Generator, Optional, TypeVar, Generic, TYPE_CHECKING
 from uuid import UUID
 
 from pydantic import BaseModel
-from sqlalchemy.orm import Session
+
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
 
 ModelDTO = TypeVar("ModelDTO", bound=BaseModel)
 
@@ -59,7 +61,7 @@ class UOW(ABC):
         self._required_filters = required_filters
 
     @contextlib.contextmanager
-    def transaction(self) -> Generator[Session, None, None]:
+    def transaction(self) -> Generator["Session", None, None]:
         raise NotImplementedError
 
     @property

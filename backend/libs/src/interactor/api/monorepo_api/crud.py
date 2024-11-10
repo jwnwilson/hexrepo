@@ -4,11 +4,13 @@ from logging import getLogger
 from typing import Any, Callable, List, Optional, Type, Union
 from uuid import UUID
 
-from app.adaptor.db.exception import IntegrityError, InvalidArgument, RecordNotFound
-from app.adaptor.db.interface import PaginatedData, UOW, Repository
 from fastapi import APIRouter, Depends, HTTPException, Response
 from fastapi.types import DecoratedCallable
 from pydantic import BaseModel
+
+from monorepo_db.exception import IntegrityError, InvalidArgument, RecordNotFound
+from monorepo_db.interface import PaginatedData, UOW, Repository
+
 
 logger = getLogger()
 

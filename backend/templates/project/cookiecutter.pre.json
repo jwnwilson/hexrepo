@@ -4,6 +4,7 @@
         "azure",
         "gcp"
     ],
+    "use_api": "y",
     "use_db": "y",
     "use_db_logic": [
         "sql",
@@ -14,8 +15,9 @@
         "use_db_logic": "{{ cookiecutter.use_db != 'n' }}"
     },
     "__prompts__": {
-        "use_db": "Do you want to use a database?",
-        "use_storage": "Do you want to use a storage service?",
+        "use_api": "Do you want fastapi?",
+        "use_db": "Do you want a database?",
+        "use_storage": "Do you want a storage service?",
         "use_db_logic": {
             "__prompt__": "Select the db storage method",
             "sql": "Add Sqlalchemy to project",

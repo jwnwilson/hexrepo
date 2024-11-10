@@ -7,3 +7,7 @@ features:
     enabled: {{cookiecutter.use_storage}}
     resources:
       - src/app/adaptor/storage
+  - name: api
+    enabled: {{cookiecutter.use_api}}
+    resources:
+      - src/app/interactor/api

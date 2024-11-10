@@ -7,7 +7,7 @@ from sqlalchemy.engine.base import Connection, Engine
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy import event
 
-from app.config import config
+from monorepo_db.config import config
 
 
 class DatabaseSessionManager:

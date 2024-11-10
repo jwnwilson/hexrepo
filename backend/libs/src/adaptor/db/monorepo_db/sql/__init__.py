@@ -1,2 +1,2 @@
-from .uow import SqlUOW
+from .uow import BaseSqlUOW
 from .session import DatabaseSessionManager

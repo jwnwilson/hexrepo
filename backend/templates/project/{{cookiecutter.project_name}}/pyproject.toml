@@ -24,6 +24,9 @@ monorepo-storage = {path = "../../libs/src/adaptor/storage", develop = true}
 {% if cookiecutter.use_db %}
 monorepo-db = {path = "../../libs/src/adaptor/db", develop = true}
 {% endif %}
+{% if cookiecutter.use_api %}
+monorepo-api = {path = "../../libs/src/interactor/api", develop = true}
+{% endif %}
 pytest = "^8.3.3"
 mypy = "^1.13.0"
 black = "^24.10.0"

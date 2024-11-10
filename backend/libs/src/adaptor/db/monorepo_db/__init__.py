@@ -1,1 +1,1 @@
-from .sql.uow import BaseSqlUOW
+from .interface import UOW

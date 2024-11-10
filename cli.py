@@ -8,10 +8,14 @@ app = typer.Typer()
 
 @app.command()
 def create_be_library():
-    library_type: str = typer.prompt("Please enter the library type (adaptor/interactor)")
-    if library_type not in ["adaptor", "interactor"]:
+    print("Please enter the library type:")
+    print("1 - adaptor")
+    print("2 - interactor")
+    library_option: str = typer.prompt("Choose from [1, 2]")
+    if library_option not in ["1", "2"]:
         typer.echo("Invalid library type. Please enter either 'adaptor' or 'interactor'.")
         return
+    library_type = {"1": "adaptor", "2": "interactor"}[library_option]
 
     # CD to libs/src/adaptor or libs/src/interactor folder
     os.chdir(f"backend/libs/src/{library_type}")
