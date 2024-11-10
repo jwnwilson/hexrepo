@@ -2,11 +2,12 @@
 
 - Setup backend
     - Add db adpator logic  
-         - Add ability to boiler plate code for features
-            - Add boiler plate to template update with cruft?
+         
         - Add aws, gcp, azure options to library installs
     - Setup easy lib development
         - https://github.com/python-poetry/poetry/issues/9611
+    - Add ability to update project from template
+        - Use cruft to update projects from template?
     
     - Update db template with db adaptor
     - Setup lib deployment to infra
