@@ -9,6 +9,11 @@ venv:
 	@echo "Creating virtual environment..."
 	./tools/setup_env.sh
 
+setup:
+	@echo "Setting up monorep..."
+	. $(VENV_DIR)/bin/activate; \
+	python cli.py setup
+
 be_project: venv
 	@echo "Creating project..."
 	. $(VENV_DIR)/bin/activate; \

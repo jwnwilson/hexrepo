@@ -41,5 +41,15 @@ def add_be_library():
     pass
 
 
+@app.command()
+def setup():
+    # Save env vars in ~/.bashrc or ~/.zshrc
+    # Pick ~/.bashrc or ~/.zshrc based on shell
+    # Check if env vars exist
+    # if not prompt user to enter them
+    # Add envs to ~/.bashrc or ~/.zshrc
+    pass
+
+
 if __name__ == "__main__":
     app()

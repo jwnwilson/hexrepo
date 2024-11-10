@@ -1,3 +1,9 @@
+# Python / Typescript Monorepo
+
+## Setup - AWS
+
+Setup the following env vars directly or via `make setup`
+
 # To Do
 
 - Setup backend

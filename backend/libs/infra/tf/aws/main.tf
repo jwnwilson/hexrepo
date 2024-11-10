@@ -1,7 +1,7 @@
 terraform {
   backend "s3" {
     region = "eu-west-1"
-    bucket = "jwnwilson-monorepo"
+    bucket = "monorepo-jwn"
     key = "terraform.tfstate"
   }
   required_providers {
