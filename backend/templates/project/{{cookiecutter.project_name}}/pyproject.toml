@@ -18,10 +18,10 @@ alembic = "^1.13.3"
 gevent = "^24.10.3"
 
 [tool.poetry.group.dev.dependencies]
-{% if cookiecutter.feature_storage %}
+{% if cookiecutter.use_storage %}
 monorepo-storage = {path = "../../libs/src/adaptor/storage", develop = true}
 {% endif %}
-{% if cookiecutter.feature_db %}
+{% if cookiecutter.use_db %}
 monorepo-db = {path = "../../libs/src/adaptor/db", develop = true}
 {% endif %}
 pytest = "^8.3.3"

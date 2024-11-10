@@ -34,12 +34,12 @@ def install_libraries():
     print("Skipping library install until library repo is available")
     return
     CLOUD_PROVIDER = "{{ cookiecutter.cloud_provider }}"
-    feature_db = '{{ cookiecutter.feature_db }}'
-    feature_storage = '{{ cookiecutter.feature_storage }}'
-    if feature_db:
+    use_db = '{{ cookiecutter.use_db }}'
+    use_storage = '{{ cookiecutter.use_storage }}'
+    if use_db:
         logger.info( f"installing library: db" )
         os.system(f"poetry add monorepo_db -G prod")
-    if feature_storage:
+    if use_storage:
         logger.info( f"installing library: storage" )
         os.system(f"poetry add monorepo_storage -G prod")
 
