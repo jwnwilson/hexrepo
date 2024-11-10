@@ -3,10 +3,9 @@ from typing import Dict, Generator, Optional
 
 from ..interface import UOW
 from .session import DatabaseSessionManager
-from .models.example import ExampleRepository
 
 
-class SqlUOW(UOW):
+class BaseSqlUOW(UOW):
     def __init__(self, db_url: str, required_filters: Optional[Dict] = None):
         self._db_url: str = db_url
         self._required_filters: Optional[Dict] = required_filters
@@ -20,12 +19,6 @@ class SqlUOW(UOW):
     @property
     def session(self):
         return self.session_manager.session
-
-    @property
-    def example(self) -> ExampleRepository:
-        return ExampleRepository(
-            session_manager=self.session_manager, required_filters=self._required_filters
-        )
 
     # Used for testing
     def create_all(self):

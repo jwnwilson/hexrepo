@@ -1,11 +1,10 @@
 # To Do
 
 - Setup backend
-    - Add create project script
-        - Add sql and storage library to it
     - Add db adpator logic  
-        - Need a way to add adpator folders to project for models and alembic models
-        - Add [aws],[gcp],[azure] install options
+         - Add ability to boiler plate code for features
+            - Add boiler plate to template update with cruft?
+        - Add aws, gcp, azure options to library installs
     - Setup easy lib development
         - https://github.com/python-poetry/poetry/issues/9611
     

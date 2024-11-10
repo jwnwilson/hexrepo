@@ -31,17 +31,17 @@ def delete_resource(resource):
 
 
 def install_libraries():
+    print("Skipping library install until library repo is available")
+    return
     CLOUD_PROVIDER = "{{ cookiecutter.cloud_provider }}"
-    feature_sql = '{{ cookiecutter.feature_sql }}'
-    feature_nosql = '{{ cookiecutter.feature_nosql }}'
+    feature_db = '{{ cookiecutter.feature_db }}'
     feature_storage = '{{ cookiecutter.feature_storage }}'
-    breakpoint()
-    if feature_sql or feature_nosql:
-        logger.info( f"installing library: sql" )
-        os.system(f"poetry add -e ../../libs/src/adaptor/db -G dev")
+    if feature_db:
+        logger.info( f"installing library: db" )
+        os.system(f"poetry add monorepo_db -G prod")
     if feature_storage:
         logger.info( f"installing library: storage" )
-        os.system(f"poetry add -e ../../libs/src/adaptor/storage -G dev")
+        os.system(f"poetry add monorepo_storage -G prod")
 
 
 if __name__ == "__main__":

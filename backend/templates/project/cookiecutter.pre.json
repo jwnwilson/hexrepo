@@ -10,7 +10,16 @@
         "azure",
         "gcp"
     ],
-    "feature_sql": true,
-    "feature_nosql": false,
-    "feature_storage": true
+    "use_db": true,
+    "use_storage": true,
+    "__conditions__": {
+        "enable_storage": "{{ cookiecutter.use_db != 'n' }}"
+    },
+    "__prompts__": {
+        "enable_storage": {
+            "__prompt__": "Select the db storage method",
+            "db_sql": "Add Sqlalchemy",
+            "nosql": "Add NoSQL wrapper"
+        }
+    }
 }

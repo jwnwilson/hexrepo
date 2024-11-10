@@ -1,8 +1,8 @@
 features:
   - name: sql
-    enabled: {{cookiecutter.feature_sql}}
+    enabled: {{cookiecutter.feature_db}}
     resources:
-      - src/app/adaptor/db/sql
+      - src/app/adaptor/db
   - name: storage
     enabled: {{cookiecutter.feature_storage}}
     resources:
