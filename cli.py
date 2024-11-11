@@ -4,8 +4,9 @@ from cookiecutter.main import cookiecutter
 import typer
 
 from tools.logic.folder import get_projects, get_libraries, get_library_type
-from tools.logic.env import check_missing_env_vars
+from tools.logic.env import check_missing_env_vars, set_env_var
 from tools.prompts.common import prompt_cloud_provider, prompt_library_type, prompt_shell_file
+from tools.templates.libs import generate_libs_makefile
 
 app = typer.Typer()
 
@@ -57,8 +58,10 @@ def setup():
 
     # Save env vars in ~/.bashrc or ~/.zshrc
     for env in new_env_vars:
-        typer.echo(f"Saving {env} in {shell_file}")
-        os.system(f"echo 'export {env}={new_env_vars[env]}' >> ~/.{shell_file}")
+        set_env_var(shell_file, env, new_env_vars[env])
+
+    # Copy libs makefile to libs
+    generate_libs_makefile(cloud_provider)
 
     # Add options to deploy repo to cloud provider
 
