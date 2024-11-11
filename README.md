@@ -4,6 +4,11 @@
 
 Setup the following env vars directly or via `make setup`
 
+AWS_ACCOUNT
+AWS_DEFAULT_REGION
+AWS_ACCESS_KEY_ID
+AWS_SECRET_ACCESS_KEY
+
 # To Do
 
 - Setup backend
