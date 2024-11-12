@@ -4,6 +4,8 @@
 
 ### Prerequesites
 
+- Terraform installed
+- Pyenv installed
 - AWS account access key and secret
 - AWS account permissions to create / modify:
     - KMS
@@ -27,6 +29,7 @@ AWS_SECRET_ACCESS_KEY
 
 - Setup backend
     - Setup infra for libs
+        - Add lib repo info to project template
     - Setup infra for projects
     - Add db adpator logic  
         - Add aws, gcp, azure options to library installs

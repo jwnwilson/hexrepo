@@ -28,3 +28,9 @@ resource "aws_codeartifact_repository" "monorepo" {
   repository = "monorepo"
   domain     = aws_codeartifact_domain.monorepo.domain
 }
+
+data "aws_codeartifact_repository_endpoint" "monorepo" {
+  domain     = aws_codeartifact_domain.monorepo.domain
+  repository = aws_codeartifact_repository.monorepo.repository
+  format     = "pypi"
+}

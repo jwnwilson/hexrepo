@@ -1,7 +1,11 @@
+import json
+import subprocess
 import boto3
 import os
 
 import typer
+
+from tools.logic.env import set_env_var
 
 
 def create_tf_state(cloud_provider: str) -> None:
@@ -34,20 +38,23 @@ Please update AWS_TF_STATE_BUCKET env var in your shell file and try again.""")
         typer.echo(f"Bucket {bucket_name} created successfully.")
 
 
-def create_lib_infra() -> None:
+def create_lib_infra(shell_file: str) -> None:
     typer.echo("Creating infrastructure for libraries...")
     # Placeholder for library infra setup
     os.chdir("backend/libs")
     os.system("make tf_init")
     os.system("make tf_plan")
     os.system("make tf_apply")
-    # Save code repo details in env vars
-    print("To do add code repo details to env vars")
-
+    # Save lib repo url to env var
+    tf_output = subprocess.check_output(["make", "tf_output"])
+    repo_url: str = json.loads(tf_output)["aws_codeartifact_repository_endpoint"]["value"]
+    set_env_var(shell_file, "MONOREPO_LIB_REPO_URL", repo_url)
     typer.echo("Infrastructure setup complete.")
 
 
 def publish_libs() -> None:
     typer.echo("Publishing libraries to repo...")
+    # Get code repo token
+    # Publish all libraries
     # Placeholder for publishing libraries to repo
     typer.echo("Libraries published successfully.")

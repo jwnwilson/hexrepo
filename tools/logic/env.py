@@ -34,13 +34,11 @@ def set_env_var(shell_file: str, env: str, value: str):
     os.environ[env] = value
 
 
-def setup_env_vars(cloud_provider: str):
+def setup_env_vars(shell_file: str, cloud_provider: str):
     missing_envs: List[str] = check_missing_env_vars(cloud_provider)
     
     if not missing_envs:
         return
-    
-    shell_file: str = prompt_shell_file()
     
     new_env_vars = {}
     for env in missing_envs:

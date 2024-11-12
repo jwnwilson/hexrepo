@@ -1,5 +1,5 @@
 import os
-from typing import List
+from typing import List, Optional
 from cookiecutter.main import cookiecutter
 import typer
 
@@ -38,11 +38,16 @@ def add_be_library(project: str, library: str):
 
 @app.command()
 def setup():
-    cloud_provider: str = prompt_cloud_provider()
+    shell_file: str = prompt_shell_file()
+
+    cloud_provider: Optional[str] = os.environ.get("MONOREPO_CODE_REPO")
+    if not cloud_provider:
+        cloud_provider = prompt_cloud_provider()
+        set_env_var(shell_file, "MONOREPO_CODE_REPO", cloud_provider)
     
     # Setup cloud provider env vars
-    setup_env_vars(cloud_provider)
-
+    setup_env_vars(cloud_provider, shell_file)
+        
     # Copy libs makefile to libs
     generate_libs_makefile(cloud_provider)
 
@@ -52,7 +57,7 @@ def setup():
 
     # Add options to deploy repo to cloud provider
     if prompt_setup_lib_infra():
-        create_lib_infra()
+        create_lib_infra(shell_file)
 
     # Publish libraries to repo
     if prompt_deploy_libs():

@@ -10,13 +10,16 @@ TF_STATE_BUCKET=${AWS_TF_STATE_BUCKET}
 TF_STATE_REGION=${AWS_DEFAULT_REGION}
 
 tf_init:
-	cd infra/tf/aws  && terraform init -input=false
+	@cd infra/tf/aws  && terraform init -input=false
 
 tf_plan:
-	cd infra/tf/aws  && terraform plan -out tfapply
+	@cd infra/tf/aws  && terraform plan -out tfapply
 
 tf_apply:
-	cd infra/tf/aws  && terraform apply -auto-approve tfapply
+	@cd infra/tf/aws  && terraform apply -auto-approve tfapply
 
 tf_destroy:
-	cd infra/tf/aws  && terraform destroy
+	@cd infra/tf/aws  && terraform destroy
+
+tf_output:
+	@cd infra/tf/aws && terraform output -json

@@ -1,6 +1,7 @@
 # infra
 .terraform
 .terraform.lock.hcl
+tfapply
 
 # python
 # Byte-compiled / optimized / DLL files
