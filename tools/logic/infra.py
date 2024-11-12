@@ -5,7 +5,9 @@ import os
 
 import typer
 
+from tools.logic.auth import authenticate_lib_repo
 from tools.logic.env import set_env_var
+from tools.logic.project import get_libraries, get_library_type
 
 
 def create_tf_state(cloud_provider: str) -> None:
@@ -38,7 +40,7 @@ Please update AWS_TF_STATE_BUCKET env var in your shell file and try again.""")
         typer.echo(f"Bucket {bucket_name} created successfully.")
 
 
-def create_lib_infra(shell_file: str) -> None:
+def create_lib_infra(cloud_provider: str, shell_file: str) -> None:
     typer.echo("Creating infrastructure for libraries...")
     # Placeholder for library infra setup
     os.chdir("backend/libs")
@@ -46,15 +48,23 @@ def create_lib_infra(shell_file: str) -> None:
     os.system("make tf_plan")
     os.system("make tf_apply")
     # Save lib repo url to env var
-    tf_output = subprocess.check_output(["make", "tf_output"])
-    repo_url: str = json.loads(tf_output)["aws_codeartifact_repository_endpoint"]["value"]
-    set_env_var(shell_file, "MONOREPO_LIB_REPO_URL", repo_url)
+    if cloud_provider == "aws":
+        tf_output = subprocess.check_output(["make", "tf_output"])
+        repo_url: str = json.loads(tf_output)["aws_codeartifact_repository_endpoint"]["value"]
+        set_env_var(shell_file, "MONOREPO_LIB_REPO_URL", repo_url)
     typer.echo("Infrastructure setup complete.")
 
 
-def publish_libs() -> None:
+def publish_libs(cloud_provider: str, shell_file: str) -> None:
     typer.echo("Publishing libraries to repo...")
     # Get code repo token
+    assert os.environ.get("MONOREPO_LIB_REPO_URL"), "Library repo url not found."
+    authenticate_lib_repo(cloud_provider, shell_file)
     # Publish all libraries
+    breakpoint()
+    for lib in get_libraries():
+        lib_type = get_library_type(lib)
+        os.chdir(f"backend/libs/src/{lib_type}/{lib}")
+        os.system("make publish")
     # Placeholder for publishing libraries to repo
     typer.echo("Libraries published successfully.")

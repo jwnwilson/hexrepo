@@ -27,6 +27,8 @@ def check_missing_env_vars(cloud_provider: str) -> List[str]:
 
 def set_env_var(shell_file: str, env: str, value: str):
     typer.echo(f"Saving {env} in {shell_file}")
+    # Replace existing value if it exists
+    # Else append to file
     shell_command: str = f"echo 'export {env}={value}' >> {shell_file}"
     os.system(shell_command)
     # Update env var for follow up commands

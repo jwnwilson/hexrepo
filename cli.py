@@ -57,11 +57,11 @@ def setup():
 
     # Add options to deploy repo to cloud provider
     if prompt_setup_lib_infra():
-        create_lib_infra(shell_file)
+        create_lib_infra(cloud_provider, shell_file)
 
     # Publish libraries to repo
     if prompt_deploy_libs():
-        publish_libs()
+        publish_libs(cloud_provider, shell_file)
 
 
 
