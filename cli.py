@@ -3,9 +3,11 @@ from typing import List
 from cookiecutter.main import cookiecutter
 import typer
 
-from tools.logic.folder import get_projects, get_libraries, get_library_type
-from tools.logic.env import check_missing_env_vars, set_env_var
+from tools.logic.infra import create_lib_infra, create_tf_state, publish_libs
+from tools.logic.project import get_projects, get_libraries, get_library_type, install_library_in_project
+from tools.logic.env import check_missing_env_vars, set_env_var, setup_env_vars
 from tools.prompts.common import prompt_cloud_provider, prompt_library_type, prompt_shell_file
+from tools.prompts.infra import prompt_deploy_libs, prompt_setup_lib_infra, prompt_setup_tf
 from tools.templates.libs import generate_libs_makefile
 
 app = typer.Typer()
@@ -30,40 +32,32 @@ def create_be_project():
 
 @app.command()
 def add_be_library(project: str, library: str):
-    # Install library locally in poetry dev group
-    libraries: List[str] = get_libraries()
-    projects: List[str] = get_projects()
-
-    assert project in projects, f"Project {project} not found"
-    assert library in libraries, f"Library {library} not found"
-
     # Install library from repo if available
-    library_type = get_library_type(library)
-    os.chdir(f"backend/projects/{project}") 
-    os.system(f"poetry add --editable ../../libs/src/{library_type}/{library} -G dev")
-    os.system(f"poetry add {library} -G prod")
+    install_library_in_project(library, project)
 
 
 @app.command()
 def setup():
     cloud_provider: str = prompt_cloud_provider()
-    # Check if env vars exist
-    missing_envs: List[str] = check_missing_env_vars(cloud_provider)
-    new_env_vars = {}
-    for env in missing_envs:
-        new_env_vars[env] = typer.prompt(f"Env value: {env} not found, please enter {env}")
-
-    # Pick ~/.bashrc or ~/.zshrc based on shell
-    shell_file: str = prompt_shell_file()
-
-    # Save env vars in ~/.bashrc or ~/.zshrc
-    for env in new_env_vars:
-        set_env_var(shell_file, env, new_env_vars[env])
+    
+    # Setup cloud provider env vars
+    setup_env_vars(cloud_provider)
 
     # Copy libs makefile to libs
     generate_libs_makefile(cloud_provider)
 
+    # Create initial terraform state infra
+    if prompt_setup_tf():
+        create_tf_state(cloud_provider)
+
     # Add options to deploy repo to cloud provider
+    if prompt_setup_lib_infra():
+        create_lib_infra()
+
+    # Publish libraries to repo
+    if prompt_deploy_libs():
+        publish_libs()
+
 
 
 if __name__ == "__main__":

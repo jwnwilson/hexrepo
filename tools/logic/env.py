@@ -4,11 +4,14 @@ from typing import List
 
 import typer
 
+from tools.prompts.common import prompt_shell_file
+
 AWS_ENV_VARS = [
     "AWS_ACCOUNT",
     "AWS_DEFAULT_REGION",
     "AWS_ACCESS_KEY_ID",
     "AWS_SECRET_ACCESS_KEY",
+    "AWS_TF_STATE_BUCKET"
 ]
 
 
@@ -29,3 +32,19 @@ def set_env_var(shell_file: str, env: str, value: str):
     # Update env var for follow up commands
     os.putenv(env, value)
     os.environ[env] = value
+
+
+def setup_env_vars(cloud_provider: str):
+    missing_envs: List[str] = check_missing_env_vars(cloud_provider)
+    
+    if not missing_envs:
+        return
+    
+    shell_file: str = prompt_shell_file()
+    
+    new_env_vars = {}
+    for env in missing_envs:
+        new_env_vars[env] = typer.prompt(f"Env value: {env} not found, please enter {env}")
+
+    for env in new_env_vars:
+        set_env_var(shell_file, env, new_env_vars[env])

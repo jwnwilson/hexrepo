@@ -2,12 +2,26 @@
 
 ## Setup - AWS
 
+### Prerequesites
+
+- AWS account access key and secret
+- AWS account permissions to create / modify:
+    - KMS
+    - code artifact
+    - ECS
+    - ECR
+    - VPC
+    - API gateway
+
+### Setup
+
 Setup the following env vars directly or via `make setup`
 
 AWS_ACCOUNT
 AWS_DEFAULT_REGION
 AWS_ACCESS_KEY_ID
 AWS_SECRET_ACCESS_KEY
+
 
 # To Do
 
@@ -38,3 +52,7 @@ AWS_SECRET_ACCESS_KEY
     - Spendesk
     - Charlie hr
     - Product board
+    - Payments
+    - Automated API docs
+    - External APIs
+    - Serverless setup

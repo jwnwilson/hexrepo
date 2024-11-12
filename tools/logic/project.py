@@ -2,6 +2,8 @@
 import os
 from typing import List
 
+import typer
+
 
 def scan_folder(folder: str) -> List[str]:
     return [f for f in os.listdir(folder) if os.path.isdir(os.path.join(folder, f))]
@@ -27,3 +29,18 @@ def get_library_type(library: str) -> str:
         return "interactor"
     else:
         raise RuntimeError(f"Library {library} not found")
+    
+
+def install_library_in_project(library: str, project: str):
+    # Install library locally in poetry dev group
+    libraries: List[str] = get_libraries()
+    projects: List[str] = get_projects()
+
+    assert project in projects, f"Project {project} not found"
+    assert library in libraries, f"Library {library} not found"
+    
+    library_type = get_library_type(library)
+    os.chdir(f"backend/projects/{project}") 
+    os.system(f"poetry add --editable ../../libs/src/{library_type}/{library} -G dev")
+    os.system(f"poetry add {library} -G prod")
+    typer.echo(f"Library {library} installed in project {project}")

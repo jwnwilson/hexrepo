@@ -10,6 +10,7 @@ python = "^3.12"
 typer = "^0.12.5"
 cookiecutter = "^2.6.0"
 pyyaml = "^6.0.2"
+boto3 = "^1.35.58"
 
 
 [build-system]

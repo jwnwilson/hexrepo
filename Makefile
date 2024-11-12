@@ -6,10 +6,10 @@ VENV_DIR = $(MKFILE_DIR)$(VENV)
 
 # Setup commands
 venv:
-	@echo "Creating virtual environment..."
+	@echo "Checking if venv is setup..."
 	./tools/setup_env.sh
 
-setup:
+setup: venv
 	@echo "Setting up monorep..."
 	. $(VENV_DIR)/bin/activate; \
 	python cli.py setup
