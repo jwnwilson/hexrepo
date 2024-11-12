@@ -40,10 +40,10 @@ def add_be_library(project: str, library: str):
 def setup():
     shell_file: str = prompt_shell_file()
 
-    cloud_provider: Optional[str] = os.environ.get("MONOREPO_CODE_REPO")
+    cloud_provider: Optional[str] = os.environ.get("MONOREPO_CLOUD_PROVIDER")
     if not cloud_provider:
         cloud_provider = prompt_cloud_provider()
-        set_env_var(shell_file, "MONOREPO_CODE_REPO", cloud_provider)
+        set_env_var(shell_file, "MONOREPO_CLOUD_PROVIDER", cloud_provider)
     
     # Setup cloud provider env vars
     setup_env_vars(cloud_provider, shell_file)

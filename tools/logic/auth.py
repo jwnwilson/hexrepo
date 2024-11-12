@@ -13,4 +13,5 @@ def authenticate_lib_repo(cloud_provider: str, shell_file: str) -> str:
             domain="monorepo",
             domainOwner=aws_account
         )["authorizationToken"]
-        set_env_var(shell_file, "MONOREPO_LIB_REPO_AUTH_TOKEN", auth_token)
+        set_env_var(shell_file, "MONOREPO_LIB_REPO_PASSWORD", auth_token)
+        set_env_var(shell_file, "MONOREPO_LIB_REPO_USERNAME", "aws")

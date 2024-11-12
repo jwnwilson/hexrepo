@@ -31,7 +31,7 @@ clean:
 publish:
 	@echo "Publishing package..."
 	. $(VENV_DIR)/bin/activate; \
-	poetry config repositories.monorep $(MONOREPO_CODE_REPO)
-	poetry config http-basic.monorep system $(MONOREPO_LIB_REPO_AUTH_TOKEN)
-	poetry publish --build
+	poetry config repositories.monorep $(MONOREPO_LIB_REPO_URL)
+	poetry config http-basic.monorep $(MONOREPO_LIB_REPO_USERNAME) $(MONOREPO_LIB_REPO_PASSWORD)
+	poetry publish --build --repository monorep
 
