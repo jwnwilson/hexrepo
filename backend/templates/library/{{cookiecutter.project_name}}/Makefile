@@ -7,12 +7,8 @@ VENV_DIR = $(MKFILE_DIR)$(VENV)
 
 # Setup commands
 venv:
-	@echo "Creating virtual environment..."
-	python3.12 -m venv $(VENV); \
-	source $(VENV_DIR)/bin/activate && \
-	export SYSTEM_VERSION_COMPAT=1 && \
-	pip install poetry && \
-	poetry install
+	@echo "Checking if venv is setup..."
+	@./tools/setup_env.sh
 
 test:
 	@echo "Running tests..."
@@ -32,6 +28,6 @@ publish:
 	@echo "Publishing package..."
 	. $(VENV_DIR)/bin/activate; \
 	poetry config repositories.monorep $(MONOREPO_LIB_REPO_URL)
-	poetry config http-basic.monorep $(MONOREPO_LIB_REPO_USERNAME) $(MONOREPO_LIB_REPO_PASSWORD)
+	@poetry config http-basic.monorep $(MONOREPO_LIB_REPO_USERNAME) $(MONOREPO_LIB_REPO_PASSWORD)
 	poetry publish --build --repository monorep
 

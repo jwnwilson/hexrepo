@@ -28,8 +28,7 @@ AWS_SECRET_ACCESS_KEY
 # To Do
 
 - Setup backend
-    - Setup infra for libs
-        - Add lib repo info to project template
+    - Setup lib install from deployed libraries
     - Setup infra for projects
     - Add db adpator logic  
         - Add aws, gcp, azure options to library installs
@@ -41,6 +40,7 @@ AWS_SECRET_ACCESS_KEY
     - Setup async tasks
     - Setup auth / cross project auth / client
     - Setup pipeline
+    - Setup mypy
 
 - Setup Frontend
     - Setup micro fe

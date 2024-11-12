@@ -31,17 +31,23 @@ def delete_resource(resource):
 
 
 def install_libraries():
-    print("Skipping library install until library repo is available")
-    return
     CLOUD_PROVIDER = "{{ cookiecutter.cloud_provider }}"
     use_db = '{{ cookiecutter.use_db }}'
     use_storage = '{{ cookiecutter.use_storage }}'
+    use_api = '{{ cookiecutter.use_api }}'
+
+    os.system("poetry source add --priority=supplemental monorepo ${MONOREPO_LIB_REPO_URL}simple")
+    os.system("poetry config http-basic.monorepo $MONOREPO_LIB_REPO_USERNAME $MONOREPO_LIB_REPO_PASSWORD")
+    
     if use_db:
-        logger.info( f"installing library: db" )
-        os.system(f"poetry add monorepo_db -G prod")
+        logger.info("installing library: db" )
+        os.system("poetry add --source monorepo monorepo-db -G prod")
     if use_storage:
-        logger.info( f"installing library: storage" )
-        os.system(f"poetry add monorepo_storage -G prod")
+        logger.info("installing library: storage" )
+        os.system("poetry add --source monorepo monorepo-storage -G prod")
+    if use_api:
+        logger.info("installing library: api" )
+        os.system("poetry add --source monorepo monorepo-api -G prod")
 
 
 if __name__ == "__main__":

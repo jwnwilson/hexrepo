@@ -51,14 +51,14 @@ def create_lib_infra(cloud_provider: str, shell_file: str) -> None:
     if cloud_provider == "aws":
         tf_output = subprocess.check_output(["make", "tf_output"])
         repo_url: str = json.loads(tf_output)["aws_codeartifact_repository_endpoint"]["value"]
-        set_env_var(shell_file, "MONOREPO_CODE_REPO", repo_url)
+        set_env_var(shell_file, "MONOREPO_LIB_REPO_URL", repo_url )
     typer.echo("Infrastructure setup complete.")
 
 
 def publish_libs(cloud_provider: str, shell_file: str) -> None:
     typer.echo("Publishing libraries to repo...")
     # Get code repo token
-    assert os.environ.get("MONOREPO_CODE_REPO"), "Library repo url not found."
+    assert os.environ.get("MONOREPO_LIB_REPO_URL"), "Library repo url not found."
     authenticate_lib_repo(cloud_provider, shell_file)
     # Publish all libraries
     project_dir: str = os.getcwd()
