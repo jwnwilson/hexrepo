@@ -37,8 +37,8 @@ def install_libraries():
     use_api = '{{ cookiecutter.use_api }}'
 
     os.system("make venv")
-    os.system("source ./.venv/bin/activate && poetry source add --priority=supplemental monorepo ${MONOREPO_LIB_REPO_URL}simple")
     os.system("source ./.venv/bin/activate && poetry config http-basic.monorepo $MONOREPO_LIB_REPO_USERNAME $MONOREPO_LIB_REPO_PASSWORD")
+    os.system("source ./.venv/bin/activate && poetry source add --priority=supplemental monorepo ${MONOREPO_LIB_REPO_URL}simple")
     
     if use_db:
         logger.info("installing library: db" )
@@ -55,4 +55,4 @@ def install_libraries():
 
 if __name__ == "__main__":
     delete_resources_for_disabled_features()
-    install_libraries()
+    # install_libraries()

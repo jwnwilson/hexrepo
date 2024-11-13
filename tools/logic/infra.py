@@ -40,6 +40,17 @@ Please update AWS_TF_STATE_BUCKET env var in your shell file and try again.""")
         typer.echo(f"Bucket {bucket_name} created successfully.")
 
 
+def authenticate_cloud(cloud_provider: str, shell_file: str) -> None:
+    typer.echo("Authenticating with cloud provider...")
+     # Save lib repo url to env var
+    if cloud_provider == "aws":
+        print("Replace me with AWS authentication logic")
+        tf_output = subprocess.check_output(["make", "tf_output"])
+        repo_url: str = json.loads(tf_output)["aws_codeartifact_repository_endpoint"]["value"]
+        set_env_var(shell_file, "MONOREPO_LIB_REPO_URL", repo_url )
+    typer.echo("Authentication successful.")
+
+
 def create_lib_infra(cloud_provider: str, shell_file: str) -> None:
     typer.echo("Creating infrastructure for libraries...")
     # Placeholder for library infra setup
@@ -47,11 +58,6 @@ def create_lib_infra(cloud_provider: str, shell_file: str) -> None:
     os.system("make tf_init")
     os.system("make tf_plan")
     os.system("make tf_apply")
-    # Save lib repo url to env var
-    if cloud_provider == "aws":
-        tf_output = subprocess.check_output(["make", "tf_output"])
-        repo_url: str = json.loads(tf_output)["aws_codeartifact_repository_endpoint"]["value"]
-        set_env_var(shell_file, "MONOREPO_LIB_REPO_URL", repo_url )
     typer.echo("Infrastructure setup complete.")
 
 

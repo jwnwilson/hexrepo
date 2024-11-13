@@ -1,8 +1,8 @@
 [tool.poetry]
-name = "{{cookiecutter.project_slug}}"
-version = "{{cookiecutter.version}}"
-description = "{{cookiecutter.project_short_description}}"
-authors = ["{{cookiecutter.full_name}} <{{cookiecutter.email}}>"]
+name = "example"
+version = "0.1.0"
+description = "A short description of the project"
+authors = ["Your name <Your address email (you@example.com)>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
@@ -16,15 +16,9 @@ pydantic-settings = "^2.6.0"
 psycopg2 = "^2.9.10"
 alembic = "^1.13.3"
 gevent = "^24.10.3"
-{% if cookiecutter.use_storage %}
 monorepo-storage = {path = "../../libs/src/adaptor/storage", develop = true}
-{% endif %}
-{% if cookiecutter.use_db %}
 monorepo-db = {path = "../../libs/src/adaptor/db", develop = true}
-{% endif %}
-{% if cookiecutter.use_api %}
 monorepo-api = {path = "../../libs/src/interactor/api", develop = true}
-{% endif %}
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.3"

@@ -3,7 +3,7 @@ from typing import List, Optional
 from cookiecutter.main import cookiecutter
 import typer
 
-from tools.logic.infra import create_lib_infra, create_tf_state, publish_libs
+from tools.logic.infra import authenticate_cloud, create_lib_infra, create_tf_state, publish_libs
 from tools.logic.project import get_projects, get_libraries, get_library_type, install_library_in_project
 from tools.logic.env import check_missing_env_vars, set_env_var, setup_env_vars
 from tools.prompts.common import prompt_cloud_provider, prompt_library_type, prompt_shell_file
@@ -50,6 +50,8 @@ def setup():
         
     # Copy libs makefile to libs
     generate_libs_makefile(cloud_provider)
+
+    authenticate_cloud(cloud_provider, shell_file)
 
     # Create initial terraform state infra
     if prompt_setup_tf():

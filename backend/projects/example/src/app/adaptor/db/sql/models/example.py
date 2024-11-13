@@ -9,6 +9,7 @@ from monorepo_db.sql.repository import SQLRepository
 from app.domain.example import ExampleDTO
 
 
+
 class ExampleTable(Base):
     __tablename__ = "example"
 
