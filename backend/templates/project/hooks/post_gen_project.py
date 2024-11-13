@@ -39,6 +39,8 @@ def install_libraries():
     os.system("poetry source add --priority=supplemental monorepo ${MONOREPO_LIB_REPO_URL}simple")
     os.system("poetry config http-basic.monorepo $MONOREPO_LIB_REPO_USERNAME $MONOREPO_LIB_REPO_PASSWORD")
     
+    print("refactor me to be dynamic")
+
     if use_db:
         logger.info("installing library: db" )
         os.system("poetry add --source monorepo monorepo-db -G prod")
@@ -48,6 +50,8 @@ def install_libraries():
     if use_api:
         logger.info("installing library: api" )
         os.system("poetry add --source monorepo monorepo-api -G prod")
+
+    print("dynamically add pip install -e commands to develop libs script")
 
 
 if __name__ == "__main__":

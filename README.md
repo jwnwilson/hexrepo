@@ -29,11 +29,11 @@ AWS_SECRET_ACCESS_KEY
 
 - Setup backend
     - Setup lib install from deployed libraries
+        - Look at make command to comment / uncomment dev dependencies and switch between both dev and prod
     - Setup infra for projects
     - Add db adpator logic  
+        - Add extra dependencies like boto gcp libs etc
         - Add aws, gcp, azure options to library installs
-    - Setup easy lib development with prod groups
-        - https://github.com/python-poetry/poetry/issues/9611
     - Add ability to update project from template
         - Use cruft to update projects from template?    
     - Add storage libs for gcp, aws, azure
