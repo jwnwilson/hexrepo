@@ -58,7 +58,7 @@ run_local: down db
 
 develop_lib:
 	@echo "Developing using local libraries..."
-	./scripts/develop_lis.sh
+	./scripts/develop_libs.sh
 
 # Testing commands
 test:

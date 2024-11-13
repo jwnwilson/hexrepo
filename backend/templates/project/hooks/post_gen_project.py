@@ -39,8 +39,6 @@ def install_libraries():
     os.system("poetry source add --priority=supplemental monorepo ${MONOREPO_LIB_REPO_URL}simple")
     os.system("poetry config http-basic.monorepo $MONOREPO_LIB_REPO_USERNAME $MONOREPO_LIB_REPO_PASSWORD")
     
-    print("refactor me to be dynamic")
-
     if use_db:
         logger.info("installing library: db" )
         os.system("poetry add --source monorepo monorepo-db -G prod")
