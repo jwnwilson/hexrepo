@@ -28,9 +28,6 @@ AWS_SECRET_ACCESS_KEY
 # To Do
 
 - Setup backend
-    - Setup docker container builds
-        - Setup base lib image to re-use for projects
-        - Remove auth and lib install logic
     - Setup infra for projects
     - Add db adpator logic  
         - Add extra dependencies like boto gcp libs etc
@@ -42,6 +39,8 @@ AWS_SECRET_ACCESS_KEY
     - Setup auth / cross project auth / client
     - Setup pipeline
     - Setup mypy
+    - Setup docker container builds
+        - Setup base lib image to re-use for projects
 
 - Setup Frontend
     - Setup micro fe

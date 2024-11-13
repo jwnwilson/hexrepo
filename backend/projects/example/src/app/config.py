@@ -1,0 +1,36 @@
+import os
+import logging
+from pydantic_settings import BaseSettings
+
+logger = logging.getLogger()
+# Silence noisy logs from faker
+logging.getLogger("faker.factory").setLevel(logging.ERROR)
+
+
+class Config(BaseSettings):
+    """
+    Application settings.
+
+    These parameters can be configured
+    with environment variables.
+    """
+    # Current environment
+    environment: str = os.environ.get("environment", "dev") 
+
+    # FEATURE FLAGS
+
+    # Database settings
+    DB_URL: str = os.environ["DB_URL"]
+
+    DB_SQL_LOGGING: bool = os.environ.get("DB_SQL_LOGGING", "false") == "true"
+    DB_SSL_CONNECTION: bool = os.environ.get("DB_SSL_CONNECTION", "false") == "true"
+
+    # API settings
+    API_PREFIX: str = "/api/v1"
+    host: str = "0.0.0.0"
+    port: int = 8000
+
+    ALLOWED_ORIGINS: str = os.environ.get("ALLOWED_ORIGINS", "localhost")
+
+
+config = Config()  # type: ignore

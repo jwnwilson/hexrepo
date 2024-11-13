@@ -31,6 +31,7 @@ def delete_resource(resource):
 
 
 def install_libraries():
+    # Deprecated, using local editable libraries over deployed libraries
     CLOUD_PROVIDER = "{{ cookiecutter.cloud_provider }}"
     use_db = '{{ cookiecutter.use_db }}'
     use_storage = '{{ cookiecutter.use_storage }}'

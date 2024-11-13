@@ -49,14 +49,14 @@ class SQLRepository(Repository):
     model: Any = BaseSQLModel
     model_dto: ModelDTOType = BaseModel
 
-    def __init__(self, session_manager: DatabaseSessionManager, required_filters: Optional[Dict] = None, query: Optional[Query] = None):
-        self._session_manager: DatabaseSessionManager = session_manager
+    def __init__(self, session: Session, required_filters: Optional[Dict] = None, query: Optional[Query] = None):
+        self._session: Session = session
         self._required_filters = required_filters
         self.query: Query = query or DefaultQuery(self.model, self.model_dto, self.session)
 
     @property
     def session(self) -> Session:
-        return self._session_manager.session
+        return self._session
 
     def _query_single(self, id: UUID) -> Row:
         try:
