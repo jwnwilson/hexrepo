@@ -2,7 +2,7 @@ import os
 from collections.abc import Generator
 from monorepo_db import UOW
 
-from app.adaptor.db.sql import SqlUOW 
+from app.adaptor.db.sql import SqlUOW
 from app.config import config
 
 

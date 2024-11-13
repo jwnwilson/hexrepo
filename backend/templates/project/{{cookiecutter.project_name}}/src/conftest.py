@@ -3,7 +3,7 @@ from collections.abc import Generator
 import pytest
 from fastapi.testclient import TestClient
 
-from app.adaptor.db.interface import UOW
+from monorepo_db.interface import UOW
 from app.adaptor.db.sql.uow import SqlUOW
 from app.domain.example import ExampleDTO
 

@@ -1,16 +1,16 @@
 from datetime import datetime
 from uuid import UUID
 
-from fastapi import APIRouter, FastAPI
+from fastapi import FastAPI
 from fastapi.testclient import TestClient
 import pytest
 from pydantic import BaseModel
 from polyfactory.factories.pydantic_factory import ModelFactory
 from unittest.mock import Mock
 
-from app.interactor.api.fastapi.crud import CrudRouter
-from app.adaptor.db.exception import RecordNotFound
-from app.adaptor.db.interface import PaginatedData
+from monorepo_api.crud import CrudRouter
+from monorepo_db.exception import RecordNotFound
+from monorepo_db.interface import PaginatedData
 
 
 class MockCreateSchema(BaseModel):
