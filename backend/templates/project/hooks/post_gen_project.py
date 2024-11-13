@@ -36,18 +36,19 @@ def install_libraries():
     use_storage = '{{ cookiecutter.use_storage }}'
     use_api = '{{ cookiecutter.use_api }}'
 
-    os.system("poetry source add --priority=supplemental monorepo ${MONOREPO_LIB_REPO_URL}simple")
-    os.system("poetry config http-basic.monorepo $MONOREPO_LIB_REPO_USERNAME $MONOREPO_LIB_REPO_PASSWORD")
+    os.system("make venv")
+    os.system("source ./.venv/bin/activate && poetry source add --priority=supplemental monorepo ${MONOREPO_LIB_REPO_URL}simple")
+    os.system("source ./.venv/bin/activate && poetry config http-basic.monorepo $MONOREPO_LIB_REPO_USERNAME $MONOREPO_LIB_REPO_PASSWORD")
     
     if use_db:
         logger.info("installing library: db" )
-        os.system("poetry add --source monorepo monorepo-db -G prod")
+        os.system("source ./.venv/bin/activate && poetry add --source monorepo monorepo-db -G prod")
     if use_storage:
         logger.info("installing library: storage" )
-        os.system("poetry add --source monorepo monorepo-storage -G prod")
+        os.system("source ./.venv/bin/activate && poetry add --source monorepo monorepo-storage -G prod")
     if use_api:
         logger.info("installing library: api" )
-        os.system("poetry add --source monorepo monorepo-api -G prod")
+        os.system("source ./.venv/bin/activate && poetry add --source monorepo monorepo-api -G prod")
 
     print("dynamically add pip install -e commands to develop libs script")
 

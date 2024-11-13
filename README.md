@@ -28,10 +28,10 @@ AWS_SECRET_ACCESS_KEY
 # To Do
 
 - Setup backend
-    - Setup lib install from deployed libraries
     - Setup docker container builds
         - Decide if we use deployed library versions or local lib in builds
         - just use latest version of libs and publish libs for other projects if needed
+        - Docker can't build using lib files outside project dir
     - Setup infra for projects
     - Add db adpator logic  
         - Add extra dependencies like boto gcp libs etc

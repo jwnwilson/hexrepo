@@ -17,12 +17,8 @@ VENV_DIR = $(MKFILE_DIR)$(VENV)
 
 # Setup commands
 venv:
-	@echo "Creating virtual environment..."
-	python3.12 -m venv $(VENV); \
-	source $(VENV_DIR)/bin/activate && \
-	export SYSTEM_VERSION_COMPAT=1 && \
-	pip install poetry && \
-	poetry install
+	@echo "Checking if venv is setup..."
+	@./tools/setup_env.sh
 
 build:
 	docker compose build 
@@ -52,16 +48,16 @@ down:
 	docker compose down
 
 # Host API locally, loading local env file
-run_local: down db
+run_local: down db venv
 	source $(VENV_DIR)/bin/activate && \
 	PYTHONPATH=src uvicorn app.interactor.api.fastapi.main:app --reload --env-file env/local.env
 
 develop_lib:
 	@echo "Developing using local libraries..."
-	./scripts/develop_libs.sh
+	./tools/develop_libs.sh
 
 # Testing commands
-test:
+test: venv
 	@echo "Running unit tests"
 	. $(VENV_DIR)/bin/activate; \
 	pytest
@@ -72,7 +68,7 @@ coverage:
 	pytest --cov-report html	
 
 lint:
-	bash ./scripts/lint.sh
+	bash ./tools/lint.sh
 
 clean:
 	find . -type f -name '*.py[co]' -delete -o -type d -name __pycache__ -delete

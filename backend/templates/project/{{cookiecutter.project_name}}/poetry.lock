@@ -782,55 +782,64 @@ name = "monorepo-api"
 version = "0.1.0"
 description = "A short description of the project"
 optional = false
-python-versions = "^3.12"
-files = []
-develop = true
+python-versions = ">=3.12,<4.0"
+files = [
+    {file = "monorepo_api-0.1.0-py3-none-any.whl", hash = "sha256:509d7e9047b521ad5dcde6f48659031d8403563b1f9ba030c9e18ea3ccac3796"},
+    {file = "monorepo_api-0.1.0.tar.gz", hash = "sha256:fd01f0c8a990a0c97b6281df6e786fefb7af099631ff9d7e588bf97cd685609a"},
+]
 
 [package.dependencies]
-fastapi = "^0.115.4"
-pydantic = "^2.9.2"
-pydantic-settings = "^2.6.1"
+fastapi = ">=0.115.4,<0.116.0"
+pydantic = ">=2.9.2,<3.0.0"
+pydantic-settings = ">=2.6.1,<3.0.0"
 
 [package.source]
-type = "directory"
-url = "../../libs/src/interactor/api"
+type = "legacy"
+url = "https://monorepo-675468650888.d.codeartifact.eu-west-1.amazonaws.com/pypi/monorepo/simple"
+reference = "monorepo"
 
 [[package]]
 name = "monorepo-db"
 version = "0.1.0"
 description = "A short description of the project"
 optional = false
-python-versions = "^3.12"
-files = []
-develop = true
+python-versions = ">=3.12,<4.0"
+files = [
+    {file = "monorepo_db-0.1.0-py3-none-any.whl", hash = "sha256:9fc11a6baf3da502f876af5268423279a074a9134568043577deecf6e656cd59"},
+    {file = "monorepo_db-0.1.0.tar.gz", hash = "sha256:4283ee4fa09b2084e5aaeb703204887662a7ba371e3612ddf25f7aef8decba99"},
+]
 
 [package.dependencies]
-pydantic = "^2.9.2"
-pydantic-settings = "^2.6.1"
+pydantic = ">=2.9.2,<3.0.0"
+pydantic-settings = ">=2.6.1,<3.0.0"
 
 [package.source]
-type = "directory"
-url = "../../libs/src/adaptor/db"
+type = "legacy"
+url = "https://monorepo-675468650888.d.codeartifact.eu-west-1.amazonaws.com/pypi/monorepo/simple"
+reference = "monorepo"
 
 [[package]]
 name = "monorepo-storage"
 version = "0.1.0"
 description = ""
 optional = false
-python-versions = "^3.12"
-files = []
-develop = true
+python-versions = ">=3.12,<4.0"
+files = [
+    {file = "monorepo_storage-0.1.0-py3-none-any.whl", hash = "sha256:530021a429ebff791757c9d81b76ae39272b788cf4a60c2b1d9fb011bc1a76ff"},
+    {file = "monorepo_storage-0.1.0.tar.gz", hash = "sha256:b68cc0474a37f5f6d8ea9b9674febaa452e510464714d795acb3a8dcb244df10"},
+]
 
 [package.dependencies]
-pydantic = "^2.9.2"
-pydantic-settings = "^2.6.1"
+pydantic = ">=2.9.2,<3.0.0"
+pydantic-settings = ">=2.6.1,<3.0.0"
 
 [package.extras]
 aws = ["boto3 (>=1.35.54,<2.0.0)"]
 
 [package.source]
-type = "directory"
-url = "../../libs/src/adaptor/storage"
+type = "legacy"
+url = "https://monorepo-675468650888.d.codeartifact.eu-west-1.amazonaws.com/pypi/monorepo/simple"
+reference = "monorepo"
 
 [[package]]
 name = "mypy"
@@ -1542,4 +1551,4 @@ testing = ["coverage[toml]", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "60d01605db0acd9930a2fe3d9e6aa7df879f79eddf05346590fffbad78b2f62d"
+content-hash = "273abb3da067a18cb0a002b5a259a7d46212559f13bb3dfd2f80a6eaf9d308b4"
