@@ -36,6 +36,7 @@ AWS_SECRET_ACCESS_KEY
         - Use cruft to update projects from template?    
     - Add storage libs for gcp, aws, azure
     - Setup async tasks
+        - Setup task chaining with re-runs
     - Setup auth / cross project auth / client
     - Setup pipeline
     - Setup mypy
