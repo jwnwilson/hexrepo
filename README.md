@@ -29,6 +29,7 @@ AWS_SECRET_ACCESS_KEY
 
 - Setup backend
     - Setup infra for projects
+        - Create terraform lib project to keep all projects up to date
     - Add db adpator logic  
         - Add extra dependencies like boto gcp libs etc
         - Add aws, gcp, azure options to library installs
@@ -36,10 +37,11 @@ AWS_SECRET_ACCESS_KEY
         - Use cruft to update projects from template?    
     - Add storage libs for gcp, aws, azure
     - Setup async tasks
-        - Setup task chaining with re-runs
+        - Setup task chaining with idempotent re-run
     - Setup auth / cross project auth / client
     - Setup pipeline
     - Setup mypy
+        - Look at ruff
     - Setup docker container builds
         - Setup base lib image to re-use for projects
 
@@ -60,3 +62,8 @@ AWS_SECRET_ACCESS_KEY
     - Automated API docs
     - External APIs
     - Serverless setup
+    - Free infra under my own domain to allow users to try it out
+
+Tools to looks at
+- stackshare to see what services / tools companies use
+    https://stackshare.io/uber-technologies/uber

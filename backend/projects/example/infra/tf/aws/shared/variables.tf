@@ -21,18 +21,8 @@ variable "project" {
   default = "{{cookiecutter.project_slug}}-service"
 }
 
-variable "ecr_api_url" {}
-
 variable "docker_tag" {
   default = "latest"
-}
-
-variable "domain" {
-  default = "{{cookiecutter.project_slug}}-service.link"
-}
-
-variable "api_subdomain" {
-  default = "api"
 }
 
 variable "api_repo" {
