@@ -69,10 +69,16 @@ clean:
 
 
 tf_init:
-	cd infra/tf/aws  && terraform init -input=false
+	@echo "Initializing Terraform shared infra"
+	cd infra/tf/aws/shared  && terraform init -input=false
+	@echo "Initializing Terraform environment infra"
+	cd infra/tf/aws/environment  && terraform init -input=false
 
 tf_plan:
-	cd infra/tf/aws  && terraform plan -out tfapply
+	@echo "Planning Terraform shared infra"
+	cd infra/tf/aws/shared  && terraform plan -out tfapply
+	@echo "Planning Terraform environment infra"
+	cd infra/tf/aws/environment  && terraform plan -out tfapply
 
 tf_apply:
 	cd infra/tf/aws  && terraform apply -auto-approve tfapply

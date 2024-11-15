@@ -65,6 +65,9 @@ def setup():
     if prompt_deploy_libs():
         publish_libs(cloud_provider, shell_file)
 
+    # Setup tf infra for repos (s3 bucket)
+
+
 
 
 if __name__ == "__main__":

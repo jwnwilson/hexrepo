@@ -1,8 +1,8 @@
 terraform {
   backend "s3" {
-    region = "{{cookiecutter.aws_region}}"
-    bucket = "monorepo-{{cookiecutter.project_slug}}-tf"
-    key = "terraform.tfstate"
+    region = "eu-west-1"
+    bucket = "monorepo-jwn"
+    key = "{{cookiecutter.project_slug}}-shared.tfstate"
   }
   required_providers {
     aws = {
@@ -16,7 +16,7 @@ provider "aws" {
 }
 
 module "example_ecr" {
-  source = "../../../../../libs/infra/tf/aws/modules/ecr"
+  source = "../../../../../../libs/infra/tf/aws/modules/ecr"
   project           = "example"
   aws_access_key    = var.aws_access_key
   aws_secret_key    = var.aws_secret_key

@@ -2,21 +2,11 @@ variable "aws_access_key" {}
 
 variable "aws_secret_key" {}
 
-variable "region" {}
+variable "aws_region" {}
 
 variable "environment" {}
 
 variable "project" {}
-
-variable "ecr_url" {}
-
-variable "lambda_command" {
-  default = ""
-}
-
-variable "docker_tag" {
-  default = "latest"
-}
 
 variable "vpc_cidr_block" {
   default = ""

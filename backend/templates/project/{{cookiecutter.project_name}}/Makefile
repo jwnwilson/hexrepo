@@ -71,10 +71,16 @@ clean:
 
 
 tf_init:
-	cd infra/tf/{{cookiecutter.cloud_provider}}  && terraform init -input=false
+	@echo "Initializing Terraform shared infra"
+	cd infra/tf/{{cookiecutter.cloud_provider}}/shared  && terraform init -input=false
+	@echo "Initializing Terraform environment infra"
+	cd infra/tf/{{cookiecutter.cloud_provider}}/environment  && terraform init -input=false
 
 tf_plan:
-	cd infra/tf/{{cookiecutter.cloud_provider}}  && terraform plan -out tfapply
+	@echo "Planning Terraform shared infra"
+	cd infra/tf/{{cookiecutter.cloud_provider}}/shared  && terraform plan -out tfapply
+	@echo "Planning Terraform environment infra"
+	cd infra/tf/{{cookiecutter.cloud_provider}}/environment  && terraform plan -out tfapply
 
 tf_apply:
 	cd infra/tf/{{cookiecutter.cloud_provider}}  && terraform apply -auto-approve tfapply
