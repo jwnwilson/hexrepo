@@ -29,7 +29,9 @@ AWS_SECRET_ACCESS_KEY
 
 - Setup backend
     - Setup infra for projects
-        - Create terraform lib project to keep all projects up to date
+        - Add user setup to infra as code
+        - Add shared infa to libs folder
+    - Setup pipeline
     - Add db adpator logic  
         - Add extra dependencies like boto gcp libs etc
         - Add aws, gcp, azure options to library installs
@@ -39,7 +41,6 @@ AWS_SECRET_ACCESS_KEY
     - Setup async tasks
         - Setup task chaining with idempotent re-run
     - Setup auth / cross project auth / client
-    - Setup pipeline
     - Setup mypy
         - Look at ruff
     - Setup docker container builds

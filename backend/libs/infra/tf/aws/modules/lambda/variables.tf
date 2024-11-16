@@ -15,7 +15,7 @@ variable "description" {
 variable "ecr_url" {}
 
 variable "lambda_command" {
-  default = ""
+  default = []
 }
 
 variable "docker_tag" {

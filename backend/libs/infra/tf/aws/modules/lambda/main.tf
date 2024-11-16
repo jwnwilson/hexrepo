@@ -34,7 +34,7 @@ module "lambda" {
   )
 
   # override docker image command to run worker handler
-  image_config_command = var.lambda_command
+  image_config_command = var.lambda_command != [] ? var.lambda_command : null
 
   vpc_subnet_ids         = var.vpc_subnet_ids
   vpc_security_group_ids = var.vpc_security_group_ids

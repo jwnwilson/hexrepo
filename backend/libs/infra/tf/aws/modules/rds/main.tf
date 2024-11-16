@@ -59,15 +59,18 @@ module "security_group" {
 
 module "db" {
   source  = "terraform-aws-modules/rds/aws"
-  version = "~> 3.0"
+  version = "~> 6.0"
 
   identifier = "${var.project}-db-${var.environment}"
 
+  create_db_option_group    = false
+  create_db_parameter_group = false
+
   # All available versions: https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_PostgreSQL.html#PostgreSQL.Concepts
   engine               = "postgres"
-  engine_version       = "11.13"
-  family               = "postgres11" # DB parameter group
-  major_engine_version = "11"         # DB option group
+  engine_version       = "14"
+  family               = "postgres14" # DB parameter group
+  major_engine_version = "14"         # DB option group
   instance_class       = "db.t2.micro"
 
   allocated_storage     = 20
@@ -77,7 +80,7 @@ module "db" {
   # NOTE: Do NOT use 'user' as the value for 'username' as it throws:
   # "Error creating DB Instance: InvalidParameterValue: MasterUsername
   # user cannot be used as it is a reserved word used by the engine"
-  name                  = "authorizer"
+  db_name               = var.project
   username              = data.aws_ssm_parameter.username.value
   password              = data.aws_ssm_parameter.password.value
   port                  = 5432
