@@ -6,14 +6,15 @@ import os
 import typer
 
 from tools.logic.auth import authenticate_lib_repo
+from tools.logic.config import MonorepoConfig
 from tools.logic.env import set_env_var
 from tools.logic.project import get_libraries, get_library_type
 
 
-def create_tf_state(cloud_provider: str) -> None:
-    if cloud_provider == "aws":
+def create_tf_state(config: MonorepoConfig) -> None:
+    if config.cloud_provider == "aws":
         # Prompt for bucket name
-        bucket_name: str = os.environ.get("AWS_TF_STATE_BUCKET")
+        bucket_name: str = config.cloud_provider_config.AWS_TF_STATE_BUCKET
         # Attempt to create bucket
         try:
             client = boto3.client(
@@ -40,18 +41,18 @@ Please update AWS_TF_STATE_BUCKET env var in your shell file and try again.""")
         typer.echo(f"Bucket {bucket_name} created successfully.")
 
 
-def authenticate_cloud(cloud_provider: str, shell_file: str) -> None:
+def authenticate_cloud(config: MonorepoConfig) -> None:
     typer.echo("Authenticating with cloud provider...")
      # Save lib repo url to env var
-    if cloud_provider == "aws":
+    if config.cloud_provider == "aws":
         print("Replace me with AWS authentication logic")
         tf_output = subprocess.check_output(["make", "tf_output"])
         repo_url: str = json.loads(tf_output)["aws_codeartifact_repository_endpoint"]["value"]
-        set_env_var(shell_file, "MONOREPO_LIB_REPO_URL", repo_url )
+        config.set_config_var("monorepo_lib_repo_url", repo_url, set_env_var=True)
     typer.echo("Authentication successful.")
 
 
-def create_lib_infra(cloud_provider: str, shell_file: str) -> None:
+def create_lib_infra(config: MonorepoConfig) -> None:
     typer.echo("Creating infrastructure for libraries...")
     # Placeholder for library infra setup
     os.chdir("backend/libs")
@@ -61,11 +62,11 @@ def create_lib_infra(cloud_provider: str, shell_file: str) -> None:
     typer.echo("Infrastructure setup complete.")
 
 
-def publish_libs(cloud_provider: str, shell_file: str) -> None:
+def publish_libs(config: MonorepoConfig) -> None:
     typer.echo("Publishing libraries to repo...")
     # Get code repo token
     assert os.environ.get("MONOREPO_LIB_REPO_URL"), "Library repo url not found."
-    authenticate_lib_repo(cloud_provider, shell_file)
+    authenticate_lib_repo(config)
     # Publish all libraries
     project_dir: str = os.getcwd()
     for lib in get_libraries():
@@ -75,3 +76,13 @@ def publish_libs(cloud_provider: str, shell_file: str) -> None:
         os.system("make publish")
     # Placeholder for publishing libraries to repo
     typer.echo("Libraries published successfully.")
+
+
+def setup_shared_infra(config: MonorepoConfig) -> None:
+    typer.echo("Setting up shared infrastructure...")
+    # Placeholder for shared infra setup
+    os.chdir("backend/libs")
+    os.system("make tf_init")
+    os.system("make tf_plan")
+    os.system("make tf_apply")
+    typer.echo("Shared infrastructure setup complete.")

@@ -1,13 +1,13 @@
 import os
-from typing import List, Optional
+from typing import List, Optional, Tuple
 from cookiecutter.main import cookiecutter
 import typer
 
-from tools.logic.infra import authenticate_cloud, create_lib_infra, create_tf_state, publish_libs
-from tools.logic.project import get_projects, get_libraries, get_library_type, install_library_in_project
-from tools.logic.env import check_missing_env_vars, set_env_var, setup_env_vars
-from tools.prompts.common import prompt_cloud_provider, prompt_library_type, prompt_shell_file
-from tools.prompts.infra import prompt_deploy_libs, prompt_setup_lib_infra, prompt_setup_tf
+from tools.logic.config import MonorepoConfig, get_or_create_config
+from tools.logic.infra import authenticate_cloud, create_lib_infra, create_tf_state, publish_libs, setup_shared_infra
+from tools.logic.project import install_library_in_project
+from tools.prompts.common import prompt_library_type
+from tools.prompts.infra import prompt_deploy_libs, prompt_setup_lib_infra, prompt_setup_project_infra, prompt_setup_shared_infra, prompt_setup_tf
 from tools.templates.libs import generate_libs_makefile
 
 app = typer.Typer()
@@ -20,7 +20,13 @@ def create_be_library():
     os.chdir(f"backend/libs/src/{library_type}")
     # Run cookie cutter command to copy template
     cookiecutter("../../../templates/library")
-
+    # Setup infra for libray
+    if prompt_setup_lib_infra():
+        typer.echo("Setting up library infrastructure...")
+        os.system("make tf_init")
+        os.system("make tf_plan")
+        os.system("make tf_apply")
+        typer.echo("Shared infrastructure setup complete.")
 
 @app.command()
 def create_be_project():
@@ -28,6 +34,13 @@ def create_be_project():
     os.chdir(f"backend/projects")
     # Run cookie cutter command to copy template
     cookiecutter("../templates/project")
+    # Setup infra for service
+    if prompt_setup_project_infra():
+        typer.echo("Setting up project infrastructure...")
+        os.system("make tf_init")
+        os.system("make tf_plan")
+        os.system("make tf_apply")
+        typer.echo("Shared infrastructure setup complete.")
 
 
 @app.command()
@@ -38,40 +51,32 @@ def add_be_library(project: str, library: str):
 
 @app.command()
 def setup():
-    shell_file: str = prompt_shell_file()
+    # project config setup
+    config: MonorepoConfig
+    created_config: bool
+    config, created_config = get_or_create_config()
 
-    cloud_provider: Optional[str] = os.environ.get("MONOREPO_CLOUD_PROVIDER")
-    if not cloud_provider:
-        cloud_provider = prompt_cloud_provider()
-        set_env_var(shell_file, "MONOREPO_CLOUD_PROVIDER", cloud_provider)
-    
-    # Setup cloud provider env vars
-    setup_env_vars(cloud_provider, shell_file)
-        
     # Copy libs makefile to libs
-    generate_libs_makefile(cloud_provider)
+    if created_config:
+        generate_libs_makefile(config)
 
-    authenticate_cloud(cloud_provider, shell_file)
+    authenticate_cloud(config)
 
     # Create initial terraform state infra
     if prompt_setup_tf():
-        create_tf_state(cloud_provider)
+        create_tf_state(config)
 
     # Add options to deploy repo to cloud provider
     if prompt_setup_lib_infra():
-        create_lib_infra(cloud_provider, shell_file)
+        create_lib_infra(config)
 
     # Publish libraries to repo
     if prompt_deploy_libs():
-        publish_libs(cloud_provider, shell_file)
-
-    # Prompt users to select environments to create
+        publish_libs(config)
 
     # Setup shared infra for environments
-
-
-
-
+    if prompt_setup_shared_infra():
+        setup_shared_infra(config)
 
 
 if __name__ == "__main__":

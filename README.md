@@ -28,6 +28,8 @@ AWS_SECRET_ACCESS_KEY
 # To Do
 
 - Setup backend
+    - Add project config template
+        - prompt for environments
     - Setup infra for projects
         - Setup shared infra build first then environment
     - Setup pipeline
@@ -45,6 +47,8 @@ AWS_SECRET_ACCESS_KEY
     - Setup docker container builds
         - Setup base lib image to re-use for projects
     - Add user setup to infra as code
+        - During project config setup define monorepo user with admin account
+        - login with mono repo user and store credentials to work specifically with monorepo
 
 
 - Setup Frontend
