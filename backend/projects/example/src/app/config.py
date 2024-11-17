@@ -15,7 +15,7 @@ class Config(BaseSettings):
     with environment variables.
     """
     # Current environment
-    environment: str = os.environ.get("environment", "dev") 
+    environment: str = os.environ.get("ENVIRONMENT", "dev") 
 
     # FEATURE FLAGS
 

@@ -16,13 +16,16 @@ tf_shared_plan:
 	@cd infra/tf/aws/shared  && terraform plan -out tfapply
 
 tf_shared_apply:
-	@cd infra/tf/aws/shared  && terraform apply tfapply
+	@cd infra/tf/aws/shared  && terraform apply
 
 tf_shared_destroy:
 	@cd infra/tf/aws/shared  && terraform destroy
 
 tf_shared_output:
 	@cd infra/tf/aws/shared && terraform output -json
+
+tf_workspace:
+	@cd infra/tf/aws/environment  && terraform workspace new ${ENVIRONEMNT}
 
 tf_env_init:
 	@cd infra/tf/aws/environment  && terraform init -input=false
@@ -31,7 +34,7 @@ tf_env_plan:
 	@cd infra/tf/aws/environment  && terraform plan -out tfapply
 
 tf_env_apply:
-	@cd infra/tf/aws/environment  && terraform apply tfapply
+	@cd infra/tf/aws/environment  && terraform apply
 
 tf_env_destroy:
 	@cd infra/tf/aws/environment  && terraform destroy

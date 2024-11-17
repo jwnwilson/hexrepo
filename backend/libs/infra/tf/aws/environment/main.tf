@@ -2,7 +2,7 @@ terraform {
   backend "s3" {
     region = "eu-west-1"
     bucket = "monorepo-jwn"
-    key = "{{cookiecutter.project_slug}}-libs.tfstate"
+    key = "{{cookiecutter.project_slug}}-libs-env.tfstate"
   }
   required_providers {
     aws = {
@@ -18,7 +18,7 @@ provider "aws" {
 module "monorepo_vpc" {
   source = "../modules/vpc"
 
-  environment       = var.environment
+  environment       = terraform.workspace
   project           = "monorepo"
   aws_access_key    = var.aws_access_key
   aws_secret_key    = var.aws_secret_key

@@ -13,7 +13,7 @@ class Config(BaseSettings):
     These parameters can be configured
     with environment variables.
     """
-    environment: str = os.environ.get("environment", "dev")    
+    environment: str = os.environ.get("ENVIRONMENT", "dev")    
 
 
 config = Config()  # type: ignore

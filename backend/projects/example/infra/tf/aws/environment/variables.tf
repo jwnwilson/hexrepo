@@ -1,7 +1,4 @@
 /* general */
-variable "environment" {
-  default = "develop"
-}
 
 variable "aws_region" {
   default = "eu-west-1"
