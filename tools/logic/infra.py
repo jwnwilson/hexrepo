@@ -80,7 +80,7 @@ def setup_global_env_infra(config: MonorepoConfig) -> None:
     with chdir("backend/libs"):
         os.system(f"make tf_env_init ENV=dev")
         for env in config.environments:
-            os.system(f"ENVIRONEMNT={env} make tf_workspace")
+            os.system(f"ENVIRONMENT={env} make tf_workspace")
             # os.system(f"make tf_env_plan ")
             os.system(f"make tf_env_apply ")
     typer.echo("Shared infrastructure setup complete.")

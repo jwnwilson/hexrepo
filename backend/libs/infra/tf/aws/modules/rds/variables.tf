@@ -8,6 +8,10 @@ variable "environment" {}
 
 variable "project" {}
 
+variable "username" {
+  default = "postgres"
+}
+
 variable "vpc_cidr_block" {
   default = ""
 }

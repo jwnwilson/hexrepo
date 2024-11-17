@@ -1,7 +1,7 @@
 .EXPORT_ALL_VARIABLES:
 
 TF_VAR_docker_tag=${docker_tag}
-TF_VAR_environment=${ENVIRONEMNT}
+TF_VAR_environment=${ENVIRONMENT}
 TF_VAR_ecr_api_url=${AWS_ACCOUNT}.dkr.ecr.eu-west-1.amazonaws.com/_api
 TF_VAR_aws_access_key=${AWS_ACCESS_KEY_ID}
 TF_VAR_aws_secret_key=${AWS_SECRET_ACCESS_KEY}
@@ -25,7 +25,7 @@ tf_shared_output:
 	@cd infra/tf/aws/shared && terraform output -json
 
 tf_workspace:
-	@cd infra/tf/aws/environment  && terraform workspace new ${ENVIRONEMNT}
+	@cd infra/tf/aws/environment  && terraform workspace new $(ENVIRONMENT)
 
 tf_env_init:
 	@cd infra/tf/aws/environment  && terraform init -input=false
