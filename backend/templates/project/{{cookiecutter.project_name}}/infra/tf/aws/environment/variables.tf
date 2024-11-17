@@ -7,10 +7,6 @@ variable "aws_region" {
   default = "eu-west-1"
 }
 
-variable "region" {
-  default = "eu-west-1"
-}
-
 variable "aws_access_key" {
 }
 
@@ -22,6 +18,8 @@ variable "project" {
 }
 
 variable "ecr_api_url" {}
+
+variable "vpc_id" {}
 
 variable "docker_tag" {
   default = "latest"

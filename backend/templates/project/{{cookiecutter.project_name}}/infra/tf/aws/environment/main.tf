@@ -15,55 +15,48 @@ provider "aws" {
   region  = var.aws_region
 }
 
-module "{{cookiecutter.project_slug}}_vpc" {
-  source = "../../../../../../libs/infra/tf/aws/modules/vpc"
-
-  environment       = var.environment
-  project           = "{{cookiecutter.project_slug}}"
-  aws_access_key    = var.aws_access_key
-  aws_secret_key    = var.aws_secret_key
-  aws_region        = var.aws_region
+data "aws_vpc" "monorepo" {
+  filter {
+    name   = "name"
+    values = ["monorepo-vpc-${var.environment}"]
+  }
 }
-
 
 data "aws_ecr_repository" "ecr_repo" {
   name                 = var.project
 }
 
-
-module "{{cookiecutter.project_slug}}_api" {
+module "example_api" {
   source = "../../../../../../libs/infra/tf/aws/modules/lambda"
 
   environment       = var.environment
-  project           = "{{cookiecutter.project_slug}}"
+  project           = "example"
   ecr_url           = data.aws_ecr_repository.ecr_repo.repository_url
   docker_tag        = var.docker_tag
   aws_access_key    = var.aws_access_key
   aws_secret_key    = var.aws_secret_key
   aws_region        = var.aws_region
-  vpc_subnet_ids    = module.{{cookiecutter.project_slug}}_vpc.private_subnet_ids
-  vpc_security_group_ids = module.{{cookiecutter.project_slug}}_vpc.security_group_ids
+  vpc_id            = data.aws_vpc.monorepo.id
 }
 
-module "{{cookiecutter.project_slug}}_api_gateway" {
+module "example_api_gateway" {
   source = "../../../../../../libs/infra/tf/aws/modules/apigateway"
 
   environment       = var.environment
   lambda_invoke_arn = module.example_api.lambda_function_invoke_arn
   lambda_name       = module.example_api.lambda_function_name
   domain            = var.domain
-  api_subdomain     = "{{cookiecutter.project_slug}}-${var.environment}"
-  project           = "{{cookiecutter.project_slug}}"
+  api_subdomain     = "example-${var.environment}"
+  project           = "example"
 }
 
-module "{{cookiecutter.project_slug}}_postgres" {
+module "example_postgres" {
   source = "../../../../../../libs/infra/tf/aws/modules/rds"
 
   environment       = var.environment
-  project           = "{{cookiecutter.project_slug}}"
+  project           = "example"
   aws_access_key    = var.aws_access_key
   aws_secret_key    = var.aws_secret_key
   aws_region        = var.aws_region
-  vpc_id            = module.{{cookiecutter.project_slug}}_vpc.vpc_id
-  vpc_subnet_ids    = module.{{cookiecutter.project_slug}}_vpc.private_subnet_ids
+  vpc_id            = data.aws_vpc.monorepo.id
 }

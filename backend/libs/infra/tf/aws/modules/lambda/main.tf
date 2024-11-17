@@ -5,6 +5,26 @@ provider "aws" {
   region     = var.aws_region
 }
 
+data "aws_vpc" "selected" {
+  id = var.vpc_id
+}
+
+data "aws_subnets" "vpc_subnet_ids" {
+  filter {
+    name   = "vpc-id"
+    values = [var.vpc_id]
+  }
+}
+
+data "aws_security_group" "selected" {
+  vpc_id = data.aws_vpc.selected.id
+
+  filter {
+    name   = "group-name"
+    values = ["default"]
+  }
+}
+
 module "lambda" {
   source                  = "terraform-aws-modules/lambda/aws"
 
@@ -36,8 +56,8 @@ module "lambda" {
   # override docker image command to run worker handler
   image_config_command = var.lambda_command != [] ? var.lambda_command : null
 
-  vpc_subnet_ids         = var.vpc_subnet_ids
-  vpc_security_group_ids = var.vpc_security_group_ids
+  vpc_subnet_ids         = data.aws_subnets.vpc_subnet_ids.ids
+  vpc_security_group_ids = [data.aws_security_group.selected.id]
 
 }
 

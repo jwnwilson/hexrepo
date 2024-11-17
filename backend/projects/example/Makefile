@@ -78,10 +78,11 @@ tf_plan:
 	@echo "Planning Terraform shared infra"
 	cd infra/tf/aws/shared  && terraform plan -out tfapply
 	@echo "Planning Terraform environment infra"
-	cd infra/tf/aws/environment  && terraform plan -out tfapply
+	cd infra/tf/aws/environment && terraform plan -out tfapply
 
 tf_apply:
-	cd infra/tf/aws  && terraform apply -auto-approve tfapply
+	cd infra/tf/aws/shared && terraform apply -auto-approve tfapply
+	cd infra/tf/aws/environment  && terraform apply -auto-approve tfapply
 
 tf_destroy:
 	cd infra/tf/aws  && terraform destroy

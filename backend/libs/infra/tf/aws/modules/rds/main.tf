@@ -5,6 +5,30 @@ provider "aws" {
   region     = var.aws_region
 }
 
+data "aws_vpc" "selected" {
+  id = var.vpc_id
+}
+
+data "aws_subnets" "private_subnet_ids" {
+  filter {
+    name   = "vpc-id"
+    values = [var.vpc_id]
+  }
+
+  tags = {
+    Tier = "Private"
+  }
+}
+
+data "aws_security_group" "selected" {
+  vpc_id = data.aws_vpc.selected.id
+
+  filter {
+    name   = "group-name"
+    values = ["default"]
+  }
+}
+
 
 ################################################################################
 # RDS Module
@@ -35,7 +59,7 @@ module "security_group" {
       to_port     = 5432
       protocol    = "tcp"
       description = "PostgreSQL access from within VPC"
-      cidr_blocks = var.vpc_cidr_block
+      cidr_blocks = data.aws_vpc.selected.cidr_block
     },
   ]
 
@@ -86,7 +110,7 @@ module "db" {
   port                  = 5432
 
   multi_az               = false
-  subnet_ids             = var.vpc_subnet_ids
+  subnet_ids             = data.aws_subnets.private_subnet_ids.ids
   vpc_security_group_ids = [module.security_group.security_group_id]
 
   parameters = [

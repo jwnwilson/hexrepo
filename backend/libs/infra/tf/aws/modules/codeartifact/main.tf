@@ -3,12 +3,12 @@ resource "aws_kms_key" "monorepo" {
 }
 
 resource "aws_codeartifact_domain" "monorepo" {
-  domain         = "monorepo"
+  domain         = var.domain
   encryption_key = aws_kms_key.monorepo.arn
 }
 
 resource "aws_codeartifact_repository" "monorepo" {
-  repository = "monorepo"
+  repository = var.project
   domain     = aws_codeartifact_domain.monorepo.domain
 }
 

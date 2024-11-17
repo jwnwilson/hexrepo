@@ -15,21 +15,16 @@ provider "aws" {
   region  = var.aws_region
 }
 
-module "example_vpc" {
-  source = "../../../../../../libs/infra/tf/aws/modules/vpc"
-
-  environment       = var.environment
-  project           = "example"
-  aws_access_key    = var.aws_access_key
-  aws_secret_key    = var.aws_secret_key
-  aws_region        = var.aws_region
+data "aws_vpc" "monorepo" {
+  filter {
+    name   = "tag:Name"
+    values = ["monorepo-vpc-${var.environment}"]
+  }
 }
-
 
 data "aws_ecr_repository" "ecr_repo" {
   name                 = var.project
 }
-
 
 module "example_api" {
   source = "../../../../../../libs/infra/tf/aws/modules/lambda"
@@ -41,8 +36,7 @@ module "example_api" {
   aws_access_key    = var.aws_access_key
   aws_secret_key    = var.aws_secret_key
   aws_region        = var.aws_region
-  vpc_subnet_ids    = module.example_vpc.private_subnet_ids
-  vpc_security_group_ids = module.example_vpc.security_group_ids
+  vpc_id            = data.aws_vpc.monorepo.id
 }
 
 module "example_api_gateway" {
@@ -64,6 +58,5 @@ module "example_postgres" {
   aws_access_key    = var.aws_access_key
   aws_secret_key    = var.aws_secret_key
   aws_region        = var.aws_region
-  vpc_id            = module.example_vpc.vpc_id
-  vpc_subnet_ids    = module.example_vpc.private_subnet_ids
+  vpc_id            = data.aws_vpc.monorepo.id
 }

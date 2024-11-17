@@ -29,8 +29,7 @@ AWS_SECRET_ACCESS_KEY
 
 - Setup backend
     - Setup infra for projects
-        - Add user setup to infra as code
-        - Add shared infa to libs folder
+        - Setup shared infra build first then environment
     - Setup pipeline
     - Add db adpator logic  
         - Add extra dependencies like boto gcp libs etc
@@ -45,6 +44,8 @@ AWS_SECRET_ACCESS_KEY
         - Look at ruff
     - Setup docker container builds
         - Setup base lib image to re-use for projects
+    - Add user setup to infra as code
+
 
 - Setup Frontend
     - Setup micro fe

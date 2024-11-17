@@ -22,14 +22,9 @@ variable "docker_tag" {
   default = "latest"
 }
 
-variable "vpc_subnet_ids" {
+variable "vpc_id" {
   default = ""
 }
-
-variable "vpc_security_group_ids" {
-  default = ""
-}
-
 variable "environment_variables"{
   default = {}
 }
