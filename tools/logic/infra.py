@@ -1,3 +1,4 @@
+from contextlib import chdir
 import json
 import subprocess
 import boto3
@@ -45,20 +46,17 @@ def authenticate_cloud(config: MonorepoConfig) -> None:
     typer.echo("Authenticating with cloud provider...")
      # Save lib repo url to env var
     if config.cloud_provider == "aws":
-        print("Replace me with AWS authentication logic")
-        tf_output = subprocess.check_output(["make", "tf_output"])
-        repo_url: str = json.loads(tf_output)["aws_codeartifact_repository_endpoint"]["value"]
-        config.set_config_var("monorepo_lib_repo_url", repo_url, set_env_var=True)
+        authenticate_lib_repo(config)
     typer.echo("Authentication successful.")
 
 
 def create_lib_infra(config: MonorepoConfig) -> None:
     typer.echo("Creating infrastructure for libraries...")
     # Placeholder for library infra setup
-    os.chdir("backend/libs")
-    os.system("make tf_init")
-    os.system("make tf_plan")
-    os.system("make tf_apply")
+    with chdir("backend/libs"):
+        os.system("make tf_shared_init")
+        os.system("make tf_shared_plan")
+        os.system("make tf_shared_apply")
     typer.echo("Infrastructure setup complete.")
 
 
@@ -68,21 +66,20 @@ def publish_libs(config: MonorepoConfig) -> None:
     assert os.environ.get("MONOREPO_LIB_REPO_URL"), "Library repo url not found."
     authenticate_lib_repo(config)
     # Publish all libraries
-    project_dir: str = os.getcwd()
     for lib in get_libraries():
-        os.chdir(project_dir)
         lib_type = get_library_type(lib)
-        os.chdir(f"backend/libs/src/{lib_type}/{lib}")
-        os.system("make publish")
+        with chdir(f"backend/libs/src/{lib_type}/{lib}"):
+            os.system("make publish")
     # Placeholder for publishing libraries to repo
     typer.echo("Libraries published successfully.")
 
 
-def setup_shared_infra(config: MonorepoConfig) -> None:
-    typer.echo("Setting up shared infrastructure...")
+def setup_global_env_infra(config: MonorepoConfig) -> None:
+    typer.echo("Setting up global env infrastructure...")
     # Placeholder for shared infra setup
-    os.chdir("backend/libs")
-    os.system("make tf_init")
-    os.system("make tf_plan")
-    os.system("make tf_apply")
+    with chdir("backend/libs"):
+        os.system(f"make tf_env_init ENV=dev")
+        for env in config.environments:
+            os.system(f"ENVIRONEMNT={env} make tf_env_plan ")
+            os.system(f"ENVIRONEMNT={env} make tf_env_apply ")
     typer.echo("Shared infrastructure setup complete.")

@@ -1,4 +1,5 @@
 
+from contextlib import chdir
 import os
 from typing import List
 
@@ -40,7 +41,7 @@ def install_library_in_project(library: str, project: str):
     assert library in libraries, f"Library {library} not found"
 
     library_type = get_library_type(library)
-    os.chdir(f"backend/projects/{project}") 
-    os.system(f"poetry add --editable ../../libs/src/{library_type}/{library} -G dev")
-    os.system(f"poetry add {library} -G prod")
+    with chdir(f"backend/projects/{project}"):
+        os.system(f"poetry add --editable ../../libs/src/{library_type}/{library} -G dev")
+        os.system(f"poetry add {library} -G prod")
     typer.echo(f"Library {library} installed in project {project}")

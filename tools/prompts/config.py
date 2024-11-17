@@ -18,8 +18,8 @@ def prompt_environments() -> List[str]:
     create_env: bool = True
     environments: List[str] = []
     while create_env:
-        env: str = typer.prompt("Please enter name of environment to create: [dev, staging, prod, etc]")
-        environments.append(env)
+        env: str = typer.prompt("Please enter name of environment to create:", default="dev,prod")
+        environments += env.split(",")
         typer.echo(f"Current environments to create: {environments}")
         create_env: bool = typer.confirm("Add another environment?")
 

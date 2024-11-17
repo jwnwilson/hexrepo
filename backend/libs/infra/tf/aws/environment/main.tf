@@ -16,7 +16,7 @@ provider "aws" {
 }
 
 module "monorepo_vpc" {
-  source = ".modules/vpc"
+  source = "../modules/vpc"
 
   environment       = var.environment
   project           = "monorepo"

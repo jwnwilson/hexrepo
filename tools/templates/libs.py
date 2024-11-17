@@ -1,8 +1,11 @@
 import jinja2
+from typing import TYPE_CHECKING
 
-from tools.logic.config import MonorepoConfig
+if TYPE_CHECKING:
+    from tools.logic.config import MonorepoConfig
 
-def generate_libs_makefile(config: MonorepoConfig):
+
+def generate_libs_makefile(config: "MonorepoConfig"):
     environment = jinja2.Environment(
         trim_blocks=True,
         lstrip_blocks=True,

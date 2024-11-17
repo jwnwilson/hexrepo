@@ -1,3 +1,3 @@
 output "aws_codeartifact_repository_endpoint" {
-  value = data.aws_codeartifact_repository_endpoint.monorepo.repository_endpoint
+  value = module.monorepo_code_artifact.codeartifact_repository_endpoint
 }

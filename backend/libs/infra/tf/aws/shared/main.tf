@@ -16,7 +16,7 @@ provider "aws" {
 }
 
 module "monorepo_code_artifact" {
-  source = "./modules/codeartifact"
+  source = "../modules/codeartifact"
   project = "monorepo"
   domain = "monorepo"
 }

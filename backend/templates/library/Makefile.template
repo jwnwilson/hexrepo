@@ -12,16 +12,16 @@ TF_STATE_REGION=${AWS_DEFAULT_REGION}
 {% endif %}
 
 tf_init:
-	@cd infra/tf/{{cloud_provider}}  && terraform init -input=false
+	@cd infra/tf/{{cloud_provider}}/shared  && terraform init -input=false
 
 tf_plan:
-	@cd infra/tf/{{cloud_provider}}  && terraform plan -out tfapply
+	@cd infra/tf/{{cloud_provider}}/shared  && terraform plan -out tfapply
 
 tf_apply:
-	@cd infra/tf/{{cloud_provider}}  && terraform apply -auto-approve tfapply
+	@cd infra/tf/{{cloud_provider}}/shared  && terraform apply tfapply
 
 tf_destroy:
-	@cd infra/tf/{{cloud_provider}}  && terraform destroy
+	@cd infra/tf/{{cloud_provider}}/shared  && terraform destroy
 
 tf_output:
-	@cd infra/tf/aws && terraform output -json
+	@cd infra/tf/aws/shared && terraform output -json

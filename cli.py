@@ -1,10 +1,10 @@
 import os
-from typing import List, Optional, Tuple
+from contextlib import chdir
 from cookiecutter.main import cookiecutter
 import typer
 
 from tools.logic.config import MonorepoConfig, get_or_create_config
-from tools.logic.infra import authenticate_cloud, create_lib_infra, create_tf_state, publish_libs, setup_shared_infra
+from tools.logic.infra import authenticate_cloud, create_lib_infra, create_tf_state, publish_libs, setup_global_env_infra
 from tools.logic.project import install_library_in_project
 from tools.prompts.common import prompt_library_type
 from tools.prompts.infra import prompt_deploy_libs, prompt_setup_lib_infra, prompt_setup_project_infra, prompt_setup_shared_infra, prompt_setup_tf
@@ -17,30 +17,31 @@ app = typer.Typer()
 def create_be_library():
     library_type = prompt_library_type()
     # CD to libs/src/adaptor or libs/src/interactor folder
-    os.chdir(f"backend/libs/src/{library_type}")
-    # Run cookie cutter command to copy template
-    cookiecutter("../../../templates/library")
-    # Setup infra for libray
-    if prompt_setup_lib_infra():
-        typer.echo("Setting up library infrastructure...")
-        os.system("make tf_init")
-        os.system("make tf_plan")
-        os.system("make tf_apply")
-        typer.echo("Shared infrastructure setup complete.")
+    with chdir(f"backend/libs/src/{library_type}"):
+        # Run cookie cutter command to copy template
+        cookiecutter("../../../templates/library")
+        # Setup infra for libray
+        if prompt_setup_lib_infra():
+            typer.echo("Setting up library infrastructure...")
+            os.system("make tf_init")
+            os.system("make tf_plan")
+            os.system("make tf_apply")
+            typer.echo("Shared infrastructure setup complete.")
+
 
 @app.command()
 def create_be_project():
     # CD to projects folder
-    os.chdir(f"backend/projects")
-    # Run cookie cutter command to copy template
-    cookiecutter("../templates/project")
-    # Setup infra for service
-    if prompt_setup_project_infra():
-        typer.echo("Setting up project infrastructure...")
-        os.system("make tf_init")
-        os.system("make tf_plan")
-        os.system("make tf_apply")
-        typer.echo("Shared infrastructure setup complete.")
+    with chdir(f"backend/projects"):
+        # Run cookie cutter command to copy template
+        cookiecutter("../templates/project")
+        # Setup infra for service
+        if prompt_setup_project_infra():
+            typer.echo("Setting up project infrastructure...")
+            os.system("make tf_init")
+            os.system("make tf_plan")
+            os.system("make tf_apply")
+            typer.echo("Shared infrastructure setup complete.")
 
 
 @app.command()
@@ -60,8 +61,6 @@ def setup():
     if created_config:
         generate_libs_makefile(config)
 
-    authenticate_cloud(config)
-
     # Create initial terraform state infra
     if prompt_setup_tf():
         create_tf_state(config)
@@ -69,6 +68,8 @@ def setup():
     # Add options to deploy repo to cloud provider
     if prompt_setup_lib_infra():
         create_lib_infra(config)
+    
+    authenticate_cloud(config)
 
     # Publish libraries to repo
     if prompt_deploy_libs():
@@ -76,7 +77,7 @@ def setup():
 
     # Setup shared infra for environments
     if prompt_setup_shared_infra():
-        setup_shared_infra(config)
+        setup_global_env_infra(config)
 
 
 if __name__ == "__main__":
