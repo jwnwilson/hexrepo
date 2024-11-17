@@ -28,10 +28,7 @@ AWS_SECRET_ACCESS_KEY
 # To Do
 
 - Setup backend
-    - Add project config template
-        - prompt for environments
     - Setup infra for projects
-        - Setup shared infra build first then environment
     - Setup pipeline
     - Add db adpator logic  
         - Add extra dependencies like boto gcp libs etc
@@ -44,12 +41,11 @@ AWS_SECRET_ACCESS_KEY
     - Setup auth / cross project auth / client
     - Setup mypy
         - Look at ruff
-    - Setup docker container builds
+    - Improve docker container builds
         - Setup base lib image to re-use for projects
     - Add user setup to infra as code
         - During project config setup define monorepo user with admin account
         - login with mono repo user and store credentials to work specifically with monorepo
-
 
 - Setup Frontend
     - Setup micro fe
