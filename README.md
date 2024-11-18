@@ -29,6 +29,7 @@ AWS_SECRET_ACCESS_KEY
 
 - Setup backend
     - Setup infra for projects
+        - Reduce example image size
         - Deploy default fastapi image to allow infra setup
     - Setup pipeline
     - Add db adpator logic  
