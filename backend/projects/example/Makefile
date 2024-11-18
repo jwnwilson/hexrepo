@@ -84,9 +84,13 @@ tf_apply:
 	@echo "Applying Terraform infra"
 	cd infra/tf/aws/shared && terraform apply
 	@echo "Deploying image to enable environment deployment"
+	./tools/deploy.sh
 	cd infra/tf/aws/environment  && terraform apply
 
 tf_destroy:
 	@echo "Destroying Terraform infra"
 	cd infra/tf/aws/shared  && terraform destroy
 	cd infra/tf/aws/environment  && terraform destroy
+
+deploy_container:
+	./tools/deploy.sh

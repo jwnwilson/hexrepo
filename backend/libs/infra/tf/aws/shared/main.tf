@@ -18,7 +18,7 @@ provider "aws" {
 module "monorepo_code_artifact" {
   source = "../modules/codeartifact"
   project = "monorepo"
-  domain = "jwnwilson.co.uk"
+  domain = "monorepo"
 }
 
 module "monorepo_route_53_zone" {
