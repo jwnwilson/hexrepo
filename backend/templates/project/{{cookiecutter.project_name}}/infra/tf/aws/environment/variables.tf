@@ -11,7 +11,7 @@ variable "aws_secret_key" {
 }
 
 variable "project" {
-  default = "example"
+  default = "{{cookiecutter.project_slug}}"
 }
 
 variable "docker_tag" {
@@ -23,10 +23,10 @@ variable "domain" {
 }
 
 variable "api_subdomain" {
-  default = "example"
+  default = "{{cookiecutter.project_slug}}"
 }
 
 variable "api_repo" {
   description = "Name of container image repository"
-  default     = "example_service_api"
+  default     = "{{cookiecutter.project_slug}}_api"
 }

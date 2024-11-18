@@ -47,15 +47,15 @@ module "example_api_gateway" {
   lambda_invoke_arn = module.example_api.lambda_function_invoke_arn
   lambda_name       = module.example_api.lambda_function_name
   domain            = var.domain
-  api_subdomain     = "example-${terraform.workspace}"
-  project           = "example"
+  api_subdomain     = "{{cookiecutter.project_slug}}-${terraform.workspace}"
+  project           = "{{cookiecutter.project_slug}}"
 }
 
 module "example_postgres" {
   source = "../../../../../../libs/infra/tf/aws/modules/rds"
 
   environment       = terraform.workspace
-  project           = "example"
+  project           = "{{cookiecutter.project_slug}}"
   aws_access_key    = var.aws_access_key
   aws_secret_key    = var.aws_secret_key
   aws_region        = var.aws_region
