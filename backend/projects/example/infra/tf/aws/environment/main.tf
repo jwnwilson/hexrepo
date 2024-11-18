@@ -2,7 +2,7 @@ terraform {
   backend "s3" {
     region = "eu-west-1"
     bucket = "monorepo-jwn"
-    key = "{{cookiecutter.project_slug}}-environment.tfstate"
+    key = "example-environment.tfstate"
   }
   required_providers {
     aws = {
@@ -26,11 +26,11 @@ data "aws_ecr_repository" "ecr_repo" {
   name                 = "monorepo-${var.project}"
 }
 
-module "{{cookiecutter.project_slug}}_api" {
+module "example_api" {
   source = "../../../../../../libs/infra/tf/aws/modules/lambda"
 
   environment       = terraform.workspace
-  project           = "{{cookiecutter.project_slug}}"
+  project           = "example"
   ecr_url           = data.aws_ecr_repository.ecr_repo.repository_url
   docker_tag        = var.docker_tag
   aws_access_key    = var.aws_access_key
@@ -40,22 +40,22 @@ module "{{cookiecutter.project_slug}}_api" {
   lambda_command    = ["uvicorn", "src.app.interactor.api.fastapi.main:app", "--host", "0.0.0.0", "--port", "8000"]
 }
 
-module "{{cookiecutter.project_slug}}_api_gateway" {
+module "example_api_gateway" {
   source = "../../../../../../libs/infra/tf/aws/modules/apigateway"
 
   environment       = terraform.workspace
-  lambda_invoke_arn = module.{{cookiecutter.project_slug}}_api.lambda_function_invoke_arn
-  lambda_name       = module.{{cookiecutter.project_slug}}_api.lambda_function_name
+  lambda_invoke_arn = module.example_api.lambda_function_invoke_arn
+  lambda_name       = module.example_api.lambda_function_name
   domain            = var.domain
-  api_subdomain     = "{{cookiecutter.project_slug}}-${terraform.workspace}"
-  project           = "{{cookiecutter.project_slug}}"
+  api_subdomain     = "example-${terraform.workspace}"
+  project           = "example"
 }
 
-module "{{cookiecutter.project_slug}}_postgres" {
+module "example_postgres" {
   source = "../../../../../../libs/infra/tf/aws/modules/rds"
 
   environment       = terraform.workspace
-  project           = "{{cookiecutter.project_slug}}"
+  project           = "example"
   aws_access_key    = var.aws_access_key
   aws_secret_key    = var.aws_secret_key
   aws_region        = var.aws_region
