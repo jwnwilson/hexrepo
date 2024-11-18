@@ -85,9 +85,18 @@ module "security_group" {
   ]
 }
 
+resource "aws_db_subnet_group" "default" {
+  name       = "monorepo-${var.environment}"
+  subnet_ids = data.aws_subnets.private_subnet_ids.ids
+
+  tags = {
+    Name = "monorepo-${var.environment}"
+  }
+}
+
 module "db" {
   source  = "terraform-aws-modules/rds/aws"
-  version = "~> 6.0"
+  version = "~> 6.10"
 
   identifier = "${var.project}-db-${var.environment}"
 
@@ -96,10 +105,10 @@ module "db" {
 
   # All available versions: https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_PostgreSQL.html#PostgreSQL.Concepts
   engine               = "postgres"
-  engine_version       = "14"
-  family               = "postgres14" # DB parameter group
-  major_engine_version = "14"         # DB option group
-  instance_class       = "db.t2.micro"
+  engine_version       = "16"
+  family               = "postgres15" # DB parameter group
+  major_engine_version = "16"         # DB option group
+  instance_class       = var.db_instance_class
 
   allocated_storage     = 20
   max_allocated_storage = 100
@@ -116,6 +125,7 @@ module "db" {
   multi_az               = false
   subnet_ids             = data.aws_subnets.private_subnet_ids.ids
   vpc_security_group_ids = [module.security_group.security_group_id]
+  db_subnet_group_name   = aws_db_subnet_group.default.name
 
   parameters = [
     {

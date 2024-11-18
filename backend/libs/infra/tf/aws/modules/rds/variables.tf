@@ -35,3 +35,7 @@ variable "vpc_security_group_ids" {
 variable "environment_variables"{
   default = {}
 }
+
+variable "db_instance_class" {
+  default = "db.t3.micro"
+}

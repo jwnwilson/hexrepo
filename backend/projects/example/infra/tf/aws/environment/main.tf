@@ -23,38 +23,39 @@ data "aws_vpc" "monorepo" {
 }
 
 data "aws_ecr_repository" "ecr_repo" {
-  name                 = var.project
+  name                 = "monorepo-${var.project}"
 }
 
-module "example_api" {
+module "{{cookiecutter.project_slug}}_api" {
   source = "../../../../../../libs/infra/tf/aws/modules/lambda"
 
   environment       = terraform.workspace
-  project           = "example"
+  project           = "{{cookiecutter.project_slug}}"
   ecr_url           = data.aws_ecr_repository.ecr_repo.repository_url
   docker_tag        = var.docker_tag
   aws_access_key    = var.aws_access_key
   aws_secret_key    = var.aws_secret_key
   aws_region        = var.aws_region
   vpc_id            = data.aws_vpc.monorepo.id
+  lambda_command    = ["uvicorn", "src.app.interactor.api.fastapi.main:app", "--host", "0.0.0.0", "--port", "8000"]
 }
 
-module "example_api_gateway" {
+module "{{cookiecutter.project_slug}}_api_gateway" {
   source = "../../../../../../libs/infra/tf/aws/modules/apigateway"
 
   environment       = terraform.workspace
-  lambda_invoke_arn = module.example_api.lambda_function_invoke_arn
-  lambda_name       = module.example_api.lambda_function_name
+  lambda_invoke_arn = module.{{cookiecutter.project_slug}}_api.lambda_function_invoke_arn
+  lambda_name       = module.{{cookiecutter.project_slug}}_api.lambda_function_name
   domain            = var.domain
-  api_subdomain     = "example-${terraform.workspace}"
-  project           = "example"
+  api_subdomain     = "{{cookiecutter.project_slug}}-${terraform.workspace}"
+  project           = "{{cookiecutter.project_slug}}"
 }
 
-module "example_postgres" {
+module "{{cookiecutter.project_slug}}_postgres" {
   source = "../../../../../../libs/infra/tf/aws/modules/rds"
 
   environment       = terraform.workspace
-  project           = "example"
+  project           = "{{cookiecutter.project_slug}}"
   aws_access_key    = var.aws_access_key
   aws_secret_key    = var.aws_secret_key
   aws_region        = var.aws_region

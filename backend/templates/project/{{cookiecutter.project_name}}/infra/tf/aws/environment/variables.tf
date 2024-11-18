@@ -1,7 +1,4 @@
 /* general */
-variable "environment" {
-  default = "develop"
-}
 
 variable "aws_region" {
   default = "eu-west-1"
@@ -14,23 +11,19 @@ variable "aws_secret_key" {
 }
 
 variable "project" {
-  default = "example-service"
+  default = "example"
 }
-
-variable "ecr_api_url" {}
-
-variable "vpc_id" {}
 
 variable "docker_tag" {
   default = "latest"
 }
 
 variable "domain" {
-  default = "example-service.link"
+  default = "jwnwilson.co.uk"
 }
 
 variable "api_subdomain" {
-  default = "api"
+  default = "example"
 }
 
 variable "api_repo" {

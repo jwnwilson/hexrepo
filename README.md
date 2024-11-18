@@ -29,6 +29,7 @@ AWS_SECRET_ACCESS_KEY
 
 - Setup backend
     - Setup infra for projects
+        - Deploy default fastapi image to allow infra setup
     - Setup pipeline
     - Add db adpator logic  
         - Add extra dependencies like boto gcp libs etc
@@ -46,6 +47,9 @@ AWS_SECRET_ACCESS_KEY
     - Add user setup to infra as code
         - During project config setup define monorepo user with admin account
         - login with mono repo user and store credentials to work specifically with monorepo
+    - Enforce architecture rules:
+        - https://roman.pt/posts/python-architecture-linter/
+        - [deply](https://github.com/Vashkatsi/deply)
 
 - Setup Frontend
     - Setup micro fe

@@ -71,20 +71,21 @@ tf_workspace:
 	@cd infra/tf/aws/environment  && terraform workspace new $(ENVIRONMENT)
 
 tf_init:
-	@echo "Initializing Terraform shared infra"
+	@echo "Initializing Terraform infra"
 	cd infra/tf/aws/shared  && terraform init -input=false
-	@echo "Initializing Terraform environment infra"
 	cd infra/tf/aws/environment  && terraform init -input=false
 
 tf_plan:
-	@echo "Planning Terraform shared infra"
+	@echo "Planning Terraform infra"
 	cd infra/tf/aws/shared  && terraform plan -out tfapply
-	@echo "Planning Terraform environment infra"
 	cd infra/tf/aws/environment && terraform plan -out tfapply
 
 tf_apply:
+	@echo "Applying Terraform infra"
 	cd infra/tf/aws/shared && terraform apply
 	cd infra/tf/aws/environment  && terraform apply
 
 tf_destroy:
-	cd infra/tf/aws  && terraform destroy
+	@echo "Destroying Terraform infra"
+	cd infra/tf/aws/shared  && terraform destroy
+	cd infra/tf/aws/environment  && terraform destroy

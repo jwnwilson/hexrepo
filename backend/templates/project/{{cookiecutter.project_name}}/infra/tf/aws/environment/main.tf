@@ -17,13 +17,13 @@ provider "aws" {
 
 data "aws_vpc" "monorepo" {
   filter {
-    name   = "name"
+    name   = "tag:Name"
     values = ["monorepo-vpc-${terraform.workspace}"]
   }
 }
 
 data "aws_ecr_repository" "ecr_repo" {
-  name                 = var.project
+  name                 = "monorepo-${var.project}"
 }
 
 module "example_api" {
@@ -37,6 +37,7 @@ module "example_api" {
   aws_secret_key    = var.aws_secret_key
   aws_region        = var.aws_region
   vpc_id            = data.aws_vpc.monorepo.id
+  lambda_command    = ["uvicorn", "src.app.interactor.api.fastapi.main:app", "--host", "0.0.0.0", "--port", "8000"]
 }
 
 module "example_api_gateway" {

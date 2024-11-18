@@ -73,19 +73,21 @@ tf_workspace:
 	@cd infra/tf/{{cookiecutter.cloud_provider}}/environment  && terraform workspace new $(ENVIRONMENT)
 
 tf_init:
-	@echo "Initializing Terraform shared infra"
+	@echo "Initializing Terraform infra"
 	cd infra/tf/{{cookiecutter.cloud_provider}}/shared  && terraform init -input=false
-	@echo "Initializing Terraform environment infra"
 	cd infra/tf/{{cookiecutter.cloud_provider}}/environment  && terraform init -input=false
 
 tf_plan:
-	@echo "Planning Terraform shared infra"
+	@echo "Planning Terraform infra"
 	cd infra/tf/{{cookiecutter.cloud_provider}}/shared  && terraform plan -out tfapply
-	@echo "Planning Terraform environment infra"
 	cd infra/tf/{{cookiecutter.cloud_provider}}/environment  && terraform plan -out tfapply
 
 tf_apply:
-	cd infra/tf/{{cookiecutter.cloud_provider}}  && terraform apply
+	@echo "Applying Terraform infra"
+	cd infra/tf/{{cookiecutter.cloud_provider}}/shared  && terraform apply
+	cd infra/tf/{{cookiecutter.cloud_provider}}/environment  && terraform apply
 
 tf_destroy:
-	cd infra/tf/{{cookiecutter.cloud_provider}}  && terraform destroy
+	@echo "Destroying Terraform infra"
+	cd infra/tf/{{cookiecutter.cloud_provider}}/shared  && terraform destroy
+	cd infra/tf/{{cookiecutter.cloud_provider}}/environment  && terraform destroy
