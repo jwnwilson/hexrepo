@@ -101,12 +101,27 @@ module "db" {
   identifier = "${var.project}-db-${var.environment}"
 
   create_db_option_group    = false
-  create_db_parameter_group = false
+  create_db_parameter_group = true
+
+  parameters = [
+    {
+      name  = "autovacuum"
+      value = 1
+    },
+    {
+      name  = "client_encoding"
+      value = "utf8"
+    },
+    {
+      name  = "rds.force_ssl"
+      value = 0
+    }
+  ]
 
   # All available versions: https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_PostgreSQL.html#PostgreSQL.Concepts
   engine               = "postgres"
   engine_version       = "16"
-  family               = "postgres15" # DB parameter group
+  family               = "postgres16" # DB parameter group
   major_engine_version = "16"         # DB option group
   instance_class       = var.db_instance_class
 
@@ -126,15 +141,4 @@ module "db" {
   subnet_ids             = data.aws_subnets.private_subnet_ids.ids
   vpc_security_group_ids = [module.security_group.security_group_id]
   db_subnet_group_name   = aws_db_subnet_group.default.name
-
-  parameters = [
-    {
-      name  = "autovacuum"
-      value = 1
-    },
-    {
-      name  = "client_encoding"
-      value = "utf8"
-    }
-  ]
 }

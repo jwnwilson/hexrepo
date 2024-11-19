@@ -35,6 +35,7 @@ module "lambda" {
 
   image_uri               = "${var.ecr_url}:${var.docker_tag}"
   package_type            = "Image"
+  architectures          = ["arm64"]
   
   attach_network_policy   = true
   timeout                 = 30
@@ -56,7 +57,7 @@ module "lambda" {
   image_config_command = var.lambda_command
 
   vpc_subnet_ids         = data.aws_subnets.vpc_subnet_ids.ids
-  vpc_security_group_ids = [data.aws_security_group.selected.id]
+  vpc_security_group_ids = var.security_group_ids
 
 }
 

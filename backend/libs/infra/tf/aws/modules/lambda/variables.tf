@@ -27,3 +27,7 @@ variable "vpc_id" {
 variable "environment_variables"{
   default = {}
 }
+
+variable "security_group_ids" {
+  default = []
+}

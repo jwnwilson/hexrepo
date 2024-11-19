@@ -77,13 +77,13 @@ tf_init:
 
 tf_plan:
 	@echo "Planning Terraform infra"
-	cd infra/tf/aws/shared  && terraform plan -out tfapply
-	cd infra/tf/aws/environment && terraform plan -out tfapply
+	cd infra/tf/aws/shared  && terraform plan
+	cd infra/tf/aws/environment && terraform plan
 
 tf_apply:
 	@echo "Applying Terraform infra"
-	cd infra/tf/aws/shared && terraform apply -auto-approve tf_apply
-	cd infra/tf/aws/environment  && terraform apply -auto-approve -auto-approve tf_apply
+	cd infra/tf/aws/shared && terraform apply
+	cd infra/tf/aws/environment  && terraform apply
 
 tf_destroy:
 	@echo "Destroying Terraform infra"
