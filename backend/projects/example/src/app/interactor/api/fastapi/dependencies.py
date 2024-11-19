@@ -8,9 +8,10 @@ from app.config import config
 
 def get_db_url():
     # Running on the cloud
-    if config.DB_URL_SECRET_ID:
+    if config.DB_PASSWORD_SECRET_NAME:
         if config.CLOUD_PROVIDER == "aws":
-            return AWSSecretAdaptor().get_secret(config.DB_URL_SECRET_ID)
+            password = AWSSecretAdaptor().get_secret(config.DB_PASSWORD_SECRET_NAME)
+            return config.DB_URL.format(password=password)
         else:
             raise NotImplementedError(f"No secret manager implemented for Cloud provider {config.CLOUD_PROVIDER}")
     # Running locally

@@ -41,7 +41,7 @@ module "example_api" {
   environment_variables = {
     ENVIRONMENT                 = terraform.workspace
     CLOUD_PROVIDER              = "AWS"
-    DB_URL                      = "${module.example_postgres.db_instance_endpoint}/${var.project}"
+    DB_URL                      = "postgresql+psycopg2://postgres:{password}@${module.example_postgres.db_instance_endpoint}/${var.project}"
     DB_PASSWORD_SECRET_NAME     = module.example_postgres.db_password_secret_name
   }
 }
@@ -66,4 +66,5 @@ module "example_postgres" {
   aws_secret_key    = var.aws_secret_key
   aws_region        = var.aws_region
   vpc_id            = data.aws_vpc.monorepo.id
+  username          = "postgres"
 }
