@@ -89,8 +89,8 @@ tf_apply:
 
 tf_destroy:
 	@echo "Destroying Terraform infra"
-	cd infra/tf/aws/shared  && terraform destroy
 	cd infra/tf/aws/environment  && terraform destroy
+	cd infra/tf/aws/shared  && terraform destroy
 
 deploy_container:
 	./tools/deploy.sh

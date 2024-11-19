@@ -89,5 +89,5 @@ tf_apply:
 
 tf_destroy:
 	@echo "Destroying Terraform infra"
-	cd infra/tf/{{cookiecutter.cloud_provider}}/shared  && terraform destroy
 	cd infra/tf/{{cookiecutter.cloud_provider}}/environment  && terraform destroy
+	cd infra/tf/{{cookiecutter.cloud_provider}}/shared  && terraform destroy

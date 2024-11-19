@@ -29,8 +29,8 @@ AWS_SECRET_ACCESS_KEY
 
 - Setup backend
     - Setup infra for projects
-        - Reduce example image size
         - Deploy default fastapi image to allow infra setup
+        - Connect to deployed DBs via env vars
     - Setup pipeline
     - Add db adpator logic  
         - Add extra dependencies like boto gcp libs etc
@@ -40,7 +40,7 @@ AWS_SECRET_ACCESS_KEY
     - Add storage libs for gcp, aws, azure
     - Setup async tasks
         - Setup task chaining with idempotent re-run
-    - Setup auth / cross project auth / client
+    - Setup auth / cross project auth / authorisation
     - Setup mypy
         - Look at ruff
     - Improve docker container builds
@@ -61,6 +61,7 @@ AWS_SECRET_ACCESS_KEY
 
 - Automate setup
 - Investigate setting up company services
+    - Analytics
     - JIRA / Confluence
     - Spendesk
     - Charlie hr
