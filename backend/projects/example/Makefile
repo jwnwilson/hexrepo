@@ -82,15 +82,20 @@ tf_plan:
 
 tf_apply:
 	@echo "Applying Terraform infra"
-	cd infra/tf/aws/shared && terraform apply
-	@echo "Deploying image to enable environment deployment"
-	./tools/deploy.sh
-	cd infra/tf/aws/environment  && terraform apply
+	cd infra/tf/aws/shared && terraform apply -auto-approve tf_apply
+	cd infra/tf/aws/environment  && terraform apply -auto-approve -auto-approve tf_apply
 
 tf_destroy:
 	@echo "Destroying Terraform infra"
 	cd infra/tf/aws/environment  && terraform destroy
 	cd infra/tf/aws/shared  && terraform destroy
+
+tf_setup:
+	@echo "Applying Terraform infra"
+	cd infra/tf/aws/shared && terraform apply
+	@echo "Deploying image to enable environment deployment"
+	./tools/deploy.sh
+	cd infra/tf/aws/environment  && terraform apply
 
 deploy_container:
 	./tools/deploy.sh

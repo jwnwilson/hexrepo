@@ -91,3 +91,13 @@ tf_destroy:
 	@echo "Destroying Terraform infra"
 	cd infra/tf/{{cookiecutter.cloud_provider}}/environment  && terraform destroy
 	cd infra/tf/{{cookiecutter.cloud_provider}}/shared  && terraform destroy
+
+tf_setup:
+	@echo "Applying Terraform infra"
+	cd infra/tf/aws/shared && terraform apply
+	@echo "Deploying image to enable environment deployment"
+	./tools/deploy.sh
+	cd infra/tf/aws/environment  && terraform apply
+
+deploy_container:
+	./tools/deploy.sh

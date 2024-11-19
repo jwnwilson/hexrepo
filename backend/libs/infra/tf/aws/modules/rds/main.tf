@@ -40,7 +40,7 @@ resource "random_password" "master"{
 }
 
 resource "aws_secretsmanager_secret" "password" {
-  name = "${var.project}-db-password-secret"
+  name = "${var.project}-db-password"
 }
 
 resource "aws_secretsmanager_secret_version" "password" {

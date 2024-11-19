@@ -32,12 +32,17 @@ module "example_api" {
   environment       = terraform.workspace
   project           = "example"
   ecr_url           = data.aws_ecr_repository.ecr_repo.repository_url
-  docker_tag        = var.docker_tag
   aws_access_key    = var.aws_access_key
   aws_secret_key    = var.aws_secret_key
   aws_region        = var.aws_region
   vpc_id            = data.aws_vpc.monorepo.id
-  lambda_command    = ["uvicorn", "src.app.interactor.api.fastapi.main:app", "--host", "0.0.0.0", "--port", "8000"]
+  lambda_command    = ["src.app.interactor.api,fastapi.lambda.handler"]
+
+  environment_variables = {
+    ENVIRONMENT                 = terraform.workspace
+    DB_URL                      = "${module.example_postgres.db_instance_endpoint}/${var.project}"
+    DB_PASSWORD_SECRET_NAME     = module.example_postgres.db_password_secret_name
+  }
 }
 
 module "example_api_gateway" {

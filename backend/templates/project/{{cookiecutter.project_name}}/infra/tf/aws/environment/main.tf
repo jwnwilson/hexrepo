@@ -30,14 +30,25 @@ module "example_api" {
   source = "../../../../../../libs/infra/tf/aws/modules/lambda"
 
   environment       = terraform.workspace
-  project           = "example"
+  project           = "{{cookiecutter.project_slug}}"
   ecr_url           = data.aws_ecr_repository.ecr_repo.repository_url
-  docker_tag        = var.docker_tag
   aws_access_key    = var.aws_access_key
   aws_secret_key    = var.aws_secret_key
   aws_region        = var.aws_region
   vpc_id            = data.aws_vpc.monorepo.id
+  {% if cookiecutter.cloud_provider == "aws" %}
+  lambda_command    = ["src.app.interactor.api,fastapi.lambda.handler"]
+  {% else %}
   lambda_command    = ["uvicorn", "src.app.interactor.api.fastapi.main:app", "--host", "0.0.0.0", "--port", "8000"]
+  {% endif %}
+
+  {% if cookiecutter.use_db %}
+  environment_variables = {
+    ENVIRONMENT                 = terraform.workspace
+    DB_URL                      = "${module.example_postgres.db_instance_endpoint}/${var.project}"
+    DB_PASSWORD_SECRET_NAME     = module.example_postgres.db_password_secret_name
+  }
+  {% endif %}
 }
 
 module "example_api_gateway" {

@@ -14,12 +14,8 @@ variable "project" {
   default = "{{cookiecutter.project_slug}}"
 }
 
-variable "docker_tag" {
-  default = "latest"
-}
-
 variable "domain" {
-  default = "jwnwilson.co.uk"
+  default = "{{cookiecutter.domain}}"
 }
 
 variable "api_subdomain" {
