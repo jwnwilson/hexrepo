@@ -9,7 +9,7 @@ from app.config import config
 
 ENVIRONMENT = os.environ.get("ENVIRONMENT", "")
 
-root_prefix = f"/"
+root_prefix = f""
 
 app = FastAPI(
     title="{{cookiecutter.project_slug}} Service",

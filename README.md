@@ -29,7 +29,6 @@ AWS_SECRET_ACCESS_KEY
 
 - Setup backend
     - Setup infra for projects
-        - Deploy default fastapi image to allow infra setup
         - Connect to deployed DBs via env vars
     - Setup pipeline
         - use github actions

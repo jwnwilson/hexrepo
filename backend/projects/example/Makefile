@@ -19,7 +19,7 @@ venv:
 	@./tools/setup_env.sh
 
 build:
-	docker compose build 
+	docker compose build --no-cache
 
 # DB management
 db_delete_data: down

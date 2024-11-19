@@ -18,8 +18,8 @@ services:
     tty: true
     # Mount local files into the container so we can update files inside the container
     volumes:
-      - ../../libs:/libs
-      - ./src:/code/src
+      - ../../libs/src:/libs/src
+      - ./src:/code/task
     expose:
       - "8000"
     ports:
