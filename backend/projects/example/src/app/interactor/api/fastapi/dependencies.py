@@ -1,9 +1,22 @@
-import os
 from collections.abc import Generator
 from monorepo_db import UOW
+from monorepo_storage import AWSSecretAdaptor
 
 from app.adaptor.db.sql import SqlUOW
 from app.config import config
+
+
+def get_db_url():
+    # Running on the cloud
+    if config.DB_URL_SECRET_ID:
+        if config.CLOUD_PROVIDER == "aws":
+            return AWSSecretAdaptor().get_secret(config.DB_URL_SECRET_ID)
+        else:
+            raise NotImplementedError(f"No secret manager implemented for Cloud provider {config.CLOUD_PROVIDER}")
+    # Running locally
+    else:
+        return config.DB_URL
+
 
 
 def get_uow() -> Generator[UOW, None, None]:

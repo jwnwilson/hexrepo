@@ -40,6 +40,7 @@ module "example_api" {
 
   environment_variables = {
     ENVIRONMENT                 = terraform.workspace
+    CLOUD_PROVIDER              = "AWS"
     DB_URL                      = "${module.example_postgres.db_instance_endpoint}/${var.project}"
     DB_PASSWORD_SECRET_NAME     = module.example_postgres.db_password_secret_name
   }

@@ -45,6 +45,7 @@ module "example_api" {
   {% if cookiecutter.use_db %}
   environment_variables = {
     ENVIRONMENT                 = terraform.workspace
+    CLOUD_PROVIDER              = "{{ cookiecutter.cloud_provider|upper }}"
     DB_URL                      = "${module.example_postgres.db_instance_endpoint}/${var.project}"
     DB_PASSWORD_SECRET_NAME     = module.example_postgres.db_password_secret_name
   }

@@ -15,11 +15,13 @@ class Config(BaseSettings):
     with environment variables.
     """
     # Current environment
+    CLOUD_PROVIDER: str = os.environ.get("CLOUD_PROVIDER", "local")
     environment: str = os.environ.get("ENVIRONMENT", "dev") 
 
     # FEATURE FLAGS
 
     # Database settings
+    DB_URL_SECRET_ID: str = os.environ.get("DB_URL_SECRET_ID", "")
     DB_URL: str = os.environ["DB_URL"]
 
     DB_SQL_LOGGING: bool = os.environ.get("DB_SQL_LOGGING", "false") == "true"

@@ -32,14 +32,14 @@ AWS_SECRET_ACCESS_KEY
         - Connect to deployed DBs via env vars
     - Setup pipeline
         - use github actions
-    - Add db adpator logic from hex lib
-        - Add extra dependencies like boto gcp libs etc
-        - Add aws, gcp, azure options to library installs
     - Add ability to update project from template
         - Use cruft to update projects from template?    
     - Setup async tasks
         - Setup task chaining with idempotent re-run
     - Setup auth / cross project auth / authorisation
+        - Add db adpator logic from hex lib
+        - Add extra dependencies like boto gcp libs etc
+        - Add aws, gcp, azure options to library installs
     - Add storage libs for gcp, aws, azure
     - Setup mypy
         - Look at ruff
