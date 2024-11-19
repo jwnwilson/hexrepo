@@ -36,7 +36,7 @@ module "example_api" {
   aws_secret_key    = var.aws_secret_key
   aws_region        = var.aws_region
   vpc_id            = data.aws_vpc.monorepo.id
-  lambda_command    = ["src.app.interactor.api,fastapi.lambda.handler"]
+  lambda_command    = ["src.app.interactor.api.fastapi.lambda_handler.handler"]
 
   environment_variables = {
     ENVIRONMENT                 = terraform.workspace

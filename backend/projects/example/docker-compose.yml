@@ -7,6 +7,7 @@ version: '3'
 services:
   api:
     container_name: example
+    platform: "linux/arm64"
     env_file:
       - env/docker.env
     image: "example"
@@ -27,7 +28,7 @@ services:
       - postgres_db
     # Override lambda entry point to revert to default docker behaviour
     entrypoint: ""
-    command: "uvicorn app.adapter.into.fastapi.main:app --host 0.0.0.0 --port 80 --reload --debug"
+    command: "uvicorn app.interactor.api.fastapi.main:app --host 0.0.0.0 --port 8000 --reload"
 
   postgres_db:
     container_name: example_db

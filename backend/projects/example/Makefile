@@ -95,7 +95,9 @@ tf_setup:
 	cd infra/tf/aws/shared && terraform apply
 	@echo "Deploying image to enable environment deployment"
 	./tools/deploy.sh
-	cd infra/tf/aws/environment  && terraform apply
+	# Re-add after destorying default env
+	# @cd infra/tf/aws/environment && terraform workspace new dev
+	cd infra/tf/aws/environment && terraform apply
 
 deploy_container:
 	./tools/deploy.sh

@@ -60,8 +60,7 @@ resource "aws_api_gateway_stage" "this" {
   cache_cluster_enabled = false
   cache_cluster_size = "0.5"
   xray_tracing_enabled = true
-  
-}
+  }
 
 resource "aws_api_gateway_domain_name" "this" {
   certificate_arn = aws_acm_certificate_validation.api_cert_validation.certificate_arn
@@ -127,8 +126,6 @@ resource "aws_api_gateway_deployment" "apideploy" {
    ]
 
    rest_api_id = aws_api_gateway_rest_api.apiLambda.id
-   stage_name  = var.environment
-   stage_description = "Deployed at ${timestamp()}"
 
    lifecycle {
     create_before_destroy = true

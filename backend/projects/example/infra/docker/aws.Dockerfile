@@ -15,5 +15,5 @@ RUN poetry lock && poetry install --no-root
 COPY ./projects/example/src ./src
 COPY ./projects/example/alembic.ini ./
 
-ENV PYTHONPATH ${LAMBDA_TASK_ROOT}/app
-CMD ["src.app.interactor.api,fastapi.lambda.handler"]
+ENV PYTHONPATH ${LAMBDA_TASK_ROOT}/src
+CMD ["src.app.interactor.api.fastapi.lambda_handler.handler"]

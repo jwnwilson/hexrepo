@@ -32,15 +32,16 @@ AWS_SECRET_ACCESS_KEY
         - Deploy default fastapi image to allow infra setup
         - Connect to deployed DBs via env vars
     - Setup pipeline
-    - Add db adpator logic  
+        - use github actions
+    - Add db adpator logic from hex lib
         - Add extra dependencies like boto gcp libs etc
         - Add aws, gcp, azure options to library installs
     - Add ability to update project from template
         - Use cruft to update projects from template?    
-    - Add storage libs for gcp, aws, azure
     - Setup async tasks
         - Setup task chaining with idempotent re-run
     - Setup auth / cross project auth / authorisation
+    - Add storage libs for gcp, aws, azure
     - Setup mypy
         - Look at ruff
     - Improve docker container builds
