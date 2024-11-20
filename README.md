@@ -35,6 +35,7 @@ AWS_SECRET_ACCESS_KEY
             - investigate 3rd party software for cheaper NAT + bastion access to DB
                 https://fck-nat.dev/stable/deploying/#terraform
                 - Remove nat gateway
+        - Update template and verify destroy / rebuild
     - Setup pipeline for monorepo
         - use github actions
         - listen to changes in backend/libs and backend/projects only

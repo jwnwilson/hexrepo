@@ -132,10 +132,10 @@ module "db" {
   # NOTE: Do NOT use 'user' as the value for 'username' as it throws:
   # "Error creating DB Instance: InvalidParameterValue: MasterUsername
   # user cannot be used as it is a reserved word used by the engine"
-  db_name               = var.project
-  username              = var.username
-  manage_master_user_password              = true
-  port                  = 5432
+  db_name                     = var.project
+  username                    = var.username
+  manage_master_user_password = true
+  port                        = 5432
 
   multi_az               = false
   subnet_ids             = data.aws_subnets.private_subnet_ids.ids
