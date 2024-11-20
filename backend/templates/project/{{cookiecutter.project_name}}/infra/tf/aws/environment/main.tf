@@ -37,7 +37,7 @@ module "example_api" {
   aws_region        = var.aws_region
   vpc_id            = data.aws_vpc.monorepo.id
   {% if cookiecutter.cloud_provider == "aws" %}
-  lambda_command    = ["src.app.interactor.api.fastapi.lambda_handler.handler"]
+  lambda_command    = ["src.app.interactor.aws.lambda_api.handlerr"]
   {% else %}
   lambda_command    = ["uvicorn", "app.interactor.api.fastapi.main:app", "--host", "0.0.0.0", "--port", "8000"]
   {% endif %}
