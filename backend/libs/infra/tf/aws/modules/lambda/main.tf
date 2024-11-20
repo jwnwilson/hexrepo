@@ -14,6 +14,10 @@ data "aws_subnets" "vpc_subnet_ids" {
     name   = "vpc-id"
     values = [var.vpc_id]
   }
+
+  tags = {
+    Tier = "Private"
+  }
 }
 
 data "aws_security_group" "selected" {
