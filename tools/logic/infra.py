@@ -57,6 +57,9 @@ def create_lib_infra(config: MonorepoConfig) -> None:
         os.system("make tf_shared_init")
         os.system("make tf_shared_plan")
         os.system("make tf_shared_apply")
+        code_repo_data = subprocess.getoutput("make tf_shared_output")
+        code_repo_url = json.loads(code_repo_data)["aws_codeartifact_repository_endpoint"]["value"]
+        config.set_config_var("monorepo_lib_repo_url", code_repo_url, set_env=True)
     typer.echo("Infrastructure setup complete.")
 
 

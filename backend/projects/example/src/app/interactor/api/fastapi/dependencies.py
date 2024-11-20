@@ -10,6 +10,7 @@ def get_db_url():
     # Running on the cloud
     if config.DB_PASSWORD_SECRET_NAME:
         if config.CLOUD_PROVIDER.upper() == "AWS":
+            print("Getting secret from AWS")
             password = AWSSecretAdaptor().get_secret(config.DB_PASSWORD_SECRET_NAME)
             db_url =  config.DB_URL.format(password=password)
             print(f"db_url: {db_url}")

@@ -1,3 +1,3 @@
 output codeartifact_repository_endpoint {
-  value = aws_codeartifact_repository.monorepo.repository
+  value = data.aws_codeartifact_repository_endpoint.monorepo.repository_endpoint
 }

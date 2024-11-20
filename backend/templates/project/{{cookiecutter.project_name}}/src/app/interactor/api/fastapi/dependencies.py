@@ -9,9 +9,12 @@ from app.config import config
 def get_db_url():
     # Running on the cloud
     if config.DB_PASSWORD_SECRET_NAME:
-        if config.CLOUD_PROVIDER == "aws":
+        if config.CLOUD_PROVIDER.upper() == "AWS":
+            print("Getting secret from AWS")
             password = AWSSecretAdaptor().get_secret(config.DB_PASSWORD_SECRET_NAME)
-            return config.DB_URL.format(password=password)
+            db_url =  config.DB_URL.format(password=password)
+            print(f"db_url: {db_url}")
+            return db_url
         else:
             raise NotImplementedError(f"No secret manager implemented for Cloud provider {config.CLOUD_PROVIDER}")
     # Running locally
@@ -21,6 +24,6 @@ def get_db_url():
 
 
 def get_uow() -> Generator[UOW, None, None]:
-    uow = SqlUOW(db_url=config.DB_URL)
+    uow = SqlUOW(db_url=get_db_url())
     with uow.transaction():
         yield uow

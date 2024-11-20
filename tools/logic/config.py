@@ -26,10 +26,10 @@ class MonorepoConfig(BaseSettings):
     monorepo_lib_repo_url: str = ""
     monorepo_lib_repo_username: str = ""
 
-    def set_config_var(self, key: str, value: str, set_env_var: bool = False):
+    def set_config_var(self, key: str, value: str, set_env: bool = False):
         setattr(self, key, value)
         self.save_config()
-        if set_env_var:
+        if set_env:
             set_env_var(self.shell_file, key.upper(), value)
 
     def save_config(self):

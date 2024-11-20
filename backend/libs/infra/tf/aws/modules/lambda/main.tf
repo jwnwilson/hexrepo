@@ -83,9 +83,9 @@ module "lambda" {
 #   source_arn    = "${aws_cloudwatch_event_rule.every_one_minute.arn}"
 # }
 
-resource "aws_iam_policy" "sqs-s3-lambda-policy" {
-  name        = "sqs-s3-lambda-policy-${var.project}-${var.environment}"
-  description = "allow lambda access to sqs policy"
+resource "aws_iam_policy" "sqs-secret-lambda-policy" {
+  name        = "sqs-secret-lambda-policy-${var.project}-${var.environment}"
+  description = "allow lambda access to sqs policy & secret manager"
 
   policy = <<EOF
 {
@@ -97,6 +97,13 @@ resource "aws_iam_policy" "sqs-s3-lambda-policy" {
       ],
       "Effect": "Allow",
       "Resource": "*"
+    },
+    {
+      "Action": [
+        "secretsmanager:GetSecretValue"
+      ],
+      "Effect": "Allow",
+      "Resource": "*"
     }
   ]
 }
@@ -105,6 +112,6 @@ EOF
 
 resource "aws_iam_role_policy_attachment" "sqs-attach" {
   role       = module.lambda.lambda_role_name
-  policy_arn = aws_iam_policy.sqs-s3-lambda-policy.arn
+  policy_arn = aws_iam_policy.sqs-secret-lambda-policy.arn
 }
 
