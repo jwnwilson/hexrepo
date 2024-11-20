@@ -14,6 +14,10 @@ variable "project" {
   default = "example"
 }
 
+variable "docker_tag" {
+  default = "latest"
+}
+
 variable "domain" {
   default = "jwnwilson.co.uk"
 }

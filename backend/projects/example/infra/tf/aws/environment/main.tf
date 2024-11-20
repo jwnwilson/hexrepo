@@ -36,6 +36,7 @@ module "example_api" {
   environment        = terraform.workspace
   project            = "example"
   ecr_url            = data.aws_ecr_repository.ecr_repo.repository_url
+  docker_tag         = var.docker_tag 
   aws_access_key     = var.aws_access_key
   aws_secret_key     = var.aws_secret_key
   aws_region         = var.aws_region
@@ -57,6 +58,7 @@ module "migrate_db_task" {
   environment        = terraform.workspace
   project            = "example-db-migrate"
   ecr_url            = data.aws_ecr_repository.ecr_repo.repository_url
+  docker_tag         = var.docker_tag 
   aws_access_key     = var.aws_access_key
   aws_secret_key     = var.aws_secret_key
   aws_region         = var.aws_region

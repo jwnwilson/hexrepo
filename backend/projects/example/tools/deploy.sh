@@ -20,3 +20,5 @@ docker tag "${latest_image}" "${aws_ecr}/${ecr_repo_name}:latest"
 docker tag "${latest_image}" "${aws_ecr}/${ecr_repo_name}:${docker_tag}"
 docker push "${aws_ecr}/${ecr_repo_name}:latest"
 docker push "${aws_ecr}/${ecr_repo_name}:${docker_tag}"
+
+make tf_apply TF_VAR_docker_tag=${docker_tag}

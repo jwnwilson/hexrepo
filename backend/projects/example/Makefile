@@ -2,7 +2,7 @@
 .DEFAULT_GOAL = help
 .EXPORT_ALL_VARIABLES:
 
-TF_VAR_docker_tag=${docker_tag}
+TF_VAR_docker_tag := latest
 TF_VAR_environment=${ENVIRONMENT}
 TF_VAR_ecr_api_url=${AWS_ACCOUNT}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/example_api
 TF_VAR_aws_access_key=${AWS_ACCESS_KEY_ID}
@@ -19,7 +19,7 @@ venv:
 	@./tools/setup_env.sh
 
 build:
-	docker compose build --no-cache
+	docker compose build
 
 # DB management
 db_delete_data: down
@@ -99,5 +99,5 @@ tf_setup:
 	# @cd infra/tf/aws/environment && terraform workspace new dev
 	cd infra/tf/aws/environment && terraform apply
 
-deploy_container:
+deploy: build
 	./tools/deploy.sh
