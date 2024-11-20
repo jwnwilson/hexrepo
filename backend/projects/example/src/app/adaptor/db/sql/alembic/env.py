@@ -8,10 +8,15 @@ from monorepo_db import get_db_url
 from monorepo_db.sql.models.base_model import Base
 
 
+def get_db_url_alembic():
+    # Escape % in the db_url
+    return get_db_url().replace('%', '%%') 
+
+
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
-config.set_main_option("sqlalchemy.url", get_db_url())
+config.set_main_option("sqlalchemy.url", get_db_url_alembic())
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
@@ -42,7 +47,7 @@ def run_migrations_offline() -> None:
     script output.
 
     """
-    url = app_config.DB_URL
+    url = get_db_url_alembic()
     context.configure(
         url=url,
         target_metadata=target_metadata,
@@ -74,7 +79,7 @@ def run_migrations_online():
     """
     configuration = config.get_section(config.config_ini_section)
     assert configuration
-    configuration["sqlalchemy.url"] = app_config.DB_URL
+    configuration["sqlalchemy.url"] = get_db_url_alembic()
     connectable = engine_from_config(
         context.config.get_section(context.config.config_ini_section),
         prefix="sqlalchemy.",

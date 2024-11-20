@@ -33,8 +33,6 @@ def get_db_url_from_cloud_provider(cloud_provider: str) -> str:
         password: str = json.loads(password_data)["password"]
         # url encode password to escape special characters
         password = quote(password)
-        # Escape % in the db_url
-        password = password.replace('%', '%%')
         return config.DB_URL.format(password=password)
     else:
         raise NotImplementedError(f"No get db_url logic implemented for Cloud provider {cloud_provider}")
@@ -45,7 +43,6 @@ def get_db_url():
     if config.DB_PASSWORD_SECRET_NAME:
         logger.info("Getting DB URL from cloud provider")
         db_url: str = get_db_url_from_cloud_provider(config.CLOUD_PROVIDER)
-        print(f"DB URL: '{db_url}'")
         return db_url
     # Running locally
     else:
