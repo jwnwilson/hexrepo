@@ -100,7 +100,7 @@ resource "aws_iam_policy" "sqs-secret-lambda-policy" {
     },
     {
       "Action": [
-        "secretsmanager:GetSecretValue"
+        "secretsmanager:*"
       ],
       "Effect": "Allow",
       "Resource": "*"

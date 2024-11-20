@@ -30,7 +30,6 @@ AWS_SECRET_ACCESS_KEY
 - Setup backend
     - Setup infra for projects
         - Connect to deployed DBs via env vars
-            - Verify nat gateway allows secret connection
             - Complete db setup
             - investigate 3rd party software for cheaper NAT + bastion access to DB
                 https://fck-nat.dev/stable/deploying/#terraform

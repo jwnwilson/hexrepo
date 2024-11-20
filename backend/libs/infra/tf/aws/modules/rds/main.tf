@@ -33,20 +33,20 @@ data "aws_security_group" "selected" {
 ################################################################################
 # RDS Module
 ################################################################################
-resource "random_password" "master"{
-  length           = 16
-  special          = true
-  override_special = "_!%^"
-}
+# resource "random_password" "master"{
+#   length           = 16
+#   special          = true
+#   override_special = "_!%^"
+# }
 
-resource "aws_secretsmanager_secret" "password" {
-  name = "${var.project}-db-password"
-}
+# resource "aws_secretsmanager_secret" "password" {
+#   name = "${var.project}-db-password"
+# }
 
-resource "aws_secretsmanager_secret_version" "password" {
-  secret_id = aws_secretsmanager_secret.password.id
-  secret_string = random_password.master.result
-}
+# resource "aws_secretsmanager_secret_version" "password" {
+#   secret_id = aws_secretsmanager_secret.password.id
+#   secret_string = random_password.master.result
+# }
 
 module "security_group" {
   source  = "terraform-aws-modules/security-group/aws"
@@ -134,7 +134,7 @@ module "db" {
   # user cannot be used as it is a reserved word used by the engine"
   db_name               = var.project
   username              = var.username
-  password              = aws_secretsmanager_secret_version.password.secret_string
+  manage_master_user_password              = true
   port                  = 5432
 
   multi_az               = false

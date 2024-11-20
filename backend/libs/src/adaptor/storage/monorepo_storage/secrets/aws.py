@@ -10,7 +10,7 @@ class AWSSecretAdaptor(SecretAdaptor):
         self.client = boto3.client("secretsmanager")
 
     def get_secret(self, secret_name: str) -> str:
-        print("Getting secret")
+        logger.info(f"Getting secret: {secret_name}")
         try:
             get_secret_value_response = self.client.get_secret_value(
                 SecretId=secret_name
