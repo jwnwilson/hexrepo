@@ -30,8 +30,6 @@ AWS_SECRET_ACCESS_KEY
 - Setup backend
     - Setup infra for projects
         - Connect to deployed DBs via env vars
-            - Complete db setup
-                - Setup db migration logic
             - investigate 3rd party software for cheaper NAT + bastion access to DB
                 https://fck-nat.dev/stable/deploying/#terraform
                 - Remove nat gateway
@@ -39,15 +37,15 @@ AWS_SECRET_ACCESS_KEY
     - Setup pipeline for monorepo
         - use github actions
         - listen to changes in backend/libs and backend/projects only
+        - Setup test / lint build image
+        - Setup db migration
+        - Setup deployment
     - Add ability to update project from template
-        - Use cruft to update projects from template?    
+        - Use cruft to update projects from template?
     - Setup async tasks
+        - Conform to ECS / Fargate
         - Setup task chaining with idempotent re-run
     - Setup auth / cross project auth / authorisation
-        - Add db adpator logic from hex lib
-        - Add extra dependencies like boto gcp libs etc
-        - Add aws, gcp, azure options to library installs
-    - Add storage libs for gcp, aws, azure
     - Setup mypy
         - Look at ruff
     - Improve docker container builds
@@ -55,6 +53,7 @@ AWS_SECRET_ACCESS_KEY
     - Add user setup to infra as code
         - During project config setup define monorepo user with admin account
         - login with mono repo user and store credentials to work specifically with monorepo
+    - Add another cloud provider - GCP
     - Enforce architecture rules:
         - https://roman.pt/posts/python-architecture-linter/
         - [deply](https://github.com/Vashkatsi/deply)

@@ -12,3 +12,9 @@ variable "nat_gateway" {
     type = bool
     default = false
 }
+
+variable "fck_nat_gateway" {
+    type = bool
+    default = false
+  
+}

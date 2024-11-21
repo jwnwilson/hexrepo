@@ -17,3 +17,7 @@ output "private_subnet_ids" {
 output "security_group_ids" {
   value = [module.vpc.default_security_group_id]
 }
+
+# output "debug" {
+#   value = local.private_subnet_ids_az_map
+# }
