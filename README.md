@@ -28,18 +28,14 @@ AWS_SECRET_ACCESS_KEY
 # To Do
 
 - Setup backend
-    - Setup infra for projects
-        - Connect to deployed DBs via env vars
-            - investigate 3rd party software for cheaper NAT + bastion access to DB
-                https://fck-nat.dev/stable/deploying/#terraform
-                - Remove nat gateway
-        - Update template and verify destroy / rebuild
     - Setup pipeline for monorepo
         - use github actions
         - listen to changes in backend/libs and backend/projects only
         - Setup test / lint build image
         - Setup db migration
         - Setup deployment
+    - Setup infra for projects
+        - Update template and verify destroy / rebuild
     - Add ability to update project from template
         - Use cruft to update projects from template?
     - Setup async tasks
