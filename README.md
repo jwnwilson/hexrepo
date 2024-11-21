@@ -7,13 +7,9 @@
 - Terraform installed
 - Pyenv installed
 - AWS account access key and secret
-- AWS account permissions to create / modify:
-    - KMS
-    - code artifact
-    - ECS
-    - ECR
-    - VPC
-    - API gateway
+- AWS account permissions set as detailed later
+- Route53 domain purchased and setup
+
 
 ### Setup
 

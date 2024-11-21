@@ -14,12 +14,12 @@ setup: venv
 	@. $(VENV_DIR)/bin/activate; \
 	python cli.py setup
 
-be_project: venv
+create_be_project: venv
 	@echo "Creating project..."
 	@. $(VENV_DIR)/bin/activate; \
 	python cli.py create-be-project
 
-be_library: venv
+create_be_library: venv
 	@echo "Creating library..."
 	@. $(VENV_DIR)/bin/activate; \
 	python cli.py create-be-library
@@ -28,3 +28,38 @@ add_be_library: venv
 	@echo "Adding library to project..."
 	@. $(VENV_DIR)/bin/activate; \
 	python cli.py add_be_library
+
+test_be_projects:
+	@echo "Testing projects..."
+	@. $(VENV_DIR)/bin/activate; \
+	python cli.py test_be_projects
+
+test_be_libs:
+	@echo "Testing libraries..."
+	@. $(VENV_DIR)/bin/activate; \
+	python cli.py test_be_libs
+
+lint_be_projects:
+	@echo "Linting projects..."
+	@. $(VENV_DIR)/bin/activate; \
+	python cli.py lint_be_projects
+
+lint_be_libs:
+	@echo "Linting libraries..."
+	@. $(VENV_DIR)/bin/activate; \
+	python cli.py lint_be_libs
+
+deploy_be_projects:
+	@echo "Deploying projects..."
+	@. $(VENV_DIR)/bin/activate; \
+	python cli.py deploy_be_projects
+
+deploy_be_libs:
+	@echo "Deploying libraries..."
+	@. $(VENV_DIR)/bin/activate; \
+	python cli.py deploy_be_libs
+
+migrate_db:
+	@echo "Migrating database..."
+	@. $(VENV_DIR)/bin/activate; \
+	python cli.py migrate_db
