@@ -4,13 +4,13 @@ from alembic import context
 from app.config import config as app_config
 from sqlalchemy import Connection, engine_from_config, pool
 
-from monorepo_db import get_db_url
+from monorepo_db.sql import get_sql_db_url
 from monorepo_db.sql.models.base_model import Base
 
 
 def get_db_url_alembic():
     # Escape % in the db_url
-    return get_db_url().replace('%', '%%') 
+    return get_sql_db_url().replace('%', '%%') 
 
 
 # this is the Alembic Config object, which provides

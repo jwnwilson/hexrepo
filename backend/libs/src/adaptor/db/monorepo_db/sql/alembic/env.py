@@ -3,13 +3,13 @@ from logging.config import fileConfig
 from alembic import context
 from sqlalchemy import Connection, engine_from_config, pool
 
-from ...config import get_db_url
+from ..config import get_sql_db_url
 from app.adaptor.db.sql.models.base_model import Base
 
 
 def get_db_url_alembic():
     # Escape % in the db_url
-    return get_db_url().replace('%', '%%') 
+    return get_sql_db_url().replace('%', '%%') 
 
 
 # this is the Alembic Config object, which provides
