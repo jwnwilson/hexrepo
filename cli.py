@@ -1,11 +1,12 @@
 import os
 from contextlib import chdir
+from typing import List
 from cookiecutter.main import cookiecutter
 import typer
 
 from tools.logic.config import MonorepoConfig, get_or_create_config
 from tools.logic.infra import authenticate_cloud, create_lib_infra, create_tf_state, publish_libs, setup_global_env_infra
-from tools.logic.project import install_library_in_project
+from tools.logic.project import get_libraries, get_library_type, get_projects, install_library_in_project
 from tools.prompts.common import prompt_library_type
 from tools.prompts.infra import prompt_deploy_libs, prompt_setup_lib_infra, prompt_setup_project_infra, prompt_setup_shared_infra, prompt_setup_tf
 from tools.templates.libs import generate_libs_makefile
@@ -78,6 +79,33 @@ def setup():
     # Setup shared infra for environments
     if prompt_setup_shared_infra():
         setup_global_env_infra(config)
+
+
+@app.command()
+def test_be_projects(run_all: bool = True):
+    if run_all:
+        projects: List[str] = get_projects()
+    else:
+        # get list of modified files
+        # find projects that have been modified
+        # run tests for those projects
+        raise NotImplementedError("Not implemented yet")
+    for project in projects:
+        os.system(f"cd backend/projects/{project} && make test")
+
+
+@app.command()
+def test_be_libs(run_all: bool = True):
+    if run_all:
+        libraries: List[str] = get_libraries()
+    else:
+        # get list of modified files
+        # find projects that have been modified
+        # run tests for those projects
+        raise NotImplementedError("Not implemented yet")
+    for lib in libraries:
+        lib_type: str = get_library_type(lib)
+        os.system(f"cd backend/libs/src/{lib_type}/{lib} && make test")
 
 
 if __name__ == "__main__":

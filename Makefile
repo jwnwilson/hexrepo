@@ -32,12 +32,12 @@ add_be_library: venv
 test_be_projects:
 	@echo "Testing projects..."
 	@. $(VENV_DIR)/bin/activate; \
-	python cli.py test_be_projects
+	python cli.py test-be-projects
 
 test_be_libs:
 	@echo "Testing libraries..."
 	@. $(VENV_DIR)/bin/activate; \
-	python cli.py test_be_libs
+	python cli.py test-be-libs
 
 lint_be_projects:
 	@echo "Linting projects..."

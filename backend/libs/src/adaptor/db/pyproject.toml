@@ -12,7 +12,6 @@ pydantic-settings = "^2.6.1"
 psycopg2-binary = "^2.9.10"
 monorepo-storage = {path = "../storage", develop = true}
 
-
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.3"
 mypy = "^1.13.0"
