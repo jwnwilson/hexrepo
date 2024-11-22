@@ -10,10 +10,20 @@ venv:
 	@echo "Checking if venv is setup..."
 	@./tools/setup_env.sh
 
-test: venv
+test: db venv
 	@echo "Running tests..."
 	. $(VENV_DIR)/bin/activate; \
 	pytest
+
+# Setup docker db for tests
+db: db_down
+	docker compose run --service-ports -d postgres_db 
+
+db_down:
+	docker compose down
+
+db_delete_data: db_down
+	docker compose run postgres_db bash -c "rm -rf /var/lib/postgresql/data/*"
 
 lint: venv
 	@echo "Linting"

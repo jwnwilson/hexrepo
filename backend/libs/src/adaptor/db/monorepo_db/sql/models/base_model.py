@@ -10,6 +10,7 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 meta = sa.MetaData()
 
 
+# Base model for all tables in all projects
 class Base(DeclarativeBase):
     """Base for all models."""
 

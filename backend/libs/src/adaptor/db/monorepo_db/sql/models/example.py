@@ -1,15 +1,27 @@
-from typing import TYPE_CHECKING, Dict, List
+from typing import Optional
+from uuid import UUID
+from pydantic import BaseModel
+from sqlalchemy import String, Text
+from sqlalchemy.orm import Mapped, mapped_column
 
-from pydantic import UUID4
-from sqlalchemy import UUID, Column, Integer, String, Text, Table, ForeignKey
-from sqlalchemy.orm import Mapped, mapped_column, relationship, joinedload
+from monorepo_db.sql.uow import BaseSqlUOW
 
 from ..repository import SQLRepository
 from .base_model import Base
-from app.domain.example import ExampleDTO
 
 
+class CreateExampleDTO(BaseModel):
+    name: str
+    url: str
+    location: Optional[str] = None
+    language: Optional[str] = None
 
+
+class ExampleDTO(BaseModel):
+    id: UUID
+
+
+# This is only used in tests and will not be used in projects 
 class ExampleTable(Base):
     __tablename__ = "example"
 
@@ -22,3 +34,9 @@ class ExampleTable(Base):
 class ExampleRepository(SQLRepository):
     model = ExampleTable
     model_dto = ExampleDTO
+
+
+class SqlUOW(BaseSqlUOW):
+    @property
+    def example(self) -> ExampleRepository:
+        return ExampleRepository(self.session)
