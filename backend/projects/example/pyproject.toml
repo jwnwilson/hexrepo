@@ -48,12 +48,12 @@ profile = "black"
 [tool.pytest.ini_options]
 addopts = "-vv --cov --cov-report xml --cov-report term-missing --cov-fail-under=50"
 asyncio_mode = "auto"
-testpaths = ["app/tests"]
+testpaths = ["src/tests"]
 env_files = ["env/local.env"]
 
 [tool.coverage.run]
 concurrency = ["gevent"]
-omit = ["app/tests/*"]
+omit = ["src/tests/*"]
 source = ["app"]
 
 [tool.mypy]

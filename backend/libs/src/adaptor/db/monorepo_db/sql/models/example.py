@@ -10,7 +10,7 @@ from ..repository import SQLRepository
 from .base_model import Base
 
 
-class CreateExampleDTO(BaseModel):
+class ExampleCreateDTO(BaseModel):
     name: str
     url: str
     location: Optional[str] = None
@@ -19,6 +19,13 @@ class CreateExampleDTO(BaseModel):
 
 class ExampleDTO(BaseModel):
     id: UUID
+
+
+class ExampleUpdateDTO(BaseModel):
+    name: Optional[str] = None
+    url: Optional[str] = None
+    location: Optional[str] = None
+    language: Optional[str] = None
 
 
 # This is only used in tests and will not be used in projects 
