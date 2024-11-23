@@ -29,37 +29,37 @@ add_be_library: venv
 	@. $(VENV_DIR)/bin/activate; \
 	python cli.py add_be_library
 
-test_be_projects:
+test_be_projects: venv
 	@echo "Testing projects..."
 	@. $(VENV_DIR)/bin/activate; \
 	python cli.py test-be-projects
 
-test_be_libs:
+test_be_libs: venv
 	@echo "Testing libraries..."
 	@. $(VENV_DIR)/bin/activate; \
 	python cli.py test-be-libs
 
-lint_be_projects:
+lint_be_projects: venv
 	@echo "Linting projects..."
 	@. $(VENV_DIR)/bin/activate; \
 	python cli.py lint_be_projects
 
-lint_be_libs:
+lint_be_libs: venv
 	@echo "Linting libraries..."
 	@. $(VENV_DIR)/bin/activate; \
 	python cli.py lint_be_libs
 
-deploy_be_projects:
+deploy_be_projects: venv
 	@echo "Deploying projects..."
 	@. $(VENV_DIR)/bin/activate; \
 	python cli.py deploy_be_projects
 
-deploy_be_libs:
+deploy_be_libs: venv
 	@echo "Deploying libraries..."
 	@. $(VENV_DIR)/bin/activate; \
 	python cli.py deploy_be_libs
 
-migrate_db:
+migrate_db: venv
 	@echo "Migrating database..."
 	@. $(VENV_DIR)/bin/activate; \
 	python cli.py migrate_db
