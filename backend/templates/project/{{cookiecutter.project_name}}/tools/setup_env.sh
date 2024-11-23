@@ -12,6 +12,6 @@ cd $ROOT_DIR
 python3.12 -m venv ${VENV}; \
 source ${ROOT_DIR}/${VENV}/bin/activate && \
 export SYSTEM_VERSION_COMPAT=1 && \
-pip install poetry --all-extras  && \
+pip install poetry  && \
 poetry lock && \
-poetry install
+poetry install --all-extras
