@@ -13,4 +13,4 @@ python3.12 -m venv ${VENV}; \
 source ${ROOT_DIR}/${VENV}/bin/activate && \
 export SYSTEM_VERSION_COMPAT=1 && \
 pip install poetry  && \
-poetry install --with dev --sync
+poetry install --with dev
