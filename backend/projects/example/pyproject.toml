@@ -11,15 +11,14 @@ fastapi = "^0.115.3"
 uvicorn = "^0.32.0"
 requests = "^2.32.3"
 python-dotenv = "^1.0.1"
-sqlalchemy = "^2.0.36"
 pydantic-settings = "^2.6.0"
 alembic = "^1.13.3"
 gevent = "^24.10.3"
 psycopg2-binary = "^2.9.10"
+boto3 = "^1.35.66"
 monorepo-storage = {path = "../../libs/src/adaptor/storage", develop = true}
 monorepo-db = {path = "../../libs/src/adaptor/db", develop = true}
 monorepo-api = {path = "../../libs/src/interactor/api", develop = true}
-boto3 = "^1.35.66"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.3"
