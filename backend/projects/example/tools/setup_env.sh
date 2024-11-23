@@ -14,4 +14,4 @@ source ${ROOT_DIR}/${VENV}/bin/activate && \
 export SYSTEM_VERSION_COMPAT=1 && \
 pip install poetry && \
 poetry lock && \
-poetry install --all-extras
+poetry install --with dev --sync
