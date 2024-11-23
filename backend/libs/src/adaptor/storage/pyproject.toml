@@ -35,13 +35,13 @@ profile = "black"
 [tool.pytest.ini_options]
 addopts = "-vv --cov --cov-report xml --cov-report term-missing --cov-fail-under=50"
 asyncio_mode = "auto"
-testpaths = ["app/tests"]
+testpaths = ["tests"]
 env_files = ["env/local.env"]
 
 [tool.coverage.run]
 concurrency = ["gevent"]
-omit = ["app/tests/*"]
-source = ["app"]
+omit = ["tests/*"]
+source = ["monorepo_storage"]
 
 [tool.mypy]
 python_version = "3.12"

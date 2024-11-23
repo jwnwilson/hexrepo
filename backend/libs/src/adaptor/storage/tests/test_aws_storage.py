@@ -1,7 +1,6 @@
 import os
 import pytest 
-from storage.aws import S3Adaptor
-from storage.interface import StorageConfig
+from monorepo_storage.storage import S3Adaptor, StorageConfig
 
 
 @pytest.fixture
