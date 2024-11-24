@@ -26,10 +26,11 @@ AWS_SECRET_ACCESS_KEY
 - Setup backend
     - Setup pipeline for monorepo
         - use github actions
-        - listen to changes in backend/libs and backend/projects only
         - Setup test / lint build image
-        - Setup db migration
-        - Setup deployment
+        - Setup build / db migrate / deploy
+            - listen to changes in backend/libs and backend/projects only  
+            - Setup db migration
+            - Setup deployment
     - Setup infra for projects
         - Update template and verify destroy / rebuild
     - Add ability to update project from template
