@@ -1,5 +1,6 @@
 .PHONY: venv test lint
 .DEFAULT_GOAL = help
+.EXPORT_ALL_VARIABLES:
 
 VENV=.venv
 VENV_DIR = $(MKFILE_DIR)$(VENV)
