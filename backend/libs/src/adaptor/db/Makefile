@@ -30,10 +30,10 @@ coverage:
 	. $(VENV_DIR)/bin/activate; \
 	pytest --cov-report html	
 
-lint:
+lint: venv
 	bash ./tools/lint.sh
 
-lint_check:
+lint_check: venv
 	bash ./tools/lint.sh --check
 
 clean:
