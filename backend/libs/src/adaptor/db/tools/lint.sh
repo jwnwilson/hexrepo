@@ -18,7 +18,7 @@ if [[ -z "${GITHUB_ACTIONS}" ]]; then
     . ${VENV_DIR}/bin/activate
 else
     echo "Running on github skipping venv creation."
-    poetry shell
+    . $(poetry env info --path)/bin/activate
 fi
 
 if [[ -z "${check}" ]]; then
