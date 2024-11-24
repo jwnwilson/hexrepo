@@ -10,9 +10,14 @@ while [[ "$#" -gt 0 ]]; do
     esac
 done
 
+
 APP_FOLDER="monorepo_db tests"
 
-. ${VENV_DIR}/bin/activate
+if [[ -z "${GITHUB_ACTIONS}" ]]; then
+    echo "Running on github skipping venv activation."
+else
+    source ${VENV_DIR}/bin/activate
+fi
 
 if [[ -z "${check}" ]]; then
     black ${APP_FOLDER} 

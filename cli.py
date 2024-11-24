@@ -1,6 +1,6 @@
 import os
 from contextlib import chdir
-from typing import List
+from typing import List, Optional
 from cookiecutter.main import cookiecutter
 import typer
 
@@ -95,14 +95,13 @@ def test_be_projects(run_all: bool = True):
 
 
 @app.command()
-def test_be_libs(run_all: bool = True):
-    if run_all:
+def test_be_libs(libraries: Optional[List[str]] = None):
+    repo_libs: List[str] = get_libraries()
+    if not libraries:
         libraries: List[str] = get_libraries()
     else:
-        # get list of modified files
-        # find projects that have been modified
-        # run tests for those projects
-        raise NotImplementedError("Not implemented yet")
+        assert all(lib in repo_libs for lib in libraries), "Invalid library name provided"
+    
     for lib in libraries:
         lib_type: str = get_library_type(lib)
         typer.echo(f"Running linting check for {lib}...")
