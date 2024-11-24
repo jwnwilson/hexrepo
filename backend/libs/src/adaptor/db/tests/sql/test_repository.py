@@ -1,5 +1,5 @@
 import uuid
-from typing import Dict, Optional
+from typing import Any, Dict, Optional
 
 import pytest
 
@@ -38,7 +38,7 @@ def test_repository_read_err_if_not_found(uow: UOW) -> None:
 def test_repository_read_multi(
     uow: UOW, example_records: Dict[str, ExampleDTO]
 ) -> None:
-    read_multi: PaginatedData[ExampleDTO] = uow.example.read_multi()
+    read_multi: PaginatedData[Any] = uow.example.read_multi()
 
     assert read_multi.total == len(example_records)
 
@@ -48,7 +48,7 @@ def test_repository_read_multi_filter_in(
 ) -> None:
     assert len(example_records) == 2
 
-    read_multi: PaginatedData[ExampleDTO] = uow.example.read_multi(
+    read_multi: PaginatedData[Any] = uow.example.read_multi(
         filters={"id__in": [list(example_records.values())[0].id]}
     )
 

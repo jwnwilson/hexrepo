@@ -48,3 +48,4 @@ source = ["monorepo_db"]
 python_version = "3.12"
 strict = true
 implicit_reexport = false
+plugins = ['pydantic.mypy']

@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union, cast
 from uuid import UUID
 
 from pydantic import UUID4, BaseModel
@@ -17,14 +17,14 @@ from ..interface import (
     Repository,
     UpdateModelDTO,
 )
-from .interface import BaseSQLModel, Query
+from .interface import BaseSQLModel, Query, SQLModelType
 
 logger = logging.getLogger()
 
 
 class DefaultQuery(Query):
-    def __init__(self, model: BaseSQLModel, model_dto: ModelDTOType, session: Session):
-        self.model: BaseSQLModel = model
+    def __init__(self, model: SQLModelType, model_dto: ModelDTOType, session: Session):
+        self.model: SQLModelType = model
         self.model_dto: ModelDTOType = model_dto
         self.session: Session = session
 
@@ -40,12 +40,14 @@ class DefaultQuery(Query):
         # Query to return total number of entities
         return select(func.count()).select_from(self.model)
 
-    def parse_dto(self, dto: ModelDTO) -> BaseSQLModel:
+    def parse_dto(self, dto: ModelDTO) -> Any:
         # logic to convert pydantic DTO to db model and add FK relationship data if needed
-        db_obj = self.model(**dto.model_dump())
+        db_obj: BaseSQLModel = self.model(**dto.model_dump())  # type: ignore
         return db_obj
 
-    def update_relationships(self, db_obj: BaseSQLModel, dto: ModelDTO) -> BaseSQLModel:
+    def update_relationships(
+        self, db_obj: Union[Row[Any], BaseSQLModel], dto: ModelDTO
+    ) -> Row[Any] | BaseSQLModel:
         # logic to update FK relationships during update logic
         return db_obj
 
@@ -92,11 +94,11 @@ class SQLRepository(Repository):
             query = self._filter(query, filters)
         return int(self.session.scalar(query))
 
-    def _query_to_dto(self, query: Select[Any]) -> List[ModelDTO]:
+    def _query_to_dto(self, query: Select[Any]) -> List[BaseModel]:
         query_result = self.session.execute(query)
         return [self._model_to_dto(row) for row in query_result.scalars()]
 
-    def _model_to_dto(self, row: Row[Any]) -> ModelDTO:
+    def _model_to_dto(self, row: Union[BaseSQLModel, Row[Any]]) -> BaseModel:
         return self.model_dto(**row.__dict__)
 
     def _filter(
@@ -150,8 +152,8 @@ class SQLRepository(Repository):
             else:
                 setattr(db_obj, key, getattr(obj_in, key))
 
-    def create(self, obj_in: ModelDTO) -> ModelDTO:
-        db_obj: BaseSQLModel = self.query.parse_dto(obj_in)
+    def create(self, obj_in: ModelDTO) -> BaseModel:
+        db_obj: Any = self.query.parse_dto(obj_in)
         try:
             self.session.add(db_obj)
             self.session.flush()
@@ -164,7 +166,7 @@ class SQLRepository(Repository):
         self.session.refresh(db_obj)
         return self._model_to_dto(db_obj)
 
-    def read(self, id: UUID) -> ModelDTO:
+    def read(self, id: UUID) -> BaseModel:
         query_result = self._query_single(id)
         try:
             return self._model_to_dto(query_result)
@@ -186,14 +188,14 @@ class SQLRepository(Repository):
         query = self._order(query, order_by)
         total = self._get_total(filters)
         query = self.paginate(query, page_number, page_size)
-        results = self._query_to_dto(query)
+        results: List[BaseModel] = self._query_to_dto(query)
         return PaginatedData(
             results=results, total=total, page_size=page_size, page_number=page_number
         )
 
     def update(
         self, id: UUID, obj_in: UpdateModelDTO, merge_objects: bool = False
-    ) -> ModelDTO:
+    ) -> BaseModel:
         existing_obj: Row[Any] = self._query_single(id)
         self._update_db_model_attrs(existing_obj, obj_in, merge_objects)
         self.query.update_relationships(existing_obj, obj_in)

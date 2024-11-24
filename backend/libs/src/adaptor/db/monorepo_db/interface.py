@@ -21,10 +21,12 @@ class Repository(ABC):
     def create(self, obj_in: ModelDTO) -> Any:
         raise NotImplementedError
 
-    def read(self, id: UUID) -> ModelDTO:
+    def read(self, id: UUID) -> Any:
         raise NotImplementedError
 
-    def update(self, id: UUID, obj_in: UpdateModelDTO) -> ModelDTO | None:
+    def update(
+        self, id: UUID, obj_in: UpdateModelDTO, merge_objects: bool = False
+    ) -> Any:
         raise NotImplementedError
 
     def delete(self, id: UUID) -> None:
@@ -36,12 +38,12 @@ class Repository(ABC):
         page_size: int = 100,
         page_number: int = 1,
         order_by: str = "-created_at",
-    ) -> PaginatedData[ModelDTO]:
+    ) -> PaginatedData[BaseModel]:
         raise NotImplementedError
 
     def search(
         self, search_param: Dict[str, str], page_size: int = 100, page_number: int = 1
-    ) -> PaginatedData[ModelDTO]:
+    ) -> PaginatedData[BaseModel]:
         raise NotImplementedError
 
 
