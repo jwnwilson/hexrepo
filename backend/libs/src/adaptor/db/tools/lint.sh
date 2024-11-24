@@ -14,9 +14,10 @@ done
 APP_FOLDER="monorepo_db tests"
 
 if [[ -z "${GITHUB_ACTIONS}" ]]; then
-    echo "Running on github skipping venv activation."
+    echo "Running locally, activating venv."
+    . ${VENV_DIR}/bin/activate
 else
-    source ${VENV_DIR}/bin/activate
+    echo "Running on github skipping venv creation."
 fi
 
 if [[ -z "${check}" ]]; then

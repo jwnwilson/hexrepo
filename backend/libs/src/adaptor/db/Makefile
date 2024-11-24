@@ -12,8 +12,7 @@ venv:
 
 test: db venv
 	@echo "Running tests..."
-	. $(VENV_DIR)/bin/activate; \
-	pytest
+	@./tools/test.sh
 
 # Setup docker db for tests
 db: db_down
