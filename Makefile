@@ -4,6 +4,7 @@
 
 VENV=.venv
 VENV_DIR = $(MKFILE_DIR)$(VENV)
+LIBRARY:=${LIBRARY}
 
 # Setup commands
 venv:
@@ -38,7 +39,7 @@ test_be_projects: venv
 test_be_libs: venv
 	@echo "Testing libraries..."
 	@. $(VENV_DIR)/bin/activate; \
-	python cli.py test-be-libs
+	python cli.py test-be-libs --libraries=$(LIBRARY)
 
 lint_be_projects: venv
 	@echo "Linting projects..."

@@ -27,4 +27,4 @@ jobs:
         python-version: '3.12'
         cache: 'poetry'
     - name: Test Libraries
-      run: make test_be_libs LIB=${{ matrix.library }}
+      run: make test_be_libs LIBRARY=${{ matrix.library }}
