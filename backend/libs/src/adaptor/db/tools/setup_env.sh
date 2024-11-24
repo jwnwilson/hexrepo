@@ -3,15 +3,16 @@ VENV=.venv
 SCRIPT_DIR=$(dirname "$(realpath $0)")
 ROOT_DIR=$(dirname $SCRIPT_DIR)
 
+if [ -d "./.venv" ]; then
+    echo "Virtual environment already exists, skipping venv creation."
+    exit 0
+fi
+
 if [[ -z "${GITHUB_ACTIONS}" ]]; then
     echo "Running locally, creating venv."
 else
     echo "Running on github skipping venv creation."
-    exit 0
-fi
-
-if [ -d "./.venv" ]; then
-    echo "Virtual environment already exists, skipping venv creation."
+    poetry install --with dev
     exit 0
 fi
 
