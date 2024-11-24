@@ -1,8 +1,7 @@
-#!/usr/bin/env bash
+#!/usr/bin bash
 
 set -e
-
-#!/bin/bash
+VENV=.venv
 
 while [[ "$#" -gt 0 ]]; do
     case $1 in
@@ -12,6 +11,8 @@ while [[ "$#" -gt 0 ]]; do
 done
 
 APP_FOLDER="monorepo_db tests"
+
+. ${VENV_DIR}/bin/activate
 
 if [[ -z "${check}" ]]; then
     black ${APP_FOLDER} 
