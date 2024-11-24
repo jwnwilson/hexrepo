@@ -96,8 +96,9 @@ def test_be_projects(run_all: bool = True):
 
 @app.command()
 def test_be_libs(libraries: Optional[List[str]] = None):
+    print("GITHUB ACTIONS", os.environ["GITHUB_ACTIONS"])
     repo_libs: List[str] = get_libraries()
-    libraries = libraries.remove("")
+    libraries = libraries.remove("") if "" in libraries else libraries
 
     if not libraries:
         libraries: List[str] = get_libraries()
