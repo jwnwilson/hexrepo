@@ -1,5 +1,6 @@
 from typing import Optional
 from uuid import UUID
+
 from pydantic import BaseModel
 from sqlalchemy import String, Text
 from sqlalchemy.orm import Mapped, mapped_column
@@ -28,7 +29,7 @@ class ExampleUpdateDTO(BaseModel):
     language: Optional[str] = None
 
 
-# This is only used in tests and will not be used in projects 
+# This is only used in tests and will not be used in projects
 class ExampleTable(Base):
     __tablename__ = "example"
 

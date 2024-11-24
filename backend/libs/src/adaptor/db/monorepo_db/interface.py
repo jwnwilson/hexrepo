@@ -1,14 +1,13 @@
-from abc import ABC
 import contextlib
-from typing import Any, Dict, Generator, Optional, TypeVar, Generic, TYPE_CHECKING
+from abc import ABC
+from typing import TYPE_CHECKING, Any, Dict, Generator, Generic, Optional, Type, TypeVar
 from uuid import UUID
 
 from pydantic import BaseModel
 
-if TYPE_CHECKING:
-    from sqlalchemy.orm import Session
-
 ModelDTO = TypeVar("ModelDTO", bound=BaseModel)
+UpdateModelDTO = TypeVar("UpdateModelDTO", bound=BaseModel)
+ModelDTOType = Type[BaseModel]
 
 
 class PaginatedData(BaseModel, Generic[ModelDTO]):
@@ -22,46 +21,40 @@ class Repository(ABC):
     def create(self, obj_in: ModelDTO) -> Any:
         raise NotImplementedError
 
-    def read(self, id: UUID) -> ModelDTO | None:  # type: ignore
+    def read(self, id: UUID) -> ModelDTO:
         raise NotImplementedError
 
-    def update(self, id: UUID) -> ModelDTO | None:  # type: ignore
+    def update(self, id: UUID, obj_in: UpdateModelDTO) -> ModelDTO | None:
         raise NotImplementedError
 
-    def delete(self, id: UUID) -> ModelDTO | None:  # type: ignore
+    def delete(self, id: UUID) -> None:
         raise NotImplementedError
 
     def read_multi(
         self,
-        filters: Optional[Dict] = None,
+        filters: Optional[Dict[str, Any]] = None,
         page_size: int = 100,
         page_number: int = 1,
         order_by: str = "-created_at",
-        query_type: str = "base",
-        fields: str = "base",
-    ) -> PaginatedData:
+    ) -> PaginatedData[ModelDTO]:
         raise NotImplementedError
 
-    def get_offset(self, page_size: int, page_number: int):
-        return (page_number - 1) * page_size
-
-    def paginate(self, query, page_number, page_size):
-        raise NotImplementedError
-
-    def search(self, search_param: dict, page_size=100, page_number=1) -> PaginatedData:
+    def search(
+        self, search_param: Dict[str, str], page_size: int = 100, page_number: int = 1
+    ) -> PaginatedData[ModelDTO]:
         raise NotImplementedError
 
 
 class UOW(ABC):
-    def __init__(self, db_url: str, required_filters: Optional[Dict] = None):
+    def __init__(self, db_url: str, required_filters: Optional[Dict[str, str]] = None):
         self._db_url: str = db_url
-        self._required_filters: Optional[Dict] = required_filters
+        self._required_filters: Optional[Dict[str, str]] = required_filters
 
-    def set_required_filters(self, required_filters: Dict):
+    def set_required_filters(self, required_filters: Dict[str, str]) -> None:
         self._required_filters = required_filters
 
     @contextlib.contextmanager
-    def transaction(self) -> Generator["Session", None, None]:
+    def transaction(self) -> Generator[Any, None, None]:
         raise NotImplementedError
 
     @property
@@ -69,8 +62,8 @@ class UOW(ABC):
         raise NotImplementedError
 
     # Used for testing
-    def create_all(self):
+    def create_all(self) -> None:
         raise NotImplementedError
 
-    def drop_all(self):
+    def drop_all(self) -> None:
         raise NotImplementedError

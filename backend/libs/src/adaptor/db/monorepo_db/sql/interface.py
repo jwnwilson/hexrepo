@@ -1,16 +1,14 @@
 from abc import ABC
-from typing import TypeVar
+from typing import Any
 from uuid import UUID
 
-from pytest import Session
-from sqlalchemy import Select
-from pydantic import BaseModel
+from sqlalchemy import Row, Select
+from sqlalchemy.orm import Session
 
+from ..interface import ModelDTO, ModelDTOType, UpdateModelDTO
 from .models.base_model import Base
 
 BaseSQLModel = Base
-ModelDTOType = type[BaseModel]
-ModelDTO = TypeVar("ModelDTO", bound=BaseModel)
 
 
 class Query(ABC):
@@ -18,24 +16,23 @@ class Query(ABC):
         self.model: BaseSQLModel = model
         self.model_dto: ModelDTOType = model_dto
         self.session: Session = session
-        
-    def query_multi(self) -> Select:
+
+    def query_multi(self) -> Select[Any]:
         # Query to return list of entities
         raise NotImplementedError
-    
-    def query_single(self, id: UUID) -> Select:
+
+    def query_single(self, id: UUID) -> Select[Any]:
         # Query to retun a single entity by id
         raise NotImplementedError
-    
-    def query_total(self) -> int:
+
+    def query_total(self) -> Select[Any]:
         # Query to return total number of entities
         raise NotImplementedError
-    
+
     def parse_dto(self, dto: ModelDTO) -> BaseSQLModel:
         # logic to query db and add relationship data to db model
         raise NotImplementedError
-    
-    def update_relationships(self, db_obj: BaseSQLModel, dto: ModelDTO) -> BaseSQLModel:
+
+    def update_relationships(self, db_obj: Row[Any], dto: ModelDTO) -> BaseSQLModel:
         # logic to update relationships during update logic
         raise NotImplementedError
-    

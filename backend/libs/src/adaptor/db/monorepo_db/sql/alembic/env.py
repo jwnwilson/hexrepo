@@ -3,13 +3,14 @@ from logging.config import fileConfig
 from alembic import context
 from sqlalchemy import Connection, engine_from_config, pool
 
+from monorepo_db.sql.models.base_model import Base
+
 from ..config import get_sql_db_url
-from app.adaptor.db.sql.models.base_model import Base
 
 
-def get_db_url_alembic():
+def get_db_url_alembic() -> str:
     # Escape % in the db_url
-    return get_sql_db_url().replace('%', '%%') 
+    return get_sql_db_url().replace("%", "%%")
 
 
 # this is the Alembic Config object, which provides
@@ -69,7 +70,7 @@ def do_run_migrations(connection: Connection | None) -> None:
         context.run_migrations()
 
 
-def run_migrations_online():
+def run_migrations_online() -> None:
     """Run migrations in 'online' mode.
 
     In this scenario we need to create an Engine
@@ -80,7 +81,7 @@ def run_migrations_online():
     assert configuration
     configuration["sqlalchemy.url"] = get_db_url_alembic()
     connectable = engine_from_config(
-        context.config.get_section(context.config.config_ini_section),
+        context.config.get_section(context.config.config_ini_section),  # type: ignore
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
         future=True,

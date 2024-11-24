@@ -1,4 +1,5 @@
-from typing import Generator
+from typing import Dict, Generator
+
 import pytest
 
 from monorepo_db import UOW
@@ -15,17 +16,17 @@ def uow() -> Generator[UOW, None, None]:
 
 
 @pytest.fixture(scope="function", autouse=True)
-def create_tables(uow: UOW):
+def create_tables(uow: UOW) -> None:
     uow.drop_all()
     uow.create_all()
 
 
 @pytest.fixture
-def example_records(uow: UOW):
-    example_1: ExampleDTO = uow.example.create(ExampleCreateDTO(
-        name="example1", url="example1.com"
-    ))
-    example_2: ExampleDTO = uow.example.create(ExampleCreateDTO(
-        name="example2", url="example2.com"
-    ))
+def example_records(uow: UOW) -> Dict[str, ExampleDTO]:
+    example_1: ExampleDTO = uow.example.create(
+        ExampleCreateDTO(name="example1", url="example1.com")
+    )
+    example_2: ExampleDTO = uow.example.create(
+        ExampleCreateDTO(name="example2", url="example2.com")
+    )
     return {"example_1": example_1, "example_2": example_2}

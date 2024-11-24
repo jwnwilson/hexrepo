@@ -25,11 +25,16 @@ db_down:
 db_delete_data: db_down
 	docker compose run postgres_db bash -c "rm -rf /var/lib/postgresql/data/*"
 
-lint: venv
-	@echo "Linting"
+coverage:
+	@echo "Running unit tests"	
 	. $(VENV_DIR)/bin/activate; \
-	black python/
-	flake8 python/
+	pytest --cov-report html	
+
+lint:
+	bash ./tools/lint.sh
+
+lint_check:
+	bash ./tools/lint.sh --check
 
 clean:
 	find . -type f -name '*.py[co]' -delete -o -type d -name __pycache__ -delete

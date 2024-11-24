@@ -1,5 +1,4 @@
 import logging
-import os
 
 from alembic import command
 from alembic.config import Config
@@ -7,7 +6,7 @@ from alembic.config import Config
 logger = logging.getLogger(__name__)
 
 
-def update_db():
+def update_db() -> None:
     logger.info(f"Running DB migrations")
     alembic_cfg = Config("alembic.ini")
 

@@ -1,17 +1,16 @@
 import contextlib
-from typing import Dict, Iterator, Optional
+from typing import Any, ContextManager, Dict, Generator, Iterator, Optional
 
 import sqlalchemy
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, event
 from sqlalchemy.engine.base import Connection, Engine
 from sqlalchemy.orm import Session, sessionmaker
-from sqlalchemy import event
 
 from monorepo_db.config import config
 
 
 class DatabaseSessionManager:
-    def __init__(self, host: str, engine_args: Optional[Dict] = None):
+    def __init__(self, host: str, engine_args: Optional[Dict[str, Any]] = None):
         self._engine_args = engine_args or dict(
             poolclass=sqlalchemy.pool.NullPool,
             future=True,
@@ -20,12 +19,14 @@ class DatabaseSessionManager:
         if config.DB_SSL_CONNECTION:
             self._engine_args["connect_args"] = {"sslmode": "require"}
 
-        self._engine: Engine = create_engine(host, **self._engine_args)
-        self._sessionmaker = sessionmaker(autocommit=False, bind=self._engine)
-        self._query_counts = {}
+        self._engine: Optional[Engine] = create_engine(host, **self._engine_args)
+        self._sessionmaker: Optional[sessionmaker[Session]] = sessionmaker(
+            autocommit=False, bind=self._engine
+        )
+        self._query_counts: Dict[Connection, int] = {}
         self._session: Optional[Session] = None
 
-    def close(self):
+    def close(self) -> None:
         if self._engine is None:
             raise RuntimeError("DatabaseSessionManager is not initialized")
         self._engine.dispose()
@@ -51,14 +52,15 @@ class DatabaseSessionManager:
                 raise
 
     @contextlib.contextmanager
-    def transaction(self) -> Iterator[Session]:
+    def transaction(self) -> Generator[Session, None, None]:
         if self._sessionmaker is None:
             raise Exception("DatabaseSessionManager is not initialized")
-        
+
         if self._session:
-            return self._session
+            return self._session  # type: ignore
 
         self._session = self._sessionmaker()
+        assert self._session is not None, "Session not initialized"
         with self.count_queries(self._session.connection()):
             try:
                 yield self._session
@@ -72,9 +74,9 @@ class DatabaseSessionManager:
         self._session = None
 
     @contextlib.contextmanager
-    def count_queries(self, conn):
+    def count_queries(self, conn: Connection) -> Generator[int, None, None]:
         # Wrap sessions and track number of queries executed
-        def before_cursor_execute(
+        def before_cursor_execute(  # type: ignore
             conn, cursor, statement, parameters, context, executemany
         ):
             self._query_counts[conn] += 1
@@ -87,7 +89,7 @@ class DatabaseSessionManager:
             event.remove(conn, "before_cursor_execute", before_cursor_execute)
 
     @property
-    def session_query_count(self, session=None):
+    def session_query_count(self, session: Optional[Session] = None) -> int:
         # Return number of queries from first session for testing
         if session is not None:
             return self._query_counts[session.connection()]

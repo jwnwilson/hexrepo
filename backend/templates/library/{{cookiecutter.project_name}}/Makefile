@@ -15,11 +15,13 @@ test:
 	. $(VENV_DIR)/bin/activate; \
 	pytest
 
-lint:
-	@echo "Linting"
+coverage:
+	@echo "Running unit tests"	
 	. $(VENV_DIR)/bin/activate; \
-	black python/
-	flake8 python/
+	pytest --cov-report html	
+
+lint:
+	bash ./tools/lint.sh
 
 clean:
 	find . -type f -name '*.py[co]' -delete -o -type d -name __pycache__ -delete

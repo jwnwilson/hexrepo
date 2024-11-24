@@ -105,6 +105,9 @@ def test_be_libs(run_all: bool = True):
         raise NotImplementedError("Not implemented yet")
     for lib in libraries:
         lib_type: str = get_library_type(lib)
+        typer.echo(f"Running linting check for {lib}...")
+        os.system(f"cd backend/libs/src/{lib_type}/{lib} && make lint")
+        typer.echo(f"Running tests check for {lib}...")
         os.system(f"cd backend/libs/src/{lib_type}/{lib} && make test")
 
 

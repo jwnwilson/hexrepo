@@ -13,6 +13,7 @@ psycopg2-binary = "^2.9.10"
 monorepo-storage = {path = "../storage", develop = true}
 sqlalchemy = "^2.0.36"
 boto3 = "^1.35.68"
+alembic = "^1.14.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.3"
@@ -46,3 +47,4 @@ source = ["monorepo_db"]
 [tool.mypy]
 python_version = "3.12"
 strict = true
+implicit_reexport = false

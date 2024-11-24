@@ -1,1 +1,1 @@
-from .interface import UOW
+from .interface import UOW as UOW

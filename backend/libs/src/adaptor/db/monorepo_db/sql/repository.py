@@ -1,17 +1,23 @@
 import logging
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
+from uuid import UUID
 
 from pydantic import UUID4, BaseModel
-from sqlalchemy import UUID, Row, Select, asc, desc, func, select
+from sqlalchemy import Row, Select, asc, desc, func, select
 from sqlalchemy.exc import IntegrityError as SQLIntegrityError
 from sqlalchemy.exc import MultipleResultsFound
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.collections import InstrumentedList
 
-from ..interface import PaginatedData, Repository
 from ..exception import IntegrityError, RecordNotFound
-from .session import DatabaseSessionManager
-from .interface import Query, BaseSQLModel, ModelDTOType, ModelDTO
+from ..interface import (
+    ModelDTO,
+    ModelDTOType,
+    PaginatedData,
+    Repository,
+    UpdateModelDTO,
+)
+from .interface import BaseSQLModel, Query
 
 logger = logging.getLogger()
 
@@ -22,23 +28,23 @@ class DefaultQuery(Query):
         self.model_dto: ModelDTOType = model_dto
         self.session: Session = session
 
-    def query_multi(self) -> Select:
+    def query_multi(self) -> Select[Any]:
         # Query to return list of entities
         return select(self.model)
-    
-    def query_single(self, id: UUID) -> Select:
+
+    def query_single(self, id: UUID) -> Select[Any]:
         # Query to retun a single entity by id
         return self.query_multi().where(self.model.id == id)
-    
-    def query_total(self) -> int:
+
+    def query_total(self) -> Select[Any]:
         # Query to return total number of entities
         return select(func.count()).select_from(self.model)
-    
+
     def parse_dto(self, dto: ModelDTO) -> BaseSQLModel:
         # logic to convert pydantic DTO to db model and add FK relationship data if needed
         db_obj = self.model(**dto.model_dump())
         return db_obj
-    
+
     def update_relationships(self, db_obj: BaseSQLModel, dto: ModelDTO) -> BaseSQLModel:
         # logic to update FK relationships during update logic
         return db_obj
@@ -49,18 +55,25 @@ class SQLRepository(Repository):
     model: Any = BaseSQLModel
     model_dto: ModelDTOType = BaseModel
 
-    def __init__(self, session: Session, required_filters: Optional[Dict] = None, query: Optional[Query] = None):
+    def __init__(
+        self,
+        session: Session,
+        required_filters: Optional[Dict[str, Any]] = None,
+        query: Optional[Query] = None,
+    ):
         self._session: Session = session
         self._required_filters = required_filters
-        self.query: Query = query or DefaultQuery(self.model, self.model_dto, self.session)
+        self.query: Query = query or DefaultQuery(
+            self.model, self.model_dto, self.session
+        )
 
     @property
     def session(self) -> Session:
         return self._session
 
-    def _query_single(self, id: UUID) -> Row:
+    def _query_single(self, id: UUID) -> Any:
         try:
-            query: Select = self.query.query_single(id)
+            query: Select[Any] = self.query.query_single(id)
             results = self.session.execute(query).one_or_none()
         # Should this be logged here, or allowed to bomb out the request with a 500?
         except MultipleResultsFound:
@@ -73,24 +86,24 @@ class SQLRepository(Repository):
             )
         return results[0]
 
-    def _get_total(self, filters: Optional[Dict] = None):
-        query = self.query.query_total()
+    def _get_total(self, filters: Optional[Dict[str, Any]] = None) -> int:
+        query: Select[Any] = self.query.query_total()
         if filters:
             query = self._filter(query, filters)
-        return self.session.scalar(query)
+        return int(self.session.scalar(query))
 
-    def _query_to_dto(self, query):
+    def _query_to_dto(self, query: Select[Any]) -> List[ModelDTO]:
         query_result = self.session.execute(query)
         return [self._model_to_dto(row) for row in query_result.scalars()]
 
-    def _model_to_dto(self, row):
+    def _model_to_dto(self, row: Row[Any]) -> ModelDTO:
         return self.model_dto(**row.__dict__)
-    
+
     def _filter(
         self,
-        query: Select,
+        query: Select[Any],
         filters: Dict[str, Any],
-    ) -> Select:
+    ) -> Select[Any]:
         for key in filters:
             if key.endswith("__in"):
                 model_attr = getattr(self.model, key.split("__")[0])
@@ -102,17 +115,19 @@ class SQLRepository(Repository):
 
     def _order(
         self,
-        query: Select,
+        query: Select[Any],
         order_by: Optional[str] = None,
-    ) -> Select:
+    ) -> Select[Any]:
         if order_by is not None:
             direction = desc if order_by.startswith("-") else asc
             query = query.order_by(direction(order_by.lstrip("-")))
             return query
         else:
             return query
-    
-    def _update_db_model_attrs(self, db_obj: BaseSQLModel, obj_in: ModelDTO, merge_objects: bool):
+
+    def _update_db_model_attrs(
+        self, db_obj: Row[Any], obj_in: ModelDTO, merge_objects: bool
+    ) -> None:
         """Update db_obj with new data from obj_in, if merge_objects is True, merge the dictionary
         attrs and replace the existing data with the new data.
 
@@ -127,12 +142,10 @@ class SQLRepository(Repository):
             if type(getattr(db_obj, key)) is InstrumentedList:
                 continue
             current_value = getattr(db_obj, key, None)
-            is_object_attr = isinstance(current_value, dict) and isinstance(
-                value, dict
-            )
+            is_object_attr = isinstance(current_value, dict) and isinstance(value, dict)
             # Merge the existing dict with new data - favours new data
             if is_object_attr and merge_objects:
-                merged_value = {**current_value, **value}
+                merged_value: Dict[str, Any] = {**current_value, **value}  # type: ignore
                 setattr(db_obj, key, merged_value)
             else:
                 setattr(db_obj, key, getattr(obj_in, key))
@@ -151,7 +164,7 @@ class SQLRepository(Repository):
         self.session.refresh(db_obj)
         return self._model_to_dto(db_obj)
 
-    def read(self, id: UUID4) -> ModelDTO:
+    def read(self, id: UUID) -> ModelDTO:
         query_result = self._query_single(id)
         try:
             return self._model_to_dto(query_result)
@@ -162,11 +175,11 @@ class SQLRepository(Repository):
 
     def read_multi(
         self,
-        filters: Optional[Dict] = None,
+        filters: Optional[Dict[str, Any]] = None,
         page_size: int = 100,
         page_number: int = 1,
         order_by: str = "-created_at",
-    ) -> PaginatedData:
+    ) -> PaginatedData[ModelDTO]:
         query = self.query.query_multi()
         if filters:
             query = self._filter(query, filters)
@@ -178,11 +191,13 @@ class SQLRepository(Repository):
             results=results, total=total, page_size=page_size, page_number=page_number
         )
 
-    def update(self, id: UUID4, obj_in: ModelDTO, merge_objects=False) -> ModelDTO:
-        existing_obj: BaseSQLModel = self._query_single(id)
+    def update(
+        self, id: UUID, obj_in: UpdateModelDTO, merge_objects: bool = False
+    ) -> ModelDTO:
+        existing_obj: Row[Any] = self._query_single(id)
         self._update_db_model_attrs(existing_obj, obj_in, merge_objects)
         self.query.update_relationships(existing_obj, obj_in)
-                
+
         try:
             self.session.flush()
         except IntegrityError as err:
@@ -194,15 +209,17 @@ class SQLRepository(Repository):
         self.session.refresh(existing_obj)
         return self._model_to_dto(existing_obj)
 
-    def delete(self, id: UUID4) -> bool:
+    def delete(self, id: UUID) -> None:
         result = self._query_single(id)
         self.session.delete(result)
         self.session.flush()
 
-    def _get_offset(self, page_size: int, page_number: int):
+    def _get_offset(self, page_size: int, page_number: int) -> int:
         return (page_number - 1) * page_size
 
-    def paginate(self, query: Select, page_number: int, page_size: int) -> Select:
+    def paginate(
+        self, query: Select[Any], page_number: int, page_size: int
+    ) -> Select[Any]:
         if page_size > 0 and page_number >= 1:
             offset: int = self._get_offset(page_size, page_number)
             query = query.offset(offset).limit(page_size)

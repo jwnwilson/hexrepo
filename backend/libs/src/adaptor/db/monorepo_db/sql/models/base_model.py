@@ -3,9 +3,9 @@ from datetime import datetime
 
 import sqlalchemy as sa
 from sqlalchemy import DateTime
-from sqlalchemy.sql import func
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+from sqlalchemy.sql import func
 
 meta = sa.MetaData()
 
