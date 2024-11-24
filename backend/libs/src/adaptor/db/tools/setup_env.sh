@@ -13,6 +13,7 @@ if [[ -z "${GITHUB_ACTIONS}" ]]; then
 else
     echo "Running on github skipping venv creation."
     poetry install --with dev
+    poetry shell
     exit 0
 fi
 
