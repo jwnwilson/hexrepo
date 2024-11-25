@@ -19,5 +19,6 @@ if [[ -z "${GITHUB_ACTIONS}" ]]; then
 else
     echo "Running on github skipping venv creation."
     . $(poetry env info --path)/bin/activate
+    echo `which python`
     poetry install --with dev
 fi
