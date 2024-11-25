@@ -26,6 +26,8 @@ AWS_SECRET_ACCESS_KEY
 - Setup backend
     - Setup pipeline for monorepo
         - Setup test / lint build image
+            - Need to dyanmically set poetry cache key to library poetry lock file for correct caching.
+            - Look at https://github.com/nektos/act
             - Setup pyright and ruff
             - Port changes to all libs and projects
         - Setup build / db migrate / deploy
