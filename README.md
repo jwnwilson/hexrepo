@@ -66,6 +66,7 @@ AWS_SECRET_ACCESS_KEY
 - Automate setup
 - Investigate setting up company services
     - Feature Flagging / A / B testing
+    - Switching calculation verisons
     - Analytics
     - JIRA / Confluence
     - Spendesk
