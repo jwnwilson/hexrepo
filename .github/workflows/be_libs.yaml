@@ -38,5 +38,7 @@ jobs:
           ${{ runner.os }}-build-${{ env.cache-name }}-
           ${{ runner.os }}-build-
           ${{ runner.os }}-
-    - name: Test Libraries
+    - name: Test Library
       run: make test_be_libs LIBRARY=${{ matrix.library }}
+    - name: Deploy Library
+      run: make deploy_be_libs LIBRARY=${{ matrix.library }} --check_modified

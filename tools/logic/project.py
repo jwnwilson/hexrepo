@@ -1,6 +1,7 @@
 
 from contextlib import chdir
 import os
+import subprocess
 from typing import List
 
 import typer
@@ -19,6 +20,16 @@ def get_libraries()-> List[str]:
     adaptor_folder = "backend/libs/src/adaptor"
     interactor_folder = "backend/libs/src/interactor"
     return scan_folder(adaptor_folder) + scan_folder(interactor_folder)
+
+
+def get_modified_libraries(libraries: List[str]) -> List[str]:
+    modified_libs: List[str] = []
+    modified_files = subprocess.getoutput("git diff --name-only")
+    for lib in libraries:
+        lib_type = get_library_type(lib)
+        if f"backend/libs/src/{lib_type}/{lib}" in modified_files:
+            modified_libs.append(lib)
+    return modified_libs
 
 
 def get_library_type(library: str) -> str:

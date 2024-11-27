@@ -1,6 +1,7 @@
 from contextlib import chdir
 import json
 import subprocess
+from typing import List, Optional
 import boto3
 import os
 
@@ -9,7 +10,7 @@ import typer
 from tools.logic.auth import authenticate_lib_repo
 from tools.logic.config import MonorepoConfig
 from tools.logic.env import set_env_var
-from tools.logic.project import get_libraries, get_library_type
+from tools.logic.project import get_libraries, get_library_type, get_modified_libraries
 
 
 def create_tf_state(config: MonorepoConfig) -> None:
@@ -63,13 +64,18 @@ def create_lib_infra(config: MonorepoConfig) -> None:
     typer.echo("Infrastructure setup complete.")
 
 
-def publish_libs(config: MonorepoConfig) -> None:
+def publish_libs(config: MonorepoConfig, libraries: Optional[List[str]], check_modified: bool = False) -> None:
     typer.echo("Publishing libraries to repo...")
     # Get code repo token
     assert os.environ.get("MONOREPO_LIB_REPO_URL"), "Library repo url not found."
     authenticate_lib_repo(config)
-    # Publish all libraries
-    for lib in get_libraries():
+    # Publish all libraries if none specified
+    libraries = libraries if libraries else get_libraries()
+
+    if check_modified:
+        libraries = get_modified_libraries(libraries)
+
+    for lib in libraries:
         lib_type = get_library_type(lib)
         with chdir(f"backend/libs/src/{lib_type}/{lib}"):
             os.system("make publish")

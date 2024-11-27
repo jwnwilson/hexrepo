@@ -1,5 +1,6 @@
 .PHONY: venv test lint
 .DEFAULT_GOAL = help
+.EXPORT_ALL_VARIABLES:
 
 VENV := .venv
 MKFILE_DIR := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
@@ -26,9 +27,5 @@ clean:
 
 publish: venv
 	@echo "Publishing package..."
-	rm -rf dist
-	. $(VENV_DIR)/bin/activate; \
-	poetry config repositories.monorep $(MONOREPO_LIB_REPO_URL)
-	@poetry config http-basic.monorep $(MONOREPO_LIB_REPO_USERNAME) $(MONOREPO_LIB_REPO_PASSWORD)
-	poetry publish --build --repository monorep
+	@./tools/publish.sh
 

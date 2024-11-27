@@ -96,7 +96,6 @@ def test_be_projects(run_all: bool = True):
 
 @app.command()
 def test_be_libs(libraries: Optional[List[str]] = None):
-    print("GITHUB ACTIONS", os.environ["GITHUB_ACTIONS"])
     repo_libs: List[str] = get_libraries()
     libraries = libraries.remove("") if "" in libraries else libraries
 
@@ -111,6 +110,15 @@ def test_be_libs(libraries: Optional[List[str]] = None):
         os.system(f"cd backend/libs/src/{lib_type}/{lib} && make lint_check")
         typer.echo(f"Running tests check for {lib}...")
         os.system(f"cd backend/libs/src/{lib_type}/{lib} && make test")
+
+
+@app.command()
+def deploy_be_libs(libraries: Optional[List[str]] = None, check_modified: bool = False):
+    config: MonorepoConfig
+    config, _ = get_or_create_config()
+    libraries = libraries.remove("") if "" in libraries else libraries
+
+    publish_libs(config, libraries=libraries, check_modified=check_modified)
 
 
 if __name__ == "__main__":
