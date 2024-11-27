@@ -59,7 +59,7 @@ deploy_be_projects: venv
 deploy_be_libs: venv
 	@echo "Deploying libraries..."
 	@. $(VENV_DIR)/bin/activate; \
-	python cli.py deploy-be-libs --libraries=$(LIBRARY)
+	python cli.py deploy-be-libs --libraries=$(LIBRARY) --check-modified
 
 migrate_db: venv
 	@echo "Migrating database..."
