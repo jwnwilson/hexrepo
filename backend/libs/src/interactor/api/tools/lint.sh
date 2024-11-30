@@ -11,7 +11,7 @@ while [[ "$#" -gt 0 ]]; do
 done
 
 
-APP_FOLDER="monorepo_stoage tests"
+APP_FOLDER="monorepo_api tests"
 
 if [[ -z "${GITHUB_ACTIONS}" ]]; then
     echo "Running locally, activating venv."
