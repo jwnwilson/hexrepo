@@ -1,5 +1,7 @@
 import os
-import pytest 
+
+import pytest
+
 from monorepo_storage.storage import S3Adaptor, StorageConfig
 
 
@@ -9,15 +11,15 @@ def aws_config() -> StorageConfig:
         aws_auth={
             "user": "test-user",
             "upload_user_access_id": "test-access-id",
-            "upload_user_secret_key": "test-secret"
+            "upload_user_secret_key": "test-secret",
         },
         aws_bucket="monorepo-jwn",
-        aws_upload_prefix="test-upload-prefix"
+        aws_upload_prefix="test-upload-prefix",
     )
 
 
 @pytest.fixture
-def clear_test_data(aws_config: StorageConfig):
+def clear_test_data(aws_config: StorageConfig) -> None:
     storage_adaptor = S3Adaptor(storage_config=aws_config)
     storage_adaptor.delete("test_folder/test_file.txt")
     storage_adaptor.delete("test_folder/")
@@ -28,7 +30,7 @@ def clear_test_data(aws_config: StorageConfig):
 
 
 @pytest.mark.e2e
-def test_aws_storage_e2e(aws_config: StorageConfig, clear_test_data):
+def test_aws_storage_e2e(aws_config: StorageConfig, clear_test_data: None) -> None:
     # Assert credentials are set
     storage_adaptor = S3Adaptor(aws_config)
 
@@ -41,7 +43,7 @@ def test_aws_storage_e2e(aws_config: StorageConfig, clear_test_data):
     test_file_path: str = f"tests/test_data/{test_file_name}"
     with open(test_file_path, "w") as f:
         f.write("test file content")
-    
+
     storage_adaptor.save(test_file_path, f"{aws_folder}/{test_file_name}")
 
     # List folder / files
@@ -52,7 +54,7 @@ def test_aws_storage_e2e(aws_config: StorageConfig, clear_test_data):
     assert f"{aws_folder}/{test_file_name}" in listed_files
 
     # Load file
-    test_file_path: str = f"tests/test_data/downloaded_test_file.txt"
+    test_file_path = f"tests/test_data/downloaded_test_file.txt"
     storage_adaptor.load(f"{aws_folder}/{test_file_name}", test_file_path)
     with open(test_file_path, "r") as f:
         assert f.read() == "test file content"

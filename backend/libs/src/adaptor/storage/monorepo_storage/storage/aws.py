@@ -1,11 +1,11 @@
 import logging
 import os
-from typing import List
+from typing import Any, List, Optional
 
-import boto3
+import boto3  # type: ignore
 
-from .interface import StorageAdaptor, StorageData, UploadUrlData, StorageConfig
 from .config import config
+from .interface import StorageAdaptor, StorageConfig, StorageData, UploadUrlData
 
 logger = logging.getLogger(__name__)
 
@@ -18,8 +18,12 @@ class S3Adaptor(StorageAdaptor):
         self.bucket = self.s3.Bucket(self.bucket_name)
         self.user = storage_config.aws_auth.get("user")
         self.upload_prefix = storage_config.aws_upload_prefix
-        self.upload_user_access_id = storage_config.aws_auth.get("upload_user_access_id")
-        self.upload_user_secret_key = storage_config.aws_auth.get("upload_user_secret_key")
+        self.upload_user_access_id = storage_config.aws_auth.get(
+            "upload_user_access_id"
+        )
+        self.upload_user_secret_key = storage_config.aws_auth.get(
+            "upload_user_secret_key"
+        )
         self.public_url_timeout = config.public_url_timeout
         self._upload_client = None
 
@@ -37,10 +41,10 @@ class S3Adaptor(StorageAdaptor):
         )
 
     @property
-    def upload_client(self):
+    def upload_client(self) -> Any:
         if self._upload_client:
             return self._upload_client
-        
+
         client = boto3.client("ssm")
         access_id = client.get_parameter(
             Name=self.upload_user_access_id, WithDecryption=True
@@ -72,7 +76,7 @@ class S3Adaptor(StorageAdaptor):
         )
         return public_url
 
-    def create_folder(self, path: str):
+    def create_folder(self, path: str) -> None:
         if not path.endswith("/"):
             path = path + "/"
         self.client.put_object(Bucket=self.bucket_name, Key=path)
@@ -86,12 +90,14 @@ class S3Adaptor(StorageAdaptor):
         )
 
     def list(
-        self, path: str, include_files=True, include_folders=True, as_urls=False
+        self,
+        path: str,
+        include_files: Optional[bool] = True,
+        include_folders: Optional[bool] = True,
+        as_urls: Optional[bool] = False,
     ) -> List[str]:
         prefix: str = path
-        objs = self.client.list_objects_v2(
-            Bucket=self.bucket_name, Prefix=prefix
-        )
+        objs = self.client.list_objects_v2(Bucket=self.bucket_name, Prefix=prefix)
         results: List[str] = []
         if include_files:
             results = results + [obj["Key"] for obj in objs.get("Contents", [])]
@@ -110,14 +116,15 @@ class S3Adaptor(StorageAdaptor):
         self.bucket.upload_file(source_path, target_path)
         return StorageData(path=self._get_url(target_path))
 
-    def load(self, source_path: str, target_path: str):
+    def load(self, source_path: str, target_path: str) -> StorageData:
         logger.info(
             f"Loading file: {source_path} from s3 bucket: {self.bucket_name}, to path: {target_path}"
         )
         target_dir = "/".join(target_path.split("/")[:-1])
         os.makedirs(target_dir, exist_ok=True)
         self.client.download_file(self.bucket_name, source_path, target_path)
+        return StorageData(path=target_path)
 
-    def delete(self, path: str):
+    def delete(self, path: str) -> None:
         self.client.delete_object(Bucket=self.bucket_name, Key=path)
         logger.info(f"Deleted file: {path} from s3 bucket: {self.bucket_name}")

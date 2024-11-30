@@ -1,4 +1,4 @@
-from .interface import StorageAdaptor
-from .aws import S3Adaptor
-from .config import Config
-from .aws import StorageConfig
+from .aws import S3Adaptor as S3Adaptor
+from .aws import StorageConfig as StorageConfig
+from .config import Config as Config
+from .interface import StorageAdaptor as StorageAdaptor

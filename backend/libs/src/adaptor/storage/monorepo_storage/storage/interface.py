@@ -1,5 +1,5 @@
 from abc import ABC
-from typing import List, Optional
+from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel
 
@@ -10,11 +10,11 @@ class StorageData(BaseModel):
 
 class UploadUrlData(BaseModel):
     upload_url: str
-    fields: dict
+    fields: Dict[str, Any]
 
 
 class StorageConfig(BaseModel):
-    aws_auth: dict
+    aws_auth: Dict[str, Any]
     aws_bucket: str
     aws_upload_prefix: Optional[str] = None
 
@@ -23,7 +23,7 @@ class StorageAdaptor(ABC):
     def __init__(self, config: StorageConfig) -> None:
         pass
 
-    def create_folder(self, path: str):
+    def create_folder(self, path: str) -> None:
         raise NotImplementedError
 
     def list(self, path: str) -> List[str]:
@@ -37,6 +37,6 @@ class StorageAdaptor(ABC):
 
     def load(self, source_file_path: str, target_file_path: str) -> StorageData:
         raise NotImplementedError
-    
-    def delete(self, path: str):
+
+    def delete(self, path: str) -> None:
         raise NotImplementedError
