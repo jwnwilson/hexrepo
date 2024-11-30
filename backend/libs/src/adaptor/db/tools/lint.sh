@@ -15,7 +15,7 @@ APP_FOLDER="monorepo_db tests"
 
 if [[ -z "${GITHUB_ACTIONS}" ]]; then
     echo "Running locally, activating venv."
-    . ${VENV_DIR}/bin/activate
+    . ${VENV}/bin/activate
 else
     echo "Running on github skipping venv creation."
     . $(poetry env info --path)/bin/activate

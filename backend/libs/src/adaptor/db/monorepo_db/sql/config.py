@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 def get_sql_db_url_from_cloud_provider(cloud_provider: str) -> str:
     if cloud_provider.upper() == "AWS":
-        password_data: str = AWSSecretAdaptor().get_secret(  # type: ignore
+        password_data: str = AWSSecretAdaptor().get_secret(
             config.DB_PASSWORD_SECRET_NAME
         )
         password: str = json.loads(password_data)["password"]
