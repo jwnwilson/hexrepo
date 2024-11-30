@@ -1,16 +1,14 @@
 import json
 from enum import Enum
 from logging import getLogger
-from typing import Any, Callable, List, Optional, Type, Union
+from typing import Any, Callable, Dict, List, Optional, Type, Union
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Response
 from fastapi.types import DecoratedCallable
-from pydantic import BaseModel
-
 from monorepo_db.exception import IntegrityError, InvalidArgument, RecordNotFound
-from monorepo_db.interface import PaginatedData, UOW, Repository
-
+from monorepo_db.interface import UOW, PaginatedData, Repository
+from pydantic import BaseModel
 
 logger = getLogger()
 
@@ -44,7 +42,7 @@ class CrudRouter(APIRouter):
 
     def __init__(
         self,
-        db_dependency: Callable,
+        db_dependency: Callable[[], UOW],
         repository: str,
         response_schema: Type[BaseModel],
         methods: List[str],
@@ -55,7 +53,7 @@ class CrudRouter(APIRouter):
         paginate: Optional[int] = None,
         **kwargs: Any,
     ):
-        self.db_dependency: Callable = db_dependency
+        self.db_dependency: Callable[[], UOW] = db_dependency
         self.repository: str = repository
         self.methods = methods or ["READ"]
 
@@ -68,7 +66,7 @@ class CrudRouter(APIRouter):
         super().__init__(prefix=prefix, tags=tags, redirect_slashes=True, **kwargs)
         self._setup_routes()
 
-    def _setup_routes(self):
+    def _setup_routes(self) -> None:
         if "CREATE" in self.methods:
             assert self.create_schema
             self.add_api_route(
@@ -89,7 +87,7 @@ class CrudRouter(APIRouter):
                 "/",
                 self._read_multi(),
                 methods=["GET"],
-                response_model=PaginatedData[self.response_schema],
+                response_model=PaginatedData[self.response_schema],  # type: ignore
             )
         if "UPDATE" in self.methods:
             assert self.update_schema
@@ -109,10 +107,10 @@ class CrudRouter(APIRouter):
             )
 
     @property
-    def router(self):
+    def router(self) -> APIRouter:
         return self
 
-    def _create(self) -> Callable:
+    def _create(self) -> Callable[[Any], Any]:
         def create_record(
             obj_in: self.create_schema,  # type: ignore
             uow: UOW = Depends(self.db_dependency),
@@ -127,7 +125,7 @@ class CrudRouter(APIRouter):
 
         return create_record
 
-    def _read(self) -> Callable:
+    def _read(self) -> Callable[[Any], Any]:
         def read_record(
             id: UUID,
             uow: UOW = Depends(self.db_dependency),
@@ -142,19 +140,19 @@ class CrudRouter(APIRouter):
 
         return read_record
 
-    def _read_multi(self) -> Callable:
+    def _read_multi(self) -> Callable[[UOW], Any]:
         def read_multiple_records(
             uow: UOW = Depends(self.db_dependency),
-            filters: str | None = "{}",
+            filters: str = "{}",
             page_size: int = 0,
             page_number: int = 1,
             order_by: str = "-created_at",
         ) -> PaginatedData:  # type: ignore
             repository: Repository = getattr(uow, self.repository)
             try:
-                filters = json.loads(filters)
+                parsed_filters: Dict[str, Any] = json.loads(filters)
                 return repository.read_multi(
-                    filters=filters,
+                    filters=parsed_filters,
                     page_size=page_size,
                     page_number=page_number,
                     order_by=order_by,
@@ -164,7 +162,7 @@ class CrudRouter(APIRouter):
 
         return read_multiple_records
 
-    def _update(self) -> Callable:
+    def _update(self) -> Callable[[UUID, Any, UOW], Any]:
         def update_record(
             id: UUID,
             obj_in: self.update_schema,  # type: ignore
@@ -182,11 +180,11 @@ class CrudRouter(APIRouter):
 
         return update_record
 
-    def _delete(self) -> Callable:
+    def _delete(self) -> Callable[[UUID, UOW], None]:
         def delete_record(
             id: UUID,
             uow: UOW = Depends(self.db_dependency),
-        ):
+        ) -> None:
             try:
                 repository: Repository = getattr(uow, self.repository)
                 return repository.delete(id)

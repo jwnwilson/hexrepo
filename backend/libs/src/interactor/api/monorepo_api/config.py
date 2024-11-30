@@ -1,6 +1,7 @@
-import os
 import logging
+import os
 from typing import Optional
+
 from pydantic_settings import BaseSettings
 
 logger = logging.getLogger()
@@ -13,7 +14,8 @@ class Config(BaseSettings):
     These parameters can be configured
     with environment variables.
     """
-    environment: str = os.environ.get("environment", "dev")    
+
+    environment: str = os.environ.get("environment", "dev")
 
 
-config = Config()  # type: ignore
+config: Config = Config()
