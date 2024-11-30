@@ -17,10 +17,10 @@ test: venv
 	pytest
 
 lint: venv
-	@echo "Linting"
-	. $(VENV_DIR)/bin/activate; \
-	black python/
-	flake8 python/
+	bash ./tools/lint.sh
+
+lint_check: venv
+	bash ./tools/lint.sh --check
 
 clean:
 	find . -type f -name '*.py[co]' -delete -o -type d -name __pycache__ -delete
