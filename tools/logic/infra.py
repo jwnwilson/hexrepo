@@ -82,6 +82,10 @@ def publish_libs(config: MonorepoConfig, libraries: Optional[List[str]], check_m
     if check_modified:
         libraries = get_modified_libraries(libraries)
 
+    if not libraries:
+        typer.echo("No modified libraries found, no libraries to publish.")
+        return
+
     for lib in libraries:
         lib_type = get_library_type(lib)
         with chdir(f"backend/libs/src/{lib_type}/{lib}"):

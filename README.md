@@ -34,8 +34,8 @@ AWS_SECRET_ACCESS_KEY
             - listen to changes in backend/libs and backend/projects only  
             - Setup db migration
             - Setup deployment
-            - Matrix of projects / libs to parallelise
             - Have check in deployment and pass that run if no files changed to trigger deployment
+            - Auto increment version in pipeline
     - Setup infra for projects
         - Update template and verify destroy / rebuild
     - Add ability to update project from template
