@@ -5,7 +5,7 @@ from cookiecutter.main import cookiecutter
 import typer
 
 from tools.logic.config import MonorepoConfig, get_or_create_config
-from tools.logic.infra import authenticate_cloud, create_lib_infra, create_tf_state, publish_libs, run_system_command, setup_global_env_infra
+from tools.logic.infra import authenticate_cloud, create_lib_infra, create_tf_state, deploy_projects, publish_libs, run_system_command, setup_global_env_infra
 from tools.logic.project import get_libraries, get_library_type, get_projects, install_library_in_project
 from tools.prompts.common import prompt_library_type
 from tools.prompts.infra import prompt_deploy_libs, prompt_setup_lib_infra, prompt_setup_project_infra, prompt_setup_shared_infra, prompt_setup_tf
@@ -119,6 +119,16 @@ def deploy_be_libs(libraries: Optional[List[str]] = None, check_modified: bool =
     libraries = libraries.remove("") if "" in libraries else libraries
 
     publish_libs(config, libraries=libraries, check_modified=check_modified)
+
+
+@app.command()
+def deploy_be_projects(projects: Optional[List[str]] = None, check_modified: bool = False, no_input: bool = False):
+    config: MonorepoConfig
+    config, _ = get_or_create_config(no_input=no_input)
+    projects = projects.remove("") if "" in projects else projects
+
+    deploy_projects(config, projects=projects, check_modified=check_modified)
+
 
 
 if __name__ == "__main__":

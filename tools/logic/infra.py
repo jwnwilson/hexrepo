@@ -10,7 +10,7 @@ import typer
 from tools.logic.auth import authenticate_lib_repo
 from tools.logic.config import MonorepoConfig
 from tools.logic.env import set_env_var
-from tools.logic.project import get_libraries, get_library_type, get_modified_libraries
+from tools.logic.project import get_libraries, get_library_type, get_modified_libraries, get_modified_projects, get_projects, get_projects_usings_libraries
 
 
 def run_system_command(command: str) -> None:
@@ -92,6 +92,31 @@ def publish_libs(config: MonorepoConfig, libraries: Optional[List[str]], check_m
             os.system("make publish")
     # Placeholder for publishing libraries to repo
     typer.echo("Libraries published successfully.")
+
+
+def deploy_projects(config: MonorepoConfig, projects: Optional[List[str]], check_modified: bool = False) -> None:
+    typer.echo("Publishing projects to repo...")
+    # Get code repo token
+    assert os.environ.get("MONOREPO_LIB_REPO_URL"), "Library repo url not found."
+    authenticate_lib_repo(config)
+    # Publish all libraries if none specified
+    projects = projects if projects else get_projects()
+
+    if check_modified:
+        breakpoint()
+        libraries = get_modified_libraries(libraries)
+        projects_with_modified_libs = get_projects_usings_libraries(libraries)
+        projects = set(projects_with_modified_libs + get_modified_projects(projects))
+
+    if not projects:
+        typer.echo("No modified projects found, no projects to publish.")
+        return
+
+    for proj in projects:
+        with chdir(f"backend/projects/{proj}"):
+            os.system("make deploy")
+    # Placeholder for publishing libraries to repo
+    typer.echo("Projects deployed successfully.")
 
 
 def setup_global_env_infra(config: MonorepoConfig) -> None:

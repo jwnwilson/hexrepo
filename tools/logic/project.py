@@ -2,7 +2,7 @@
 from contextlib import chdir
 import os
 import subprocess
-from typing import List
+from typing import List, Set
 
 import typer
 
@@ -30,6 +30,28 @@ def get_modified_libraries(libraries: List[str]) -> List[str]:
         if f"backend/libs/src/{lib_type}/{lib}" in modified_files:
             modified_libs.append(lib)
     return modified_libs
+
+
+def get_modified_projects(projects: List[str]) -> List[str]:
+    modified_projects: List[str] = []
+    modified_files = subprocess.getoutput("git diff --name-only")
+    for proj in projects:
+        if f"backend/projects/{proj}" in modified_files:
+            modified_projects.append(proj)
+    return modified_projects
+
+
+def get_projects_usings_libraries(libraries: List[str]) -> List[str]:
+    breakpoint()
+    projects: List[str] = get_projects()
+    projects_using_libs: Set[str] = {}
+    for proj in projects:
+        with chdir(f"backend/projects/{proj}"):
+            for lib in libraries:
+                with open("pyproject.toml") as f:
+                    if f"monorepo_{lib}" in f.read():
+                        projects_using_libs.add(proj)
+    return list(projects_using_libs)
 
 
 def get_library_type(library: str) -> str:

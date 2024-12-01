@@ -36,6 +36,8 @@ AWS_SECRET_ACCESS_KEY
             - Setup deployment
             - Have check in deployment and pass that run if no files changed to trigger deployment
             - Auto increment version in pipeline
+                - Add githook to check if version needs to be increased
+                - Add command to bump library version
     - Setup infra for projects
         - Update template and verify destroy / rebuild
     - Add ability to update project from template
