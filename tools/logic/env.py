@@ -9,6 +9,10 @@ from os import fdopen, remove
 import typer
 
 
+def running_on_ci() -> bool:
+    return bool(os.environ.get("CI", False))
+
+
 def value_in_file(file_path: str, value: str) -> bool:
     abs_file_path: str = expanduser(file_path)
     with open(abs_file_path) as f:
@@ -38,6 +42,13 @@ def replace(file_path: str, pattern: str, subst: str):
 
 
 def set_env_var(shell_file: str, env: str, value: str):
+    if running_on_ci():
+        ci_set_env_var(env, value)
+    else:
+        local_set_env_var(shell_file, env, value)
+
+
+def local_set_env_var(shell_file: str, env: str, value: str):
     typer.echo(f"Saving {env} in {shell_file}")
     env_command: str = f'export {env}="{value}"\n'
     # Replace existing value if it exists
@@ -48,5 +59,12 @@ def set_env_var(shell_file: str, env: str, value: str):
         shell_command: str = f"echo '{env_command}' >> {shell_file}"
         os.system(shell_command)
     # Update env var for follow up commands
+    os.putenv(env, value)
+    os.environ[env] = value
+
+
+def ci_set_env_var(env: str, value: str):
+    typer.echo(f"Setting {env} in CI environment")
+    os.system(f"echo 'export {env}={value}' >> $GITHUB_ENV")
     os.putenv(env, value)
     os.environ[env] = value
