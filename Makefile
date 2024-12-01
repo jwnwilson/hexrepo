@@ -39,7 +39,7 @@ test_be_projects: venv
 test_be_libs: venv
 	@echo "Testing libraries..."
 	@. $(VENV_DIR)/bin/activate; \
-	python cli.py test-be-libs --libraries=$(LIBRARY) --no-input=$(NO_INPUT)
+	python cli.py test-be-libs --libraries=$(LIBRARY)
 
 lint_be_projects: venv
 	@echo "Linting projects..."
@@ -59,7 +59,7 @@ deploy_be_projects: venv
 deploy_be_libs: venv
 	@echo "Deploying libraries..."
 	@. $(VENV_DIR)/bin/activate; \
-	python cli.py deploy-be-libs --libraries=$(LIBRARY) --check-modified
+	python cli.py deploy-be-libs --libraries=$(LIBRARY) --check-modified --no-input
 
 migrate_db: venv
 	@echo "Migrating database..."
