@@ -51,4 +51,4 @@ jobs:
     - name: Test Library
       run: make test_be_libs LIBRARY=${{ matrix.library }}
     - name: Deploy Library
-      run: make deploy_be_libs LIBRARY=${{ matrix.library }}
+      run: make deploy_be_libs LIBRARY=${{ matrix.library }} NO_INPUT=true

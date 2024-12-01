@@ -70,10 +70,10 @@ def setup_project_config() -> MonorepoConfig:
     return config
 
 
-def get_or_create_config() -> Tuple[MonorepoConfig, bool]:
+def get_or_create_config(no_input: bool = False) -> Tuple[MonorepoConfig, bool]:
     created_config: bool = False
     config: Optional[MonorepoConfig] = MonorepoConfig.load_config()
-    if not config or prompt_config_setup():
+    if not config or (no_input or prompt_config_setup()):
         config: MonorepoConfig = setup_project_config()
         created_config = True
     if not config: 
