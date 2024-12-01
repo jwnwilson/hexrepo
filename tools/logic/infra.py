@@ -83,7 +83,7 @@ def publish_libs(config: MonorepoConfig, libraries: Optional[List[str]], check_m
         libraries = get_modified_libraries(libraries)
 
     if not libraries:
-        typer.echo("No modified libraries found, no libraries to publish.")
+        typer.echo("No modified files found, skipping publish.")
         return
 
     for lib in libraries:
@@ -109,7 +109,7 @@ def deploy_projects(config: MonorepoConfig, projects: Optional[List[str]], check
         projects = set(projects_with_modified_libs + get_modified_projects(projects))
 
     if not projects:
-        typer.echo("No modified projects found, no projects to publish.")
+        typer.echo("No modified files found, skipping deploy.")
         return
 
     for proj in projects:
