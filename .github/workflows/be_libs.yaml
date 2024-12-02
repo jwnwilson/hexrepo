@@ -26,7 +26,12 @@ jobs:
   test_libs:
     strategy:
       matrix:
-        library: ["db", "storage", "api"]
+        library:
+        - "backend/libs/src/adaptor/db"
+        - "backend/libs/src/adaptor/storage"
+        - "backend/libs/src/interactor/api"
+    env:
+      POETRY_LOCK_FILE: "${{ matrix.library }}/poetry.lock"
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -43,12 +48,22 @@ jobs:
         cache-name: cache-cli-poetry
       with:
         path: ./.venv
-        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('poetry.lock') }}
+        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles( poetry.lock ) }}
         restore-keys: |
           ${{ runner.os }}-build-${{ env.cache-name }}-
-          ${{ runner.os }}-build-
-          ${{ runner.os }}-
+    - name: Cache lib venv
+      id: cache-lib-poetry
+      uses: actions/cache@v3
+      env:
+        cache-name: cache-lib-poetry
+      with:
+        path: "${{ matrix.library }}/.venv"
+        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ matrix.library }}-${{ hashFiles( env.POETRY_LOCK_FILE ) }}
+        restore-keys: |
+          ${{ runner.os }}-build-${{ env.cache-name }}-${{ matrix.library }}-
     - name: Test Library
       run: make test_be_libs LIBRARY=${{ matrix.library }}
     - name: Deploy Library
-      run: make deploy_be_libs LIBRARY=${{ matrix.library }}
+      run: |
+        export LIB=basename "${{ matrix.library }}""
+        make deploy_be_libs LIBRARY=${LIB}

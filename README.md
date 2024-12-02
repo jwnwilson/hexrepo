@@ -27,6 +27,7 @@ AWS_SECRET_ACCESS_KEY
     - Setup pipeline for monorepo
         - Setup test / lint build image
             - Need to dyanmically set poetry cache key to library poetry lock file for correct caching.
+                - Universal venv location for CLI
             - Look at https://github.com/nektos/act
             - Setup pyright and ruff
             - Port changes to all libs and projects
@@ -46,8 +47,6 @@ AWS_SECRET_ACCESS_KEY
         - Conform to ECS / Fargate
         - Setup task chaining with idempotent re-run
     - Setup auth / cross project auth / authorisation
-    - Setup mypy
-        - Look at ruff
     - Improve docker container builds
         - Setup base lib image to re-use for projects
     - Add user setup to infra as code
