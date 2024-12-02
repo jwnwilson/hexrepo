@@ -33,7 +33,7 @@ jobs:
       env:
         cache-name: cache-cli-poetry
       with:
-        path: ./.cli_venv
+        path: .venv
         key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('poetry.lock') }}
         restore-keys: |
           ${{ runner.os }}-build-${{ env.cache-name }}-
