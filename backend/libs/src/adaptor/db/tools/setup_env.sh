@@ -8,16 +8,10 @@ if [ -d "./.venv" ]; then
     exit 0
 fi
 
-if [[ -z "${GITHUB_ACTIONS}" ]]; then
-    echo "Running locally, creating venv."
-    cd $ROOT_DIR
-    python3.12 -m venv ${VENV}; \
-    source ${ROOT_DIR}/${VENV}/bin/activate && \
-    export SYSTEM_VERSION_COMPAT=1 && \
-    pip install poetry  && \
-    poetry install --with dev
-else
-    echo "Running on github skipping venv creation."
-    . $(poetry env info --path)/bin/activate
-    poetry install --with dev
-fi
+cd $ROOT_DIR
+python3.12 -m venv ${VENV}; \
+source ${ROOT_DIR}/${VENV}/bin/activate && \
+export SYSTEM_VERSION_COMPAT=1 && \
+pip install poetry && \
+poetry lock && \
+poetry install --with dev
