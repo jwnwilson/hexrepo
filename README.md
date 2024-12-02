@@ -59,6 +59,7 @@ AWS_SECRET_ACCESS_KEY
         - [deply](https://github.com/Vashkatsi/deply)
 
 - Setup Frontend
+    - Move to seperate repo
     - Setup micro fe
     - Add app creation script for micro fe
     - Add component lib
