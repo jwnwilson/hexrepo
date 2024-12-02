@@ -62,9 +62,10 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-build-${{ env.cache-name }}-${{ matrix.library }}-
     - name: Test Library
-      run: make test_be_libs LIBRARY=${{ matrix.library }}
+      run: |
+        export LIB=`basename "${{ matrix.library }}"`
+        make test_be_libs LIBRARY=${LIB}
     - name: Deploy Library
       run: |
         export LIB=`basename "${{ matrix.library }}"`
-        echo $LIB
         make deploy_be_libs LIBRARY=${LIB}
