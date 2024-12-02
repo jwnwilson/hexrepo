@@ -65,5 +65,5 @@ jobs:
       run: make test_be_libs LIBRARY=${{ matrix.library }}
     - name: Deploy Library
       run: |
-        export LIB=basename "${{ matrix.library }}""
+        export LIB=`basename "${{ matrix.library }}"`
         make deploy_be_libs LIBRARY=${LIB}
