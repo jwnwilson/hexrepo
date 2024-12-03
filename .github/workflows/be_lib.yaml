@@ -66,6 +66,7 @@ jobs:
         export LIB=`basename "${{ matrix.library }}"`
         make test_be_libs LIBRARY=${LIB}
   deploy_libs:
+    needs: test_libs
     strategy:
       matrix:
         library:
