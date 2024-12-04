@@ -39,11 +39,10 @@ AWS_SECRET_ACCESS_KEY
         - Setup build / db migrate / deploy
             - Setup db migration
             - Setup deployment
-            - Have check in deployment and pass that run if no files changed to trigger deployment
             - Auto increment version in pipeline
                 - Add githook to check if version needs to be increased
                 - Add command to bump library version
-        - Move tools to common lib to remove duplication
+        - Move lib & project tools to root tools folder to remove duplication
     - Add ability to update project from template
         - Use cruft to update projects from template?
         - Update template and verify destroy / rebuild

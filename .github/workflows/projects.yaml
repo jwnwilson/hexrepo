@@ -35,3 +35,22 @@ jobs:
         poetry_lock_file: "${{ matrix.project }}/poetry.lock"
     - name: Test Libraries
       run: make test_projects
+  deploy_projects:
+    needs: test_projects
+    strategy:
+      matrix:
+        project:
+        - "projects/example"
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - id: python_venv
+      name: Cache project venv
+      uses: ./.github/actions/be_venv
+      with:
+        venv_path: ${{ matrix.project }}
+        poetry_lock_file: "${{ matrix.project }}/poetry.lock"
+    - name: Deploy Project
+      run: |
+        export PROJ=`basename "${{ matrix.project }}"`
+        make deploy_projects PROJECT=${PROJ}

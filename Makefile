@@ -5,6 +5,7 @@
 VENV=.venv
 VENV_DIR = $(MKFILE_DIR)$(VENV)
 LIBRARY:=${LIBRARY}
+PROJECT:=${PROJECT}
 
 # Setup commands
 venv:
@@ -54,7 +55,7 @@ lint_libs: venv
 deploy_projects: venv
 	@echo "Deploying projects..."
 	@. $(VENV_DIR)/bin/activate; \
-	python cli.py deploy-projects
+	python cli.py deploy-projects --projects=$(PROJECT) --check-modified --no-input
 
 deploy_libs: venv
 	@echo "Deploying libraries..."
