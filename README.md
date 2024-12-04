@@ -32,6 +32,7 @@ AWS_SECRET_ACCESS_KEY
             - Auto increment version in pipeline
                 - Add githook to check if version needs to be increased
                 - Add command to bump library version
+        - Move tools to common lib to remove duplication
     - Setup infra for projects
         - Update template and verify destroy / rebuild
         - Add project & library setup test
