@@ -6,8 +6,12 @@ name: Templates
 on:
   push:
     branches: [ main ]
+    paths:
+      - templates/**
   pull_request:
     branches: [ main ]
+    paths:
+      - templates/**
 
 permissions:
   contents: read

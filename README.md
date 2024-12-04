@@ -1,6 +1,15 @@
 # Python Monorepo
 
-This is my python monorepo that used hexagonal architecture to manage complexity, it also will automatically share library logic across projects and auto update projects when a library or shared infra as code is modified. The project also allows local debugging of library code while developing for convenience. 
+This is my python monorepo that uses hexagonal architecture to manage complexity. 
+
+Features include:
+
+- CLI commands to setup projects
+- CLI to create libraries and add them to project
+- Auto update projects when a library is updated
+- Auto update projects infra as code when shared infra as code if modified
+- Local debugging of library code while developing
+- Automatic deployment of libraries and projects 
 
 ## Setup - AWS
 
