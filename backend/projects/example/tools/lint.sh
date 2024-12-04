@@ -10,7 +10,7 @@ while [[ "$#" -gt 0 ]]; do
     esac
 done
 
-APP_FOLDER="app tests"
+APP_FOLDER="src"
 
 echo "Activating venv."
 . ${VENV_DIR}/bin/activate

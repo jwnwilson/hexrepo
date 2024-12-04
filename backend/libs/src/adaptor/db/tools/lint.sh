@@ -11,7 +11,7 @@ while [[ "$#" -gt 0 ]]; do
 done
 
 
-APP_FOLDER="src"
+APP_FOLDER="monorepo_db tests"
 
 echo "Activating venv."
 . ${VENV_DIR}/bin/activate
