@@ -25,12 +25,7 @@ AWS_SECRET_ACCESS_KEY
 
 - Setup backend
     - Setup pipeline for monorepo
-        - Setup test / lint build image
-            - Look at https://github.com/nektos/act
-            - Setup pyright and ruff
-            - Port changes to all libs and projects
         - Setup build / db migrate / deploy
-            - listen to changes in backend/libs and backend/projects only  
             - Setup db migration
             - Setup deployment
             - Have check in deployment and pass that run if no files changed to trigger deployment
@@ -39,6 +34,7 @@ AWS_SECRET_ACCESS_KEY
                 - Add command to bump library version
     - Setup infra for projects
         - Update template and verify destroy / rebuild
+        - Add project & library setup test
     - Add ability to update project from template
         - Use cruft to update projects from template?
     - Setup async tasks
@@ -54,6 +50,10 @@ AWS_SECRET_ACCESS_KEY
     - Enforce architecture rules:
         - https://roman.pt/posts/python-architecture-linter/
         - [deply](https://github.com/Vashkatsi/deply)
+    - Setup test / lint build image
+            - Look at https://github.com/nektos/act
+            - Setup pyright and ruff
+            - Port changes to all libs and projects
 
 - Setup Frontend
     - Move to seperate repo

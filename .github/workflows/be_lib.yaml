@@ -37,30 +37,15 @@ jobs:
     - uses: actions/checkout@v4
     - name: Install poetry
       run: pipx install poetry
+      shell: bash
     - uses: actions/setup-python@v5
       with:
         python-version: '3.12'
         cache: 'poetry'
-    - name: Cache cli venv
-      id: cache-cli-poetry
-      uses: actions/cache@v3
-      env:
-        cache-name: cache-cli-poetry
+    - id: python_venv
+      uses: ./.github/actions/be_venv
       with:
-        path: .venv
-        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles( 'poetry.lock' ) }}
-        restore-keys: |
-          ${{ runner.os }}-build-${{ env.cache-name }}-
-    - name: Cache lib venv
-      id: cache-lib-poetry
-      uses: actions/cache@v3
-      env:
-        cache-name: cache-lib-poetry
-      with:
-        path: "${{ matrix.library }}/.venv"
-        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ matrix.library }}-${{ hashFiles( env.POETRY_LOCK_FILE ) }}
-        restore-keys: |
-          ${{ runner.os }}-build-${{ env.cache-name }}-${{ matrix.library }}-
+        venv_path: ${{ matrix.library }}
     - name: Test Library
       run: |
         export LIB=`basename "${{ matrix.library }}"`
@@ -80,30 +65,15 @@ jobs:
     - uses: actions/checkout@v4
     - name: Install poetry
       run: pipx install poetry
+      shell: bash
     - uses: actions/setup-python@v5
       with:
         python-version: '3.12'
         cache: 'poetry'
-    - name: Cache cli venv
-      id: cache-cli-poetry
-      uses: actions/cache@v3
-      env:
-        cache-name: cache-cli-poetry
+    - id: python_venv
+      uses: ./.github/actions/be_venv
       with:
-        path: .venv
-        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles( 'poetry.lock' ) }}
-        restore-keys: |
-          ${{ runner.os }}-build-${{ env.cache-name }}-
-    - name: Cache lib venv
-      id: cache-lib-poetry
-      uses: actions/cache@v3
-      env:
-        cache-name: cache-lib-poetry
-      with:
-        path: "${{ matrix.library }}/.venv"
-        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ matrix.library }}-${{ hashFiles( env.POETRY_LOCK_FILE ) }}
-        restore-keys: |
-          ${{ runner.os }}-build-${{ env.cache-name }}-${{ matrix.library }}-
+        venv_path: ${{ matrix.library }}
     - name: Deploy Library
       run: |
         export LIB=`basename "${{ matrix.library }}"`
