@@ -35,14 +35,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    - name: Install poetry
-      run: pipx install poetry
-      shell: bash
-    - uses: actions/setup-python@v5
-      with:
-        python-version: '3.12'
-        cache: 'poetry'
     - id: python_venv
+      name: Cache project venv
       uses: ./.github/actions/be_venv
       with:
         venv_path: ${{ matrix.library }}
@@ -63,14 +57,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    - name: Install poetry
-      run: pipx install poetry
-      shell: bash
-    - uses: actions/setup-python@v5
-      with:
-        python-version: '3.12'
-        cache: 'poetry'
     - id: python_venv
+      name: Cache project venv
       uses: ./.github/actions/be_venv
       with:
         venv_path: ${{ matrix.library }}

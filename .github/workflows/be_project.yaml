@@ -23,29 +23,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    - name: Set up Python 3.12
-      uses: actions/setup-python@v4
+    - id: python_venv
+      name: Cache project venv
+      uses: ./.github/actions/be_venv
       with:
-        python-version: "3.12"
-    - name: Cache cli venv
-      id: cache-cli-poetry
-      uses: actions/cache@v3
-      env:
-        cache-name: cache-cli-poetry
-      with:
-        path: .venv
-        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('poetry.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-build-${{ env.cache-name }}-
-    - name: Cache project venv
-      id: cache-project-poetry
-      uses: actions/cache@v3
-      env:
-        cache-name: cache-project-poetry
-      with:
-        path: "${{ matrix.project }}/.venv"
-        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ matrix.library }}-${{ hashFiles( env.POETRY_LOCK_FILE ) }}
-        restore-keys: |
-          ${{ runner.os }}-build-${{ env.cache-name }}-${{ matrix.library }}-
+        venv_path: ${{ matrix.library }}
     - name: Test Libraries
       run: make test_be_projects
