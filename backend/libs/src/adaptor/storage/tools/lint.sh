@@ -13,13 +13,8 @@ done
 
 APP_FOLDER="monorepo_storage tests"
 
-if [[ -z "${GITHUB_ACTIONS}" ]]; then
-    echo "Running locally, activating venv."
-    . ${VENV_DIR}/bin/activate
-else
-    echo "Running on github skipping venv creation."
-    . $(poetry env info --path)/bin/activate
-fi
+echo "Activating venv."
+. ${VENV_DIR}/bin/activate
 
 if [[ -z "${check}" ]]; then
     black ${APP_FOLDER} 

@@ -91,6 +91,9 @@ def test_be_projects(run_all: bool = True):
         # run tests for those projects
         raise NotImplementedError("Not implemented yet")
     for project in projects:
+        typer.echo(f"Running linting check for {project}...")
+        run_system_command(f"cd backend/projects/{project} && make lint_check")
+        typer.echo(f"Running tests check for {project}...")
         run_system_command(f"cd backend/projects/{project} && make test")
 
 

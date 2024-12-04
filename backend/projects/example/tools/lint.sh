@@ -1,9 +1,7 @@
 #!/usr/bin/env bash
 
 set -e
-set -x
-
-#!/bin/bash
+VENV=.venv
 
 while [[ "$#" -gt 0 ]]; do
     case $1 in
@@ -12,7 +10,10 @@ while [[ "$#" -gt 0 ]]; do
     esac
 done
 
-APP_FOLDER=app
+APP_FOLDER="app tests"
+
+echo "Activating venv."
+. ${VENV_DIR}/bin/activate
 
 if [[ -z "${check}" ]]; then
     black ${APP_FOLDER} 
