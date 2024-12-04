@@ -6,8 +6,14 @@ name: Projects
 on:
   push:
     branches: [ main ]
+    paths:
+      - libs/**
+      - projects/**
   pull_request:
     branches: [ main ]
+    paths:
+      - libs/**
+      - projects/**
 
 permissions:
   contents: read

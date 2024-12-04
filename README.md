@@ -1,4 +1,6 @@
-# Python / Typescript Monorepo
+# Python Monorepo
+
+This is my python monorepo that used hexagonal architecture to manage complexity, it also will automatically share library logic across projects and auto update projects when a library or shared infra as code is modified. The project also allows local debugging of library code while developing for convenience. 
 
 ## Setup - AWS
 
