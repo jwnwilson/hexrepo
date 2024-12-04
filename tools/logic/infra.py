@@ -61,7 +61,7 @@ def authenticate_cloud(config: MonorepoConfig) -> None:
 def create_lib_infra(config: MonorepoConfig) -> None:
     typer.echo("Creating infrastructure for libraries...")
     # Placeholder for library infra setup
-    with chdir("backend/libs"):
+    with chdir("libs"):
         os.system("make tf_shared_init")
         os.system("make tf_shared_plan")
         os.system("make tf_shared_apply")
@@ -88,7 +88,7 @@ def publish_libs(config: MonorepoConfig, libraries: Optional[List[str]], check_m
 
     for lib in libraries:
         lib_type = get_library_type(lib)
-        with chdir(f"backend/libs/src/{lib_type}/{lib}"):
+        with chdir(f"libs/src/{lib_type}/{lib}"):
             os.system("make publish")
     # Placeholder for publishing libraries to repo
     typer.echo("Libraries published successfully.")
@@ -113,7 +113,7 @@ def deploy_projects(config: MonorepoConfig, projects: Optional[List[str]], check
         return
 
     for proj in projects:
-        with chdir(f"backend/projects/{proj}"):
+        with chdir(f"projects/{proj}"):
             os.system("make deploy")
     # Placeholder for publishing libraries to repo
     typer.echo("Projects deployed successfully.")
@@ -122,7 +122,7 @@ def deploy_projects(config: MonorepoConfig, projects: Optional[List[str]], check
 def setup_global_env_infra(config: MonorepoConfig) -> None:
     typer.echo("Setting up global env infrastructure...")
     # Placeholder for shared infra setup
-    with chdir("backend/libs"):
+    with chdir("libs"):
         os.system(f"make tf_env_init ENV=dev")
         for env in config.environments:
             os.system(f"ENVIRONMENT={env} make tf_workspace")

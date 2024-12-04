@@ -33,11 +33,10 @@ AWS_SECRET_ACCESS_KEY
                 - Add githook to check if version needs to be increased
                 - Add command to bump library version
         - Move tools to common lib to remove duplication
-    - Setup infra for projects
-        - Update template and verify destroy / rebuild
-        - Add project & library setup test
     - Add ability to update project from template
         - Use cruft to update projects from template?
+        - Update template and verify destroy / rebuild
+        - Add project & library setup test
     - Setup async tasks
         - Conform to ECS / Fargate
         - Setup task chaining with idempotent re-run

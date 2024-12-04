@@ -18,7 +18,7 @@ app = typer.Typer()
 def create_be_library():
     library_type = prompt_library_type()
     # CD to libs/src/adaptor or libs/src/interactor folder
-    with chdir(f"backend/libs/src/{library_type}"):
+    with chdir(f"libs/src/{library_type}"):
         # Run cookie cutter command to copy template
         cookiecutter("../../../templates/library")
         # Setup infra for libray
@@ -33,7 +33,7 @@ def create_be_library():
 @app.command()
 def create_be_project():
     # CD to projects folder
-    with chdir(f"backend/projects"):
+    with chdir(f"projects"):
         # Run cookie cutter command to copy template
         cookiecutter("../templates/project")
         # Setup infra for service
@@ -92,9 +92,9 @@ def test_be_projects(run_all: bool = True):
         raise NotImplementedError("Not implemented yet")
     for project in projects:
         typer.echo(f"Running linting check for {project}...")
-        run_system_command(f"cd backend/projects/{project} && make lint_check")
+        run_system_command(f"cd projects/{project} && make lint_check")
         typer.echo(f"Running tests check for {project}...")
-        run_system_command(f"cd backend/projects/{project} && make test")
+        run_system_command(f"cd projects/{project} && make test")
 
 
 @app.command()
@@ -110,9 +110,9 @@ def test_be_libs(libraries: Optional[List[str]] = None):
     for lib in libraries:
         lib_type: str = get_library_type(lib)
         typer.echo(f"Running linting check for {lib}...")
-        run_system_command(f"cd backend/libs/src/{lib_type}/{lib} && make lint_check")
+        run_system_command(f"cd libs/src/{lib_type}/{lib} && make lint_check")
         typer.echo(f"Running tests check for {lib}...")
-        run_system_command(f"cd backend/libs/src/{lib_type}/{lib} && make test")
+        run_system_command(f"cd libs/src/{lib_type}/{lib} && make test")
 
 
 @app.command()

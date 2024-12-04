@@ -27,9 +27,9 @@ jobs:
     strategy:
       matrix:
         library:
-        - "backend/libs/src/adaptor/db"
-        - "backend/libs/src/adaptor/storage"
-        - "backend/libs/src/interactor/api"
+        - "libs/src/adaptor/db"
+        - "libs/src/adaptor/storage"
+        - "libs/src/interactor/api"
     env:
       POETRY_LOCK_FILE: "${{ matrix.library }}/poetry.lock"
     runs-on: ubuntu-latest
@@ -50,9 +50,9 @@ jobs:
     strategy:
       matrix:
         library:
-        - "backend/libs/src/adaptor/db"
-        - "backend/libs/src/adaptor/storage"
-        - "backend/libs/src/interactor/api"
+        - "libs/src/adaptor/db"
+        - "libs/src/adaptor/storage"
+        - "libs/src/interactor/api"
     env:
       POETRY_LOCK_FILE: "${{ matrix.library }}/poetry.lock"
     runs-on: ubuntu-latest

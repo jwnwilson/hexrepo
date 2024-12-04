@@ -38,4 +38,4 @@ share/python-wheels/
 MANIFEST
 
 # Generatedfiles
-backend/libs/Makefile
+libs/Makefile
