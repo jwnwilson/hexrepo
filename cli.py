@@ -15,7 +15,7 @@ app = typer.Typer()
 
 
 @app.command()
-def create_be_library():
+def create_library():
     library_type = prompt_library_type()
     # CD to libs/src/adaptor or libs/src/interactor folder
     with chdir(f"libs/src/{library_type}"):
@@ -31,7 +31,7 @@ def create_be_library():
 
 
 @app.command()
-def create_be_project():
+def create_project():
     # CD to projects folder
     with chdir(f"projects"):
         # Run cookie cutter command to copy template
@@ -46,7 +46,7 @@ def create_be_project():
 
 
 @app.command()
-def add_be_library(project: str, library: str):
+def add_library(project: str, library: str):
     # Install library from repo if available
     install_library_in_project(library, project)
 
@@ -82,7 +82,7 @@ def setup():
 
 
 @app.command()
-def test_be_projects(run_all: bool = True):
+def test_projects(run_all: bool = True):
     if run_all:
         projects: List[str] = get_projects()
     else:
@@ -98,7 +98,7 @@ def test_be_projects(run_all: bool = True):
 
 
 @app.command()
-def test_be_libs(libraries: Optional[List[str]] = None):
+def test_libs(libraries: Optional[List[str]] = None):
     repo_libs: List[str] = get_libraries()
     libraries = libraries.remove("") if "" in libraries else libraries
 
@@ -116,7 +116,7 @@ def test_be_libs(libraries: Optional[List[str]] = None):
 
 
 @app.command()
-def deploy_be_libs(libraries: Optional[List[str]] = None, check_modified: bool = False, no_input: bool = False):
+def deploy_libs(libraries: Optional[List[str]] = None, check_modified: bool = False, no_input: bool = False):
     config: MonorepoConfig
     config, _ = get_or_create_config(no_input=no_input)
     libraries = libraries.remove("") if "" in libraries else libraries
@@ -125,7 +125,7 @@ def deploy_be_libs(libraries: Optional[List[str]] = None, check_modified: bool =
 
 
 @app.command()
-def deploy_be_projects(projects: Optional[List[str]] = None, check_modified: bool = False, no_input: bool = False):
+def deploy_projects(projects: Optional[List[str]] = None, check_modified: bool = False, no_input: bool = False):
     config: MonorepoConfig
     config, _ = get_or_create_config(no_input=no_input)
     projects = projects.remove("") if "" in projects else projects

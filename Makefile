@@ -16,47 +16,47 @@ setup: venv
 	@. $(VENV_DIR)/bin/activate; \
 	python cli.py setup
 
-create_be_project: venv
+create_project: venv
 	@echo "Creating project..."
 	@. $(VENV_DIR)/bin/activate; \
 	python cli.py create-be-project
 
-create_be_library: venv
+create_library: venv
 	@echo "Creating library..."
 	@. $(VENV_DIR)/bin/activate; \
 	python cli.py create-be-library
 
-add_be_library: venv
+add_library: venv
 	@echo "Adding library to project..."
 	@. $(VENV_DIR)/bin/activate; \
-	python cli.py add_be_library
+	python cli.py add_library
 
-test_be_projects: venv
+test_projects: venv
 	@echo "Testing projects..."
 	@. $(VENV_DIR)/bin/activate; \
 	python cli.py test-be-projects
 
-test_be_libs: venv
+test_libs: venv
 	@echo "Testing libraries..."
 	@. $(VENV_DIR)/bin/activate; \
 	python cli.py test-be-libs --libraries=$(LIBRARY)
 
-lint_be_projects: venv
+lint_projects: venv
 	@echo "Linting projects..."
 	@. $(VENV_DIR)/bin/activate; \
-	python cli.py lint_be_projects
+	python cli.py lint_projects
 
-lint_be_libs: venv
+lint_libs: venv
 	@echo "Linting libraries..."
 	@. $(VENV_DIR)/bin/activate; \
-	python cli.py lint_be_libs
+	python cli.py lint_libs
 
-deploy_be_projects: venv
+deploy_projects: venv
 	@echo "Deploying projects..."
 	@. $(VENV_DIR)/bin/activate; \
 	python cli.py deploy-be-projects
 
-deploy_be_libs: venv
+deploy_libs: venv
 	@echo "Deploying libraries..."
 	@. $(VENV_DIR)/bin/activate; \
 	python cli.py deploy-be-libs --libraries=$(LIBRARY) --check-modified --no-input
