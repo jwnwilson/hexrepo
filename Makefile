@@ -19,12 +19,12 @@ setup: venv
 create_project: venv
 	@echo "Creating project..."
 	@. $(VENV_DIR)/bin/activate; \
-	python cli.py create-be-project
+	python cli.py create-project
 
 create_library: venv
 	@echo "Creating library..."
 	@. $(VENV_DIR)/bin/activate; \
-	python cli.py create-be-library
+	python cli.py create-library
 
 add_library: venv
 	@echo "Adding library to project..."
@@ -34,12 +34,12 @@ add_library: venv
 test_projects: venv
 	@echo "Testing projects..."
 	@. $(VENV_DIR)/bin/activate; \
-	python cli.py test-be-projects
+	python cli.py test-projects
 
 test_libs: venv
 	@echo "Testing libraries..."
 	@. $(VENV_DIR)/bin/activate; \
-	python cli.py test-be-libs --libraries=$(LIBRARY)
+	python cli.py test-libs --libraries=$(LIBRARY)
 
 lint_projects: venv
 	@echo "Linting projects..."
@@ -54,12 +54,12 @@ lint_libs: venv
 deploy_projects: venv
 	@echo "Deploying projects..."
 	@. $(VENV_DIR)/bin/activate; \
-	python cli.py deploy-be-projects
+	python cli.py deploy-projects
 
 deploy_libs: venv
 	@echo "Deploying libraries..."
 	@. $(VENV_DIR)/bin/activate; \
-	python cli.py deploy-be-libs --libraries=$(LIBRARY) --check-modified --no-input
+	python cli.py deploy-libs --libraries=$(LIBRARY) --check-modified --no-input
 
 migrate_db: venv
 	@echo "Migrating database..."
