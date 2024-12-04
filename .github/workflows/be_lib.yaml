@@ -40,6 +40,7 @@ jobs:
       uses: ./.github/actions/be_venv
       with:
         venv_path: ${{ matrix.library }}
+        poetry_lock_file: "${{ matrix.library }}/poetry.lock"
     - name: Test Library
       run: |
         export LIB=`basename "${{ matrix.library }}"`
@@ -62,6 +63,7 @@ jobs:
       uses: ./.github/actions/be_venv
       with:
         venv_path: ${{ matrix.library }}
+        poetry_lock_file: "${{ matrix.library }}/poetry.lock"
     - name: Deploy Library
       run: |
         export LIB=`basename "${{ matrix.library }}"`

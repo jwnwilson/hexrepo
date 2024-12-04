@@ -4,6 +4,9 @@ inputs:
   venv_path: 
     description: 'Path to the virtual environment'
     required: true
+  poetry_lock_file:
+    description: 'Path to the poetry.lock file'
+    required: true
 runs:
   using: "composite"
   steps:
@@ -30,6 +33,6 @@ runs:
         cache-name: cache-lib-poetry
       with:
         path: "${{ inputs.venv_path }}/.venv"
-        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ inputs.venv_path }}-${{ hashFiles( env.POETRY_LOCK_FILE ) }}
+        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ inputs.venv_path }}-${{ hashFiles( inputs.poetry_lock_file ) }}
         restore-keys: |
           ${{ runner.os }}-build-${{ env.cache-name }}-${{ inputs.venv_path }}-

@@ -18,8 +18,6 @@ jobs:
       matrix:
         project:
         - "backend/projects/example"
-    env:
-      POETRY_LOCK_FILE: "${{ matrix.library }}/poetry.lock"
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -27,6 +25,7 @@ jobs:
       name: Cache project venv
       uses: ./.github/actions/be_venv
       with:
-        venv_path: ${{ matrix.library }}
+        venv_path: ${{ matrix.project }}
+        poetry_lock_file: "${{ matrix.project }}/poetry.lock"
     - name: Test Libraries
       run: make test_be_projects
