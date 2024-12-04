@@ -61,9 +61,11 @@ AWS_SECRET_ACCESS_KEY
         - https://roman.pt/posts/python-architecture-linter/
         - [deply](https://github.com/Vashkatsi/deply)
     - Setup test / lint build image
-            - Look at https://github.com/nektos/act
-            - Setup pyright and ruff
-            - Port changes to all libs and projects
+        - Look at https://github.com/nektos/act
+        - Setup ruff
+        - Port changes to all libs and projects
+        - Switch to bastion to access all dbs as needed
+
 
 - Setup Frontend
     - Move to seperate repo

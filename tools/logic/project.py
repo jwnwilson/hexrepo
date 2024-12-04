@@ -2,7 +2,7 @@
 from contextlib import chdir
 import os
 import subprocess
-from typing import List, Set
+from typing import List, Optional, Set
 
 import typer
 
@@ -22,7 +22,8 @@ def get_libraries()-> List[str]:
     return scan_folder(adaptor_folder) + scan_folder(interactor_folder)
 
 
-def get_modified_libraries(libraries: List[str]) -> List[str]:
+def get_modified_libraries(libraries: Optional[List[str]] = None) -> List[str]:
+    libraries = libraries or get_libraries()
     modified_libs: List[str] = []
     modified_files = subprocess.getoutput("git diff --name-only")
     for lib in libraries:
@@ -42,7 +43,6 @@ def get_modified_projects(projects: List[str]) -> List[str]:
 
 
 def get_projects_usings_libraries(libraries: List[str]) -> List[str]:
-    breakpoint()
     projects: List[str] = get_projects()
     projects_using_libs: Set[str] = {}
     for proj in projects:

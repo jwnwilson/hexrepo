@@ -103,7 +103,7 @@ def deploy_projects(config: MonorepoConfig, projects: Optional[List[str]], check
     projects = projects if projects else get_projects()
 
     if check_modified:
-        libraries = get_modified_libraries(libraries)
+        libraries = get_modified_libraries()
         projects_with_modified_libs = get_projects_usings_libraries(libraries)
         projects = set(projects_with_modified_libs + get_modified_projects(projects))
 
