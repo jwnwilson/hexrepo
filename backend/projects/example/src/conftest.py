@@ -1,9 +1,10 @@
 import os
 from collections.abc import Generator
+
 import pytest
 from fastapi.testclient import TestClient
-
 from monorepo_db.interface import UOW
+
 from app.adaptor.db.sql.uow import SqlUOW
 from app.domain.example import ExampleDTO
 
@@ -12,6 +13,7 @@ os.environ["SQLALCHEMY_SILENCE_UBER_WARNING"] = "1"
 
 # Create local file db
 SQLALCHEMY_DATABASE_URL = "sqlite:///test.db"
+
 
 @pytest.fixture
 def uow() -> Generator[UOW, None, None]:

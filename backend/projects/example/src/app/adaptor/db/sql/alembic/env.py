@@ -1,16 +1,17 @@
 from logging.config import fileConfig
+from typing import Union
 
 from alembic import context
-from app.config import config as app_config
-from sqlalchemy import Connection, engine_from_config, pool
-
 from monorepo_db.sql import get_sql_db_url
 from monorepo_db.sql.models.base_model import Base
+from sqlalchemy import Connection, engine_from_config, pool
+
+from app.config import config as app_config
 
 
 def get_db_url_alembic():
     # Escape % in the db_url
-    return get_sql_db_url().replace('%', '%%') 
+    return get_sql_db_url().replace("%", "%%")
 
 
 # this is the Alembic Config object, which provides
@@ -61,7 +62,7 @@ def run_migrations_offline() -> None:
         context.run_migrations()
 
 
-def do_run_migrations(connection: Connection | None) -> None:
+def do_run_migrations(connection: Union[Connection, None]) -> None:
     context.configure(
         connection=connection, target_metadata=target_metadata, compare_type=True
     )

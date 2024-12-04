@@ -1,4 +1,5 @@
 from collections.abc import Generator
+
 from monorepo_db import UOW
 from monorepo_db.sql import get_sql_db_url
 

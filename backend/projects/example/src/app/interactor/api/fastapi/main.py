@@ -4,8 +4,9 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 
-from .api_versions.api_v1.api import api_router_v1
 from app.config import config
+
+from .api_versions.api_v1.api import api_router_v1
 
 ENVIRONMENT = os.environ.get("ENVIRONMENT", "")
 
