@@ -38,17 +38,23 @@ AWS_SECRET_ACCESS_KEY
     - Setup pipeline for monorepo
         - Setup build / db migrate / deploy
             - Setup db migration
+                - Investigate shared bastion
+                    - Conform to shared bastion over migration lambda
+                - Schedule up and down time for DB and bastion
             - Setup deployment
             - Auto increment version in pipeline
                 - Add githook to check if version needs to be increased
                 - Add command to bump library version
         - Move lib & project tools to root tools folder to remove duplication
     - Add ability to update project from template
+        - Update project & lib templates
         - Use cruft to update projects from template?
         - Update template and verify destroy / rebuild
         - Add project & library setup test
     - Setup async tasks
-        - Conform to ECS / Fargate
+        - migrate hex lib into this repo
+            https://github.com/jwnwilson/hex-lib/tree/main/src/hex_lib/adapter/out
+        - SQS + lambda
         - Setup task chaining with idempotent re-run
     - Setup auth / cross project auth / authorisation
     - Improve docker container builds
