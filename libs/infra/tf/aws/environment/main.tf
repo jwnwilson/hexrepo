@@ -27,3 +27,13 @@ module "monorepo_vpc" {
   fck_nat_gateway   = true
   nat_gateway       = false
 }
+
+module "bastion_ec2" {
+  source = "../modules/bastionhost"
+
+  project           = "monorepo"
+  subnet_id         = module.monorepo_vpc.private_subnet_ids[0]
+  instance_type     = "t2.micro"
+  bastion_host_security_group_ids = module.monorepo_vpc.security_group_ids
+  tag_application   = "bastion"
+}

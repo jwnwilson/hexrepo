@@ -71,7 +71,7 @@ def create_lib_infra(config: MonorepoConfig) -> None:
     typer.echo("Infrastructure setup complete.")
 
 
-def publish_libs(config: MonorepoConfig, libraries: Optional[List[str]], check_modified: bool = False) -> None:
+def publish_libs(config: MonorepoConfig, libraries: Optional[List[str]] = None, check_modified: bool = False) -> None:
     typer.echo("Publishing libraries to repo...")
     # Get code repo token
     assert os.environ.get("MONOREPO_LIB_REPO_URL"), "Library repo url not found."
