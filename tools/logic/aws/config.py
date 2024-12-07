@@ -1,8 +1,11 @@
+from typing import TYPE_CHECKING
 from pydantic import BaseModel 
 import typer
 
-from tools.logic.config import MonorepoConfig
 from tools.logic.env import set_env_var
+
+if TYPE_CHECKING:
+    from tools.logic.config import MonorepoConfig
 
 
 class AWSConfig(BaseModel):
@@ -11,7 +14,7 @@ class AWSConfig(BaseModel):
     AWS_TF_STATE_BUCKET: str
 
 
-def aws_config(config: MonorepoConfig) -> MonorepoConfig:
+def aws_config(config: "MonorepoConfig") -> "MonorepoConfig":
     aws_config: AWSConfig = AWSConfig(
         AWS_ACCOUNT=typer.prompt("Please enter your AWS account ID"),
         AWS_DEFAULT_REGION=typer.prompt("Please enter your AWS default region", default="eu-west-1"),
