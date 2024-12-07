@@ -6,12 +6,12 @@ name: Shared Infra
 on:
   push:
     branches: [ main ]
-  #   paths:
-  #     - libs/infra/**
-  # pull_request:
-  #   branches: [ main ]
-  #   paths:
-  #     - libs/infra/**
+    paths:
+      - libs/infra/**
+  pull_request:
+    branches: [ main ]
+    paths:
+      - libs/infra/**
 
 env:
   # Setting an environment variable with the value of a configuration variable
