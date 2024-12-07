@@ -27,8 +27,8 @@ runs:
         key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles( 'poetry.lock' ) }}
         restore-keys: |
           ${{ runner.os }}-build-${{ env.cache-name }}-
-    - name: Cache lib venv
-      id: cache-lib-poetry
+    - name: Cache ltarget venv
+      id: cache-target-poetry
       uses: actions/cache@v3
       env:
         cache-name: cache-lib-poetry
