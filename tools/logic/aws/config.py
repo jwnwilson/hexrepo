@@ -1,4 +1,4 @@
-from pydantic_settings import BaseModel
+from pydantic import BaseModel 
 import typer
 
 from tools.logic.config import MonorepoConfig
