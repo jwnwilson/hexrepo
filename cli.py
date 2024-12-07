@@ -5,7 +5,7 @@ from cookiecutter.main import cookiecutter
 import typer
 
 from tools.logic.config import MonorepoConfig, get_or_create_config
-from tools.logic.infra import authenticate_cloud, create_lib_infra, create_tf_state, deploy_projects as deploy_projects_command, infra_apply, infra_plan, publish_libs, setup_global_env_infra
+from tools.logic.infra import authenticate_cloud, create_lib_infra, create_tf_state, deploy_projects as deploy_projects_command, env_infra_apply_command, env_infra_plan_command, publish_libs, setup_global_env_infra, shared_infra_apply_command, shared_infra_plan_command
 from tools.logic.project import get_libraries, get_library_type, get_projects, install_library_in_project
 from tools.prompts.common import prompt_library_type
 from tools.prompts.infra import prompt_deploy_libs, prompt_setup_lib_infra, prompt_setup_project_infra, prompt_setup_shared_infra, prompt_setup_tf
@@ -86,14 +86,28 @@ def setup():
 def shared_infra_plan():
     config: MonorepoConfig
     config, _ = get_or_create_config(no_input=True)
-    infra_plan(config)
+    shared_infra_plan_command(config)
 
 
 @app.command()
 def shared_infra_apply():
     config: MonorepoConfig
     config, _ = get_or_create_config(no_input=True)
-    infra_apply(config)
+    shared_infra_apply_command(config)
+
+
+@app.command()
+def env_infra_plan():
+    config: MonorepoConfig
+    config, _ = get_or_create_config(no_input=True)
+    env_infra_plan_command(config)
+
+
+@app.command()
+def env_infra_apply():
+    config: MonorepoConfig
+    config, _ = get_or_create_config(no_input=True)
+    env_infra_apply_command(config)
 
 
 @app.command()
