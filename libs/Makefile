@@ -25,7 +25,9 @@ tf_shared_output:
 	@cd infra/tf/aws/shared && terraform output -json
 
 tf_workspace:
-	@cd infra/tf/aws/environment  && terraform workspace new $(ENVIRONMENT)
+	@cd infra/tf/aws/environment  && \
+	terraform workspace new $(ENVIRONMENT) && \
+	terraform workspace select $(ENVIRONMENT) 
 
 tf_env_init:
 	@cd infra/tf/aws/environment  && terraform init -input=false

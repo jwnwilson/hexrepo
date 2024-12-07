@@ -35,7 +35,7 @@ module "bastion_ec2" {
 
   project                         = "monorepo"
   subnet_id                       = module.monorepo_vpc.private_subnet_ids[0]
-  instance_type                   = "t4g.nano"
+  instance_type                   = "t2.nano"
   bastion_host_security_group_ids = module.monorepo_vpc.security_group_ids
   tag_application                 = "bastion"
   start_time                      = "08:00:00"
