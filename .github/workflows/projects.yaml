@@ -35,7 +35,7 @@ jobs:
         poetry_lock_file: "${{ matrix.project }}/poetry.lock"
     - name: Test Libraries
       run: make test_projects
-  test_infra:
+  plan_infra:
     needs: test_projects
     strategy:
       matrix:
@@ -45,7 +45,10 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Update Infra
-      run: make tf_plan
+      run: |
+        cd ${{ matrix.project }}
+        make tf_init
+        make tf_plan
   deploy_projects:
     environment: production
     needs: test_infra
