@@ -12,7 +12,7 @@ from tools.logic.config import MonorepoConfig
 from tools.logic.project import get_libraries, get_library_type, get_modified_libraries, get_modified_projects, get_projects, get_projects_usings_libraries
 
 
-def run_system_command(command: str) -> None:
+def run_run_system_command(command: str) -> None:
     return_code = os.system(command)
     if return_code != 0:
         typer.echo(f"System command failed: {command}")
@@ -40,8 +40,8 @@ def create_lib_infra(config: MonorepoConfig) -> None:
     typer.echo("Creating infrastructure for libraries...")
     # Placeholder for library infra setup
     with chdir("libs"):
-        os.system("make tf_shared_init")
-        os.system("make tf_shared_apply")
+        run_system_command("make tf_shared_init")
+        run_system_command("make tf_shared_apply")
         code_repo_data = subprocess.getoutput("make tf_shared_output")
         code_repo_url = json.loads(code_repo_data)["aws_codeartifact_repository_endpoint"]["value"]
         config.set_config_var("monorepo_lib_repo_url", code_repo_url, set_env=True)
@@ -66,7 +66,7 @@ def publish_libs(config: MonorepoConfig, libraries: Optional[List[str]] = None, 
     for lib in libraries:
         lib_type = get_library_type(lib)
         with chdir(f"libs/src/{lib_type}/{lib}"):
-            os.system("make publish")
+            run_system_command("make publish")
     # Placeholder for publishing libraries to repo
     typer.echo("Libraries published successfully.")
 
@@ -90,7 +90,7 @@ def deploy_projects(config: MonorepoConfig, projects: Optional[List[str]], check
 
     for proj in projects:
         with chdir(f"projects/{proj}"):
-            os.system("make deploy")
+            run_system_command("make deploy")
     # Placeholder for publishing libraries to repo
     typer.echo("Projects deployed successfully.")
 
@@ -99,25 +99,25 @@ def setup_global_env_infra(config: MonorepoConfig) -> None:
     typer.echo("Setting up global env infrastructure...")
     # Placeholder for shared infra setup
     with chdir("libs"):
-        os.system(f"make tf_env_init ENV=dev")
+        run_system_command(f"make tf_env_init ENV=dev")
         for env in config.environments:
-            os.system(f"ENVIRONMENT={env} make tf_workspace")
-            # os.system(f"make tf_env_plan ")
-            os.system(f"make tf_env_apply ")
+            run_system_command(f"ENVIRONMENT={env} make tf_workspace")
+            # run_system_command(f"make tf_env_plan ")
+            run_system_command(f"make tf_env_apply ")
     typer.echo("Shared infrastructure setup complete.")
 
 
 def infra_plan(config: MonorepoConfig) -> None:
     typer.echo("Planning shared infrastructure...")
     with chdir("libs"):
-        os.system("make tf_shared_init")
-        os.system("make tf_shared_plan")
+        run_system_command("make tf_shared_init")
+        run_system_command("make tf_shared_plan")
     typer.echo("Shared infrastructure plan complete.")
 
 
 def infra_apply(config: MonorepoConfig) -> None:
     typer.echo("Applying shared infrastructure...")
     with chdir("libs"):
-        os.system("make tf_shared_init")
-        os.system("make tf_shared_apply")
+        run_system_command("make tf_shared_init")
+        run_system_command("make tf_shared_apply")
     typer.echo("Shared infrastructure apply complete.")

@@ -6,6 +6,15 @@ from typing import List, Optional, Set
 
 import typer
 
+from tools.logic.infra import run_run_system_command
+
+
+def run_system_command(command: str) -> None:
+    return_code = run_run_system_command(command)
+    if return_code != 0:
+        typer.echo(f"System command failed: {command}")
+        raise typer.Abort()
+
 
 def scan_folder(folder: str) -> List[str]:
     return [f for f in os.listdir(folder) if os.path.isdir(os.path.join(folder, f))]
@@ -75,6 +84,6 @@ def install_library_in_project(library: str, project: str):
 
     library_type = get_library_type(library)
     with chdir(f"projects/{project}"):
-        os.system(f"poetry add --editable ../../libs/src/{library_type}/{library} -G dev")
-        os.system(f"poetry add {library} -G prod")
+        run_run_system_command(f"poetry add --editable ../../libs/src/{library_type}/{library} -G dev")
+        run_run_system_command(f"poetry add {library} -G prod")
     typer.echo(f"Library {library} installed in project {project}")

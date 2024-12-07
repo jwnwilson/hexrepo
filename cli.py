@@ -5,8 +5,8 @@ from cookiecutter.main import cookiecutter
 import typer
 
 from tools.logic.config import MonorepoConfig, get_or_create_config
-from tools.logic.infra import authenticate_cloud, create_lib_infra, create_tf_state, deploy_projects as deploy_projects_command, infra_apply, infra_plan, publish_libs, run_system_command, setup_global_env_infra
-from tools.logic.project import get_libraries, get_library_type, get_projects, install_library_in_project
+from tools.logic.infra import authenticate_cloud, create_lib_infra, create_tf_state, deploy_projects as deploy_projects_command, infra_apply, infra_plan, publish_libs, run_run_system_command, setup_global_env_infra
+from tools.logic.project import get_libraries, get_library_type, get_projects, install_library_in_project, run_system_command
 from tools.prompts.common import prompt_library_type
 from tools.prompts.infra import prompt_deploy_libs, prompt_setup_lib_infra, prompt_setup_project_infra, prompt_setup_shared_infra, prompt_setup_tf
 from tools.templates.libs import generate_libs_makefile
@@ -24,9 +24,9 @@ def create_library():
         # Setup infra for libray
         if prompt_setup_lib_infra():
             typer.echo("Setting up library infrastructure...")
-            os.system("make tf_init")
-            os.system("make tf_plan")
-            os.system("make tf_apply")
+            run_system_command("make tf_init")
+            run_system_command("make tf_plan")
+            run_system_command("make tf_apply")
             typer.echo("Shared infrastructure setup complete.")
 
 
@@ -39,9 +39,9 @@ def create_project():
         # Setup infra for service
         if prompt_setup_project_infra():
             typer.echo("Setting up project infrastructure...")
-            os.system("make tf_init")
-            os.system("make tf_plan")
-            os.system("make tf_apply")
+            run_system_command("make tf_init")
+            run_system_command("make tf_plan")
+            run_system_command("make tf_apply")
             typer.echo("Shared infrastructure setup complete.")
 
 
@@ -106,9 +106,9 @@ def test_projects(run_all: bool = True):
         raise NotImplementedError("Not implemented yet")
     for project in projects:
         typer.echo(f"Running linting check for {project}...")
-        run_system_command(f"cd projects/{project} && make lint_check")
+        run_run_system_command(f"cd projects/{project} && make lint_check")
         typer.echo(f"Running tests check for {project}...")
-        run_system_command(f"cd projects/{project} && make test")
+        run_run_system_command(f"cd projects/{project} && make test")
 
 
 @app.command()
@@ -124,9 +124,9 @@ def test_libs(libraries: Optional[List[str]] = None):
     for lib in libraries:
         lib_type: str = get_library_type(lib)
         typer.echo(f"Running linting check for {lib}...")
-        run_system_command(f"cd libs/src/{lib_type}/{lib} && make lint_check")
+        run_run_system_command(f"cd libs/src/{lib_type}/{lib} && make lint_check")
         typer.echo(f"Running tests check for {lib}...")
-        run_system_command(f"cd libs/src/{lib_type}/{lib} && make test")
+        run_run_system_command(f"cd libs/src/{lib_type}/{lib} && make test")
 
 
 @app.command()

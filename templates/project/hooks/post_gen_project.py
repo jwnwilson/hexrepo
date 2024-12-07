@@ -4,6 +4,8 @@ import shutil
 import yaml
 import logging
 
+from tools.logic.project import run_system_command
+
 logger = logging.getLogger(__name__)
 
 MANIFEST = "manifest.yml"
@@ -37,19 +39,19 @@ def install_libraries():
     use_storage = '{{ cookiecutter.use_storage }}'
     use_api = '{{ cookiecutter.use_api }}'
 
-    os.system("make venv")
-    os.system("source ./.venv/bin/activate && poetry config http-basic.monorepo $MONOREPO_LIB_REPO_USERNAME $MONOREPO_LIB_REPO_PASSWORD")
-    os.system("source ./.venv/bin/activate && poetry source add --priority=supplemental monorepo ${MONOREPO_LIB_REPO_URL}simple")
+    run_system_command("make venv")
+    run_system_command("source ./.venv/bin/activate && poetry config http-basic.monorepo $MONOREPO_LIB_REPO_USERNAME $MONOREPO_LIB_REPO_PASSWORD")
+    run_system_command("source ./.venv/bin/activate && poetry source add --priority=supplemental monorepo ${MONOREPO_LIB_REPO_URL}simple")
     
     if use_db:
         logger.info("installing library: db" )
-        os.system("source ./.venv/bin/activate && poetry add --source monorepo monorepo-db -G prod")
+        run_system_command("source ./.venv/bin/activate && poetry add --source monorepo monorepo-db -G prod")
     if use_storage:
         logger.info("installing library: storage" )
-        os.system("source ./.venv/bin/activate && poetry add --source monorepo monorepo-storage -G prod")
+        run_system_command("source ./.venv/bin/activate && poetry add --source monorepo monorepo-storage -G prod")
     if use_api:
         logger.info("installing library: api" )
-        os.system("source ./.venv/bin/activate && poetry add --source monorepo monorepo-api -G prod")
+        run_system_command("source ./.venv/bin/activate && poetry add --source monorepo monorepo-api -G prod")
 
     print("dynamically add pip install -e commands to develop libs script")
 

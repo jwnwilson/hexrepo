@@ -8,6 +8,8 @@ from os import fdopen, remove
 
 import typer
 
+from tools.logic.project import run_system_command
+
 
 def running_on_ci() -> bool:
     return bool(os.environ.get("CI", False))
@@ -57,7 +59,7 @@ def local_set_env_var(shell_file: str, env: str, value: str):
     else:
         # Else append to file
         shell_command: str = f"echo '{env_command}' >> {shell_file}"
-        os.system(shell_command)
+        run_system_command(shell_command)
     # Update env var for follow up commands
     os.putenv(env, value)
     os.environ[env] = value
@@ -65,6 +67,6 @@ def local_set_env_var(shell_file: str, env: str, value: str):
 
 def ci_set_env_var(env: str, value: str):
     typer.echo(f"Setting {env} in CI environment")
-    os.system(f"echo 'export {env}={value}' >> $GITHUB_ENV")
+    run_system_command(f"echo 'export {env}={value}' >> $GITHUB_ENV")
     os.putenv(env, value)
     os.environ[env] = value
