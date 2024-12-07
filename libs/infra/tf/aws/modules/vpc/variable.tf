@@ -18,3 +18,13 @@ variable "fck_nat_gateway" {
     default = false
   
 }
+
+variable "nat_start_time" {
+    default = ""
+  
+}
+
+variable "nat_stop_time" {
+    default = ""
+  
+}

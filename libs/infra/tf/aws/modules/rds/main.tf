@@ -141,4 +141,11 @@ module "db" {
   subnet_ids             = data.aws_subnets.private_subnet_ids.ids
   vpc_security_group_ids = [module.security_group.security_group_id]
   db_subnet_group_name   = aws_db_subnet_group.default.name
+
+  tags = {
+    Environment = terraform.workspace
+    StartTime   = var.start_time
+    StopTime    = var.stop_time
+  }
+
 }

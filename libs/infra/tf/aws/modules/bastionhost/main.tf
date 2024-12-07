@@ -53,5 +53,8 @@ resource "aws_instance" "bastion_host_ec2_instance" {
   }
   tags = {
     Name = "${var.project}-${terraform.workspace}-bastion-host"
+    StartTime = var.start_time
+    StopTime = var.stop_time
+    Type    = "bastion"
   }
 }

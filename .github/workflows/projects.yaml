@@ -35,8 +35,20 @@ jobs:
         poetry_lock_file: "${{ matrix.project }}/poetry.lock"
     - name: Test Libraries
       run: make test_projects
-  deploy_projects:
+  test_infra:
     needs: test_projects
+    strategy:
+      matrix:
+        project:
+        - "projects/example"
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Update Infra
+      run: make tf_plan
+  deploy_projects:
+    environment: production
+    needs: test_infra
     strategy:
       matrix:
         project:
@@ -50,6 +62,8 @@ jobs:
       with:
         venv_path: ${{ matrix.project }}
         poetry_lock_file: "${{ matrix.project }}/poetry.lock"
+    - name: Update Infra
+      run: make tf_apply
     - name: Deploy Project
       run: |
         export PROJ=`basename "${{ matrix.project }}"`

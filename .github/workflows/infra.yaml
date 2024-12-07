@@ -17,9 +17,21 @@ permissions:
   contents: read
 
 jobs:
-  placeholder:
+  test_infra:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    - name: Placeholder
-      run: echo "Placeholder"
+    - name: Update Infra
+      run: make tf_plan
+  deploy_projects:
+    environment: production
+    needs: test_infra
+    strategy:
+      matrix:
+        project:
+        - "projects/example"
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Update Infra
+      run: make tf_apply

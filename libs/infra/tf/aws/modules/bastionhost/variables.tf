@@ -12,3 +12,13 @@ variable "instance_type" {
 variable "project" {
     type = string
 }
+
+variable "start_time" {
+    default = ""
+  
+}
+
+variable "stop_time" {
+    default = ""
+  
+}

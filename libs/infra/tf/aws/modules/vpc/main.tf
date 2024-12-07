@@ -90,6 +90,11 @@ module "fck-nat" {
 
   update_route_tables = true
   route_tables_ids = local.private_route_table_map
+
+  tags = {
+    StartTime = var.nat_start_time
+    StopTime = var.nat_stop_time
+  }
 }
 
 # module "fck-nat" {

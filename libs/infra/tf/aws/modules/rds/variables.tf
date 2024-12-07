@@ -39,3 +39,12 @@ variable "environment_variables"{
 variable "db_instance_class" {
   default = "db.t3.micro"
 }
+
+variable "start_time" {
+  default = ""
+}
+
+variable "stop_time" {
+  default = ""
+  
+}
