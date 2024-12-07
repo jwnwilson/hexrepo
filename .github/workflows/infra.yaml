@@ -77,7 +77,7 @@ jobs:
         venv_path: "."
         poetry_lock_file: "./poetry.lock"
     - name: Plan Env Infra
-      run: make env_infra_plan
+      run: make env_infra_plan ENV="${{ matrix.env }}"
   apply_env_infra:
     strategy:
       matrix:
@@ -95,4 +95,4 @@ jobs:
         venv_path: "."
         poetry_lock_file: "./poetry.lock"
     - name: Apply Env Infra
-      run: make env_infra_apply
+      run: make env_infra_apply ENV="${{ matrix.env }}"

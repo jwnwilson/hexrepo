@@ -27,6 +27,16 @@ shared_infra_apply: venv
 	@. $(VENV_DIR)/bin/activate; \
 	python cli.py shared-infra-apply
 
+env_infra_plan: venv
+	@echo "Planning env infra..."
+	@. $(VENV_DIR)/bin/activate; \
+	python cli.py env-infra-plan --env=$(ENV)
+
+env_infra_apply: venv
+	@echo "Applying env infra..."
+	@. $(VENV_DIR)/bin/activate; \
+	python cli.py env-infra-apply --env=$(ENV)
+
 create_project: venv
 	@echo "Creating project..."
 	@. $(VENV_DIR)/bin/activate; \
