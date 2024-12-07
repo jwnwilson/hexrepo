@@ -41,7 +41,6 @@ def create_lib_infra(config: MonorepoConfig) -> None:
     # Placeholder for library infra setup
     with chdir("libs"):
         os.system("make tf_shared_init")
-        os.system("make tf_shared_plan")
         os.system("make tf_shared_apply")
         code_repo_data = subprocess.getoutput("make tf_shared_output")
         code_repo_url = json.loads(code_repo_data)["aws_codeartifact_repository_endpoint"]["value"]
@@ -111,6 +110,7 @@ def setup_global_env_infra(config: MonorepoConfig) -> None:
 def infra_plan(config: MonorepoConfig) -> None:
     typer.echo("Planning shared infrastructure...")
     with chdir("libs"):
+        os.system("make tf_shared_init")
         os.system("make tf_shared_plan")
     typer.echo("Shared infrastructure plan complete.")
 
@@ -118,5 +118,6 @@ def infra_plan(config: MonorepoConfig) -> None:
 def infra_apply(config: MonorepoConfig) -> None:
     typer.echo("Applying shared infrastructure...")
     with chdir("libs"):
+        os.system("make tf_shared_init")
         os.system("make tf_shared_apply")
     typer.echo("Shared infrastructure apply complete.")

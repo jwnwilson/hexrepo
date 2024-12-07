@@ -22,24 +22,24 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - id: python_venv
-      name: Cache project venv
+      name: Cache venv
       uses: ./.github/actions/be_venv
       with:
         venv_path: "."
         poetry_lock_file: "./poetry.lock"
-    - name: Update Infra
+    - name: Plan Infra
       run: make shared_infra_plan
-  deploy_projects:
+  apply_infra:
     environment: production
     needs: test_infra
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
     - id: python_venv
-      name: Cache project venv
+      name: Cache venv
       uses: ./.github/actions/be_venv
       with:
         venv_path: "."
         poetry_lock_file: "./poetry.lock"
-    - name: Update Infra
+    - name: Apply Infra
       run: make shared_infra_apply
