@@ -84,14 +84,14 @@ def setup():
 @app.command()
 def shared_infra_plan():
     config: MonorepoConfig
-    config, _ = get_or_create_config()
+    config, _ = get_or_create_config(no_input=True)
     infra_plan(config)
 
 
 @app.command()
 def shared_infra_apply():
     config: MonorepoConfig
-    config, _ = get_or_create_config()
+    config, _ = get_or_create_config(no_input=True)
     infra_apply(config)
 
 
