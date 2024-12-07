@@ -56,7 +56,7 @@ jobs:
         make tf_plan
   deploy_projects:
     environment: production
-    needs: test_infra
+    needs: plan_infra
     strategy:
       matrix:
         project:
