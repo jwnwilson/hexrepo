@@ -41,8 +41,9 @@ AWS_SECRET_ACCESS_KEY
         - Setup build / db migrate / deploy
             - Setup db migration
                 - Investigate shared bastion
-                    - Conform to shared bastion over migration lambda
-                - Schedule up and down time for DB, bastion & NAT gateway
+                    - Add ssh agent to bastion
+                - Setup lambda to schedule bastion up / down time based on ec2 and rds tags
+                - Add db migration to ci / cd
             - Setup deployment
             - Auto shared infra -> project update
             - Auto increment version in pipeline

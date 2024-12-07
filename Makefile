@@ -6,6 +6,7 @@ VENV=.venv
 VENV_DIR = $(MKFILE_DIR)$(VENV)
 LIBRARY:=${LIBRARY}
 PROJECT:=${PROJECT}
+ENV:=${ENV}
 
 # Setup commands
 venv:
@@ -30,12 +31,12 @@ shared_infra_apply: venv
 env_infra_plan: venv
 	@echo "Planning env infra..."
 	@. $(VENV_DIR)/bin/activate; \
-	python cli.py env-infra-plan --env=$(ENV)
+	python cli.py env-infra-plan $(ENV)
 
 env_infra_apply: venv
 	@echo "Applying env infra..."
 	@. $(VENV_DIR)/bin/activate; \
-	python cli.py env-infra-apply --env=$(ENV)
+	python cli.py env-infra-apply $(ENV)
 
 create_project: venv
 	@echo "Creating project..."
@@ -85,4 +86,14 @@ deploy_libs: venv
 migrate_db: venv
 	@echo "Migrating database..."
 	@. $(VENV_DIR)/bin/activate; \
-	python cli.py migrate_db
+	python cli.py migrate-db
+
+stop_infra: venv
+	@echo "Stopping infra..."
+	@. $(VENV_DIR)/bin/activate; \
+	python cli.py stop-infra
+
+start_infra: venv
+	@echo "Starting infra..."
+	@. $(VENV_DIR)/bin/activate; \
+	python cli.py start-infra

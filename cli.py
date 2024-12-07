@@ -4,6 +4,7 @@ from typing import List, Optional
 from cookiecutter.main import cookiecutter
 import typer
 
+from tools.logic.aws.manage import start_infra_command, stop_infra_command
 from tools.logic.config import MonorepoConfig, get_or_create_config
 from tools.logic.infra import authenticate_cloud, create_lib_infra, create_tf_state, deploy_projects as deploy_projects_command, env_infra_apply_command, env_infra_plan_command, publish_libs, setup_global_env_infra, shared_infra_apply_command, shared_infra_plan_command
 from tools.logic.project import get_libraries, get_library_type, get_projects, install_library_in_project
@@ -97,17 +98,17 @@ def shared_infra_apply():
 
 
 @app.command()
-def env_infra_plan():
+def env_infra_plan(env: str):
     config: MonorepoConfig
     config, _ = get_or_create_config(no_input=True)
-    env_infra_plan_command(config)
+    env_infra_plan_command(config, env)
 
 
 @app.command()
-def env_infra_apply():
+def env_infra_apply(env: str):
     config: MonorepoConfig
     config, _ = get_or_create_config(no_input=True)
-    env_infra_apply_command(config)
+    env_infra_apply_command(config, env)
 
 
 @app.command()
@@ -161,6 +162,19 @@ def deploy_projects(projects: Optional[List[str]] = None, check_modified: bool =
 
     deploy_projects_command(config, projects=projects, check_modified=check_modified)
 
+
+@app.command()
+def start_infra():
+    config: MonorepoConfig
+    config, _ = get_or_create_config(no_input=True)
+    start_infra_command(config)
+
+
+@app.command()
+def stop_infra():
+    config: MonorepoConfig
+    config, _ = get_or_create_config(no_input=True)
+    stop_infra_command(config)
 
 
 if __name__ == "__main__":
