@@ -20,7 +20,7 @@ env:
   TF_VAR_aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
   TF_VAR_aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   TF_STATE_BUCKET: ${{ vars.AWS_TF_STATE_BUCKET }}
-  TF_STATE_REGION: ${{ vars.AWS_DEFAULT_REGION }
+  TF_STATE_REGION: ${{ vars.AWS_DEFAULT_REGION }}
 
 jobs:
   test_infra:
