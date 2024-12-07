@@ -106,3 +106,17 @@ def setup_global_env_infra(config: MonorepoConfig) -> None:
             # os.system(f"make tf_env_plan ")
             os.system(f"make tf_env_apply ")
     typer.echo("Shared infrastructure setup complete.")
+
+
+def infra_plan(config: MonorepoConfig) -> None:
+    typer.echo("Planning shared infrastructure...")
+    with chdir("libs"):
+        os.system("make tf_shared_plan")
+    typer.echo("Shared infrastructure plan complete.")
+
+
+def infra_apply(config: MonorepoConfig) -> None:
+    typer.echo("Applying shared infrastructure...")
+    with chdir("libs"):
+        os.system("make tf_shared_apply")
+    typer.echo("Shared infrastructure apply complete.")

@@ -17,6 +17,16 @@ setup: venv
 	@. $(VENV_DIR)/bin/activate; \
 	python cli.py setup
 
+shared_infra_plan:
+	@echo "Planning shared infra..."
+	@. $(VENV_DIR)/bin/activate; \
+	python cli.py shared-infra-plan
+
+shared_infra_apply:
+	@echo "Applying shared infra..."
+	@. $(VENV_DIR)/bin/activate; \
+	python cli.py shared-infra-apply
+
 create_project: venv
 	@echo "Creating project..."
 	@. $(VENV_DIR)/bin/activate; \

@@ -22,16 +22,12 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Update Infra
-      run: make tf_plan
+      run: make shared_infra_plan
   deploy_projects:
     environment: production
     needs: test_infra
-    strategy:
-      matrix:
-        project:
-        - "projects/example"
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
     - name: Update Infra
-      run: make tf_apply
+      run: make shared_infra_apply
