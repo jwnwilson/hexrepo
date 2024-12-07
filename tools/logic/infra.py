@@ -10,13 +10,7 @@ from tools.logic.aws.auth import authenticate_lib_repo
 from tools.logic.aws.s3 import create_aws_bucket
 from tools.logic.config import MonorepoConfig
 from tools.logic.project import get_libraries, get_library_type, get_modified_libraries, get_modified_projects, get_projects, get_projects_usings_libraries
-
-
-def run_run_system_command(command: str) -> None:
-    return_code = os.system(command)
-    if return_code != 0:
-        typer.echo(f"System command failed: {command}")
-        raise typer.Abort()
+from tools.logic.commands import run_system_command
 
 
 def create_tf_state(config: MonorepoConfig) -> None:
