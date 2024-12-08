@@ -34,6 +34,7 @@ module "bastion_ec2" {
   source = "../modules/bastionhost"
 
   project                         = "monorepo"
+  vpc_id                          = module.monorepo_vpc.vpc_id
   subnet_id                       = module.monorepo_vpc.private_subnet_ids[0]
   instance_type                   = "t2.nano"
   bastion_host_security_group_ids = module.monorepo_vpc.security_group_ids

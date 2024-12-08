@@ -1,18 +1,21 @@
 data "aws_ami" "amazon-linux-2" {
   most_recent = true
 
-
   filter {
     name   = "owner-alias"
     values = ["amazon"]
   }
-
 
   filter {
     name   = "name"
     values = ["amzn2-ami-hvm*"]
   }
 }
+
+data aws_vpc "vpc" {
+  id = var.vpc_id
+}
+
 resource "aws_iam_role" "ssm_role" {
   name = "SSMRole"
 
@@ -40,12 +43,31 @@ resource "aws_iam_instance_profile" "ssm_profile" {
   role = aws_iam_role.ssm_role.name
 }
 
+resource "aws_security_group" "ssm_https" {
+  name        = "allow_ssm"
+  description = "Allow SSM traffic"
+  vpc_id      = var.vpc_id
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = [data.aws_vpc.vpc.cidr_block]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
 
 resource "aws_instance" "bastion_host_ec2_instance" {
   ami                         = data.aws_ami.amazon-linux-2.id
   instance_type               = var.instance_type
   subnet_id                   = var.subnet_id
-  vpc_security_group_ids      = var.bastion_host_security_group_ids
+  vpc_security_group_ids      = concat(var.bastion_host_security_group_ids, [aws_security_group.ssm_https.id])
   iam_instance_profile        = aws_iam_instance_profile.ssm_profile.name
 #   key_name                    = "bastion-${terraform.workspace}"
   associate_public_ip_address = false

@@ -1,5 +1,9 @@
 variable "tag_application" {}
 
+variable "vpc_id" {
+  type = string
+}
+
 variable "subnet_id" {}
 
 variable "bastion_host_security_group_ids" {}
