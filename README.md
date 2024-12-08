@@ -22,6 +22,8 @@ Features include:
 - AWS account access key and secret
 - AWS account permissions set as detailed later
 - Route53 domain purchased and setup
+- AWS CLI + SSM
+    https://docs.aws.amazon.com/systems-manager/latest/userguide/install-plugin-macos-overview.html#install-plugin-macos
 
 
 ### Setup
@@ -40,16 +42,18 @@ AWS_SECRET_ACCESS_KEY
     - Setup pipeline for monorepo
         - Setup build / db migrate / deploy
             - Setup db migration
-                - Investigate shared bastion
-                    - Add ssh agent to bastion
-                - Setup lambda to schedule bastion up / down time based on ec2 and rds tags
+                - setup ssh agent to bastion
                 - Add db migration to ci / cd
-            - Setup deployment
-            - Auto shared infra -> project update
-            - Auto increment version in pipeline
-                - Add githook to check if version needs to be increased
-                - Add command to bump library version
+            - Setup example deployment
         - Move lib & project tools to root tools folder to remove duplication
+        - Setup project to schedule bastion up / down time based on ec2 and rds tags
+            - Add option to add scheduluer to template
+        - Auto increment version in pipeline
+            - Add githook to check if version needs to be increased
+            - Add command to bump library version
+        - tear down workspace "default" and create workspace "prod"
+        - Move tools aws logic to libs
+
     - Add ability to update project from template
         - Update project & lib templates
         - Use cruft to update projects from template?

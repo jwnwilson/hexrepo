@@ -177,5 +177,13 @@ def stop_infra():
     stop_infra_command(config)
 
 
+@app.command()
+def bastion(env: str):
+    config: MonorepoConfig
+    config, _ = get_or_create_config(no_input=True)
+    # Placeholder for bastion command
+    typer.echo("Bastion command not implemented yet.")
+
+
 if __name__ == "__main__":
     app()
