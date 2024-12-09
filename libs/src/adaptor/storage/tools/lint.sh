@@ -14,7 +14,7 @@ done
 APP_FOLDER="monorepo_storage tests"
 
 echo "Activating venv."
-. ${VENV_DIR}/bin/activate
+. ${VENV}/bin/activate
 
 if [[ -z "${check}" ]]; then
     black ${APP_FOLDER} 

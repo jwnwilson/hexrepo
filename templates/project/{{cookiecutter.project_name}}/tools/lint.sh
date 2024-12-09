@@ -13,7 +13,7 @@ done
 APP_FOLDER="src"
 
 echo "Activating venv."
-. ${VENV_DIR}/bin/activate
+. ${VENV}/bin/activate
 
 if [[ -z "${check}" ]]; then
     black ${APP_FOLDER} 

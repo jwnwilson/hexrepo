@@ -40,13 +40,13 @@ AWS_SECRET_ACCESS_KEY
 
 - Setup backend
     - Setup cli as proper cli command that can be used anywhere in the project
+    - Move lib & project tools to root tools folder to remove duplication
     - Setup pipeline for monorepo
         - Setup build / db migrate / deploy
             - Setup db migration
                 - setup ssh agent to bastion
                 - Add db migration to ci / cd
             - Setup example deployment
-        - Move lib & project tools to root tools folder to remove duplication
         - Setup project to schedule bastion up / down time based on ec2 and rds tags
             - Add option to add scheduluer to template
         - Auto increment version in pipeline
