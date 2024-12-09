@@ -39,6 +39,7 @@ AWS_SECRET_ACCESS_KEY
 # To Do
 
 - Setup backend
+    - Setup cli as proper cli command that can be used anywhere in the project
     - Setup pipeline for monorepo
         - Setup build / db migrate / deploy
             - Setup db migration

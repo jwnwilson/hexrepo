@@ -15,6 +15,35 @@ from tools.logic.commands import run_system_command
 
 app = typer.Typer()
 
+@app.command()
+def setup():
+    # project config setup
+    config: MonorepoConfig
+    created_config: bool
+    config, created_config = get_or_create_config()
+
+    # Copy libs makefile to libs
+    if created_config:
+        generate_libs_makefile(config)
+
+    # Create initial terraform state infra
+    if prompt_setup_tf():
+        create_tf_state(config)
+
+    # Add options to deploy repo to cloud provider
+    if prompt_setup_lib_infra():
+        create_lib_infra(config)
+    
+    authenticate_cloud(config)
+
+    # Publish libraries to repo
+    if prompt_deploy_libs():
+        publish_libs(config)
+
+    # Setup shared infra for environments
+    if prompt_setup_shared_infra():
+        setup_global_env_infra(config)
+
 
 @app.command()
 def create_library():
@@ -51,36 +80,6 @@ def create_project():
 def add_library(project: str, library: str):
     # Install library from repo if available
     install_library_in_project(library, project)
-
-
-@app.command()
-def setup():
-    # project config setup
-    config: MonorepoConfig
-    created_config: bool
-    config, created_config = get_or_create_config()
-
-    # Copy libs makefile to libs
-    if created_config:
-        generate_libs_makefile(config)
-
-    # Create initial terraform state infra
-    if prompt_setup_tf():
-        create_tf_state(config)
-
-    # Add options to deploy repo to cloud provider
-    if prompt_setup_lib_infra():
-        create_lib_infra(config)
-    
-    authenticate_cloud(config)
-
-    # Publish libraries to repo
-    if prompt_deploy_libs():
-        publish_libs(config)
-
-    # Setup shared infra for environments
-    if prompt_setup_shared_infra():
-        setup_global_env_infra(config)
 
 
 @app.command()
@@ -175,14 +174,6 @@ def stop_infra():
     config: MonorepoConfig
     config, _ = get_or_create_config(no_input=True)
     stop_infra_command(config)
-
-
-@app.command()
-def bastion(env: str):
-    config: MonorepoConfig
-    config, _ = get_or_create_config(no_input=True)
-    # Placeholder for bastion command
-    typer.echo("Bastion command not implemented yet.")
 
 
 if __name__ == "__main__":

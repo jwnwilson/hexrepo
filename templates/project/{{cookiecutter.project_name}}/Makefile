@@ -106,3 +106,17 @@ tf_setup:
 
 deploy_container:
 	./tools/deploy.sh
+
+bastion: venv
+	@echo "Creating bastion..."
+	@. $(VENV_DIR)/bin/activate; \
+	# python cli.py bastion --env=$(ENV)
+	aws ssm start-session \
+	--target i-0ebb96e385446d037 \
+	--document-name AWS-StartPortForwardingSession \
+    --parameters '{"portNumber":["5432"],"localPortNumber":["5432"], "host":["example-db-default.clfqqiusnlbr.eu-west-1.rds.amazonaws.com"]}'
+
+migrate_db: venv
+	@echo "Migrating database..."
+	@. $(VENV_DIR)/bin/activate; \
+	python cli.py migrate-db
