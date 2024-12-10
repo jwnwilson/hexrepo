@@ -2,14 +2,12 @@
 .DEFAULT_GOAL = help
 .EXPORT_ALL_VARIABLES:
 
-TF_VAR_docker_tag=${docker_tag}
+TF_VAR_docker_tag := latest
 TF_VAR_environment=${ENVIRONMENT}
-{% if cookiecutter.cloud_provider == 'aws' %}
 TF_VAR_ecr_api_url=${AWS_ACCOUNT}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/{{cookiecutter.project_slug}}_api
 TF_VAR_aws_access_key=${AWS_ACCESS_KEY_ID}
 TF_VAR_aws_secret_key=${AWS_SECRET_ACCESS_KEY}
 TF_VAR_aws_region=${AWS_DEFAULT_REGION}
-{% endif %}
 
 VENV := .venv
 MKFILE_DIR := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
@@ -18,10 +16,10 @@ VENV_DIR = $(MKFILE_DIR)$(VENV)
 # Setup commands
 venv:
 	@echo "Checking if venv is setup..."
-	@./tools/setup_env.sh
+	@../../tools/bash_scripts/setup_env.sh
 
 build:
-	docker compose build 
+	docker compose build
 
 # DB management
 db_delete_data: down
@@ -63,11 +61,11 @@ coverage:
 	. $(VENV_DIR)/bin/activate; \
 	pytest --cov-report html	
 
-lint: venv
-	bash ./tools/lint.sh
+lint:
+	TARGET_DIRS="src" bash ../../tools/bash_scripts/lint.sh 
 
 lint_check: venv
-	bash ./tools/lint.sh --check
+	TARGET_DIRS="src" bash ../../tools/bash_scripts/lint.sh --check
 
 clean:
 	find . -type f -name '*.py[co]' -delete -o -type d -name __pycache__ -delete
@@ -79,44 +77,30 @@ tf_workspace:
 
 tf_init:
 	@echo "Initializing Terraform infra"
-	cd infra/tf/{{cookiecutter.cloud_provider}}/shared  && terraform init -input=false
-	cd infra/tf/{{cookiecutter.cloud_provider}}/environment  && terraform init -input=false
+	cd infra/tf/aws/shared  && terraform init -input=false
+	cd infra/tf/aws/environment  && terraform init -input=false
 
 tf_plan:
 	@echo "Planning Terraform infra"
-	cd infra/tf/{{cookiecutter.cloud_provider}}/shared  && terraform plan -out tfapply
-	cd infra/tf/{{cookiecutter.cloud_provider}}/environment  && terraform plan -out tfapply
+	cd infra/tf/aws/shared  && terraform plan
+	cd infra/tf/aws/environment && terraform plan
 
 tf_apply:
 	@echo "Applying Terraform infra"
-	cd infra/tf/{{cookiecutter.cloud_provider}}/shared  && terraform apply
-	cd infra/tf/{{cookiecutter.cloud_provider}}/environment  && terraform apply
+	cd infra/tf/aws/shared && terraform apply
+	cd infra/tf/aws/environment  && terraform apply
 
 tf_destroy:
 	@echo "Destroying Terraform infra"
-	cd infra/tf/{{cookiecutter.cloud_provider}}/environment  && terraform destroy
-	cd infra/tf/{{cookiecutter.cloud_provider}}/shared  && terraform destroy
+	cd infra/tf/aws/environment  && terraform destroy
+	cd infra/tf/aws/shared  && terraform destroy
 
-tf_setup:
+tf_setup: tf_workspace
 	@echo "Applying Terraform infra"
 	cd infra/tf/aws/shared && terraform apply
 	@echo "Deploying image to enable environment deployment"
-	./tools/deploy.sh
-	cd infra/tf/aws/environment  && terraform apply
+	../../tools/bash_scripts/deploy.sh
+	@cd infra/tf/aws/environment && terraform apply
 
-deploy_container:
-	./tools/deploy.sh
-
-bastion: venv
-	@echo "Creating bastion..."
-	@. $(VENV_DIR)/bin/activate; \
-	# python cli.py bastion --env=$(ENV)
-	aws ssm start-session \
-	--target i-0ebb96e385446d037 \
-	--document-name AWS-StartPortForwardingSession \
-    --parameters '{"portNumber":["5432"],"localPortNumber":["5432"], "host":["example-db-default.clfqqiusnlbr.eu-west-1.rds.amazonaws.com"]}'
-
-migrate_db: venv
-	@echo "Migrating database..."
-	@. $(VENV_DIR)/bin/activate; \
-	python cli.py migrate-db
+deploy: build tf_workspace
+	../../tools/bash_scripts/deploy.sh

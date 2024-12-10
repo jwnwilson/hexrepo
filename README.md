@@ -39,7 +39,6 @@ AWS_SECRET_ACCESS_KEY
 # To Do
 
 - Setup backend
-    - Setup cli as proper cli command that can be used anywhere in the project
     - Move lib & project tools to root tools folder to remove duplication
     - Setup pipeline for monorepo
         - Setup build / db migrate / deploy

@@ -1,4 +1,5 @@
 #! /bin/bash
+VENV_DIR=.venv
 
 if [[ -z "${GITHUB_ACTIONS}" ]]; then
     echo "Running locally, activating venv."

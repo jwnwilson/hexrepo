@@ -3,6 +3,11 @@
 set -e
 VENV=.venv
 
+if [[ -z "${TARGET_DIRS}" ]]; then
+    echo "TARGET_DIRS is not set. Exiting."
+    exit 1
+fi
+
 while [[ "$#" -gt 0 ]]; do
     case $1 in
         -c|--check) check=true; shift ;;
@@ -11,16 +16,14 @@ while [[ "$#" -gt 0 ]]; do
 done
 
 
-APP_FOLDER="monorepo_api tests"
-
 echo "Activating venv."
 . ${VENV}/bin/activate
 
 if [[ -z "${check}" ]]; then
-    black ${APP_FOLDER} 
-    isort ${APP_FOLDER} --profile black
+    black ${TARGET_DIRS} 
+    isort ${TARGET_DIRS} --profile black
 else
-    mypy ${APP_FOLDER}
-    black --check ${APP_FOLDER}
-    isort --check-only ${APP_FOLDER} --profile black
+    mypy ${TARGET_DIRS}
+    black --check ${TARGET_DIRS}
+    isort --check-only ${TARGET_DIRS} --profile black
 fi

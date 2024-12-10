@@ -1,7 +1,7 @@
 #! /bin/bash
 VENV=.venv
 SCRIPT_DIR=$(dirname "$(realpath $0)")
-ROOT_DIR=$(dirname $SCRIPT_DIR)
+ROOT_DIR=$(dirname $(dirname $SCRIPT_DIR))
 
 if [ -d "./.venv" ]; then
     echo "Virtual environment already exists, skipping venv creation."
