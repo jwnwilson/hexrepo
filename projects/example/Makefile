@@ -16,7 +16,7 @@ VENV_DIR = $(MKFILE_DIR)$(VENV)
 # Setup commands
 venv:
 	@echo "Checking if venv is setup..."
-	@./tools/setup_env.sh
+	@../../tools/bash_scripts/setup_env.sh
 
 build:
 	docker compose build
@@ -62,10 +62,10 @@ coverage:
 	pytest --cov-report html	
 
 lint:
-	bash ./tools/lint.sh
+	TARGET_DIRS="src" bash ../../tools/bash_scripts/lint.sh 
 
 lint_check: venv
-	bash ./tools/lint.sh --check
+	TARGET_DIRS="src" bash ../../tools/bash_scripts/lint.sh --check
 
 clean:
 	find . -type f -name '*.py[co]' -delete -o -type d -name __pycache__ -delete
@@ -95,14 +95,16 @@ tf_destroy:
 	cd infra/tf/aws/environment  && terraform destroy
 	cd infra/tf/aws/shared  && terraform destroy
 
-tf_setup:
+tf_setup: tf_workspace
 	@echo "Applying Terraform infra"
 	cd infra/tf/aws/shared && terraform apply
 	@echo "Deploying image to enable environment deployment"
-	./tools/deploy.sh
-	# Re-add after destorying default env
-	# @cd infra/tf/aws/environment && terraform workspace new dev
-	cd infra/tf/aws/environment && terraform apply
+	../../tools/bash_scripts/deploy.sh
+	@cd infra/tf/aws/environment && terraform apply
 
-deploy: build
-	./tools/deploy.sh
+deploy: build tf_workspace
+	../../tools/bash_scripts/deploy.sh
+
+bastion: venv
+	@echo "Activating bastion port forwarding..."
+	ENVIRONMENT=$(ENVIRONMENT) PROJECT=example ../../tools/bash_scripts/bastion.sh
