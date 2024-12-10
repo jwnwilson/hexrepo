@@ -39,7 +39,7 @@ AWS_SECRET_ACCESS_KEY
 # To Do
 
 - Setup backend
-    - Move lib & project tools to root tools folder to remove duplication
+    - Refactor hexcli to use adaptors like projects and libs
     - Setup pipeline for monorepo
         - Setup build / db migrate / deploy
             - Setup db migration
@@ -52,7 +52,6 @@ AWS_SECRET_ACCESS_KEY
             - Add githook to check if version needs to be increased
             - Add command to bump library version
         - tear down workspace "default" and create workspace "prod"
-        - Move tools aws logic to libs
 
     - Add ability to update project from template
         - Update project & lib templates

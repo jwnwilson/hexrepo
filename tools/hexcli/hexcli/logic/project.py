@@ -6,7 +6,7 @@ from typing import List, Optional, Set
 
 import typer
 
-from tools.logic.commands import run_system_command
+from hexcli.logic.commands import run_system_command
 
 
 def scan_folder(folder: str) -> List[str]:

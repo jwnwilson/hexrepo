@@ -2,7 +2,7 @@ import jinja2
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from tools.logic.config import MonorepoConfig
+    from hexcli.logic.config import MonorepoConfig
 
 
 def generate_libs_makefile(config: "MonorepoConfig"):

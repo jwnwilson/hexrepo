@@ -4,10 +4,10 @@ from typing import List, Optional, Tuple, Union
 from pydantic_settings import BaseSettings
 import typer
 
-from tools.logic.aws.config import AWSConfig, aws_config
-from tools.logic.env import set_env_var
-from tools.prompts.common import prompt_cloud_provider, prompt_shell_file
-from tools.prompts.config import prompt_config_setup, prompt_environments
+from hexcli.logic.aws.config import AWSConfig, aws_config
+from hexcli.logic.env import set_env_var
+from hexcli.prompts.common import prompt_cloud_provider, prompt_shell_file
+from hexcli.prompts.config import prompt_config_setup, prompt_environments
 
 
 class MonorepoConfig(BaseSettings):

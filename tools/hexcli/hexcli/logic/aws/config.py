@@ -2,10 +2,10 @@ from typing import TYPE_CHECKING
 from pydantic import BaseModel 
 import typer
 
-from tools.logic.env import set_env_var
+from hexcli.logic.env import set_env_var
 
 if TYPE_CHECKING:
-    from tools.logic.config import MonorepoConfig
+    from hexcli.logic.config import MonorepoConfig
 
 
 class AWSConfig(BaseModel):

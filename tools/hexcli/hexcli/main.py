@@ -4,14 +4,14 @@ from typing import List, Optional
 from cookiecutter.main import cookiecutter
 import typer
 
-from tools.logic.aws.manage import start_infra_command, stop_infra_command
-from tools.logic.config import MonorepoConfig, get_or_create_config
-from tools.logic.infra import authenticate_cloud, create_lib_infra, create_tf_state, deploy_projects as deploy_projects_command, env_infra_apply_command, env_infra_plan_command, publish_libs, setup_global_env_infra, shared_infra_apply_command, shared_infra_plan_command
-from tools.logic.project import get_libraries, get_library_type, get_projects, install_library_in_project
-from tools.prompts.common import prompt_library_type
-from tools.prompts.infra import prompt_deploy_libs, prompt_setup_lib_infra, prompt_setup_project_infra, prompt_setup_shared_infra, prompt_setup_tf
-from tools.templates.libs import generate_libs_makefile
-from tools.logic.commands import run_system_command
+from hexcli.logic.aws.manage import start_infra_command, stop_infra_command
+from hexcli.logic.config import MonorepoConfig, get_or_create_config
+from hexcli.logic.infra import authenticate_cloud, create_lib_infra, create_tf_state, deploy_projects as deploy_projects_command, env_infra_apply_command, env_infra_plan_command, publish_libs, setup_global_env_infra, shared_infra_apply_command, shared_infra_plan_command
+from hexcli.logic.project import get_libraries, get_library_type, get_projects, install_library_in_project
+from hexcli.prompts.common import prompt_library_type
+from hexcli.prompts.infra import prompt_deploy_libs, prompt_setup_lib_infra, prompt_setup_project_infra, prompt_setup_shared_infra, prompt_setup_tf
+from hexcli.templates.libs import generate_libs_makefile
+from hexcli.logic.commands import run_system_command
 
 app = typer.Typer()
 

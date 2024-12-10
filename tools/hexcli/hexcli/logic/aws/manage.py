@@ -4,7 +4,7 @@ import logging
 
 import typer
 
-from tools.logic.config import MonorepoConfig
+from hexcli.logic.config import MonorepoConfig
 
 logger = logging.getLogger()    
 

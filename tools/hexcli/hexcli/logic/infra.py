@@ -6,11 +6,11 @@ import os
 
 import typer
 
-from tools.logic.aws.auth import authenticate_lib_repo
-from tools.logic.aws.s3 import create_aws_bucket
-from tools.logic.config import MonorepoConfig
-from tools.logic.project import get_libraries, get_library_type, get_modified_libraries, get_modified_projects, get_projects, get_projects_usings_libraries
-from tools.logic.commands import run_system_command
+from hexcli.logic.aws.auth import authenticate_lib_repo
+from hexcli.logic.aws.s3 import create_aws_bucket
+from hexcli.logic.config import MonorepoConfig
+from hexcli.logic.project import get_libraries, get_library_type, get_modified_libraries, get_modified_projects, get_projects, get_projects_usings_libraries
+from hexcli.logic.commands import run_system_command
 
 
 def create_tf_state(config: MonorepoConfig) -> None:

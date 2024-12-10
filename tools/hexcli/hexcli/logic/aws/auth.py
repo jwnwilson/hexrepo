@@ -1,8 +1,8 @@
 import os
 import boto3
 
-from tools.logic.config import MonorepoConfig
-from tools.logic.env import set_env_var
+from hexcli.logic.config import MonorepoConfig
+from hexcli.logic.env import set_env_var
 
 def authenticate_lib_repo(config: MonorepoConfig) -> str:
     # Authenticate to the library repo

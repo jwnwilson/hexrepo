@@ -16,79 +16,79 @@ venv:
 setup: venv
 	@echo "Setting up monorep..."
 	@. $(VENV_DIR)/bin/activate; \
-	python cli.py setup
+	hexcli setup
 
 shared_infra_plan: venv
 	@echo "Planning shared infra..."
 	@. $(VENV_DIR)/bin/activate; \
-	python cli.py shared-infra-plan
+	hexcli shared-infra-plan
 
 shared_infra_apply: venv
 	@echo "Applying shared infra..."
 	@. $(VENV_DIR)/bin/activate; \
-	python cli.py shared-infra-apply
+	hexcli shared-infra-apply
 
 env_infra_plan: venv
 	@echo "Planning env infra..."
 	@. $(VENV_DIR)/bin/activate; \
-	python cli.py env-infra-plan $(ENV)
+	hexcli env-infra-plan $(ENV)
 
 env_infra_apply: venv
 	@echo "Applying env infra..."
 	@. $(VENV_DIR)/bin/activate; \
-	python cli.py env-infra-apply $(ENV)
+	hexcli env-infra-apply $(ENV)
 
 create_project: venv
 	@echo "Creating project..."
 	@. $(VENV_DIR)/bin/activate; \
-	python cli.py create-project
+	hexcli create-project
 
 create_library: venv
 	@echo "Creating library..."
 	@. $(VENV_DIR)/bin/activate; \
-	python cli.py create-library
+	hexcli create-library
 
 add_library: venv
 	@echo "Adding library to project..."
 	@. $(VENV_DIR)/bin/activate; \
-	python cli.py add_library
+	hexcli add_library
 
 test_projects: venv
 	@echo "Testing projects..."
 	@. $(VENV_DIR)/bin/activate; \
-	python cli.py test-projects
+	hexcli test-projects
 
 test_libs: venv
 	@echo "Testing libraries..."
 	@. $(VENV_DIR)/bin/activate; \
-	python cli.py test-libs --libraries=$(LIBRARY)
+	hexcli test-libs --libraries=$(LIBRARY)
 
 lint_projects: venv
 	@echo "Linting projects..."
 	@. $(VENV_DIR)/bin/activate; \
-	python cli.py lint_projects
+	hexcli lint_projects
 
 lint_libs: venv
 	@echo "Linting libraries..."
 	@. $(VENV_DIR)/bin/activate; \
-	python cli.py lint_libs
+	hexcli lint_libs
 
 deploy_projects: venv
 	@echo "Deploying projects..."
 	@. $(VENV_DIR)/bin/activate; \
-	python cli.py deploy-projects --projects=$(PROJECT) --check-modified --no-input
+	hexcli deploy-projects --projects=$(PROJECT) --check-modified --no-input
 
 deploy_libs: venv
 	@echo "Deploying libraries..."
 	@. $(VENV_DIR)/bin/activate; \
-	python cli.py deploy-libs --libraries=$(LIBRARY) --check-modified --no-input
+	hexcli deploy-libs --libraries=$(LIBRARY) --check-modified --no-input
 
 stop_infra: venv
 	@echo "Stopping infra..."
 	@. $(VENV_DIR)/bin/activate; \
-	python cli.py stop-infra
+	hexcli stop-infra
 
 start_infra: venv
 	@echo "Starting infra..."
 	@. $(VENV_DIR)/bin/activate; \
-	python cli.py start-infra
+	hexcli start-infra

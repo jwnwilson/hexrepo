@@ -8,7 +8,7 @@ from os import fdopen, remove
 
 import typer
 
-from tools.logic.commands import run_system_command
+from hexcli.logic.commands import run_system_command
 
 
 def running_on_ci() -> bool:
