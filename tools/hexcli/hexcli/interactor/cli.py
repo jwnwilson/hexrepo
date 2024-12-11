@@ -156,12 +156,12 @@ def deploy_libs(libraries: Optional[List[str]] = None, check_modified: bool = Fa
 
 
 @app.command()
-def deploy_projects(projects: Optional[List[str]] = None, check_modified: bool = False, no_input: bool = False):
+def deploy_projects(env: str, projects: Optional[List[str]] = None, check_modified: bool = False, no_input: bool = False):
     config: MonorepoConfig
     config, _ = get_or_create_config(no_input=no_input)
     projects = projects.remove("") if "" in projects else projects
 
-    deploy_projects_command(config, projects=projects, check_modified=check_modified)
+    deploy_projects_command(env, config, projects=projects, check_modified=check_modified, no_input=no_input)
 
 
 @app.command()

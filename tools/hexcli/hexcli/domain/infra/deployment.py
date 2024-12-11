@@ -47,7 +47,7 @@ def publish_libs(config: MonorepoConfig, libraries: Optional[List[str]] = None, 
     typer.echo("Libraries published successfully.")
 
 
-def deploy_projects(config: MonorepoConfig, projects: Optional[List[str]], check_modified: bool = False) -> None:
+def deploy_projects(env: str, config: MonorepoConfig, projects: Optional[List[str]], check_modified: bool = False, no_input: bool = False) -> None:
     typer.echo("Publishing projects to repo...")
     # Get code repo token
     assert os.environ.get("MONOREPO_LIB_REPO_URL"), "Library repo url not found."
@@ -66,7 +66,7 @@ def deploy_projects(config: MonorepoConfig, projects: Optional[List[str]], check
 
     for proj in projects:
         with chdir(f"projects/{proj}"):
-            run_system_command("make deploy")
+            run_system_command(f"make deploy ENV={env} NO_INPUT=${no_input}")
     # Placeholder for publishing libraries to repo
     typer.echo("Projects deployed successfully.")
 
