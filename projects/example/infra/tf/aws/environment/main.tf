@@ -52,27 +52,27 @@ module "example_api" {
   }
 }
 
-# module "migrate_db_task" {
-#   source = "../../../../../../libs/infra/tf/aws/modules/lambda"
+module "migrate_db_task" {
+  source = "../../../../../../libs/infra/tf/aws/modules/lambda"
 
-#   environment        = terraform.workspace
-#   project            = "example-db-migrate"
-#   ecr_url            = data.aws_ecr_repository.ecr_repo.repository_url
-#   docker_tag         = var.docker_tag 
-#   aws_access_key     = var.aws_access_key
-#   aws_secret_key     = var.aws_secret_key
-#   aws_region         = var.aws_region
-#   vpc_id             = data.aws_vpc.monorepo.id
-#   lambda_command     = ["src.app.interactor.aws.lambda_db.handler"]
-#   security_group_ids = [module.example_postgres.db_security_group_id]
+  environment        = terraform.workspace
+  project            = "example-db-migrate"
+  ecr_url            = data.aws_ecr_repository.ecr_repo.repository_url
+  docker_tag         = var.docker_tag 
+  aws_access_key     = var.aws_access_key
+  aws_secret_key     = var.aws_secret_key
+  aws_region         = var.aws_region
+  vpc_id             = data.aws_vpc.monorepo.id
+  lambda_command     = ["src.app.interactor.aws.lambda_db.handler"]
+  security_group_ids = [module.example_postgres.db_security_group_id]
 
-#   environment_variables = {
-#     ENVIRONMENT             = terraform.workspace
-#     CLOUD_PROVIDER          = "AWS"
-#     DB_URL                  = "postgresql+psycopg2://postgres:{password}@${module.example_postgres.db_instance_endpoint}/${var.project}"
-#     DB_PASSWORD_SECRET_NAME = data.aws_secretsmanager_secret.db_secret.name
-#   }
-# }
+  environment_variables = {
+    ENVIRONMENT             = terraform.workspace
+    CLOUD_PROVIDER          = "AWS"
+    DB_URL                  = "postgresql+psycopg2://postgres:{password}@${module.example_postgres.db_instance_endpoint}/${var.project}"
+    DB_PASSWORD_SECRET_NAME = data.aws_secretsmanager_secret.db_secret.name
+  }
+}
 
 module "example_api_gateway" {
   source = "../../../../../../libs/infra/tf/aws/modules/apigateway"
