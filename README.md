@@ -52,6 +52,7 @@ AWS_SECRET_ACCESS_KEY
             - Add githook to check if version needs to be increased
             - Add command to bump library version
         - tear down workspace "default" and create workspace "prod"
+        - Migrate storage -> cloud
 
     - Add ability to update project from template
         - Update project & lib templates

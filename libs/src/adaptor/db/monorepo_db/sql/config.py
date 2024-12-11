@@ -2,7 +2,7 @@ import json
 import logging
 from urllib.parse import quote
 
-from monorepo_storage.secrets.aws import AWSSecretAdaptor
+from monorepo_cloud.secrets.aws import AWSSecretAdaptor
 
 from ..config import config
 

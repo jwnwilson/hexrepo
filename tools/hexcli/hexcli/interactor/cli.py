@@ -4,14 +4,16 @@ from typing import List, Optional
 from cookiecutter.main import cookiecutter
 import typer
 
+from hexcli.config import MonorepoConfig, get_or_create_config
 from hexcli.domain.infra.manage import start_infra_command, stop_infra_command
-from hexcli.domain.config import MonorepoConfig, get_or_create_config
-from hexcli.domain.infra import authenticate_cloud, create_lib_infra, create_tf_state, deploy_projects as deploy_projects_command, env_infra_apply_command, env_infra_plan_command, publish_libs, setup_global_env_infra, shared_infra_apply_command, shared_infra_plan_command
+from hexcli.domain.infra.code_repo import authenticate_lib_repo
+from hexcli.domain.infra.deployment import create_lib_infra, deploy_projects as deploy_projects_command, env_infra_apply_command, env_infra_plan_command, publish_libs, setup_global_env_infra, shared_infra_apply_command, shared_infra_plan_command
+from hexcli.domain.infra.storage import create_tf_state
 from hexcli.domain.project import get_libraries, get_library_type, get_projects, install_library_in_project
 from hexcli.domain.prompts.common import prompt_library_type
 from hexcli.domain.prompts.infra import prompt_deploy_libs, prompt_setup_lib_infra, prompt_setup_project_infra, prompt_setup_shared_infra, prompt_setup_tf
 from hexcli.domain.templates.libs import generate_libs_makefile
-from hexcli.domain.commands import run_system_command
+from hexcli.domain.system import run_system_command
 
 app = typer.Typer()
 
@@ -34,7 +36,7 @@ def setup():
     if prompt_setup_lib_infra():
         create_lib_infra(config)
     
-    authenticate_cloud(config)
+    authenticate_lib_repo(config)
 
     # Publish libraries to repo
     if prompt_deploy_libs():

@@ -47,8 +47,8 @@ def install_libraries():
         logger.info("installing library: db" )
         run_system_command("source ./.venv/bin/activate && poetry add --source monorepo monorepo-db -G prod")
     if use_storage:
-        logger.info("installing library: storage" )
-        run_system_command("source ./.venv/bin/activate && poetry add --source monorepo monorepo-storage -G prod")
+        logger.info("installing library: cloud" )
+        run_system_command("source ./.venv/bin/activate && poetry add --source monorepo monorepo-cloud -G prod")
     if use_api:
         logger.info("installing library: api" )
         run_system_command("source ./.venv/bin/activate && poetry add --source monorepo monorepo-api -G prod")

@@ -2,16 +2,19 @@ import logging
 import os
 from typing import Any, List, Optional
 
-import boto3  # type: ignore
+import boto3
 
-from .config import config
+
+from ..config import config, AWSConfig
 from .interface import StorageAdaptor, StorageConfig, StorageData, UploadUrlData
+from .exceptions import StorageAlreadyExists, StorageInvalid
 
 logger = logging.getLogger(__name__)
 
 
 class S3Adaptor(StorageAdaptor):
-    def __init__(self, storage_config: StorageConfig) -> None:
+    def __init__(self, storage_config: StorageConfig, config: AWSConfig) -> None:
+        self.aws_config: AWSConfig = config
         self.bucket_name = storage_config.aws_bucket
         self.s3 = boto3.resource("s3")
         self.client = boto3.client("s3")
@@ -128,3 +131,22 @@ class S3Adaptor(StorageAdaptor):
     def delete(self, path: str) -> None:
         self.client.delete_object(Bucket=self.bucket_name, Key=path)
         logger.info(f"Deleted file: {path} from s3 bucket: {self.bucket_name}")
+
+    @classmethod
+    def create_bucket(cls, bucket_name: str, config: AWSConfig) -> None:
+        client = boto3.client("s3")     
+        try:
+            # Create S3 bucket
+            client.create_bucket(
+                Bucket=bucket_name,
+                CreateBucketConfiguration={
+                    'LocationConstraint': config.AWS_DEFAULT_REGION
+                }
+            )
+        except Exception as err:
+            if "BucketAlreadyOwnedByYou" in str(err):
+                raise StorageAlreadyExists(f"Bucket {bucket_name} already exists, skipping...")
+            elif "The specified bucket is not valid." in str(err):
+                raise StorageInvalid(
+                    "The bucket name can be between 3 and 63 characters long, and can contain only lower-case characters, numbers, periods, and dashes."
+                )

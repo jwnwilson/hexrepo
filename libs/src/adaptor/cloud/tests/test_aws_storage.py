@@ -2,7 +2,7 @@ import os
 
 import pytest
 
-from monorepo_storage.storage import S3Adaptor, StorageConfig
+from monorepo_cloud.storage import S3Adaptor, StorageConfig
 
 
 @pytest.fixture

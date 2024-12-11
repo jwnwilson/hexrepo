@@ -6,7 +6,7 @@ import typer
 
 from monorepo_cloud.compute import AWSComputeManager
 from monorepo_cloud.db import AWSRDSManager
-from tools.hexcli.hexcli.config import MonorepoConfig
+from hexcli.config import MonorepoConfig
 
 logger = logging.getLogger()    
 

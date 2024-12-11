@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "monorepo-storage"
+name = "monorepo-cloud"
 version = "0.3.0"
 description = ""
 authors = ["Noel Wilson <jwnwilson@hotmail.co.uk>"]
@@ -7,9 +7,12 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.12"
-boto3 = "^1.35.54"
+boto3 = {version = "^1.35.54", optional = true}
 pydantic = "^2.9.2"
 pydantic-settings = "^2.6.1"
+
+[tool.poetry.extras]
+aws = ["boto3"]
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.3"
@@ -26,9 +29,6 @@ gevent = "^24.10.3"
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
-[tool.poetry.extras]
-aws = ["boto3"]
-
 [tool.isort]
 profile = "black"
 
@@ -41,7 +41,7 @@ env_files = ["env/local.env"]
 [tool.coverage.run]
 concurrency = ["gevent"]
 omit = ["tests/*"]
-source = ["monorepo_storage"]
+source = ["monorepo_cloud"]
 
 [tool.mypy]
 python_version = "3.12"

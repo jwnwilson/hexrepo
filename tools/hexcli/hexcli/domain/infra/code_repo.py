@@ -1,5 +1,5 @@
 import typer
-from tools.hexcli.hexcli.config import MonorepoConfig
+from hexcli.config import MonorepoConfig
 from monorepo_cloud.code_repo import authenticate_repo
 
 
