@@ -15,7 +15,7 @@ pydantic-settings = "^2.6.1"
 monorepo-cloud = {path = "../../libs/src/adaptor/cloud", develop = true}
 
 [tool.poetry.scripts]
-hexcli = "hexcli.main:app"
+hexcli = "hexcli.interactor.cli:app"
 
 [build-system]
 requires = ["poetry-core"]

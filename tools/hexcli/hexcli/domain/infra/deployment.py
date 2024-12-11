@@ -6,28 +6,10 @@ import os
 
 import typer
 
-from hexcli.logic.aws.auth import authenticate_lib_repo
-from hexcli.logic.aws.s3 import create_aws_bucket
-from hexcli.logic.config import MonorepoConfig
-from hexcli.logic.project import get_libraries, get_library_type, get_modified_libraries, get_modified_projects, get_projects, get_projects_usings_libraries
-from hexcli.logic.commands import run_system_command
-
-
-def create_tf_state(config: MonorepoConfig) -> None:
-    if config.cloud_provider == "aws":
-        # Prompt for bucket name
-        bucket_name: str = config.cloud_provider_config.AWS_TF_STATE_BUCKET
-        # Attempt to create bucket
-        create_aws_bucket(bucket_name)
-        typer.echo(f"Bucket {bucket_name} created successfully.")
-
-
-def authenticate_cloud(config: MonorepoConfig) -> None:
-    typer.echo("Authenticating with cloud provider...")
-     # Save lib repo url to env var
-    if config.cloud_provider == "aws":
-        authenticate_lib_repo(config)
-    typer.echo("Authentication successful.")
+from hexcli.domain.infra.code_repo import authenticate_lib_repo
+from hexcli.config import MonorepoConfig
+from hexcli.domain.project import get_libraries, get_library_type, get_modified_libraries, get_modified_projects, get_projects, get_projects_usings_libraries
+from hexcli.domain.system import run_system_command
 
 
 def create_lib_infra(config: MonorepoConfig) -> None:

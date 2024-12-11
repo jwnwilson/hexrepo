@@ -3,10 +3,9 @@ from contextlib import chdir
 import os
 import subprocess
 from typing import List, Optional, Set
-
 import typer
 
-from hexcli.logic.commands import run_system_command
+from .system import run_system_command
 
 
 def scan_folder(folder: str) -> List[str]:
@@ -80,3 +79,4 @@ def install_library_in_project(library: str, project: str):
         run_system_command(f"poetry add --editable ../../libs/src/{library_type}/{library} -G dev")
         run_system_command(f"poetry add {library} -G prod")
     typer.echo(f"Library {library} installed in project {project}")
+

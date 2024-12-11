@@ -1,14 +1,18 @@
 
 import os
 from os.path import expanduser
-from typing import List
 from tempfile import mkstemp
 from shutil import move, copymode
 from os import fdopen, remove
 
 import typer
 
-from hexcli.logic.commands import run_system_command
+
+def run_system_command(command: str) -> None:
+    return_code = os.system(command)
+    if return_code != 0:
+        typer.echo(f"System command failed: {command}")
+        raise typer.Abort()
 
 
 def running_on_ci() -> bool:

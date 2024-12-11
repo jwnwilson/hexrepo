@@ -5,9 +5,9 @@ from pydantic_settings import BaseSettings
 import typer
 
 from monorepo_cloud.config import AWSConfig
-from hexcli.logic.env import set_env_var
-from hexcli.prompts.common import prompt_cloud_provider, prompt_shell_file
-from hexcli.prompts.config import prompt_config_setup, prompt_environments
+from hexcli.domain.env import set_env_var
+from hexcli.domain.prompts.common import prompt_cloud_provider, prompt_shell_file
+from hexcli.domain.prompts.config import prompt_config_setup, prompt_environments
 
 
 class MonorepoConfig(BaseSettings):
