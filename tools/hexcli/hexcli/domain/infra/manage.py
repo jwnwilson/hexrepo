@@ -4,58 +4,28 @@ import logging
 
 import typer
 
+from monorepo_cloud.compute import AWSComputeManager
 from hexcli.logic.config import MonorepoConfig
 
 logger = logging.getLogger()    
 
 
 def start_infra_command(config: MonorepoConfig):
-    region: str = config.cloud_provider_config.AWS_DEFAULT_REGION
+    aws_compute_manager = AWSComputeManager(config.cloud_provider_config)
+    aws_rds_manager = AWSRDSManager(config.cloud_provider_config)
     # start bastion instances that are not running
-    start_ec2s(region)
+    aws_compute_manager.start_instance(state='stopped')
     # start rds instances that are not running
-    start_rds(region)
+    aws_rds_manager.start_rds(state='stopped')
     
 
 def stop_infra_command(config: MonorepoConfig):
-    region: str = config.cloud_provider_config.AWS_DEFAULT_REGION
+    aws_compute_manager = AWSComputeManager(config.cloud_provider_config)
+    aws_rds_manager = AWSRDSManager(config.cloud_provider_config)
     # start bastion instances that are not running
-    stop_ec2s(region)
+    aws_compute_manager.stop_instance(state='stopped')
     # start rds instances that are not running
-    stop_rds(region)
-
-
-def _get_ec2_instances(ec2, state: Optional[str] = None) -> List[str]:
-    instance_data = ec2.describe_instances()
-    instancelist = []
-    for reservation in instance_data["Reservations"]:
-        for instance in reservation["Instances"]:
-            if not state:
-                instancelist.append(instance["InstanceId"])
-            elif instance["State"]['Name'].lower() == state.lower():
-                instancelist.append(instance["InstanceId"])
-    return instancelist
-
-
-def start_ec2s(region: str):
-    # start bastion instances that are not running
-    ec2 = boto3.client('ec2', region_name=region)
-    ec2_ids = _get_ec2_instances(ec2, state='stopped')
-
-    if ec2_ids:
-        ec2.start_instances(InstanceIds=ec2_ids)
-        for i in ec2_ids:
-            typer.echo('Started your instances: ' + str(i))
-
-
-def stop_ec2s(region: str):
-    ec2 = boto3.client('ec2', region_name=region)
-    ec2_ids = _get_ec2_instances(ec2, state='running')
-
-    if ec2_ids:
-        ec2.stop_instances(InstanceIds=ec2_ids)
-        for i in ec2_ids:
-            typer.echo('Started your instances: ' + str(i))
+    aws_rds_manager.stop_rds(state='stopped')
 
 
 def _get_rds_ids(region: str, state: Optional[str] = None) -> List[str]:
