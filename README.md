@@ -39,6 +39,7 @@ AWS_SECRET_ACCESS_KEY
 # To Do
 
 - Setup backend
+    - tear down workspace "default" and create workspace "prod"
     - Setup pipeline for monorepo
         - Setup build / db migrate / deploy
             - Setup db migration
@@ -50,8 +51,6 @@ AWS_SECRET_ACCESS_KEY
         - Auto increment version in pipeline
             - Add githook to check if version needs to be increased
             - Add command to bump library version
-        - tear down workspace "default" and create workspace "prod"
-        - Migrate storage -> cloud
 
     - Add ability to update project from template
         - Update project & lib templates

@@ -827,7 +827,7 @@ type = "directory"
 url = "../../libs/src/adaptor/db"
 
 [[package]]
-name = "monorepo-storage"
+name = "monorepo-cloud"
 version = "0.1.0"
 description = ""
 optional = false
@@ -844,7 +844,7 @@ aws = ["boto3 (>=1.35.54,<2.0.0)"]
 
 [package.source]
 type = "directory"
-url = "../../libs/src/adaptor/storage"
+url = "../../libs/src/adaptor/cloud"
 
 [[package]]
 name = "mypy"
