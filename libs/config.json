@@ -4,7 +4,7 @@
     "cloud_provider": "aws",
     "cloud_provider_config": {
         "AWS_ACCOUNT": "675468650888",
-        "AWS_DEFAULT_REGION": "eu-west-1",
+        "AWS_REGION": "eu-west-1",
         "AWS_TF_STATE_BUCKET": "monorepo-jwn"
     },
     "environments": [

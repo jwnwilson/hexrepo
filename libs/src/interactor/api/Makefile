@@ -30,4 +30,4 @@ clean:
 
 publish: venv
 	@echo "Publishing package..."
-	@../../../../tools/bash_scripts/ltools/publish.sh
+	@../../../../tools/bash_scripts/publish.sh

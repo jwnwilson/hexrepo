@@ -39,7 +39,6 @@ AWS_SECRET_ACCESS_KEY
 # To Do
 
 - Setup backend
-    - Refactor hexcli to use adaptors like projects and libs
     - Setup pipeline for monorepo
         - Setup build / db migrate / deploy
             - Setup db migration
