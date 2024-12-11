@@ -71,8 +71,9 @@ clean:
 	find . -type f -name '*.py[co]' -delete -o -type d -name __pycache__ -delete
 
 tf_workspace:
+	@-cd infra/tf/aws/environment  && \
+	terraform workspace new $(ENVIRONMENT)
 	@cd infra/tf/aws/environment  && \
-	terraform workspace new $(ENVIRONMENT) && \
 	terraform workspace select $(ENVIRONMENT) 
 
 tf_init:
