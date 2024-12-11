@@ -8,7 +8,7 @@ def authenticate_lib_repo(config: MonorepoConfig) -> str:
     # Authenticate to the library repo
     if config.cloud_provider == "aws":
         typer.echo("Authenticating with cloud provider...")
-        auth_token = authenticate_repo(config)
+        auth_token = authenticate_repo(config.cloud_provider_config)
         typer.echo("Authentication successful.")
         config.set_env_var( "MONOREPO_LIB_REPO_PASSWORD", auth_token)
         config.set_env_var("MONOREPO_LIB_REPO_USERNAME", "aws")

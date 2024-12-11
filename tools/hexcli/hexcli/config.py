@@ -46,7 +46,7 @@ class MonorepoConfig(BaseSettings):
 def aws_config(config: MonorepoConfig) -> MonorepoConfig:
     aws_config: AWSConfig = AWSConfig(
         AWS_ACCOUNT=typer.prompt("Please enter your AWS account ID"),
-        AWS_DEFAULT_REGION=typer.prompt("Please enter your AWS default region", default="eu-west-1"),
+        AWS_REGION=typer.prompt("Please enter your AWS region", default="eu-west-1"),
         AWS_TF_STATE_BUCKET=typer.prompt("Please enter your AWS Terraform state bucket name", default="monorepo")
     )   
 
@@ -56,7 +56,7 @@ def aws_config(config: MonorepoConfig) -> MonorepoConfig:
     set_env_var(config.shell_file, "AWS_ACCESS_KEY_ID", access_key_id)
     set_env_var(config.shell_file, "AWS_SECRET_ACCESS_KEY", access_secret_key)
     set_env_var(config.shell_file, "AWS_ACCOUNT", aws_config.AWS_ACCOUNT)
-    set_env_var(config.shell_file, "AWS_DEFAULT_REGION", aws_config.AWS_DEFAULT_REGION)
+    set_env_var(config.shell_file, "AWS_DEFAULT_REGION", aws_config.AWS_REGION)
     
     config.cloud_provider_config = aws_config
 

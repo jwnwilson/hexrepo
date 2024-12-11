@@ -2,12 +2,11 @@ import logging
 import os
 from typing import Any, List, Optional
 
-import boto3
+import boto3  # type: ignore
 
-
-from ..config import config, AWSConfig
-from .interface import StorageAdaptor, StorageConfig, StorageData, UploadUrlData
+from ..config import AWSConfig, config
 from .exceptions import StorageAlreadyExists, StorageInvalid
+from .interface import StorageAdaptor, StorageConfig, StorageData, UploadUrlData
 
 logger = logging.getLogger(__name__)
 
@@ -19,28 +18,15 @@ class S3Adaptor(StorageAdaptor):
         self.s3 = boto3.resource("s3")
         self.client = boto3.client("s3")
         self.bucket = self.s3.Bucket(self.bucket_name)
-        self.user = storage_config.aws_auth.get("user")
         self.upload_prefix = storage_config.aws_upload_prefix
-        self.upload_user_access_id = storage_config.aws_auth.get(
-            "upload_user_access_id"
-        )
-        self.upload_user_secret_key = storage_config.aws_auth.get(
-            "upload_user_secret_key"
-        )
-        self.public_url_timeout = config.public_url_timeout
-        self._upload_client = None
+        self.public_url_timeout: Optional[int] = storage_config.public_url_timeout
+        self._upload_client: Optional[str] = None
 
-        if not self.user:
-            raise RuntimeError("Auth user is not set")
         if not self.upload_prefix:
             raise RuntimeError("Upload prefix is not set")
-        if not self.upload_user_access_id:
-            raise RuntimeError("Upload access id is not set")
-        if not self.upload_user_secret_key:
-            raise RuntimeError("Upload secret key is not set")
 
-        self.url_prefix = (
-            f"https://{self.bucket_name}.s3-{config.aws_default_region}.amazonaws.com/"
+        self.url_prefix: str = (
+            f"https://{self.bucket_name}.s3-{config.AWS_REGION}.amazonaws.com/"
         )
 
     @property
@@ -48,18 +34,7 @@ class S3Adaptor(StorageAdaptor):
         if self._upload_client:
             return self._upload_client
 
-        client = boto3.client("ssm")
-        access_id = client.get_parameter(
-            Name=self.upload_user_access_id, WithDecryption=True
-        )
-        secret_key = client.get_parameter(
-            Name=self.upload_user_secret_key, WithDecryption=True
-        )
-        s3_client = boto3.client(
-            "s3",
-            aws_access_key_id=access_id["Parameter"]["Value"],
-            aws_secret_access_key=secret_key["Parameter"]["Value"],
-        )
+        s3_client = boto3.client("s3")
         self._upload_client = s3_client
 
         return s3_client
@@ -134,18 +109,18 @@ class S3Adaptor(StorageAdaptor):
 
     @classmethod
     def create_bucket(cls, bucket_name: str, config: AWSConfig) -> None:
-        client = boto3.client("s3")     
+        client = boto3.client("s3")
         try:
             # Create S3 bucket
             client.create_bucket(
                 Bucket=bucket_name,
-                CreateBucketConfiguration={
-                    'LocationConstraint': config.AWS_DEFAULT_REGION
-                }
+                CreateBucketConfiguration={"LocationConstraint": config.AWS_REGION},
             )
         except Exception as err:
             if "BucketAlreadyOwnedByYou" in str(err):
-                raise StorageAlreadyExists(f"Bucket {bucket_name} already exists, skipping...")
+                raise StorageAlreadyExists(
+                    f"Bucket {bucket_name} already exists, skipping..."
+                )
             elif "The specified bucket is not valid." in str(err):
                 raise StorageInvalid(
                     "The bucket name can be between 3 and 63 characters long, and can contain only lower-case characters, numbers, periods, and dashes."

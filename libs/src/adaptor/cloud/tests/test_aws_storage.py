@@ -2,25 +2,32 @@ import os
 
 import pytest
 
+from monorepo_cloud.config import AWSConfig
 from monorepo_cloud.storage import S3Adaptor, StorageConfig
 
 
 @pytest.fixture
-def aws_config() -> StorageConfig:
+def storage_config() -> StorageConfig:
     return StorageConfig(
-        aws_auth={
-            "user": "test-user",
-            "upload_user_access_id": "test-access-id",
-            "upload_user_secret_key": "test-secret",
-        },
         aws_bucket="monorepo-jwn",
         aws_upload_prefix="test-upload-prefix",
     )
 
 
 @pytest.fixture
-def clear_test_data(aws_config: StorageConfig) -> None:
-    storage_adaptor = S3Adaptor(storage_config=aws_config)
+def aws_config() -> AWSConfig:
+    return AWSConfig(
+        AWS_ACCOUNT="test-account",
+        AWS_REGION="eu-west-1",
+        AWS_TF_STATE_BUCKET="test-tf-state-bucket",
+    )
+
+
+@pytest.fixture
+def clear_test_data(storage_config: StorageConfig, aws_config: AWSConfig) -> None:
+    storage_adaptor: S3Adaptor = S3Adaptor(
+        storage_config=storage_config, config=aws_config
+    )
     storage_adaptor.delete("test_folder/test_file.txt")
     storage_adaptor.delete("test_folder/")
     try:
@@ -30,9 +37,11 @@ def clear_test_data(aws_config: StorageConfig) -> None:
 
 
 @pytest.mark.e2e
-def test_aws_storage_e2e(aws_config: StorageConfig, clear_test_data: None) -> None:
+def test_aws_storage_e2e(
+    storage_config: StorageConfig, aws_config: AWSConfig, clear_test_data: None
+) -> None:
     # Assert credentials are set
-    storage_adaptor = S3Adaptor(aws_config)
+    storage_adaptor = S3Adaptor(storage_config, aws_config)
 
     # Create folder
     aws_folder = "test_folder"

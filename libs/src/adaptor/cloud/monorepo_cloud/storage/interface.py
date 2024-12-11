@@ -14,9 +14,9 @@ class UploadUrlData(BaseModel):
 
 
 class StorageConfig(BaseModel):
-    aws_auth: Dict[str, Any]
     aws_bucket: str
     aws_upload_prefix: Optional[str] = None
+    public_url_timeout: Optional[int] = None
 
 
 class StorageAdaptor(ABC):

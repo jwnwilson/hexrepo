@@ -1,6 +1,7 @@
-import os
 import logging
+import os
 from typing import Optional
+
 from pydantic import BaseModel
 from pydantic_settings import BaseSettings
 
@@ -14,13 +15,14 @@ class Config(BaseSettings):
     These parameters can be configured
     with environment variables.
     """
-    environment: str = os.environ.get("ENVIRONMENT", "dev")    
+
+    environment: str = os.environ.get("ENVIRONMENT", "dev")
 
 
 class AWSConfig(BaseModel):
     AWS_ACCOUNT: str
-    AWS_DEFAULT_REGION: str
+    AWS_REGION: str
     AWS_TF_STATE_BUCKET: str
 
 
-config = Config()  # type: ignore
+config: Config = Config()
