@@ -6,12 +6,12 @@ name: Libs
 on:
   push:
     branches: [ main ]
-    paths:
-      - libs/**
-  pull_request:
-    branches: [ main ]
-    paths:
-      - libs/**
+  #   paths:
+  #     - libs/**
+  # pull_request:
+  #   branches: [ main ]
+  #   paths:
+  #     - libs/**
 
 env:
   # Setting an environment variable with the value of a configuration variable
