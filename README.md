@@ -40,7 +40,6 @@ AWS_SECRET_ACCESS_KEY
 
 - Setup backend
     - Setup plan and test on PR then apply and deploy on merge
-    - tear down workspace "default" and create workspace "prod"
     - Setup pipeline for monorepo
         - Setup build / db migrate / deploy
             - Setup db migration
@@ -52,7 +51,7 @@ AWS_SECRET_ACCESS_KEY
         - Auto increment version in pipeline
             - Add githook to check if version needs to be increased
             - Add command to bump library version
-
+    - tear down workspace "default" and create workspace "prod"
     - Add ability to update project from template
         - Update project & lib templates
         - Use cruft to update projects from template?
