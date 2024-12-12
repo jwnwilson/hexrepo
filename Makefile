@@ -76,7 +76,7 @@ lint_libs: venv
 deploy_projects: venv
 	@echo "Deploying projects..."
 	@. $(VENV_DIR)/bin/activate && \
-	hexcli deploy-projects --projects=$(PROJECT) --env=$(ENV) --check-modified --no-input
+	hexcli deploy-projects $(ENV) --projects=$(PROJECT) --check-modified --no-input
 
 deploy_libs: venv
 	@echo "Deploying libraries..."
