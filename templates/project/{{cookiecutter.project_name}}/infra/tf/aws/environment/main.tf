@@ -32,9 +32,6 @@ module "example_api" {
   environment       = terraform.workspace
   project           = "{{cookiecutter.project_slug}}"
   ecr_url           = data.aws_ecr_repository.ecr_repo.repository_url
-  aws_access_key    = var.aws_access_key
-  aws_secret_key    = var.aws_secret_key
-  aws_region        = var.aws_region
   vpc_id            = data.aws_vpc.monorepo.id
   {% if cookiecutter.cloud_provider == "aws" %}
   lambda_command    = ["src.app.interactor.aws.lambda_api.handlerr"]
@@ -70,8 +67,5 @@ module "example_postgres" {
 
   environment       = terraform.workspace
   project           = "{{cookiecutter.project_slug}}"
-  aws_access_key    = var.aws_access_key
-  aws_secret_key    = var.aws_secret_key
-  aws_region        = var.aws_region
   vpc_id            = data.aws_vpc.monorepo.id
 }

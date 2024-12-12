@@ -1,3 +1,10 @@
+terraform {
+  required_providers {
+    aws = {
+      source = "hashicorp/aws"
+    }
+  }
+}
 # Complete using this guide:
 # https://medium.com/@ilia.lazebnik/simplifying-aws-private-lambda-gateway-vpc-endpoint-association-with-terraform-b379a247afbf
 

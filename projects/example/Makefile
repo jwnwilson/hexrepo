@@ -8,6 +8,7 @@ TF_VAR_ecr_api_url=${AWS_ACCOUNT}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/ex
 TF_VAR_aws_access_key=${AWS_ACCESS_KEY_ID}
 TF_VAR_aws_secret_key=${AWS_SECRET_ACCESS_KEY}
 TF_VAR_aws_region=${AWS_DEFAULT_REGION}
+NO_INPUT:=false
 
 VENV := .venv
 MKFILE_DIR := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
@@ -89,7 +90,12 @@ tf_plan:
 tf_apply:
 	@echo "Applying Terraform infra"
 	cd infra/tf/aws/shared && terraform apply
-	cd infra/tf/aws/environment  && terraform apply
+	cd infra/tf/aws/environment && terraform apply
+
+tf_apply_no_input:
+	@echo "Applying Terraform infra"
+	cd infra/tf/aws/shared && terraform apply -auto-approve
+	cd infra/tf/aws/environment && terraform apply -auto-approve
 
 tf_destroy:
 	@echo "Destroying Terraform infra"
@@ -104,7 +110,7 @@ tf_setup: tf_workspace
 	@cd infra/tf/aws/environment && terraform apply
 
 deploy: build tf_workspace
-	../../tools/bash_scripts/deploy.sh
+	NO_INPUT=$(NO_INPUT) ../../tools/bash_scripts/deploy.sh 
 
 bastion: venv
 	@echo "Activating bastion port forwarding..."

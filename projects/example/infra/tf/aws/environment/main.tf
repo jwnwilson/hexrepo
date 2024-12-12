@@ -37,9 +37,6 @@ module "example_api" {
   project            = "example"
   ecr_url            = data.aws_ecr_repository.ecr_repo.repository_url
   docker_tag         = var.docker_tag 
-  aws_access_key     = var.aws_access_key
-  aws_secret_key     = var.aws_secret_key
-  aws_region         = var.aws_region
   vpc_id             = data.aws_vpc.monorepo.id
   lambda_command     = ["src.app.interactor.aws.lambda_api.handler"]
   security_group_ids = [module.example_postgres.db_security_group_id]
@@ -59,9 +56,6 @@ module "example_api" {
 #   project            = "example-db-migrate"
 #   ecr_url            = data.aws_ecr_repository.ecr_repo.repository_url
 #   docker_tag         = var.docker_tag 
-#   aws_access_key     = var.aws_access_key
-#   aws_secret_key     = var.aws_secret_key
-#   aws_region         = var.aws_region
 #   vpc_id             = data.aws_vpc.monorepo.id
 #   lambda_command     = ["src.app.interactor.aws.lambda_db.handler"]
 #   security_group_ids = [module.example_postgres.db_security_group_id]
@@ -90,9 +84,6 @@ module "example_postgres" {
 
   environment    = terraform.workspace
   project        = "example"
-  aws_access_key = var.aws_access_key
-  aws_secret_key = var.aws_secret_key
-  aws_region     = var.aws_region
   vpc_id         = data.aws_vpc.monorepo.id
   username       = "postgres"
 }

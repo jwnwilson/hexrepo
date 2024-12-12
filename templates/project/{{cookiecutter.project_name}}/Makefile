@@ -91,6 +91,11 @@ tf_apply:
 	cd infra/tf/aws/shared && terraform apply
 	cd infra/tf/aws/environment  && terraform apply
 
+tf_apply_no_input:
+	@echo "Applying Terraform infra"
+	cd infra/tf/aws/shared && terraform apply -auto-approve
+	cd infra/tf/aws/environment && terraform apply -auto-approve
+
 tf_destroy:
 	@echo "Destroying Terraform infra"
 	cd infra/tf/aws/environment  && terraform destroy
