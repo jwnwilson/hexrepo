@@ -39,6 +39,7 @@ AWS_SECRET_ACCESS_KEY
 # To Do
 
 - Setup backend
+    - Setup plan and test on PR then apply and deploy on merge
     - tear down workspace "default" and create workspace "prod"
     - Setup pipeline for monorepo
         - Setup build / db migrate / deploy

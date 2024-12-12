@@ -55,7 +55,7 @@ jobs:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID}}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ vars.AWS_DEFAULT_REGION }}
-    - name: Update Infra
+    - name: Infra plan
       run: |
         cd ${{ matrix.project }}
         make tf_init
@@ -84,11 +84,11 @@ jobs:
       with:
         venv_path: ${{ matrix.project }}
         poetry_lock_file: "${{ matrix.project }}/poetry.lock"
-    - name: Update Infra
+    - name: Deploy project
       run: |
         cd ${{ matrix.project }}
         make tf_init
-        make tf_apply
+        make tf_apply_no_input
     - name: Deploy Project
       run: |
         export PROJ=`basename "${{ matrix.project }}"`
