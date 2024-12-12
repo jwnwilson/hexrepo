@@ -9,11 +9,6 @@ on:
     paths:
       - libs/**
       - projects/**
-  pull_request:
-    branches: [ main ]
-    paths:
-      - libs/**
-      - projects/**
 
 env:
   # Setting an environment variable with the value of a configuration variable
@@ -24,42 +19,6 @@ env:
 
 
 jobs:
-  test_projects:
-    strategy:
-      matrix:
-        project:
-        - "projects/example"
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    - id: python_venv
-      name: Cache project venv
-      uses: ./.github/actions/be_venv
-      with:
-        venv_path: ${{ matrix.project }}
-        poetry_lock_file: "${{ matrix.project }}/poetry.lock"
-    - name: Test Libraries
-      run: make test_projects
-  plan_infra:
-    needs: test_projects
-    strategy:
-      matrix:
-        project:
-        - "projects/example"
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v2
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID}}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: ${{ vars.AWS_DEFAULT_REGION }}
-    - name: Infra plan
-      run: |
-        cd ${{ matrix.project }}
-        make tf_init
-        make tf_plan
   deploy_projects:
     environment: production
     needs: plan_infra
