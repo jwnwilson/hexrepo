@@ -6,6 +6,8 @@ from pydantic_settings import BaseSettings
 logger = logging.getLogger()
 
 
+print("test change")
+
 class Config(BaseSettings):
     """
     Application settings.
