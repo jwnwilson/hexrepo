@@ -84,7 +84,7 @@ jobs:
       with:
         venv_path: ${{ matrix.project }}
         poetry_lock_file: "${{ matrix.project }}/poetry.lock"
-    - name: Deploy project
+    - name: Infra Apply
       run: |
         cd ${{ matrix.project }}
         make tf_init
