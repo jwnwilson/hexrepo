@@ -76,6 +76,7 @@ AWS_SECRET_ACCESS_KEY
     - Setup test / lint build image
         - Look at https://github.com/nektos/act
         - Setup ruff
+        - Setup UV
         - Port changes to all libs and projects
         - Switch to bastion to access all dbs as needed
 

@@ -49,9 +49,6 @@ def publish_libs(config: MonorepoConfig, libraries: Optional[List[str]] = None, 
 
 def deploy_projects(env: str, config: MonorepoConfig, projects: Optional[List[str]], check_modified: bool = False, no_input: bool = False) -> None:
     typer.echo("Publishing projects to repo...")
-    # Get code repo token
-    assert os.environ.get("MONOREPO_LIB_REPO_URL"), "Library repo url not found."
-    authenticate_lib_repo(config)
     # Publish all libraries if none specified
     projects = projects if projects else get_projects()
 
