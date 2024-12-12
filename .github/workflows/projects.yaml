@@ -67,7 +67,7 @@ jobs:
       matrix:
         project:
         - "projects/example"
-        environment:
+        env:
         - "dev"
     runs-on: ubuntu-latest
     steps:
@@ -92,4 +92,4 @@ jobs:
     - name: Deploy Project
       run: |
         export PROJ=`basename "${{ matrix.project }}"`
-        make deploy_projects PROJECT=${PROJ} ENV=${{ matrix.envionment }}
+        make deploy_projects PROJECT=${PROJ} ENV=${{ matrix.env }}
