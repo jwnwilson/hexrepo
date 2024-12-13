@@ -11,7 +11,7 @@ if [[ -z "$PROJECT"]] then;
     exit 1
 fi
 
-DB_HOST=
+DB_HOST=$(aws rds describe-db-instances --query 'DBInstances[].DBInstanceStatus[]')
 BASTION_INSTANCE=
 
 echo "Activating bastion port forward for: ${PROJECT}, end: ${ENVIRONMENT}" 

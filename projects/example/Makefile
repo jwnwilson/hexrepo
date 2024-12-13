@@ -114,4 +114,5 @@ deploy: build tf_workspace
 
 bastion: venv
 	@echo "Activating bastion port forwarding..."
-	ENVIRONMENT=$(ENVIRONMENT) PROJECT=example ../../tools/bash_scripts/bastion.sh
+	cd ../../ && \
+	hexcli bastion ENVIRONMENT=$(ENVIRONMENT) PROJECT=example 

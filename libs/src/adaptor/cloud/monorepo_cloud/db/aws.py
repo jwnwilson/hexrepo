@@ -1,5 +1,5 @@
 import logging
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 import boto3  # type: ignore
 
@@ -13,7 +13,7 @@ class AWSRDSManager:
         self.config: AWSConfig = config
         self.client = boto3.client("rds", self.config.AWS_REGION)
 
-    def get_db_ids(self, state: Optional[str] = None) -> List[str]:
+    def get_db_ids(self, state: Optional[str] = None, tags: Optional[Dict[str,str]] = None) -> List[str]:
         db_instance_info = self.client.describe_db_instances()
 
         db_instances = []
@@ -24,6 +24,10 @@ class AWSRDSManager:
                 db_instances.append(each_db["DBInstanceIdentifier"])
 
         return db_instances
+    
+    def get_rds_host(self, db_instance_id: str) -> str:
+        db_instance_info = self.client.describe_db_instances(DBInstanceIdentifier=db_instance_id)
+        return db_instance_info["DBInstances"][0]["Endpoint"]["Address"]
 
     def start_dbs(self, state: str) -> List[str]:
         db_instance_ids: List[str] = self.get_db_ids(state=state)

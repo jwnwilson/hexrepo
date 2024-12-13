@@ -39,18 +39,17 @@ AWS_SECRET_ACCESS_KEY
 # To Do
 
 - Setup backend
-    - Setup plan and test on PR then apply and deploy on merge
+    - setup ssh agent to bastion
+        - Add cloud logic to create bastion ssh tunnel
     - Setup pipeline for monorepo
         - Setup build / db migrate / deploy
-            - Setup db migration
-                - setup ssh agent to bastion
-                - Add db migration to ci / cd
+            - Add db migration to ci / cd
             - Setup example deployment
-        - Setup project to schedule bastion up / down time based on ec2 and rds tags
-            - Add option to add scheduluer to template
-        - Auto increment version in pipeline
-            - Add githook to check if version needs to be increased
-            - Add command to bump library version
+    - Setup project to schedule bastion up / down time based on ec2 and rds tags
+        - Add option to add scheduluer to template
+    - Auto increment version in pipeline
+        - Add githook to check if version needs to be increased
+        - Add command to bump library version
     - tear down workspace "default" and create workspace "prod"
     - Add ability to update project from template
         - Update project & lib templates

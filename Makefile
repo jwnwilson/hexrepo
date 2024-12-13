@@ -92,3 +92,8 @@ start_infra: venv
 	@echo "Starting infra..."
 	@. $(VENV_DIR)/bin/activate && \
 	hexcli start-infra
+
+bastion: venv
+	@echo "Starting bastion..."
+	@. $(VENV_DIR)/bin/activate && \
+	hexcli bastion $(ENV) $(PROJECT)

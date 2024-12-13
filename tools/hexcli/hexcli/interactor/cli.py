@@ -14,6 +14,7 @@ from hexcli.domain.prompts.common import prompt_library_type
 from hexcli.domain.prompts.infra import prompt_deploy_libs, prompt_setup_lib_infra, prompt_setup_project_infra, prompt_setup_shared_infra, prompt_setup_tf
 from hexcli.domain.templates.libs import generate_libs_makefile
 from hexcli.domain.system import run_system_command
+from hexcli.domain.infra.bastion import bastion_ssh_tunnel
 
 app = typer.Typer()
 
@@ -176,6 +177,13 @@ def stop_infra():
     config: MonorepoConfig
     config, _ = get_or_create_config(no_input=True)
     stop_infra_command(config)
+
+
+@app.command()
+def bastion(env: str, project: str):
+    config: MonorepoConfig
+    config, _ = get_or_create_config(no_input=True)
+    bastion_ssh_tunnel(config, env, project)
 
 
 if __name__ == "__main__":
