@@ -14,7 +14,6 @@ class AWSComputeManager:
         self.ec2: Any = boto3.client("ec2", region_name=self.config.AWS_REGION)
 
     def get_instances(self, state: Optional[str] = None, tags: Optional[Dict[str, str]] = None) -> List[str]:
-        breakpoint()
         filters: List[Dict[Any]] = []
         for tag in tags:
             filters.append({"Name": "tag:" + tag, "Values": [tags[tag]]})

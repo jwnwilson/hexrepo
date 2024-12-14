@@ -17,7 +17,7 @@ BASTION_INSTANCE=
 echo "Activating bastion port forward for: ${PROJECT}, end: ${ENVIRONMENT}" 
 
 aws ssm start-session \
---target ${BASTION_INSTANCE} \
---document-name AWS-StartPortForwardingSession \
---parameters '{"portNumber":["5432"],"localPortNumber":["5432"], "host":["${DB_HOST}"]}'
+--target i-0ebb96e385446d037 \
+--document-name AWS-StartPortForwardingSessionToRemoteHost \
+--parameters '{"portNumber":["5432"],"localPortNumber":["5432"], "host":["example-db-default.clfqqiusnlbr.eu-west-1.rds.amazonaws.com"]}'
 

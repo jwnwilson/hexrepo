@@ -24,10 +24,11 @@ def bastion_ssh_tunnel(config: MonorepoConfig, env: str, project: str):
         if len(instance_ids) > 1:
             raise typer.Abort("Multiple bastion instances found")
 
-        run_system_command(f"""
+        bastion_command: str = f"""
             aws ssm start-session \
             --target {instance_ids[0]} \
-            --document-name AWS-StartPortForwardingSession \
-            --parameters '{"portNumber":["5432"],"localPortNumber":["5432"], "host":["{rds_host}"]}'
-        """)
+            --document-name AWS-StartPortForwardingSessionToRemoteHost \
+            --parameters '{{"portNumber":["5432"],"localPortNumber":["5432"], "host":["{rds_host}"]}}'
+        """
+        run_system_command(bastion_command)
         
