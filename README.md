@@ -38,6 +38,11 @@ AWS_SECRET_ACCESS_KEY
 
 # To Do
 
+Bugs:
+- library lintings
+- github caching
+- build and deploy pipelines
+
 - Setup backend
     - Setup pipeline for monorepo
         - Setup build / db migrate / deploy
