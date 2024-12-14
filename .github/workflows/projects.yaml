@@ -63,6 +63,7 @@ jobs:
   deploy_projects:
     environment: production
     needs: plan_infra
+    if: github.ref == 'refs/heads/master'
     strategy:
       matrix:
         project:
