@@ -13,14 +13,15 @@ class AWSComputeManager:
         self.config: AWSConfig = config
         self.ec2: Any = boto3.client("ec2", region_name=self.config.AWS_REGION)
 
-    def get_instances(self, state: Optional[str] = None, tags: Optional[Dict[str, str]] = None) -> List[str]:
-        filters: List[Dict[Any]] = []
+    def get_instances(
+        self, state: Optional[str] = None, tags: Optional[Dict[str, str]] = None
+    ) -> List[str]:
+        filters: List[Dict[str, Any]] = []
+        tags = tags or {}
         for tag in tags:
             filters.append({"Name": "tag:" + tag, "Values": [tags[tag]]})
-        
-        instance_data = self.ec2.describe_instances(
-            Filters=filters
-        )
+
+        instance_data = self.ec2.describe_instances(Filters=filters)
         instancelist = []
         for reservation in instance_data["Reservations"]:
             for instance in reservation["Instances"]:
