@@ -8,8 +8,7 @@
         "AWS_TF_STATE_BUCKET": "monorepo-jwn"
     },
     "environments": [
-        "dev",
-        "prod"
+        "default"    
     ],
     "monorepo_lib_repo_url": "https://monorepo-675468650888.d.codeartifact.eu-west-1.amazonaws.com/pypi/monorepo/",
     "monorepo_lib_repo_username": "aws"

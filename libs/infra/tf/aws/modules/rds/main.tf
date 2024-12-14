@@ -147,6 +147,7 @@ module "db" {
     Environment = terraform.workspace
     StartTime   = var.start_time
     StopTime    = var.stop_time
+    Project     = var.project
   }
 
 }

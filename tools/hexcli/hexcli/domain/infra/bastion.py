@@ -1,5 +1,7 @@
 
 from typing import List
+
+import typer
 from hexcli.config import MonorepoConfig
 from monorepo_cloud.compute import AWSComputeManager
 from monorepo_cloud.db import AWSRDSManager
@@ -14,11 +16,13 @@ def bastion_ssh_tunnel(config: MonorepoConfig, env: str, project: str):
             tags={"Type": "bastion", "Environment": env}
         )
         rds_host: str = rds_manageer.get_rds_host(
-            tags={"Project": project, "env": env}
+            tags={"Project": project, "Environment": env}
         )
         
         if not instance_ids:
-            raise Exception("No bastion instance found")
+            raise typer.Abort("No bastion instance found")
+        if len(instance_ids) > 1:
+            raise typer.Abort("Multiple bastion instances found")
 
         run_system_command(f"""
             aws ssm start-session \

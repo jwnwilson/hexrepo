@@ -1,4 +1,7 @@
+from typing import List
 import typer
+
+from hexcli.domain.project import get_environments, get_projects
 
 
 def prompt_cloud_provider() -> str:
@@ -38,3 +41,31 @@ def prompt_shell_file() -> str:
         typer.echo("Invalid shell file, please select an option: 1, 2.")
         return
     return shell_file
+
+
+def prompt_environment() -> str:
+    print("Please enter environment:")
+    enironments: List[str] = get_environments()
+    env_map: List[str] = {str(i+1): env for i, env in enumerate(enironments)}
+    options = "\n".join([f"{i} - {project}" for i, project in env_map.items()])
+    selection: str = typer.prompt(f"Choose from [{options}]", default="1")
+    try:
+        environment = env_map[selection]
+    except KeyError:
+        typer.echo(f"Invalid environment, please select an option: {options}.")
+        return
+    return environment
+
+
+def prompt_project() -> str:
+    print("Please enter project:")
+    projects: List[str] = get_projects()
+    project_map: List[str] = {str(i+1): project for i, project in enumerate(projects)}
+    options = "\n".join([f"{i} - {project}" for i, project in project_map.items()])
+    selection: str = typer.prompt(f"Choose from [{options}]", default="1")
+    try:
+        project = project_map[selection]
+    except KeyError:
+        typer.echo(f"Invalid project, please select an option: {options}.")
+        return
+    return project
