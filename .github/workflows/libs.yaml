@@ -47,3 +47,25 @@ jobs:
       run: |
         export LIB=`basename "${{ matrix.library }}"`
         make test_libs LIBRARY=${LIB}
+  deploy_libs:
+    needs: test_libs
+    strategy:
+      matrix:
+        library:
+        - "libs/src/adaptor/db"
+        - "libs/src/adaptor/cloud"
+        - "libs/src/interactor/api"
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - id: python_venv
+      name: Cache project venv
+      uses: ./.github/actions/be_venv
+      with:
+        venv_path: ${{ matrix.library }}
+        poetry_lock_file: "${{ matrix.library }}/poetry.lock"
+    - name: Deploy Library
+      run: |
+        export LIB=`basename "${{ matrix.library }}"`
+        make deploy_libs LIBRARY=${LIB}
+    
