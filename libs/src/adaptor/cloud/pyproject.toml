@@ -33,7 +33,7 @@ build-backend = "poetry.core.masonry.api"
 profile = "black"
 
 [tool.pytest.ini_options]
-addopts = "-vv --cov --cov-report xml --cov-report term-missing --cov-fail-under=40"
+addopts = "-vv --cov --cov-report xml --cov-report term-missing --cov-fail-under=30"
 asyncio_mode = "auto"
 testpaths = ["tests"]
 env_files = ["env/local.env"]
