@@ -1,6 +1,7 @@
 import os
 from contextlib import chdir
 from typing import List, Optional
+from typing_extensions import Annotated
 from cookiecutter.main import cookiecutter
 import typer
 
@@ -180,11 +181,11 @@ def stop_infra():
 
 
 @app.command()
-def bastion():
+def bastion(env: Annotated[Optional[str], typer.Argument()] = None, project: Annotated[Optional[str], typer.Argument()] = None):
     config: MonorepoConfig
     config, _ = get_or_create_config(no_input=True)
-    env: str = prompt_environment()
-    project: str = prompt_project()
+    env: str = env or prompt_environment()
+    project: str = project or prompt_project()
     bastion_ssh_tunnel(config, env, project)
 
 
