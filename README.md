@@ -39,8 +39,6 @@ AWS_SECRET_ACCESS_KEY
 # To Do
 
 - Setup backend
-    - setup ssh agent to bastion
-        - Add cloud logic to create bastion ssh tunnel
     - Setup pipeline for monorepo
         - Setup build / db migrate / deploy
             - Add db migration to ci / cd

@@ -28,13 +28,15 @@ db_delete_data: down
 
 db_upgrade: down
 	source $(VENV_DIR)/bin/activate && \
-	docker compose run api bash -c "alembic upgrade head"
+	alembic upgrade head
 
 db_downgrade: down
-	docker compose run api bash -c "alembic downgrade -1"
+	source $(VENV_DIR)/bin/activate && \
+	alembic downgrade -1
 
 db_create_migration: down
-	docker compose run api bash -c "alembic revision --autogenerate -m \"DB migration\""
+	source $(VENV_DIR)/bin/activate && \
+	alembic revision --autogenerate -m \"DB migration\"
 
 # Local Development
 db:

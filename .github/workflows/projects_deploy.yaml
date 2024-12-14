@@ -48,6 +48,9 @@ jobs:
         cd ${{ matrix.project }}
         make tf_init
         make tf_apply_no_input
+    - name: DB migration
+      run: |
+        hexcli db_migrate ENV=${{ matrix.env }} PROJECT=${PROJ}
     - name: Deploy Project
       run: |
         export PROJ=`basename "${{ matrix.project }}"`
