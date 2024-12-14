@@ -47,6 +47,7 @@ AWS_SECRET_ACCESS_KEY
             - Setup example deployment
     - Setup project to schedule bastion up / down time based on ec2 and rds tags
         - Add option to add scheduluer to template
+    - Combine shared infra + env infra pull add envs to config and pull them down 
     - Auto increment version in pipeline
         - Add githook to check if version needs to be increased
         - Add command to bump library version
@@ -78,13 +79,6 @@ AWS_SECRET_ACCESS_KEY
         - Port changes to all libs and projects
         - Switch to bastion to access all dbs as needed
 
-
-- Setup Frontend
-    - Move to seperate repo
-    - Setup micro fe
-    - Add app creation script for micro fe
-    - Add component lib
-
 - Setup E2E testing
 
 - Automate setup
@@ -101,6 +95,11 @@ AWS_SECRET_ACCESS_KEY
     - External APIs
     - Serverless setup
     - Free infra under my own domain to allow users to try it out
+
+- Setup Frontend
+    - Setup micro fe
+    - Add app creation script for micro fe
+    - Add component lib
 
 Tools to looks at
 - stackshare to see what services / tools companies use

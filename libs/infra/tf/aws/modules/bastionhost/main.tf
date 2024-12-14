@@ -19,7 +19,7 @@ data "aws_ami" "amazon-linux-2" {
   }
 }
 
-data aws_vpc "vpc" {
+data "aws_vpc" "vpc" {
   id = var.vpc_id
 }
 
@@ -71,21 +71,23 @@ resource "aws_security_group" "ssm_https" {
 
 
 resource "aws_instance" "bastion_host_ec2_instance" {
-  ami                         = data.aws_ami.amazon-linux-2.id
-  instance_type               = var.instance_type
-  subnet_id                   = var.subnet_id
-  vpc_security_group_ids      = concat(var.bastion_host_security_group_ids, [aws_security_group.ssm_https.id])
-  iam_instance_profile        = aws_iam_instance_profile.ssm_profile.name
-#   key_name                    = "bastion-${terraform.workspace}"
+  ami                    = data.aws_ami.amazon-linux-2.id
+  instance_type          = var.instance_type
+  subnet_id              = var.subnet_id
+  vpc_security_group_ids = concat(var.bastion_host_security_group_ids, [aws_security_group.ssm_https.id])
+  iam_instance_profile   = aws_iam_instance_profile.ssm_profile.name
+  #   key_name                    = "bastion-${terraform.workspace}"
   associate_public_ip_address = false
 
   #checkov:skip=CKV_AWS_135:t3.nano have ebs_optimization enabled by default
   # https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-optimized.html
   monitoring = true
   tags = {
-    Name      = "${var.project}-${terraform.workspace}-bastion-host"
-    StartTime = var.start_time
-    StopTime  = var.stop_time
-    Type      = "bastion"
+    Name        = "${var.project}-${terraform.workspace}-bastion-host"
+    StartTime   = var.start_time
+    StopTime    = var.stop_time
+    Type        = "bastion"
+    Environment = terraform.workspace
+
   }
 }
