@@ -3,6 +3,8 @@ import os
 
 from pydantic_settings import BaseSettings
 
+from monorepo_cloud.secrets.aws import AWSSecretAdaptor
+
 logger = logging.getLogger()
 # Silence noisy logs from faker
 logging.getLogger("faker.factory").setLevel(logging.ERROR)
@@ -23,8 +25,8 @@ class Config(BaseSettings):
     # FEATURE FLAGS
 
     # Database settings
-    DB_PASSWORD_SECRET_NAME: str = os.environ.get("DB_PASSWORD_SECRET_NAME", "")
-    DB_URL: str = os.environ["DB_URL"]
+    # DB_URL: str = os.environ["DB_URL"]
+    DB_URL: str = AWSSecretAdaptor.get_secret("DB_URL_SECRET_NAME", default=os.environ.get("DB_URL"))
 
     DB_SQL_LOGGING: bool = os.environ.get("DB_SQL_LOGGING", "false") == "true"
     DB_SSL_CONNECTION: bool = os.environ.get("DB_SSL_CONNECTION", "false") == "true"

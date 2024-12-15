@@ -9,13 +9,21 @@ logger = logging.getLogger(__name__)
 
 
 class AWSSecretAdaptor(SecretAdaptor):
-    def __init__(self) -> None:
-        self.client = boto3.client("secretsmanager")
+    client = None   
 
-    def get_secret(self, secret_name: str) -> str:
+    @classmethod
+    def client(cls):
+        if not cls.client:
+            cls.client = boto3.client("secretsmanager")
+        
+        return cls.client
+
+
+    @classmethod
+    def get_secret(cls, secret_name: str) -> str:
         logger.info(f"Getting secret: {secret_name}")
         try:
-            get_secret_value_response: Dict[str, str] = self.client.get_secret_value(
+            get_secret_value_response: Dict[str, str] = cls.client.get_secret_value(
                 SecretId=secret_name
             )
             logger.info(f"Secret: {secret_name} retrieved successfully.")

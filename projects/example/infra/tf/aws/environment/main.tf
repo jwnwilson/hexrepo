@@ -26,10 +26,6 @@ data "aws_ecr_repository" "ecr_repo" {
   name = "monorepo-${var.project}"
 }
 
-data "aws_secretsmanager_secret" "db_secret" {
-  arn = module.example_postgres.db_password_secret_arn
-}
-
 module "example_api" {
   source = "../../../../../../libs/infra/tf/aws/modules/lambda"
 
@@ -44,8 +40,7 @@ module "example_api" {
   environment_variables = {
     ENVIRONMENT             = terraform.workspace
     CLOUD_PROVIDER          = "AWS"
-    DB_URL                  = "postgresql+psycopg2://postgres:{password}@${module.example_postgres.db_instance_endpoint}/${var.project}"
-    DB_PASSWORD_SECRET_NAME = data.aws_secretsmanager_secret.db_secret.name
+    DB_URL_SECRET_NAME = data.example_postgres.db_url_secret_name
   }
 }
 

@@ -50,15 +50,15 @@ def migrate_db(config: MonorepoConfig, env: str, project: str):
     if config.cloud_provider == "aws":
         # Start bastion
         bastion_process = bastion_ssh_tunnel(config, env, project, background_task=True)
+        try:
+            # Get secret name
+            secret_name: str = ""
+            if env != "local":
+                tf_output: Dict[str, str] = get_terrform_output(env, project)
+                secret_name = tf_output["db_secret_name"]["value"]
 
-        # Get secret name
-        secret_name: str = ""
-        if env != "local":
-            tf_output: Dict[str, str] = get_terrform_output(env, project)
-            secret_name = tf_output["db_secret_name"]["value"]
-
-        # Run migration with secret name set
-        run_system_command(f"cd projects/{project} && make db_upgrade DB_PASSWORD_SECRET_NAME={secret_name}")
-
-        # Terminate bastiob
-        bastion_process.terminate()
+            # Run migration with secret name set
+            run_system_command(f"cd projects/{project} && make db_upgrade DB_PASSWORD_SECRET_NAME={secret_name}")
+        finally:
+            # Terminate bastion
+            bastion_process.terminate()
