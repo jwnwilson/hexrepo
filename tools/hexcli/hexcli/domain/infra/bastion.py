@@ -57,7 +57,7 @@ def migrate_db(config: MonorepoConfig, env: str, project: str):
             if env != "local":
                 tf_output: Dict[str, str] = get_terrform_output(env, project)
                 secret_name = tf_output["db_secret_name"]["value"]
-                db_url = tf_output["db_url"]["value"]
+                db_url = "postgresql+psycopg2://postgres:{password}@localhost:5432/" + project
 
             # Run migration with secret name set
             # stop making docker db call
