@@ -58,7 +58,7 @@ def migrate_db(config: MonorepoConfig, env: str, project: str):
                 secret_name = tf_output["db_secret_name"]["value"]
 
             # Run migration with secret name set
-            run_system_command(f"cd projects/{project} && make db_upgrade DB_PASSWORD_SECRET_NAME={secret_name}")
+            run_system_command(f"cd projects/{project} && make db_upgrade DB_URL_SECRET_NAME={secret_name}")
         finally:
             # Terminate bastion
             bastion_process.terminate()

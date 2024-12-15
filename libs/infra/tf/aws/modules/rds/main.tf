@@ -90,15 +90,6 @@ data "aws_secretsmanager_secret_version" "db_password" {
   secret_id = module.db.db_instance_master_user_secret_arn
 }
 
-resource "aws_secretsmanager_secret" "db_url" {
-  name = "${var.project}-db-url-${var.environment}"
-}
-
-resource "aws_secretsmanager_secret_version" "db_url" {
-  secret_id     = aws_secretsmanager_secret.db_url.id
-  secret_string = "postgresql+psycopg2://postgres:${urlencode(data.aws_secretsmanager_secret_version.db_password.secret_string)}@${module.example_postgres.db_instance_endpoint}/${var.project}"
-}
-
 resource "aws_db_subnet_group" "default" {
   name       = "monorepo-${var.environment}"
   subnet_ids = data.aws_subnets.private_subnet_ids.ids
