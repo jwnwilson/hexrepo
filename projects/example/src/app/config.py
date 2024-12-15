@@ -1,9 +1,8 @@
 import logging
 import os
 
-from pydantic_settings import BaseSettings
-
 from monorepo_db.sql.config import get_sql_db_url
+from pydantic_settings import BaseSettings
 
 logger = logging.getLogger()
 # Silence noisy logs from faker
