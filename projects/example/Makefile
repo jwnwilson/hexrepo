@@ -111,6 +111,9 @@ tf_setup: tf_workspace
 	../../tools/bash_scripts/deploy.sh
 	@cd infra/tf/aws/environment && terraform apply
 
+tf_output: tf_workspace
+	@cd infra/tf/aws/environment && terraform output -json
+
 deploy: build tf_workspace
 	NO_INPUT=$(NO_INPUT) ../../tools/bash_scripts/deploy.sh 
 

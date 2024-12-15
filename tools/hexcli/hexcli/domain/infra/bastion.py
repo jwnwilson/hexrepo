@@ -1,12 +1,13 @@
 
+import json
 import subprocess
-from typing import Any, List, Optional
+from typing import Any, Dict, List, Optional
 
 import typer
 from hexcli.config import MonorepoConfig
 from monorepo_cloud.compute import AWSComputeManager
 from monorepo_cloud.db import AWSRDSManager
-from ..system import run_system_command
+from ..system import run_system_command, run_system_command_with_output
 
 
 def bastion_ssh_tunnel(config: MonorepoConfig, env: str, project: str, background_task: bool = False) -> Optional[Any]:
@@ -32,13 +33,17 @@ def bastion_ssh_tunnel(config: MonorepoConfig, env: str, project: str, backgroun
             --parameters '{{"portNumber":["5432"],"localPortNumber":["5432"], "host":["{rds_host}"]}}'
         """
         if background_task:
-            return subprocess.Popen(bastion_command.split(" "))
+            return subprocess.Popen(bastion_command, shell=True)
         else:
             run_system_command(bastion_command)
 
 
 def get_terrform_output(env: str, project: str) -> str:
-    return run_system_command(f"cd projects/{project} && make tf_oputput ENV={env}")
+    tf_str: str = run_system_command_with_output(f"cd projects/{project} && make tf_output ENVIRONMENT={env}")
+    try:
+        return json.loads(tf_str)
+    except json.JSONDecodeError as err:
+        raise typer.Abort(f"Error parsing terraform output: {err}")
 
 
 def migrate_db(config: MonorepoConfig, env: str, project: str):
@@ -47,12 +52,13 @@ def migrate_db(config: MonorepoConfig, env: str, project: str):
         bastion_process = bastion_ssh_tunnel(config, env, project, background_task=True)
 
         # Get secret name
-        secret_name = "db"
-        # terraform_output: Dict = get_terrform_output(env, project)
-        # secret_name = terraform_output["db_password_secret_name"]
+        secret_name: str = ""
+        if env != "local":
+            tf_output: Dict[str, str] = get_terrform_output(env, project)
+            secret_name = tf_output["db_secret_name"]["value"]
 
         # Run migration with secret name set
-        run_system_command(f"cd projects/{project} && make db_migrate DB_PASSWORD_SECRET_NAME={secret_name}")
+        run_system_command(f"cd projects/{project} && make db_upgrade DB_PASSWORD_SECRET_NAME={secret_name}")
 
         # Terminate bastiob
         bastion_process.terminate()
