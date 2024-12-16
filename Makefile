@@ -101,4 +101,4 @@ bastion: venv
 migrate_db: venv
 	@echo "Starting bastion..."
 	@. $(VENV_DIR)/bin/activate && \
-	hexcli db-migrate ENV=${ENV} PROJECT=${PROJECT}
+	hexcli migrate-db ENV=${ENV} PROJECT=${PROJECT}

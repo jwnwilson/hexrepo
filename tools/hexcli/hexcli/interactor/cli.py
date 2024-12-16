@@ -15,7 +15,7 @@ from hexcli.domain.prompts.common import prompt_environment, prompt_library_type
 from hexcli.domain.prompts.infra import prompt_deploy_libs, prompt_setup_lib_infra, prompt_setup_project_infra, prompt_setup_shared_infra, prompt_setup_tf
 from hexcli.domain.templates.libs import generate_libs_makefile
 from hexcli.domain.system import run_system_command
-from hexcli.domain.infra.bastion import bastion_ssh_tunnel, migrate_db
+from hexcli.domain.infra.bastion import bastion_ssh_tunnel, migrate_db as migrate_db_func
 
 app = typer.Typer()
 
@@ -190,12 +190,12 @@ def bastion(env: Annotated[Optional[str], typer.Argument()] = None, project: Ann
 
 
 @app.command()
-def db_migrate(env: Annotated[Optional[str], typer.Argument()] = None, project: Annotated[Optional[str], typer.Argument()] = None):
+def migrate_db(env: Annotated[Optional[str], typer.Argument()] = None, project: Annotated[Optional[str], typer.Argument()] = None):
     config: MonorepoConfig
     config, _ = get_or_create_config(no_input=True)
     env: str = env or prompt_environment()
     project: str = project or prompt_project()
-    migrate_db(config, env, project)
+    migrate_db_func(config, env, project)
 
 
 if __name__ == "__main__":
