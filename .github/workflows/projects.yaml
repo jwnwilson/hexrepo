@@ -69,7 +69,7 @@ jobs:
         project:
         - "projects/example"
         env:
-        - "dev"
+        - "default"
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
