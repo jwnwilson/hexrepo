@@ -121,8 +121,8 @@ tf_refresh: tf_workspace
 tf_output: tf_workspace
 	@cd infra/tf/aws/environment && terraform output -json
 
-deploy: build tf_workspace
-	NO_INPUT=$(NO_INPUT) ../../tools/bash_scripts/deploy.sh 
+deploy: tf_workspace
+	NO_INPUT=$(NO_INPUT) ENVIRONMENT=$(ENVIRONMENT) ../../tools/bash_scripts/deploy.sh 
 
 bastion: venv
 	@echo "Activating bastion port forwarding..."
