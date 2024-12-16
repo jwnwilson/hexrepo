@@ -101,10 +101,12 @@ jobs:
         make tf_init
         make tf_apply_no_input
     - name: DB migration
+      shell: bash
       run: |
         export PROJ=`basename "${{ matrix.project }}"`
         make migrate_db PROJECT=${PROJ} ENV=${{ matrix.env }} 
     - name: Deploy Project
+      shell: bash
       run: |
         export PROJ=`basename "${{ matrix.project }}"`
         make deploy_projects PROJECT=${PROJ} ENV=${{ matrix.env }}
