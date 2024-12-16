@@ -52,6 +52,11 @@ run_local: down db venv
 	source $(VENV_DIR)/bin/activate && \
 	PYTHONPATH=src uvicorn app.interactor.api.fastapi.main:app --reload --env-file env/local.env
 
+# Host API locally, connect to cloud db
+run_bastion: bastion venv
+	source $(VENV_DIR)/bin/activate && \
+	PYTHONPATH=src uvicorn app.interactor.api.fastapi.main:app --reload --env-file env/local.env
+
 # Testing commands
 test: venv
 	@echo "Running unit tests"

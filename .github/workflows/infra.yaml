@@ -45,7 +45,7 @@ jobs:
     environment: production
     needs: plan_shared_infra
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/master'
+    if: github.ref == 'refs/heads/master' || github.event.pull_request.merged == true
     steps:
     - uses: actions/checkout@v4
     - name: Configure AWS credentials
@@ -90,7 +90,7 @@ jobs:
         env:
         - "default"
     environment: production
-    if: github.ref == 'refs/heads/master'
+    if: github.ref == 'refs/heads/master' || github.event.pull_request.merged == true
     needs: plan_env_infra
     runs-on: ubuntu-latest
     steps:

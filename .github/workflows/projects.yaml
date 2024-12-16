@@ -63,7 +63,7 @@ jobs:
   deploy_projects:
     environment: production
     needs: plan_infra
-    if: github.ref == 'refs/heads/master'
+    if: github.ref == 'refs/heads/master' || github.event.pull_request.merged == true
     strategy:
       matrix:
         project:
