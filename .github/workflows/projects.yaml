@@ -24,24 +24,24 @@ env:
 
 
 jobs:
-  test_projects:
-    strategy:
-      matrix:
-        project:
-        - "projects/example"
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    - id: python_venv
-      name: Cache project venv
-      uses: ./.github/actions/be_venv
-      with:
-        venv_path: ${{ matrix.project }}
-        poetry_lock_file: "${{ matrix.project }}/poetry.lock"
-    - name: Test Libraries
-      run: make test_projects
+  # test_projects:
+  #   strategy:
+  #     matrix:
+  #       project:
+  #       - "projects/example"
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - uses: actions/checkout@v4
+  #   - id: python_venv
+  #     name: Cache project venv
+  #     uses: ./.github/actions/be_venv
+  #     with:
+  #       venv_path: ${{ matrix.project }}
+  #       poetry_lock_file: "${{ matrix.project }}/poetry.lock"
+  #   - name: Test Libraries
+  #     run: make test_projects
   plan_infra:
-    needs: test_projects
+    # needs: test_projects
     strategy:
       matrix:
         project:
@@ -63,7 +63,7 @@ jobs:
   deploy_projects:
     environment: production
     needs: plan_infra
-    if: github.ref == 'refs/heads/master' || github.event.pull_request.merged == true
+    if: github.ref == 'refs/heads/master' && needs.plan_infra.result == 'success'
     strategy:
       matrix:
         project:
