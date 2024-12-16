@@ -35,7 +35,7 @@ def bastion_ssh_tunnel(config: MonorepoConfig, env: str, project: str, backgroun
             --parameters '{{"portNumber":["5432"],"localPortNumber":["5432"], "host":["{rds_host}"]}}'
         """
         if background_task:
-            return subprocess.Popen(bastion_command, shell=True)
+            return subprocess.Popen(bastion_command, shell=True, preexec_fn=os.setsid)
         else:
             run_system_command(bastion_command)
 

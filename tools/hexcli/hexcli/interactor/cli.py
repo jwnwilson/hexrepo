@@ -1,5 +1,6 @@
 import os
 from contextlib import chdir
+import sys
 from typing import List, Optional
 from typing_extensions import Annotated
 from cookiecutter.main import cookiecutter

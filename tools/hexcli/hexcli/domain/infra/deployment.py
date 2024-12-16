@@ -126,9 +126,9 @@ def env_infra_apply_command(config: MonorepoConfig, env: str) -> None:
 
 
 def get_terrform_output(env: str, project: str) -> str:
-    run_system_command(f"cd projects/{project} && make tf_refresh ENVIRONMENT={env}")
+    # run_system_command(f"cd projects/{project} && make tf_refresh ENVIRONMENT={env}")
     tf_str: str = run_system_command_with_output(f"cd projects/{project} && make --no-print-directory tf_output ENVIRONMENT={env}")
-    typer.echo(f"Terraform output: '{tf_str}'")
+    typer.echo(f"Loading Terraform output")
     try:
         return json.loads(tf_str)
     except json.JSONDecodeError as err:
@@ -162,3 +162,4 @@ def migrate_db(config: MonorepoConfig, env: str, project: str):
             # Terminate bastion
             typer.echo(f"Shutting down ssh tunnel to bastion")
             os.killpg(os.getpgid(bastion_process.pid), signal.SIGTERM)
+            print("Shut down ssh tunnel to bastion")
