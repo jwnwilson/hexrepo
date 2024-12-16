@@ -9,7 +9,6 @@ logger = logging.getLogger()
 logging.getLogger("faker.factory").setLevel(logging.ERROR)
 
 
-# Test Commit
 class Config(BaseSettings):
     """
     Application settings.

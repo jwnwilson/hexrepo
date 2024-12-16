@@ -65,7 +65,7 @@ def deploy_projects(env: str, config: MonorepoConfig, projects: Optional[List[st
 
     for proj in projects:
         with chdir(f"projects/{proj}"):
-            run_system_command(f"make deploy ENV={env} NO_INPUT=${no_input}")
+            run_system_command(f"make deploy ENVIRONMENT={env} NO_INPUT=${no_input}")
     # Placeholder for publishing libraries to repo
     typer.echo("Projects deployed successfully.")
 
