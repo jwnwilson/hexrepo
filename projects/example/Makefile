@@ -24,8 +24,7 @@ build:
 
 # DB management
 db_migrate:
-	source $(VENV_DIR)/bin/activate && \
-	bash -c "alembic upgrade head"
+	bash -c "source $(VENV_DIR)/bin/activate && alembic upgrade head"
 
 db_delete_data: down
 	docker compose run postgres_db bash -c "rm -rf /var/lib/postgresql/data/*"
@@ -33,12 +32,10 @@ db_delete_data: down
 db_upgrade: db_migrate down
 
 db_downgrade: down
-	source $(VENV_DIR)/bin/activate && \
-	bash -c "alembic downgrade -1"
+	bash -c "source $(VENV_DIR)/bin/activate && alembic downgrade -1"
 
 db_create_migration: down
-	source $(VENV_DIR)/bin/activate && \
-	bash -c 'alembic revision --autogenerate -m \"DB migration\"'
+	sbash -c 'source $(VENV_DIR)/bin/activate && alembic revision --autogenerate -m \"DB migration\"'
 
 # Local Development
 db:

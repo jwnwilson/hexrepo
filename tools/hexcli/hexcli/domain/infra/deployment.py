@@ -154,7 +154,7 @@ def migrate_db(config: MonorepoConfig, env: str, project: str):
             typer.echo(f"Running migration for project {project}")
             run_system_command(f"""
                 cd projects/{project} && \
-                make db_migrate DB_PASSWORD_SECRET_NAME={secret_name} DB_URL={db_url} CLOUD_PROVIDER={config.cloud_provider}
+                make --no-print-directory db_migrate DB_PASSWORD_SECRET_NAME={secret_name} DB_URL={db_url} CLOUD_PROVIDER={config.cloud_provider}
             """)
         except Exception as err:
             typer.echo(f"Error running migration: {err}")
