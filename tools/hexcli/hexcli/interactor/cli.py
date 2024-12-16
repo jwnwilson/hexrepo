@@ -1,6 +1,7 @@
 import os
 from contextlib import chdir
 from typing import List, Optional
+from typing_extensions import Annotated
 from cookiecutter.main import cookiecutter
 import typer
 
@@ -10,10 +11,11 @@ from hexcli.domain.infra.code_repo import authenticate_lib_repo
 from hexcli.domain.infra.deployment import create_lib_infra, deploy_projects as deploy_projects_command, env_infra_apply_command, env_infra_plan_command, publish_libs, setup_global_env_infra, shared_infra_apply_command, shared_infra_plan_command
 from hexcli.domain.infra.storage import create_tf_state
 from hexcli.domain.project import get_libraries, get_library_type, get_projects, install_library_in_project
-from hexcli.domain.prompts.common import prompt_library_type
+from hexcli.domain.prompts.common import prompt_environment, prompt_library_type, prompt_project
 from hexcli.domain.prompts.infra import prompt_deploy_libs, prompt_setup_lib_infra, prompt_setup_project_infra, prompt_setup_shared_infra, prompt_setup_tf
 from hexcli.domain.templates.libs import generate_libs_makefile
 from hexcli.domain.system import run_system_command
+from hexcli.domain.infra.bastion import bastion_ssh_tunnel, migrate_db
 
 app = typer.Typer()
 
@@ -176,6 +178,24 @@ def stop_infra():
     config: MonorepoConfig
     config, _ = get_or_create_config(no_input=True)
     stop_infra_command(config)
+
+
+@app.command()
+def bastion(env: Annotated[Optional[str], typer.Argument()] = None, project: Annotated[Optional[str], typer.Argument()] = None):
+    config: MonorepoConfig
+    config, _ = get_or_create_config(no_input=True)
+    env: str = env or prompt_environment()
+    project: str = project or prompt_project()
+    bastion_ssh_tunnel(config, env, project)
+
+
+@app.command()
+def db_migrate(env: Annotated[Optional[str], typer.Argument()] = None, project: Annotated[Optional[str], typer.Argument()] = None):
+    config: MonorepoConfig
+    config, _ = get_or_create_config(no_input=True)
+    env: str = env or prompt_environment()
+    project: str = project or prompt_project()
+    migrate_db(config, env, project)
 
 
 if __name__ == "__main__":

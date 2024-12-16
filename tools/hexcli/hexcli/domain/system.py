@@ -15,6 +15,10 @@ def run_system_command(command: str) -> None:
         raise typer.Abort()
 
 
+def run_system_command_with_output(command: str) -> str:
+    return os.popen(command).read()
+
+
 def running_on_ci() -> bool:
     return bool(os.environ.get("CI", False))
 

@@ -86,6 +86,10 @@ module "security_group" {
   ]
 }
 
+data "aws_secretsmanager_secret_version" "db_password" {
+  secret_id = module.db.db_instance_master_user_secret_arn
+}
+
 resource "aws_db_subnet_group" "default" {
   name       = "monorepo-${var.environment}"
   subnet_ids = data.aws_subnets.private_subnet_ids.ids
@@ -147,6 +151,7 @@ module "db" {
     Environment = terraform.workspace
     StartTime   = var.start_time
     StopTime    = var.stop_time
+    Project     = var.project
   }
 
 }

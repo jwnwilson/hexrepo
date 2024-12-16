@@ -1,6 +1,7 @@
 
 from contextlib import chdir
 import os
+import json
 import subprocess
 from typing import List, Optional, Set
 import typer
@@ -10,6 +11,14 @@ from .system import run_system_command
 
 def scan_folder(folder: str) -> List[str]:
     return [f for f in os.listdir(folder) if os.path.isdir(os.path.join(folder, f))]
+
+
+def get_environments():
+    try:
+        with open("config.json") as f:
+            return json.loads(f.read())["environments"]
+    except Exception as err:
+        raise typer.Abort(f"Error reading environments from config.json: {err}")
 
 
 def get_projects() -> List[str]:

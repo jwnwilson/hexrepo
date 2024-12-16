@@ -1,6 +1,7 @@
 import logging
 import os
 
+from monorepo_db.sql.config import get_sql_db_url
 from pydantic_settings import BaseSettings
 
 logger = logging.getLogger()
@@ -23,8 +24,7 @@ class Config(BaseSettings):
     # FEATURE FLAGS
 
     # Database settings
-    DB_PASSWORD_SECRET_NAME: str = os.environ.get("DB_PASSWORD_SECRET_NAME", "")
-    DB_URL: str = os.environ["DB_URL"]
+    DB_URL: str = get_sql_db_url()
 
     DB_SQL_LOGGING: bool = os.environ.get("DB_SQL_LOGGING", "false") == "true"
     DB_SSL_CONNECTION: bool = os.environ.get("DB_SSL_CONNECTION", "false") == "true"

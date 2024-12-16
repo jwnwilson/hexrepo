@@ -23,18 +23,22 @@ build:
 	docker compose build
 
 # DB management
+db_migrate:
+	source $(VENV_DIR)/bin/activate && \
+	alembic upgrade head
+
 db_delete_data: down
 	docker compose run postgres_db bash -c "rm -rf /var/lib/postgresql/data/*"
 
-db_upgrade: down
-	source $(VENV_DIR)/bin/activate && \
-	docker compose run api bash -c "alembic upgrade head"
+db_upgrade: db_migrate down
 
 db_downgrade: down
-	docker compose run api bash -c "alembic downgrade -1"
+	source $(VENV_DIR)/bin/activate && \
+	alembic downgrade -1
 
 db_create_migration: down
-	docker compose run api bash -c "alembic revision --autogenerate -m \"DB migration\""
+	source $(VENV_DIR)/bin/activate && \
+	alembic revision --autogenerate -m \"DB migration\"
 
 # Local Development
 db:
@@ -109,9 +113,13 @@ tf_setup: tf_workspace
 	../../tools/bash_scripts/deploy.sh
 	@cd infra/tf/aws/environment && terraform apply
 
+tf_output: tf_workspace
+	@cd infra/tf/aws/environment && terraform output -json
+
 deploy: build tf_workspace
 	NO_INPUT=$(NO_INPUT) ../../tools/bash_scripts/deploy.sh 
 
 bastion: venv
 	@echo "Activating bastion port forwarding..."
-	ENVIRONMENT=$(ENVIRONMENT) PROJECT=example ../../tools/bash_scripts/bastion.sh
+	cd ../../ && \
+	hexcli bastion 
