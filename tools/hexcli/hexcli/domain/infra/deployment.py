@@ -127,8 +127,8 @@ def env_infra_apply_command(config: MonorepoConfig, env: str) -> None:
 
 def get_terrform_output(env: str, project: str) -> str:
     run_system_command(f"cd projects/{project} && make tf_refresh ENVIRONMENT={env}")
-    tf_str: str = run_system_command_with_output(f"cd projects/{project} && make tf_output ENVIRONMENT={env}")
-    typer.echo(f"Terraform output: {tf_str}")
+    tf_str: str = run_system_command_with_output(f"cd projects/{project} && make --no-print-directory tf_output ENVIRONMENT={env}")
+    typer.echo(f"Terraform output: '{tf_str}'")
     try:
         return json.loads(tf_str)
     except json.JSONDecodeError as err:
