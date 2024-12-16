@@ -92,7 +92,8 @@ jobs:
         make tf_apply_no_input
     - name: DB migration
       run: |
-        make migrate_db ENV=${{ matrix.env }} PROJECT=${PROJ}
+        export PROJ=`basename "${{ matrix.project }}"`
+        make migrate_db ENV=${{ matrix.env }} ${PROJ}
     - name: Deploy Project
       run: |
         export PROJ=`basename "${{ matrix.project }}"`

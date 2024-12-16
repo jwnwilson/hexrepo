@@ -42,35 +42,33 @@ Bugs:
 
 - Setup backend
     - Setup pipeline for monorepo
-        - Simplify DB_URL add to secret
-            - Add logic to get secret from secret manager if env is not local
-            - Setup command to run local against bastion
         - Setup build / db migrate / deploy
             - Add db migration to ci / cd
             - Setup example deployment
     - Setup project to schedule bastion up / down time based on ec2 and rds tags
-        - Add option to add scheduluer to template
-    - Combine shared infra + env infra pull add envs to config and pull them down 
-    - Auto increment version in pipeline
-        - Add githook to check if version needs to be increased
-        - Add command to bump library version
-    - tear down workspace "default" and create workspace "prod"
     - Add ability to update project from template
         - Update project & lib templates
         - Use cruft to update projects from template?
         - Update template and verify destroy / rebuild
         - Add project & library setup test
+    - Play with AI crawler project 
+    - Combine shared infra + env infra pull add envs to config and pull them down 
+    - Auto increment version in pipeline
+        - Add githook to check if version needs to be increased
+        - Add command to bump library version
     - Setup async tasks
         - migrate hex lib into this repo
             https://github.com/jwnwilson/hex-lib/tree/main/src/hex_lib/adapter/out
         - SQS + lambda
         - Setup task chaining with idempotent re-run
     - Setup auth / cross project auth / authorisation
+    - Setup command to run local against bastion db
     - Improve docker container builds
         - Setup base lib image to re-use for projects
     - Add user setup to infra as code
         - During project config setup define monorepo user with admin account
         - login with mono repo user and store credentials to work specifically with monorepo
+    - tear down workspace "default" and create workspace "prod"
     - Add another cloud provider - GCP
     - Enforce architecture rules:
         - https://roman.pt/posts/python-architecture-linter/
