@@ -23,12 +23,14 @@ build:
 	docker compose build
 
 # DB management
+db_migrate:
+	source $(VENV_DIR)/bin/activate && \
+	alembic upgrade head
+
 db_delete_data: down
 	docker compose run postgres_db bash -c "rm -rf /var/lib/postgresql/data/*"
 
-db_upgrade: down
-	source $(VENV_DIR)/bin/activate && \
-	alembic upgrade head
+db_upgrade: db_migrate down
 
 db_downgrade: down
 	source $(VENV_DIR)/bin/activate && \

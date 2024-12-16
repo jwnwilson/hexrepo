@@ -65,7 +65,7 @@ def migrate_db(config: MonorepoConfig, env: str, project: str):
             # stop making docker db call
             run_system_command(f"""
                 cd projects/{project} && \
-                make db_upgrade DB_PASSWORD_SECRET_NAME={secret_name} DB_URL={db_url} CLOUD_PROVIDER={config.cloud_provider}
+                make db_migrate DB_PASSWORD_SECRET_NAME={secret_name} DB_URL={db_url} CLOUD_PROVIDER={config.cloud_provider}
             """)
         finally:
             # Terminate bastion
