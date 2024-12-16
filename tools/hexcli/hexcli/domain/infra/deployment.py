@@ -154,6 +154,8 @@ def migrate_db(config: MonorepoConfig, env: str, project: str):
                 cd projects/{project} && \
                 make db_migrate DB_PASSWORD_SECRET_NAME={secret_name} DB_URL={db_url} CLOUD_PROVIDER={config.cloud_provider}
             """)
+        except Exception as err:
+            typer.echo(f"Error running migration: {err}")
         finally:
             # Terminate bastion
             typer.echo(f"Shutting down ssh tunnel to bastion")
