@@ -1,9 +1,9 @@
 
-import json
 import os
 import signal
 import subprocess
 from typing import Any, Dict, List, Optional
+from contextlib import contextmanager
 
 import typer
 from hexcli.config import MonorepoConfig
@@ -39,3 +39,14 @@ def bastion_ssh_tunnel(config: MonorepoConfig, env: str, project: str, backgroun
         else:
             run_system_command(bastion_command)
 
+
+@contextmanager
+def managed_bastion_ssh(config: MonorepoConfig, env: str, project: str):
+    typer.echo(f"Starting ssh tunnel to bastion")
+    bastion_process = bastion_ssh_tunnel(config, env, project, background_task=True)
+    try:
+        yield bastion_process
+    finally:
+        typer.echo(f"Shutting down ssh tunnel to bastion")
+        os.killpg(os.getpgid(bastion_process.pid), signal.SIGTERM)
+        print("Shut down ssh tunnel to bastion")

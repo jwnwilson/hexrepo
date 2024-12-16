@@ -11,7 +11,7 @@ from hexcli.domain.infra.code_repo import authenticate_lib_repo
 from hexcli.config import MonorepoConfig
 from hexcli.domain.project import get_libraries, get_library_type, get_modified_libraries, get_modified_projects, get_projects, get_projects_usings_libraries
 from hexcli.domain.system import run_system_command, run_system_command_with_output
-from hexcli.domain.infra.bastion import bastion_ssh_tunnel
+from hexcli.domain.infra.bastion import managed_bastion_ssh
 
 
 def create_lib_infra(config: MonorepoConfig) -> None:
@@ -136,30 +136,24 @@ def get_terrform_output(env: str, project: str) -> str:
 
 
 def migrate_db(config: MonorepoConfig, env: str, project: str):
-    if config.cloud_provider == "aws":
+    if config.cloud_provider == "aws" and env != "local":
         # Start bastion
-        typer.echo(f"Starting ssh tunnel to bastion")
-        bastion_process = bastion_ssh_tunnel(config, env, project, background_task=True)
-        try:
-            # Get secret name
-            secret_name: str = ""
-            db_url: str = ""
-            if env != "local":
+        with managed_bastion_ssh(config, env, project) as bastion_process:
+            try:
                 tf_output: Dict[str, str] = get_terrform_output(env, project)
                 secret_name = tf_output["db_secret_name"]["value"]
                 db_url = "postgresql+psycopg2://postgres:{password}@127.0.0.1:5432/" + project
 
-            # Run migration with secret name set
-            # stop making docker db call
-            typer.echo(f"Running migration for project {project}")
-            run_system_command(f"""
-                cd projects/{project} && \
-                make --no-print-directory db_migrate DB_PASSWORD_SECRET_NAME={secret_name} DB_URL={db_url} CLOUD_PROVIDER={config.cloud_provider}
-            """)
-        except Exception as err:
-            typer.echo(f"Error running migration: {err}")
-        finally:
-            # Terminate bastion
-            typer.echo(f"Shutting down ssh tunnel to bastion")
-            os.killpg(os.getpgid(bastion_process.pid), signal.SIGTERM)
-            print("Shut down ssh tunnel to bastion")
+                # Run migration with secret name set
+                # stop making docker db call
+                typer.echo(f"Running migration for project {project}")
+                run_system_command(f"""
+                    cd projects/{project} && \
+                    make --no-print-directory db_migrate DB_PASSWORD_SECRET_NAME={secret_name} DB_URL={db_url} CLOUD_PROVIDER={config.cloud_provider}
+                """)
+            except Exception as err:
+                typer.echo(f"Error running migration: {err}")
+
+    elif env == "local":
+        typer.echo("Running migration locally")
+        run_system_command(f"cd projects/{project} && make --no-print-directory db_migrate")
