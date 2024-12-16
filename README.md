@@ -44,6 +44,7 @@ Bugs:
     - Setup pipeline for monorepo
         - Simplify DB_URL add to secret
             - Add logic to get secret from secret manager if env is not local
+            - Setup command to run local against bastion
         - Setup build / db migrate / deploy
             - Add db migration to ci / cd
             - Setup example deployment

@@ -1,5 +1,7 @@
 
 import json
+import os
+import signal
 import subprocess
 from typing import Any, Dict, List, Optional
 
@@ -57,11 +59,15 @@ def migrate_db(config: MonorepoConfig, env: str, project: str):
             if env != "local":
                 tf_output: Dict[str, str] = get_terrform_output(env, project)
                 secret_name = tf_output["db_secret_name"]["value"]
-                db_url = "postgresql+psycopg2://postgres:{password}@localhost:5432/" + project
+                db_url = "postgresql+psycopg2://postgres:{password}@127.0.0.1:5432/" + project
 
             # Run migration with secret name set
             # stop making docker db call
-            run_system_command(f"cd projects/{project} && make db_upgrade DB_PASSWORD_SECRET_NAME={secret_name} DB_URL={db_url} CLOUD_PROVIDER={config.cloud_provider}")
+            run_system_command(f"""
+                cd projects/{project} && \
+                make db_upgrade DB_PASSWORD_SECRET_NAME={secret_name} DB_URL={db_url} CLOUD_PROVIDER={config.cloud_provider}
+            """)
         finally:
             # Terminate bastion
-            bastion_process.terminate()
+            os.killpg(os.getpgid(bastion_process.pid), signal.SIGTERM)
+            pass
