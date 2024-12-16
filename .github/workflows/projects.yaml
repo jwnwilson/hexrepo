@@ -95,11 +95,6 @@ jobs:
       with:
           terraform_version: "^1.3.7"
           terraform_wrapper: false
-    - name: Infra Apply
-      run: |
-        cd ${{ matrix.project }}
-        make tf_init
-        make tf_apply_no_input
     - name: DB migration
       shell: bash
       run: |

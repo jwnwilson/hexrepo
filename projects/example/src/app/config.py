@@ -8,7 +8,7 @@ logger = logging.getLogger()
 # Silence noisy logs from faker
 logging.getLogger("faker.factory").setLevel(logging.ERROR)
 
-
+# Test commit for deployment
 class Config(BaseSettings):
     """
     Application settings.

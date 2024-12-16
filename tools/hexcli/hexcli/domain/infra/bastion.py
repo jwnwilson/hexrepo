@@ -9,7 +9,7 @@ import typer
 from hexcli.config import MonorepoConfig
 from monorepo_cloud.compute import AWSComputeManager
 from monorepo_cloud.db import AWSRDSManager
-from ..system import run_system_command, run_system_command_with_output
+from ..system import run_system_command
 
 
 def bastion_ssh_tunnel(config: MonorepoConfig, env: str, project: str, background_task: bool = False) -> Optional[Any]:
