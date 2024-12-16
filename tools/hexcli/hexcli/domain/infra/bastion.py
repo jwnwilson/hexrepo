@@ -39,35 +39,3 @@ def bastion_ssh_tunnel(config: MonorepoConfig, env: str, project: str, backgroun
         else:
             run_system_command(bastion_command)
 
-
-def get_terrform_output(env: str, project: str) -> str:
-    tf_str: str = run_system_command_with_output(f"cd projects/{project} && make tf_output ENVIRONMENT={env}")
-    try:
-        return json.loads(tf_str)
-    except json.JSONDecodeError as err:
-        raise typer.Abort(f"Error parsing terraform output: {err}")
-
-
-def migrate_db(config: MonorepoConfig, env: str, project: str):
-    if config.cloud_provider == "aws":
-        # Start bastion
-        bastion_process = bastion_ssh_tunnel(config, env, project, background_task=True)
-        try:
-            # Get secret name
-            secret_name: str = ""
-            db_url: str = ""
-            if env != "local":
-                tf_output: Dict[str, str] = get_terrform_output(env, project)
-                secret_name = tf_output["db_secret_name"]["value"]
-                db_url = "postgresql+psycopg2://postgres:{password}@127.0.0.1:5432/" + project
-
-            # Run migration with secret name set
-            # stop making docker db call
-            run_system_command(f"""
-                cd projects/{project} && \
-                make db_migrate DB_PASSWORD_SECRET_NAME={secret_name} DB_URL={db_url} CLOUD_PROVIDER={config.cloud_provider}
-            """)
-        finally:
-            # Terminate bastion
-            os.killpg(os.getpgid(bastion_process.pid), signal.SIGTERM)
-            pass

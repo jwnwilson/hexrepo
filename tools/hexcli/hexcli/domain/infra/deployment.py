@@ -1,7 +1,8 @@
 from contextlib import chdir
 import json
+import signal
 import subprocess
-from typing import List, Optional
+from typing import Dict, List, Optional
 import os
 
 import typer
@@ -9,7 +10,8 @@ import typer
 from hexcli.domain.infra.code_repo import authenticate_lib_repo
 from hexcli.config import MonorepoConfig
 from hexcli.domain.project import get_libraries, get_library_type, get_modified_libraries, get_modified_projects, get_projects, get_projects_usings_libraries
-from hexcli.domain.system import run_system_command
+from hexcli.domain.system import run_system_command, run_system_command_with_output
+from hexcli.domain.infra.bastion import bastion_ssh_tunnel
 
 
 def create_lib_infra(config: MonorepoConfig) -> None:
@@ -121,3 +123,38 @@ def env_infra_apply_command(config: MonorepoConfig, env: str) -> None:
             pass
         run_system_command("make tf_env_apply")
     typer.echo("Shared infrastructure apply complete.")
+
+
+def get_terrform_output(env: str, project: str) -> str:
+    tf_str: str = run_system_command_with_output(f"cd projects/{project} && make tf_output ENVIRONMENT={env}")
+    try:
+        return json.loads(tf_str)
+    except json.JSONDecodeError as err:
+        raise typer.Abort(f"Error parsing terraform output: {err}")
+
+
+def migrate_db(config: MonorepoConfig, env: str, project: str):
+    if config.cloud_provider == "aws":
+        # Start bastion
+        typer.echo(f"Starting ssh tunnel to bastion")
+        bastion_process = bastion_ssh_tunnel(config, env, project, background_task=True)
+        try:
+            # Get secret name
+            secret_name: str = ""
+            db_url: str = ""
+            if env != "local":
+                tf_output: Dict[str, str] = get_terrform_output(env, project)
+                secret_name = tf_output["db_secret_name"]["value"]
+                db_url = "postgresql+psycopg2://postgres:{password}@127.0.0.1:5432/" + project
+
+            # Run migration with secret name set
+            # stop making docker db call
+            typer.echo(f"Running migration for project {project}")
+            run_system_command(f"""
+                cd projects/{project} && \
+                make db_migrate DB_PASSWORD_SECRET_NAME={secret_name} DB_URL={db_url} CLOUD_PROVIDER={config.cloud_provider}
+            """)
+        finally:
+            # Terminate bastion
+            typer.echo(f"Shutting down ssh tunnel to bastion")
+            os.killpg(os.getpgid(bastion_process.pid), signal.SIGTERM)
