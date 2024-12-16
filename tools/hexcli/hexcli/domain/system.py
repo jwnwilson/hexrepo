@@ -1,6 +1,8 @@
 
 import os
 from os.path import expanduser
+from subprocess import Popen
+import subprocess
 from tempfile import mkstemp
 from shutil import move, copymode
 from os import fdopen, remove
@@ -16,7 +18,12 @@ def run_system_command(command: str) -> None:
 
 
 def run_system_command_with_output(command: str) -> str:
-    return os.popen(command).read()
+    output: str = ""
+    process: Popen = Popen(command, stdout=subprocess.PIPE, shell=True)
+    process.wait()
+    for line in process.stdout:
+        output += line.decode()
+    return output
 
 
 def running_on_ci() -> bool:
