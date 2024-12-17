@@ -23,7 +23,9 @@ build:
 
 # DB management
 db_migrate:
-	source $(VENV_DIR)/bin/activate && \
+	bash -c "source $(VENV_DIR)/bin/activate && alembic upgrade head"
+
+db_migrate_docker:
 	docker compose run api bash -c "alembic upgrade head"
 
 db_delete_data: down
@@ -32,30 +34,32 @@ db_delete_data: down
 db_upgrade: db_migrate down
 
 db_downgrade: down
-	docker compose run api bash -c "alembic downgrade -1"
+	bash -c "source $(VENV_DIR)/bin/activate && alembic downgrade -1"
 
 db_create_migration: down
-	docker compose run api bash -c "alembic revision --autogenerate -m \"DB migration\""
+	bash -c "source $(VENV_DIR)/bin/activate && alembic revision --autogenerate -m \"DB migration\""
 
-# Local Development
 db:
 	docker compose run --service-ports -d postgres_db 
-
-run:
-	docker compose up
 
 down:
 	docker compose down
 
+# Local Development
+
 # Host API locally, loading local env file
-run_local: down db venv
+run: down db venv
 	source $(VENV_DIR)/bin/activate && \
 	PYTHONPATH=src uvicorn app.interactor.api.fastapi.main:app --reload --env-file env/local.env
 
-# Host API locally, connect to cloud db
+# Host API locally, connect to cloud db. Still requires manual setting of DB_PASSWORD_SECRET_NAME in bastion.env
 run_bastion: bastion venv
 	source $(VENV_DIR)/bin/activate && \
 	PYTHONPATH=src uvicorn app.interactor.api.fastapi.main:app --reload --env-file env/local.env
+
+# Host API locally and run in docker
+run_docker:
+	docker compose up
 
 # Testing commands
 test: venv
@@ -88,6 +92,12 @@ tf_init:
 	cd infra/tf/aws/shared  && terraform init -input=false
 	cd infra/tf/aws/environment  && terraform init -input=false
 
+tf_setup: tf_workspace
+	@echo "Applying Terraform infra"
+	cd infra/tf/aws/shared && terraform apply
+	@echo "Deploying image to enable environment deployment"
+	make deploy
+
 tf_plan:
 	@echo "Planning Terraform infra"
 	cd infra/tf/aws/shared  && terraform plan
@@ -108,11 +118,10 @@ tf_destroy:
 	cd infra/tf/aws/environment  && terraform destroy
 	cd infra/tf/aws/shared  && terraform destroy
 
-tf_setup: tf_workspace
-	@echo "Applying Terraform infra"
-	cd infra/tf/aws/shared && terraform apply
-	@echo "Deploying image to enable environment deployment"
-	make deploy
-
 deploy: build tf_workspace
 	../../tools/bash_scripts/deploy.sh
+
+bastion: venv
+	@echo "Activating bastion port forwarding..."
+	cd ../../ && \
+	hexcli bastion 

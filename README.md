@@ -39,14 +39,12 @@ AWS_SECRET_ACCESS_KEY
 # To Do
 
 Bugs:
-
 - Setup backend
-    - Setup project to schedule bastion up / down time based on ec2 and rds tags
-    - Add ability to update project from template
-        - Update project & lib templates
+     - Add ability to update project from template
         - Use cruft to update projects from template?
         - Update template and verify destroy / rebuild
         - Add project & library setup test
+    - Setup project to schedule bastion up / down time based on ec2 and rds tags
     - Play with AI crawler project 
     - Combine shared infra + env infra pull add envs to config and pull them down 
     - Auto increment version in pipeline
@@ -70,9 +68,9 @@ Bugs:
         - https://roman.pt/posts/python-architecture-linter/
         - [deply](https://github.com/Vashkatsi/deply)
     - Setup test / lint build image
-        - Look at https://github.com/nektos/act
         - Setup ruff
         - Setup UV
+        - Look at https://github.com/nektos/act
         - Port changes to all libs and projects
         - Switch to bastion to access all dbs as needed
 

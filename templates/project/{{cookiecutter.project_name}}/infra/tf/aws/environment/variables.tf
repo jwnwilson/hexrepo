@@ -14,6 +14,10 @@ variable "project" {
   default = "{{cookiecutter.project_slug}}"
 }
 
+variable "docker_tag" {
+  default = "latest"
+}
+
 variable "domain" {
   default = "{{cookiecutter.domain}}"
 }

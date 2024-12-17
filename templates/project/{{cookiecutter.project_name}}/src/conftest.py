@@ -3,10 +3,13 @@ from collections.abc import Generator
 import pytest
 from fastapi.testclient import TestClient
 
+{% if cookiecutter.use_db == "y" %}
 from monorepo_db.interface import UOW
 from app.adaptor.db.sql.uow import SqlUOW
+{% endif %}
 from app.domain.example import ExampleDTO
 
+{% if cookiecutter.use_db == "y" %}
 # Silence SQLALchemy deprecation warning until we can upgrade
 os.environ["SQLALCHEMY_SILENCE_UBER_WARNING"] = "1"
 
@@ -28,7 +31,7 @@ def uow() -> Generator[UOW, None, None]:
 def create_tables(uow: UOW):
     uow.drop_all()
     uow.create_all()
-
+{% endif %}
 
 @pytest.fixture
 def client(uow):

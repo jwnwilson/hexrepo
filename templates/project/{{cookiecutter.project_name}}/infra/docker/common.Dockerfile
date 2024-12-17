@@ -1,4 +1,4 @@
-FROM python:3.12 as pre_auth
+FROM python:3.12-slim
 
 ARG CONTEXT=GCP
 ENV CONTEXT ${CONTEXT}
@@ -13,8 +13,6 @@ COPY ./libs /libs
 
 # RUN poetry self add keyrings.google-artifactregistry-auth
 RUN poetry lock && poetry install --no-root
-
-FROM pre_auth as build
 
 COPY ./projects/example/src ./src
 COPY ./projects/example/alembic.ini ./

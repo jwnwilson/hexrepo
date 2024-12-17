@@ -11,3 +11,4 @@ features:
     enabled: {{cookiecutter.use_api}}
     resources:
       - src/app/interactor/api
+      - src/tests/interactor/api
