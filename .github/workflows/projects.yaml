@@ -38,7 +38,7 @@ jobs:
       with:
         venv_path: ${{ matrix.project }}
         poetry_lock_file: "${{ matrix.project }}/poetry.lock"
-    - name: Test Libraries
+    - name: Test Projects
       run: make test_projects
   plan_infra:
     needs: test_projects

@@ -41,10 +41,6 @@ AWS_SECRET_ACCESS_KEY
 Bugs:
 
 - Setup backend
-    - Setup pipeline for monorepo
-        - Setup build / db migrate / deploy
-            - Setup example deployment
-    - Refactor deploy / bastion code with context manager
     - Setup project to schedule bastion up / down time based on ec2 and rds tags
     - Add ability to update project from template
         - Update project & lib templates
