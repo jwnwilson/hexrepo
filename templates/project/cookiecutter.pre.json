@@ -1,0 +1,27 @@
+{
+    "cloud_provider": [
+        "aws",
+        "azure",
+        "gcp"
+    ],
+    "use_api": "y",
+    "use_db": "y",
+    "use_db_logic": [
+        "sql",
+        "nosql"
+    ],
+    "use_storage": "y",
+    "__conditions__": {
+        "use_db_logic": "{{ cookiecutter.use_db != 'n' }}"
+    },
+    "__prompts__": {
+        "use_api": "Do you want fastapi?",
+        "use_db": "Do you want a database?",
+        "use_storage": "Do you want a storage service?",
+        "use_db_logic": {
+            "__prompt__": "Select the db storage method",
+            "sql": "Add Sqlalchemy to project",
+            "nosql": "Add NoSQL wrapper to project"
+        }
+    }
+}

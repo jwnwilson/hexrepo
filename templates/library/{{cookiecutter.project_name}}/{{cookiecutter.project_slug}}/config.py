@@ -1,0 +1,19 @@
+import os
+import logging
+from typing import Optional
+from pydantic_settings import BaseSettings
+
+logger = logging.getLogger()
+
+
+class Config(BaseSettings):
+    """
+    Application settings.
+
+    These parameters can be configured
+    with environment variables.
+    """
+    environment: str = os.environ.get("ENVIRONMENT", "dev")    
+
+
+config = Config()  # type: ignore

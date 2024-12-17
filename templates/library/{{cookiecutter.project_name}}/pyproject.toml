@@ -1,0 +1,44 @@
+[tool.poetry]
+name = "{{cookiecutter.project_slug}}"
+version = "{{cookiecutter.version}}"
+description = "{{cookiecutter.project_short_description}}"
+authors = ["{{cookiecutter.full_name}} <{{cookiecutter.email}}>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+pydantic = "^2.9.2"
+pydantic-settings = "^2.6.1"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.3"
+mypy = "^1.13.0"
+black = "^24.10.0"
+isort = "^5.13.2"
+httpx = "^0.27.2"
+pytest-dotenv = "^0.5.2"
+pytest-cov = "^6.0.0"
+pytest-xdist = "^3.6.1"
+gevent = "^24.10.3"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.isort]
+profile = "black"
+
+[tool.pytest.ini_options]
+addopts = "-vv --cov --cov-report xml --cov-report term-missing --cov-fail-under=50"
+asyncio_mode = "auto"
+testpaths = ["tests"]
+env_files = ["env/local.env"]
+
+[tool.coverage.run]
+concurrency = ["gevent"]
+omit = ["tests/*"]
+source = ["{{cookiecutter.project_slug}}"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
