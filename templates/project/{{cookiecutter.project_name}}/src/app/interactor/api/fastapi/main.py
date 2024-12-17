@@ -11,6 +11,8 @@ ENVIRONMENT = os.environ.get("ENVIRONMENT", "")
 
 root_prefix = f""
 
+print("test")
+
 app = FastAPI(
     title="{{cookiecutter.project_slug}} Service",
     description="{{cookiecutter.project_slug}} description",
