@@ -102,3 +102,8 @@ migrate_db: venv
 	@echo "Starting bastion..."
 	@. $(VENV_DIR)/bin/activate && \
 	hexcli migrate-db ${ENV} ${PROJECT}
+
+update_projects_from_template: venv
+	@echo "Updating projects from template..."
+	@. $(VENV_DIR)/bin/activate && \
+	hexcli update-projects-from-template

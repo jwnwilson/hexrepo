@@ -40,10 +40,6 @@ AWS_SECRET_ACCESS_KEY
 
 Bugs:
 - Setup backend
-     - Add ability to update project from template
-        - Use cruft to update projects from template?
-        - Update template and verify destroy / rebuild
-        - Add project & library setup test
     - Setup project to schedule bastion up / down time based on ec2 and rds tags
     - Play with AI crawler project 
     - Combine shared infra + env infra pull add envs to config and pull them down 
@@ -62,7 +58,8 @@ Bugs:
     - Add user setup to infra as code
         - During project config setup define monorepo user with admin account
         - login with mono repo user and store credentials to work specifically with monorepo
-    - tear down workspace "default" and create workspace "prod"
+    - Add CI job to detect template changes and add a new PR with applied patch to projects
+        - Add tests
     - Add another cloud provider - GCP
     - Enforce architecture rules:
         - https://roman.pt/posts/python-architecture-linter/
