@@ -12,7 +12,7 @@ docker_tag=$(git log -n1 --pretty='format:%cd' --date=format:'%Y%m%d%H%M%S')
 # Docker login
 aws ecr get-login-password --region eu-west-1 | docker login --username AWS --password-stdin 675468650888.dkr.ecr.eu-west-1.amazonaws.com
 
-docker-compose build
+docker compose build
 
 # tag and push docker image
 docker tag "${latest_image}" "${aws_ecr}/${ecr_repo_name}:latest"
