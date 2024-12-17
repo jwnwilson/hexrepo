@@ -7,7 +7,7 @@ version: '3'
 services:
   api:
     container_name: example
-    platform: "linux/arm64"
+    platform: "linux/amd64"
     env_file:
       - env/docker.env
     image: "example"

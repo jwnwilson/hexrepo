@@ -58,6 +58,9 @@ def deploy_projects(env: str, config: MonorepoConfig, projects: Optional[List[st
         libraries = get_modified_libraries()
         projects_with_modified_libs = get_projects_usings_libraries(libraries)
         projects = set(projects_with_modified_libs + get_modified_projects(projects))
+    
+    # hardcoding for testing
+    projects = ["example"]
 
     if not projects:
         typer.echo("No modified files found, skipping deploy.")

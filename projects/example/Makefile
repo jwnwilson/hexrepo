@@ -20,7 +20,8 @@ venv:
 	@../../tools/bash_scripts/setup_env.sh
 
 build:
-	docker compose build
+# Default to mac compatibility
+	DOCKER_DEFAULT_PLATFORM=linux/arm64 docker compose build
 
 # DB management
 db_migrate:

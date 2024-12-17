@@ -41,7 +41,7 @@ module "lambda" {
 
   image_uri               = "${var.ecr_url}:${var.docker_tag}"
   package_type            = "Image"
-  architectures          = ["arm64"]
+  architectures          = ["x86_64"]
   
   attach_network_policy   = true
   timeout                 = 30
