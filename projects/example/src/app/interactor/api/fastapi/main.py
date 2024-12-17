@@ -12,6 +12,8 @@ ENVIRONMENT = os.environ.get("ENVIRONMENT", "")
 
 root_prefix = f""
 
+print("test")
+
 app = FastAPI(
     title="Example Service",
     description="example description",
