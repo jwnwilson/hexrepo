@@ -39,11 +39,8 @@ AWS_SECRET_ACCESS_KEY
 # To Do
 
 Bugs:
-
 - Setup backend
      - Add ability to update project from template
-        - Update project template
-        - Update project & lib templates
         - Use cruft to update projects from template?
         - Update template and verify destroy / rebuild
         - Add project & library setup test
@@ -71,9 +68,9 @@ Bugs:
         - https://roman.pt/posts/python-architecture-linter/
         - [deply](https://github.com/Vashkatsi/deply)
     - Setup test / lint build image
-        - Look at https://github.com/nektos/act
         - Setup ruff
         - Setup UV
+        - Look at https://github.com/nektos/act
         - Port changes to all libs and projects
         - Switch to bastion to access all dbs as needed
 
