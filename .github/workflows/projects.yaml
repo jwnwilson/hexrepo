@@ -6,9 +6,9 @@ name: Projects Test & Deploy
 on:
   push:
     branches: [ main ]
-    paths:
-      - libs/**
-      - projects/**
+    # paths:
+    #   - libs/**
+    #   - projects/**
   pull_request:
     branches: [ main ]
     paths:
