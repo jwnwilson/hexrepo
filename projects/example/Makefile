@@ -113,8 +113,7 @@ tf_setup: tf_workspace
 	@echo "Applying Terraform infra"
 	cd infra/tf/aws/shared && terraform apply
 	@echo "Deploying image to enable environment deployment"
-	../../tools/bash_scripts/deploy.sh
-	@cd infra/tf/aws/environment && terraform apply
+	make deploy
 
 tf_refresh: tf_workspace
 	@cd infra/tf/aws/environment && terraform refresh
