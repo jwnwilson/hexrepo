@@ -41,12 +41,13 @@ AWS_SECRET_ACCESS_KEY
 Bugs:
 
 - Setup backend
-    - Setup project to schedule bastion up / down time based on ec2 and rds tags
-    - Add ability to update project from template
+     - Add ability to update project from template
+        - Update project template
         - Update project & lib templates
         - Use cruft to update projects from template?
         - Update template and verify destroy / rebuild
         - Add project & library setup test
+    - Setup project to schedule bastion up / down time based on ec2 and rds tags
     - Play with AI crawler project 
     - Combine shared infra + env infra pull add envs to config and pull them down 
     - Auto increment version in pipeline
