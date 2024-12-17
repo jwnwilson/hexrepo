@@ -209,7 +209,7 @@ def update_projects_from_template():
         os.system("git format-patch --relative main --stdout > ../../../patch")
 
     for project in get_projects():
-        os.system(f"git am --3way --directory projects/{project}/ ./patch")
+        os.system(f"git apply --3way --directory projects/{project}/ ./patch")
     
     os.system("rm patch")
 
