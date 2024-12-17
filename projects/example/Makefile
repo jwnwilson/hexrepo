@@ -8,7 +8,7 @@ TF_VAR_ecr_api_url=${AWS_ACCOUNT}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/ex
 TF_VAR_aws_access_key=${AWS_ACCESS_KEY_ID}
 TF_VAR_aws_secret_key=${AWS_SECRET_ACCESS_KEY}
 TF_VAR_aws_region=${AWS_DEFAULT_REGION}
-NO_INPUT:=false
+NO_INPUT:=${NO_INPUT}
 
 VENV := .venv
 MKFILE_DIR := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
