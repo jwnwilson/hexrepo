@@ -202,8 +202,6 @@ def migrate_db(env: Annotated[Optional[str], typer.Argument()] = None, project: 
 
 @app.command()
 def update_projects_from_template():
-    # Check that no changes have been made to projects before updating
-
     # Get list of changes to template/project
     with contextlib.chdir("templates/project/{{cookiecutter.project_name}}"):
         os.system("git format-patch --relative main --stdout > ../../../patch")
