@@ -5,6 +5,5 @@
     "full_name": "Your name",
     "email": "Your address email (you@example.com)",
     "version": "0.1.0",
-    "_extensions": ["extensions.StemKeysExtension"],
     "_jinja2_env_vars": {"lstrip_blocks": true, "trim_blocks": true}
 }

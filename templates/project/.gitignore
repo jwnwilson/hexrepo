@@ -37,5 +37,3 @@ share/python-wheels/
 *.egg
 MANIFEST
 .DS_Store
-
-test.db

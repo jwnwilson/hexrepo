@@ -19,6 +19,7 @@ boto3 = "^1.35.66"
 monorepo-cloud = {path = "../../libs/src/adaptor/cloud", develop = true}
 monorepo-db = {path = "../../libs/src/adaptor/db", develop = true}
 monorepo-api = {path = "../../libs/src/interactor/api", develop = true}
+cruft = "^2.15.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.3"

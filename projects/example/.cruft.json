@@ -1,0 +1,24 @@
+{
+  "template": "/Users/noelwilson/projects/hexrepo/projects/example/../../templates/project",
+  "commit": "07920aa400c6f8321754bf768be72ad9fd702b55",
+  "checkout": null,
+  "context": {
+    "cookiecutter": {
+      "project_name": "example",
+      "project_slug": "example",
+      "project_short_description": "A short description of the project",
+      "full_name": "Your name",
+      "email": "Your address email (you@example.com)",
+      "version": "0.1.0",
+      "_extensions": [
+        "extensions.StemKeysExtension"
+      ],
+      "_jinja2_env_vars": {
+        "lstrip_blocks": true,
+        "trim_blocks": true
+      },
+      "_template": "/Users/noelwilson/projects/hexrepo/projects/example/../../templates/project"
+    }
+  },
+  "directory": null
+}

@@ -42,8 +42,10 @@ Bugs:
 - Setup backend
      - Add ability to update project from template
         - Use cruft to update projects from template?
+            - Only works with git repos
+            - Might need to move templates to own repo / submodule / subrepo
         - Update template and verify destroy / rebuild
-        - Add project & library setup test
+        - Add cli & setup command tests
     - Setup project to schedule bastion up / down time based on ec2 and rds tags
     - Play with AI crawler project 
     - Combine shared infra + env infra pull add envs to config and pull them down 
