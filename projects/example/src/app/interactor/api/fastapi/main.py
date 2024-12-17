@@ -13,7 +13,7 @@ ENVIRONMENT = os.environ.get("ENVIRONMENT", "")
 root_prefix = f""
 
 app = FastAPI(
-    title="example Service",
+    title="Example Service",
     description="example description",
     version="0.0.1",
     root_path=root_prefix,
