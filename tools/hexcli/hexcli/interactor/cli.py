@@ -1,3 +1,4 @@
+import contextlib
 import os
 from contextlib import chdir
 import sys
@@ -197,6 +198,20 @@ def migrate_db(env: Annotated[Optional[str], typer.Argument()] = None, project: 
     env: str = env or prompt_environment()
     project: str = project or prompt_project()
     migrate_db_func(config, env, project)
+
+
+@app.command()
+def update_projects_from_template():
+    # Check that no changes have been made to projects before updating
+
+    # Get list of changes to template/project
+    with contextlib.chdir("templates/project/{{cookiecutter.project_name}}"):
+        os.system("git format-patch --relative main --stdout > ../../../patch")
+
+    for project in get_projects():
+        os.system(f"git am --3way --directory projects/{project}/ ./patch")
+    
+    os.system("rm patch")
 
 
 if __name__ == "__main__":
