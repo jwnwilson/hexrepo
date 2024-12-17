@@ -11,9 +11,11 @@ terraform {
   }
 }
 
+{% if cookiecutter.use_db %}
 locals {
   db_url = "postgresql+psycopg2://postgres:{password}@${module.example_postgres.db_instance_endpoint}/${var.project}"
 }
+{% endif %}
 
 provider "aws" {
   region  = var.aws_region
@@ -46,14 +48,15 @@ module "example_api" {
   security_group_ids = [module.example_postgres.db_security_group_id]
 
 
-  {% if cookiecutter.use_db %}
+  
   environment_variables = {
     ENVIRONMENT                 = terraform.workspace
     CLOUD_PROVIDER              = "{{ cookiecutter.cloud_provider|upper }}"
+    {% if cookiecutter.use_db %}
     DB_URL                      = local.db_url
     DB_PASSWORD_SECRET_NAME     = data.aws_secretsmanager_secret.db_secret.name
+    {% endif %}
   }
-  {% endif %}
 }
 
 module "example_api_gateway" {
@@ -67,6 +70,7 @@ module "example_api_gateway" {
   project           = "{{cookiecutter.project_slug}}"
 }
 
+{% if cookiecutter.use_db %}
 module "example_postgres" {
   source = "../../../../../../libs/infra/tf/aws/modules/rds"
 
@@ -79,3 +83,4 @@ module "example_postgres" {
 data "aws_secretsmanager_secret" "db_secret" {
   arn = module.example_postgres.db_password_secret_arn
 }
+{% endif %}
