@@ -41,6 +41,7 @@ AWS_SECRET_ACCESS_KEY
 Bugs:
 - Setup backend
     - Setup project to schedule bastion up / down time based on ec2 and rds tags
+        - Add tests for setup
     - Play with AI crawler project 
     - Combine shared infra + env infra pull add envs to config and pull them down 
     - Auto increment version in pipeline
