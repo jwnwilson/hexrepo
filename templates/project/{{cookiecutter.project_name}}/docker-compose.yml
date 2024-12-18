@@ -30,8 +30,9 @@ services:
     # Override lambda entry point to revert to default docker behaviour
     entrypoint: ""
     command: "uvicorn app.adapter.into.fastapi.main:app --host 0.0.0.0 --port 80 --reload --debug"
-    {$ endif %}
+    {% endif %}
 
+{% if cookiecutter.use_db %}
   postgres_db:
     container_name: {{cookiecutter.project_slug}}_db
     restart: unless-stopped
@@ -53,3 +54,4 @@ services:
 
 volumes:
   postgres_db:
+{% endif %}

@@ -4,7 +4,7 @@ import shutil
 import yaml
 import logging
 
-from tools.logic.commands import run_system_command
+from hexcli.domain.system import run_system_command
 
 logger = logging.getLogger(__name__)
 
