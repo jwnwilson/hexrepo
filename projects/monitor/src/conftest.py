@@ -5,13 +5,15 @@ from unittest.mock import Mock
 
 import pytest
 from fastapi.testclient import TestClient
+from monorepo_db import UOW, Repository
 
 from app.domain.example import ExampleDTO
+from app.interactor.api.fastapi.dependencies import StubbedUOW
 
 
 @pytest.fixture
-def uow() -> Generator[Any, None, None]:
-    yield Mock()
+def uow() -> Generator[UOW, None, None]:
+    yield StubbedUOW(db_url="test")
 
 
 @pytest.fixture
