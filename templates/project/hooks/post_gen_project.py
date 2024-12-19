@@ -13,7 +13,7 @@ def delete_resources_for_disabled_features():
     with open(MANIFEST) as manifest_file:
         manifest = yaml.load(manifest_file, Loader=yaml.Loader)
         for feature in manifest['features']:
-            if not feature['enabled']:
+            if feature['enabled'] == 'n':
                 logger.info("removing resources for disabled feature {}...".format(feature['name']))
                 for resource in feature['resources']:
                     delete_resource(resource)
