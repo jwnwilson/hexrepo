@@ -21,8 +21,7 @@ jobs:
     strategy:
       matrix:
         template:
-        - "template/project"
-        # - "template/library"
+        - "tools/hecli"
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -31,6 +30,9 @@ jobs:
       uses: ./.github/actions/be_venv
       with:
         venv_path: ${{ matrix.template }}
-        poetry_lock_file: "${{ matrix.project }}/poetry.lock"
-    - name: Test Template
-      run: make test_templates template=${{ matrix.template }}
+        poetry_lock_file: "${{ matrix.template }}/poetry.lock"
+    - name: Test Templates
+      run: |
+        cd ${{ matrix.template }}
+        make test
+  

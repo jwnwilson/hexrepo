@@ -17,6 +17,10 @@ monorepo-cloud = {path = "../../libs/src/adaptor/cloud", develop = true}
 [tool.poetry.scripts]
 hexcli = "hexcli.interactor.cli:app"
 
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.4"
+pytest-cookies = "^0.7.0"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
