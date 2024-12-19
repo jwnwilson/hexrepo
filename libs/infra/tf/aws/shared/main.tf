@@ -21,6 +21,12 @@ module "monorepo_code_artifact" {
   domain = "monorepo"
 }
 
+module "monorepo_code_artifact" {
+  source = "../modules/codeartifact"
+  project = "monitor"
+  domain = "monitor"
+}
+
 # module "monorepo_route_53_zone" {
 #   source = "../modules/route53"
 #   domain = "jwnwilson.co.uk"
