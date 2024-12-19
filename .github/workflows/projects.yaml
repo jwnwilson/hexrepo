@@ -40,13 +40,16 @@ jobs:
         venv_path: ${{ matrix.project }}
         poetry_lock_file: "${{ matrix.project }}/poetry.lock"
     - name: Test Projects
-      run: make test_projects PROJECT=${{ matrix.project }}
+      run: |
+        cd ${{ matrix.project }}
+        make test
   plan_infra:
     needs: test_projects
     strategy:
       matrix:
         project:
         - "projects/example"
+        - "projects/monitor"
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -74,6 +77,7 @@ jobs:
       matrix:
         project:
         - "projects/example"
+        - "projects/monitor"
         env:
         - "default"
     runs-on: ubuntu-latest
