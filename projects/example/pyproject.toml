@@ -49,6 +49,9 @@ addopts = "-vv --cov --cov-report xml --cov-report term-missing --cov-fail-under
 asyncio_mode = "auto"
 testpaths = ["src/tests"]
 env_files = ["env/local.env"]
+pythonpath = [
+  "src"
+]
 
 [tool.coverage.run]
 concurrency = ["gevent"]
