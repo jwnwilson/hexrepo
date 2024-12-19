@@ -42,7 +42,6 @@ Bugs:
 - Setup backend
     - Setup project to schedule bastion up / down time based on ec2 and rds tags
         - Create stub UOW for api adaptor and port to project template.
-            - Move to db liv module
             - back port fixes to template
         - update git patch logic to create new files then apply patch
     - Play with AI crawler project 
