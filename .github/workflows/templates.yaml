@@ -21,7 +21,7 @@ jobs:
     strategy:
       matrix:
         template:
-        - "tools/hecli"
+        - "tools/hexcli"
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
