@@ -1,16 +1,15 @@
 from datetime import datetime
+from unittest.mock import Mock
 from uuid import UUID
 
+import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
-import pytest
-from pydantic import BaseModel
-from polyfactory.factories.pydantic_factory import ModelFactory
-from unittest.mock import Mock
-
 from monorepo_api.crud import CrudRouter
 from monorepo_db.exception import RecordNotFound
 from monorepo_db.interface import PaginatedData
+from polyfactory.factories.pydantic_factory import ModelFactory
+from pydantic import BaseModel
 
 
 class MockCreateSchema(BaseModel):
@@ -42,14 +41,20 @@ class MockRepository:
         return MockResponseSchema(
             id=UUID("12345678-1234-5678-1234-567812345678"),
             name=obj_in.name,
-            created_at="2024-08-30T08:06:10.591198",
+            created_at=datetime.strptime(
+                "2024-08-30T08:06:10.591198", "%Y-%m-%dT%H:%M:%S.%f"
+            ),
         )
 
     def read(self, id: UUID):
         if id == UUID("00000000-0000-0000-0000-000000000000"):
             raise RecordNotFound("Record not found")
         return MockResponseSchema(
-            id=id, name="test", created_at="2024-08-30T08:06:10.591198"
+            id=id,
+            name="test",
+            created_at=datetime.strptime(
+                "2024-08-30T08:06:10.591198", "%Y-%m-%dT%H:%M:%S.%f"
+            ),
         )
 
     def read_multi(
@@ -70,7 +75,11 @@ class MockRepository:
 
     def update(self, id: UUID, obj_in):
         return MockResponseSchema(
-            id=id, name=obj_in.name, created_at="2024-08-30T08:06:10.591198"
+            id=id,
+            name=obj_in.name,
+            created_at=datetime.strptime(
+                "2024-08-30T08:06:10.591198", "%Y-%m-%dT%H:%M:%S.%f"
+            ),
         )
 
     def delete(self, id: UUID):
@@ -81,7 +90,7 @@ class MockRepository:
 
 class MockUOW:
     repository = MockRepository()
-    
+
     @property
     def session(self):
         return Mock()

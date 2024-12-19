@@ -1,9 +1,17 @@
 import os
 from collections.abc import Generator
+from typing import Any
+from unittest.mock import Mock
+
 import pytest
 from fastapi.testclient import TestClient
 
 from app.domain.example import ExampleDTO
+
+
+@pytest.fixture
+def uow() -> Generator[Any, None, None]:
+    yield Mock()
 
 
 @pytest.fixture
