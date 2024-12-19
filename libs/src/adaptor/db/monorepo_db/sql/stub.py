@@ -36,7 +36,11 @@ class StubbedRepository(Repository):
         return self._generate_fake_dto()
 
     def read_multi(
-        self, filters: Optional[Dict[str, Any]]=None, page_size: int=100, page_number: int=1, order_by: str="-created_at"
+        self,
+        filters: Optional[Dict[str, Any]] = None,
+        page_size: int = 100,
+        page_number: int = 1,
+        order_by: str = "-created_at",
     ) -> PaginatedData[BaseModel]:
         logger.info("StubbedRepository read multi called")
         return PaginatedData(
@@ -44,7 +48,9 @@ class StubbedRepository(Repository):
             total=1,
         )
 
-    def update(self, id: uuid.UUID, obj_in: BaseModel, merge_objects: bool = False) -> BaseModel:
+    def update(
+        self, id: uuid.UUID, obj_in: BaseModel, merge_objects: bool = False
+    ) -> BaseModel:
         logger.info("StubbedRepository update called")
         return self._generate_fake_dto()
 
