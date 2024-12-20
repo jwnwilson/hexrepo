@@ -39,3 +39,4 @@ MANIFEST
 .DS_Store
 
 patch
+.testing

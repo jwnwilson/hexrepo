@@ -19,7 +19,7 @@ variable "docker_tag" {
 }
 
 variable "domain" {
-  default = "{{cookiecutter.domain}}"
+  default = "{{cookiecutter.api_domain}}"
 }
 
 variable "api_subdomain" {

@@ -1,6 +1,6 @@
 from typing import Optional
 from pydantic import BaseModel
-from app.adaptor.db.sql.models.example import ExampleDTO
+from app.domain.example import ExampleDTO
 
 from monorepo_api import CrudRouter
 from ....dependencies import get_uow

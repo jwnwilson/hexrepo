@@ -1,5 +1,7 @@
 import os
 from collections.abc import Generator
+from typing import Any
+from unittest.mock import Mock
 import pytest
 from fastapi.testclient import TestClient
 
@@ -31,6 +33,10 @@ def uow() -> Generator[UOW, None, None]:
 def create_tables(uow: UOW):
     uow.drop_all()
     uow.create_all()
+{% else %}
+@pytest.fixture
+def uow() -> Generator[Any, None, None]:
+    yield Mock()
 {% endif %}
 
 @pytest.fixture

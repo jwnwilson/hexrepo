@@ -1,3 +1,4 @@
+import os
 import sys
 import json
 import functools
@@ -19,12 +20,13 @@ class SingletonMeta(type):
 
 class PromptProcess(metaclass=SingletonMeta):
 
-    def __init__(self, context):
+    def __init__(self, context, no_input=False):
         self.env = None
         self.context = context
         self.conditions = context['cookiecutter'].pop('__conditions__', {})
         self.cookiecutter = {}
         self.ignored_keys = []
+        self.no_input: bool = no_input
 
     @staticmethod
     def wraps(func_path):
@@ -82,7 +84,7 @@ class PromptProcess(metaclass=SingletonMeta):
     def prompt_user(self):
         # Get configuration from the user, ignoring keys in ignored_keys
         user_prompts = {
-            k: v for k, v in prompt_for_config(self.context).items()
+            k: v for k, v in prompt_for_config(self.context, self.no_input).items()
             if k not in self.ignored_keys
         }
         # Return a prefixed prompts
@@ -104,7 +106,8 @@ class PromptProcess(metaclass=SingletonMeta):
 def main():
     initial = generate_context()
     context = generate_context(context_file='cookiecutter.pre.json')
-    prompt_process = PromptProcess(context)
+    testing: bool = bool(os.getenv("TESTING", False))
+    prompt_process = PromptProcess(context, no_input=testing)
     initial['cookiecutter'].update(prompt_process.prompt_user())
 
     # Write the updated context back to cookiecutter.json
