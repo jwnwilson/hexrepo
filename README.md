@@ -1,7 +1,8 @@
-# Python Monorepo
+# Hextech Monorepo
 
-This is my python monorepo that uses hexagonal architecture to manage complexity. 
+This is my python monorepo inspired by turborepo that uses hexagonal architecture to manage complexity. 
 
+![alt text](docs/hextech.png)
 
 
 Features include:
@@ -9,7 +10,7 @@ Features include:
 - CLI commands to setup projects
 - CLI to create libraries and add them to project
 - Auto update projects when a library is updated
-- Auto update projects infra as code when shared infra as code if modified
+- Auto update infra as code when shared infra as code is modified
 - Local debugging of library code while developing
 - Automatic deployment of libraries and projects 
 
@@ -18,27 +19,30 @@ Features include:
 ### Prerequesites
 
 - Terraform installed
-- Pyenv installed
-- AWS account access key and secret
-- AWS account permissions set as detailed later
-- Route53 domain purchased and setup
-- AWS CLI + SSM
+- Pipx & Pyenv installed
+- An AWS Account with:
+    - AWS account access key and secret
+    - AWS account permissions set as detailed later
+- Route53 domain purchased if API setup required
+- AWS CLI + SSM installed:
     https://docs.aws.amazon.com/systems-manager/latest/userguide/install-plugin-macos-overview.html#install-plugin-macos
 
 
 ### Setup
 
-Setup the following env vars directly or via `make setup`
+Setup the following env vars directly or run:
 
+`make setup`
+
+```
 AWS_ACCOUNT
 AWS_DEFAULT_REGION
 AWS_ACCESS_KEY_ID
 AWS_SECRET_ACCESS_KEY
-
+```
 
 # To Do
 
-Bugs:
 - Setup backend
     - Setup project to schedule bastion up / down time based on ec2 and rds tags
     - Play with AI crawler project 
