@@ -11,7 +11,7 @@ from hexcli.domain.infra.code_repo import authenticate_lib_repo
 from hexcli.config import MonorepoConfig
 from hexcli.domain.project import get_libraries, get_library_type, get_modified_libraries, get_modified_projects, get_projects, get_projects_usings_libraries
 from hexcli.domain.system import run_system_command, run_system_command_with_output
-from hexcli.domain.infra.bastion import managed_bastion_ssh
+from hexcli.domain.infra.bastion import db_exists, managed_bastion_ssh
 
 
 def create_lib_infra(config: MonorepoConfig) -> None:
@@ -137,6 +137,9 @@ def get_terrform_output(env: str, project: str) -> str:
 
 def migrate_db(config: MonorepoConfig, env: str, project: str):
     if config.cloud_provider == "aws" and env != "local":
+        if not db_exists(config, project, env):
+            typer.echo(f"DB not found for project {project} in environment {env}, skipping migration")
+            return
         # Start bastion
         with managed_bastion_ssh(config, env, project) as bastion_process:
             try:

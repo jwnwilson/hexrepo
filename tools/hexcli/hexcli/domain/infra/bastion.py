@@ -50,3 +50,14 @@ def managed_bastion_ssh(config: MonorepoConfig, env: str, project: str):
         typer.echo(f"Shutting down ssh tunnel to bastion")
         os.killpg(os.getpgid(bastion_process.pid), signal.SIGTERM)
         print("Shut down ssh tunnel to bastion")
+
+
+def db_exists(config: MonorepoConfig, project: str, env: str,) -> bool:
+    rds_manageer: AWSRDSManager = AWSRDSManager(config.cloud_provider_config)
+    try:
+        rds_manageer.get_rds_host(
+            tags={"Project": project, "Environment": env}
+        )
+    except IndexError:
+        return False
+    return True

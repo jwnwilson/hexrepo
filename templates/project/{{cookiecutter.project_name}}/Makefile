@@ -92,7 +92,7 @@ tf_init:
 	cd infra/tf/aws/shared  && terraform init -input=false
 	cd infra/tf/aws/environment  && terraform init -input=false
 
-tf_setup: tf_workspace
+tf_setup:
 	@echo "Applying Terraform infra"
 	cd infra/tf/aws/shared && terraform apply
 	@echo "Deploying image to enable environment deployment"
@@ -119,7 +119,7 @@ tf_destroy:
 	cd infra/tf/aws/shared  && terraform destroy
 
 deploy: build tf_workspace
-	../../tools/bash_scripts/deploy.sh
+	${PROJECT}={{cookiecutter.project_slug}} NO_INPUT=$(NO_INPUT) ENVIRONMENT=$(ENVIRONMENT) ../../tools/bash_scripts/deploy.sh 
 
 bastion: venv
 	@echo "Activating bastion port forwarding..."
