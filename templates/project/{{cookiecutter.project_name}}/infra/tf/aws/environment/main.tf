@@ -48,8 +48,10 @@ module "example_api" {
   ecr_url           = data.aws_ecr_repository.ecr_repo.repository_url
   docker_tag        = var.docker_tag
   vpc_id            = data.aws_vpc.monorepo.id
-  {% if cookiecutter.cloud_provider == "aws" %}
-  lambda_command    = ["src.app.interactor.aws.lambda_api.handler"]
+  {% if cookiecutter.cloud_provider == "aws" and cookiecutter.use_api %}
+  lambda_command    = ["src.app.interactor.api.lambda.handler"]
+  {% elif cookiecutter.cloud_provider == "aws" %}
+    lambda_command    = ["src.app.interactor.event.lambda.handler"]
   {% else %}
   lambda_command    = ["uvicorn", "app.interactor.api.fastapi.main:app", "--host", "0.0.0.0", "--port", "8000"]
   {% endif %}
