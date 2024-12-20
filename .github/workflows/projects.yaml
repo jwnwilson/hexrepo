@@ -111,5 +111,6 @@ jobs:
       shell: bash
       run: |
         export PROJ=`basename "${{ matrix.project }}"`
+        make tf_init
         make deploy_projects PROJECT=${PROJ} ENV=${{ matrix.env }}
 
