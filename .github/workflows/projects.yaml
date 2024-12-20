@@ -112,5 +112,5 @@ jobs:
       run: |
         cd ${{ matrix.project }}
         make tf_init
-        make deploy ENVIRONMENT=${{ matrix.env }}
+        make deploy ENVIRONMENT=${{ matrix.env }} NO_INPUT=True
 
