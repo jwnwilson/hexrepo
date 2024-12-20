@@ -40,7 +40,6 @@ AWS_SECRET_ACCESS_KEY
 
 Bugs:
 - Setup backend
-    - Improve hextech cli with pipx
     - Setup project to schedule bastion up / down time based on ec2 and rds tags
     - Play with AI crawler project 
     - Plan project env infra requires apply on shared infa first in pipeline 

@@ -10,7 +10,6 @@ ENV:=${ENV}
 
 # Setup commands
 hextech:
-	@echo "Checking if hextech is setup..."
 	@./tools/bash_scripts/setup_hextech.sh
 
 setup: hextech
