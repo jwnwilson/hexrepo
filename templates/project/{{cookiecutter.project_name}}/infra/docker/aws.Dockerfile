@@ -16,4 +16,8 @@ COPY ./projects/example/src ./src
 COPY ./projects/example/alembic.ini ./
 
 ENV PYTHONPATH ${LAMBDA_TASK_ROOT}/src
-CMD ["src.app.interactor.api.lambda.handler"]
+{% if cookiecutter.use_api == 'y' %}
+CMD ["src.app.interactor.aws.lambda_api.handler"]
+{% else %}
+CMD ["src.app.interactor.event.lambda.handler"]
+{% endif %}

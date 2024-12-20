@@ -42,7 +42,7 @@ module "example_api" {
   ecr_url            = data.aws_ecr_repository.ecr_repo.repository_url
   docker_tag         = var.docker_tag
   vpc_id             = data.aws_vpc.monorepo.id
-  lambda_command     = ["src.app.interactor.api.lambda.handler"]
+  lambda_command     = ["src.app.interactor.aws.lambda_api.handler"]
   security_group_ids = [module.example_postgres.db_security_group_id]
 
   environment_variables = {

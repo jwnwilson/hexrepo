@@ -16,4 +16,4 @@ COPY ./projects/example/src ./src
 COPY ./projects/example/alembic.ini ./
 
 ENV PYTHONPATH ${LAMBDA_TASK_ROOT}/src
-CMD ["src.app.interactor.api.lambda.handler"]
+CMD ["src.app.interactor.event.lambda.handler"]
