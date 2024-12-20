@@ -1,7 +1,7 @@
 import logging
 import uuid
 from collections.abc import Generator
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Type
 
 from pydantic import BaseModel
 
@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 class StubbedRepository(Repository):
     """Fake repository for testing"""
 
-    model_dto: BaseModel
+    model_dto: Type[BaseModel]
 
     def _generate_fake_dto(self, obj_in: Optional[BaseModel] = None) -> BaseModel:
         raise NotImplementedError

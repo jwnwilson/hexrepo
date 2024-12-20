@@ -7,7 +7,7 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.12"
-hexcli = {path = "tools/hexcli", develop = true}
+hextech = {path = "tools/hextech", develop = true}
 monorepo-cloud = {path = "libs/src/adaptor/cloud", develop = true}
 
 [build-system]

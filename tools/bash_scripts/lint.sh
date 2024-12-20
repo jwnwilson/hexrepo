@@ -16,7 +16,6 @@ while [[ "$#" -gt 0 ]]; do
 done
 
 
-echo "Activating venv."
 . ${VENV}/bin/activate
 
 if [[ -z "${check}" ]]; then

@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "hexcli"
+name = "hextech"
 version = "0.1.0"
 description = ""
 authors = ["Noel Wilson <jwnwilson@hotmail.co.uk>"]
@@ -15,7 +15,7 @@ pydantic-settings = "^2.6.1"
 monorepo-cloud = {path = "../../libs/src/adaptor/cloud", develop = true}
 
 [tool.poetry.scripts]
-hexcli = "hexcli.interactor.cli:app"
+hextech = "hextech.interactor.cli:app"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.4"

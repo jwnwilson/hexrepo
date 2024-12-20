@@ -7,17 +7,17 @@ from typing_extensions import Annotated
 from cookiecutter.main import cookiecutter
 import typer
 
-from hexcli.config import MonorepoConfig, get_or_create_config
-from hexcli.domain.infra.manage import start_infra_command, stop_infra_command
-from hexcli.domain.infra.code_repo import authenticate_lib_repo
-from hexcli.domain.infra.deployment import create_lib_infra, deploy_projects as deploy_projects_command, env_infra_apply_command, env_infra_plan_command, publish_libs, setup_global_env_infra, shared_infra_apply_command, shared_infra_plan_command, migrate_db as migrate_db_func
-from hexcli.domain.infra.storage import create_tf_state
-from hexcli.domain.project import get_libraries, get_library_type, get_projects, install_library_in_project
-from hexcli.domain.prompts.common import prompt_environment, prompt_library_type, prompt_project
-from hexcli.domain.prompts.infra import prompt_deploy_libs, prompt_setup_lib_infra, prompt_setup_project_infra, prompt_setup_shared_infra, prompt_setup_tf
-from hexcli.domain.templates.libs import generate_libs_makefile
-from hexcli.domain.system import run_system_command
-from hexcli.domain.infra.bastion import bastion_ssh_tunnel
+from hextech.config import MonorepoConfig, get_or_create_config
+from hextech.domain.infra.manage import start_infra_command, stop_infra_command
+from hextech.domain.infra.code_repo import authenticate_lib_repo
+from hextech.domain.infra.deployment import create_lib_infra, deploy_projects as deploy_projects_command, env_infra_apply_command, env_infra_plan_command, publish_libs, setup_global_env_infra, shared_infra_apply_command, shared_infra_plan_command, migrate_db as migrate_db_func
+from hextech.domain.infra.storage import create_tf_state
+from hextech.domain.project import get_libraries, get_library_type, get_projects, install_library_in_project
+from hextech.domain.prompts.common import prompt_environment, prompt_library_type, prompt_project
+from hextech.domain.prompts.infra import prompt_deploy_libs, prompt_setup_lib_infra, prompt_setup_project_infra, prompt_setup_shared_infra, prompt_setup_tf
+from hextech.domain.templates.libs import generate_libs_makefile
+from hextech.domain.system import run_system_command
+from hextech.domain.infra.bastion import bastion_ssh_tunnel
 
 app = typer.Typer()
 
@@ -126,16 +126,16 @@ def test_projects(run_all: bool = True):
         # run tests for those projects
         raise NotImplementedError("Not implemented yet")
     for project in projects:
-        typer.echo(f"Running linting check for {project}...")
+        typer.echo(f"Running linting for {project} project...")
         run_system_command(f"cd projects/{project} && make lint_check")
-        typer.echo(f"Running tests check for {project}...")
+        typer.echo(f"Running tests for {project} project...")
         run_system_command(f"cd projects/{project} && make test")
 
 
 @app.command()
 def test_libs(libraries: Optional[List[str]] = None):
     repo_libs: List[str] = get_libraries()
-    libraries = libraries.remove("") if "" in libraries else libraries
+    libraries = libraries.remove("") if libraries else libraries
 
     if not libraries:
         libraries: List[str] = get_libraries()
@@ -144,9 +144,9 @@ def test_libs(libraries: Optional[List[str]] = None):
     
     for lib in libraries:
         lib_type: str = get_library_type(lib)
-        typer.echo(f"Running linting check for {lib}...")
+        typer.echo(f"Running linting for {lib} library...")
         run_system_command(f"cd libs/src/{lib_type}/{lib} && make lint_check")
-        typer.echo(f"Running tests check for {lib}...")
+        typer.echo(f"Running tests for {lib} library...")
         run_system_command(f"cd libs/src/{lib_type}/{lib} && make test")
 
 

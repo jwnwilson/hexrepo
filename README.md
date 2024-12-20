@@ -42,14 +42,16 @@ Bugs:
 - Setup backend
     - Improve hextech cli with pipx
     - Setup project to schedule bastion up / down time based on ec2 and rds tags
-    - Plan project env infra requires apply on shared infa first in pipeline 
     - Play with AI crawler project 
+    - Plan project env infra requires apply on shared infa first in pipeline 
+    - Add cookiecutter option for public access via api gateway + domain
+        - Use single domain per project by default
+    - Combine shared infra + env infra pull add envs to config and pull them down 
     - Implement template -> project update:
         - Look at cruft again
         - Re-render template with project settings 
         - Create Diff with changes
-    - Add option for public access via domain
-    - Combine shared infra + env infra pull add envs to config and pull them down 
+        - Add CI job to detect template changes and add a new PR with applied patch to projects
     - Auto increment version in pipeline
         - Add githook to check if version needs to be increased
         - Add command to bump library version
@@ -61,13 +63,11 @@ Bugs:
     - Setup auth / cross project auth / authorisation
     - Setup command to run local against bastion db
     - Improve docker container builds
+        - Reduce image size
         - Setup base lib image to re-use for projects
     - Add user setup to infra as code
         - During project config setup define monorepo user with admin account
         - login with mono repo user and store credentials to work specifically with monorepo
-    - Add CI job to detect template changes and add a new PR with applied patch to projects
-        - Add tests
-    - Add another cloud provider - GCP
     - Enforce architecture rules:
         - https://roman.pt/posts/python-architecture-linter/
         - [deply](https://github.com/Vashkatsi/deply)
@@ -77,10 +77,9 @@ Bugs:
         - Look at https://github.com/nektos/act
         - Port changes to all libs and projects
         - Switch to bastion to access all dbs as needed
+    - Add another cloud provider - GCP
 
-- Setup E2E testing
-
-- Automate setup
+- Full monorepo setup with hextech cli command like turbo repo
 - Investigate setting up company services
     - Feature Flagging / A / B testing
     - Switching calculation verisons

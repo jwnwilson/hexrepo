@@ -7,11 +7,11 @@ import os
 
 import typer
 
-from hexcli.domain.infra.code_repo import authenticate_lib_repo
-from hexcli.config import MonorepoConfig
-from hexcli.domain.project import get_libraries, get_library_type, get_modified_libraries, get_modified_projects, get_projects, get_projects_usings_libraries
-from hexcli.domain.system import run_system_command, run_system_command_with_output
-from hexcli.domain.infra.bastion import db_exists, managed_bastion_ssh
+from hextech.domain.infra.code_repo import authenticate_lib_repo
+from hextech.config import MonorepoConfig
+from hextech.domain.project import get_libraries, get_library_type, get_modified_libraries, get_modified_projects, get_projects, get_projects_usings_libraries
+from hextech.domain.system import run_system_command, run_system_command_with_output
+from hextech.domain.infra.bastion import db_exists, managed_bastion_ssh
 
 
 def create_lib_infra(config: MonorepoConfig) -> None:

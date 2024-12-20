@@ -7,7 +7,6 @@ VENV_DIR = $(MKFILE_DIR)$(VENV)
 
 # Setup commands
 venv:
-	@echo "Checking if venv is setup..."
 	@../../../../tools/bash_scripts/setup_env.sh
 
 test: venv
@@ -20,13 +19,13 @@ coverage:
 	pytest --cov-report html	
 
 lint: venv
-	TARGET_DIRS="monorepo_{{cookiecutter.project_slug}} tests" bash ../../../../tools/bash_scripts/lint.sh 
+	@TARGET_DIRS="monorepo_{{cookiecutter.project_slug}} tests" bash ../../../../tools/bash_scripts/lint.sh 
 
 lint_check: venv
-	TARGET_DIRS="monorepo_{{cookiecutter.project_slug}} tests" bash ../../../../tools/bash_scripts/lint.sh --check
+	@TARGET_DIRS="monorepo_{{cookiecutter.project_slug}} tests" bash ../../../../tools/bash_scripts/lint.sh --check
 
 clean:
-	find . -type f -name '*.py[co]' -delete -o -type d -name __pycache__ -delete
+	@find . -type f -name '*.py[co]' -delete -o -type d -name __pycache__ -delete
 
 publish: venv
 	@echo "Publishing package..."
