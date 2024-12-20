@@ -110,7 +110,5 @@ jobs:
     - name: Deploy Project
       shell: bash
       run: |
-        cd ${{ matrix.project }}
-        make tf_init
-        make deploy ENVIRONMENT=${{ matrix.env }} NO_INPUT=True
-
+        export PROJ=`basename "${{ matrix.project }}"`
+        make deploy_projects_check_modified PROJECT=${PROJ} ENV=${{ matrix.env }}

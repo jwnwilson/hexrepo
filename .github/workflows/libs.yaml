@@ -70,5 +70,5 @@ jobs:
     - name: Deploy Library
       run: |
         export LIB=`basename "${{ matrix.library }}"`
-        make deploy_libs LIBRARY=${LIB}
+        make deploy_libs_check_modified LIBRARY=${LIB}
     

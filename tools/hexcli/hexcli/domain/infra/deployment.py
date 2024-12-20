@@ -66,6 +66,7 @@ def deploy_projects(env: str, config: MonorepoConfig, projects: Optional[List[st
     for proj in projects:
         with chdir(f"projects/{proj}"):
             typer.echo(f"Deploying project {proj}...")
+            run_system_command("make tf_init")
             run_system_command(f"make deploy ENVIRONMENT={env} NO_INPUT={no_input}")
     # Placeholder for publishing libraries to repo
     typer.echo("Projects deployed successfully.")
