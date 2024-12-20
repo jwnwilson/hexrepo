@@ -11,7 +11,7 @@ terraform {
   }
 }
 
-{% if cookiecutter.use_db %}
+{% if cookiecutter.use_db == "y" %}
 locals {
   db_url = "postgresql+psycopg2://postgres:{password}@${module.example_postgres.db_instance_endpoint}/${var.project}"
 }

@@ -15,6 +15,7 @@ docker_tag=$(git log -n1 --pretty='format:%cd' --date=format:'%Y%m%d%H%M%S')
 latest_image=`docker images -q ${PROJECT}`
 
 # tag and push docker image
+echo "Tagging and pushing docker image ${latest_image} to ${aws_ecr}/${ecr_repo_name}:${docker_tag}"
 docker tag "${latest_image}" "${aws_ecr}/${ecr_repo_name}:latest"
 docker tag "${latest_image}" "${aws_ecr}/${ecr_repo_name}:${docker_tag}"
 docker push "${aws_ecr}/${ecr_repo_name}:latest"
