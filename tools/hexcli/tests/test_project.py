@@ -8,7 +8,7 @@ def test_bake_project(cookies, update_path_project, monkey_patch_cookiecutter_ho
     assert result.exit_code == 0
     assert result.exception is None
 
-    assert result.project_path.name == "Name of the project"
+    assert result.project_path.name == "test_project"
     assert result.project_path.is_dir()
 
 

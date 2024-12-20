@@ -40,8 +40,6 @@ AWS_SECRET_ACCESS_KEY
 
 Bugs:
 - Setup backend
-    - back port fixes to template
-        - Add test to create cookie cutter project then run "make test"
     - update git patch logic to create new files then apply patch
     - Improve hextech cli with pipx
     - Setup project to schedule bastion up / down time based on ec2 and rds tags
