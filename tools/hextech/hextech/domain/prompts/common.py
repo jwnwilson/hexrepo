@@ -1,7 +1,7 @@
 from typing import List
 import typer
 
-from hexcli.domain.project import get_environments, get_projects
+from hextech.domain.project import get_environments, get_projects
 
 
 def prompt_cloud_provider() -> str:

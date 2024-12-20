@@ -1,4 +1,4 @@
-.PHONY: venv test lint
+.PHONY: hextech test lint
 .DEFAULT_GOAL = help
 .EXPORT_ALL_VARIABLES:
 
@@ -9,111 +9,89 @@ PROJECT:=${PROJECT}
 ENV:=${ENV}
 
 # Setup commands
-venv:
-	@echo "Checking if venv is setup..."
-	@./tools/bash_scripts/setup_root_env.sh
+hextech:
+	@./tools/bash_scripts/setup_hextech.sh
 
-setup: venv
-	@echo "Setting up monorep..."
-	@. $(VENV_DIR)/bin/activate && \
-	hexcli setup
+setup: hextech
+	@echo "Setting up hexrepo..."
+	hex setup
 
-shared_infra_plan: venv
+shared_infra_plan: hextech
 	@echo "Planning shared infra..."
-	@. $(VENV_DIR)/bin/activate && \
-	hexcli shared-infra-plan
+	hextech shared-infra-plan
 
-shared_infra_apply: venv
+shared_infra_apply: hextech
 	@echo "Applying shared infra..."
-	@. $(VENV_DIR)/bin/activate && \
-	hexcli shared-infra-apply
+	hextech shared-infra-apply
 
-env_infra_plan: venv
+env_infra_plan: hextech
 	@echo "Planning env infra..."
-	@. $(VENV_DIR)/bin/activate && \
-	hexcli env-infra-plan $(ENV)
+	hextech env-infra-plan $(ENV)
 
-env_infra_apply: venv
+env_infra_apply: hextech
 	@echo "Applying env infra..."
-	@. $(VENV_DIR)/bin/activate && \
-	hexcli env-infra-apply $(ENV)
+	hextech env-infra-apply $(ENV)
 
-create_project: venv
+create_project: hextech
 	@echo "Creating project..."
-	@. $(VENV_DIR)/bin/activate && \
-	hexcli create-project
+	hextech create-project
 
-create_library: venv
+create_library: hextech
 	@echo "Creating library..."
-	@. $(VENV_DIR)/bin/activate && \
-	hexcli create-library
+	hextech create-library
 
-add_library: venv
+add_library: hextech
 	@echo "Adding library to project..."
-	@. $(VENV_DIR)/bin/activate && \
-	hexcli add_library
+	hextech add_library
 
-test_projects: venv
+test_projects: hextech
 	@echo "Testing projects..."
-	@. $(VENV_DIR)/bin/activate && \
-	hexcli test-projects
+	hextech test-projects
 
-test_libs: venv
+test_libs: hextech
 	@echo "Testing libraries..."
-	@. $(VENV_DIR)/bin/activate && \
-	hexcli test-libs --libraries=$(LIBRARY)
+	hextech test-libs --libraries=$(LIBRARY)
 
-lint_projects: venv
+lint_projects: hextech
 	@echo "Linting projects..."
-	@. $(VENV_DIR)/bin/activate && \
-	hexcli lint_projects
+	hextech lint_projects
 
-lint_libs: venv
+lint_libs: hextech
 	@echo "Linting libraries..."
-	@. $(VENV_DIR)/bin/activate && \
-	hexcli lint_libs
+	hextech lint_libs
 
-deploy_projects: venv
+deploy_projects: hextech
 	@echo "Deploying projects..."
-	@. $(VENV_DIR)/bin/activate && \
-	hexcli deploy-projects $(ENV) --no-input
+	hextech deploy-projects $(ENV) --no-input
 
-deploy_projects_check_modified: venv
+deploy_projects_check_modified: hextech
 	@echo "Deploying projects..."
-	@. $(VENV_DIR)/bin/activate && \
-	hexcli deploy-projects $(ENV) --check-modified --no-input
+	hextech deploy-projects $(ENV) --check-modified --no-input
 
-deploy_libs: venv
+deploy_libs: hextech
 	@echo "Deploying libraries..."
-	@. $(VENV_DIR)/bin/activate && \
-	hexcli deploy-libs --no-input
+	hextech deploy-libs --no-input
 
-deploy_libs_check_modified: venv
+deploy_libs_check_modified: hextech
 	@echo "Deploying libraries..."
-	@. $(VENV_DIR)/bin/activate && \
-	hexcli deploy-libs --check-modified --no-input
+	hextech deploy-libs --check-modified --no-input
 
-stop_infra: venv
+stop_infra: hextech
 	@echo "Stopping infra..."
-	@. $(VENV_DIR)/bin/activate && \
-	hexcli stop-infra
+	hextech stop-infra
 
-start_infra: venv
+start_infra: hextech
 	@echo "Starting infra..."
-	@. $(VENV_DIR)/bin/activate && \
-	hexcli start-infra
+	hextech start-infra
 
-bastion: venv
+bastion: hextech
 	@echo "Starting bastion..."
-	@. $(VENV_DIR)/bin/activate && \
-	hexcli bastion
+	hextech bastion
 
-migrate_db: venv
+migrate_db: hextech
 	@echo "Starting bastion..."
-	@. $(VENV_DIR)/bin/activate && \
-	hexcli migrate-db ${ENV} ${PROJECT}
+	hextech migrate-db ${ENV} ${PROJECT}
 
-update_projects_from_template: venv
+update_projects_from_template: hextech
 	@echo "Updating projects from template..."
-	@. $(VENV_DIR)/bin/activate && \
-	hexcli update-projects-from-template
+	hextech update-projects-from-template

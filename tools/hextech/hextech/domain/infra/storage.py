@@ -1,6 +1,6 @@
 import typer
 from monorepo_cloud.storage import S3Adaptor
-from hexcli.config import MonorepoConfig
+from hextech.config import MonorepoConfig
 
 
 def create_bucket(bucket_name: str, config: MonorepoConfig) -> None:

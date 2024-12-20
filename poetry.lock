@@ -265,7 +265,7 @@ requests = ">=2.23.0"
 rich = "*"
 
 [[package]]
-name = "hexcli"
+name = "hextech"
 version = "0.1.0"
 description = ""
 optional = false
@@ -283,7 +283,7 @@ typer = "^0.15.1"
 
 [package.source]
 type = "directory"
-url = "tools/hexcli"
+url = "tools/hextech"
 
 [[package]]
 name = "idna"

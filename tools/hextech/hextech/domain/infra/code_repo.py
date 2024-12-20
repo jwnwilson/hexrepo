@@ -1,5 +1,5 @@
 import typer
-from hexcli.config import MonorepoConfig
+from hextech.config import MonorepoConfig
 from monorepo_cloud.code_repo import authenticate_repo
 
 

@@ -7,7 +7,6 @@ VENV_DIR = $(MKFILE_DIR)$(VENV)
 
 # Setup commands
 venv:
-	@echo "Checking if venv is setup..."
 	@../bash_scripts/setup_env.sh
 
 # Testing commands

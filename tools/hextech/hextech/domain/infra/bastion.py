@@ -6,7 +6,7 @@ from typing import Any, Dict, List, Optional
 from contextlib import contextmanager
 
 import typer
-from hexcli.config import MonorepoConfig
+from hextech.config import MonorepoConfig
 from monorepo_cloud.compute import AWSComputeManager
 from monorepo_cloud.db import AWSRDSManager
 from ..system import run_system_command

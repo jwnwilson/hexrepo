@@ -15,7 +15,6 @@ VENV_DIR = $(MKFILE_DIR)$(VENV)
 
 # Setup commands
 venv:
-	@echo "Checking if venv is setup..."
 	@../../tools/bash_scripts/setup_env.sh
 
 build:
@@ -72,13 +71,13 @@ coverage:
 	pytest --cov-report html	
 
 lint:
-	TARGET_DIRS="src" bash ../../tools/bash_scripts/lint.sh 
+	@TARGET_DIRS="src" bash ../../tools/bash_scripts/lint.sh 
 
 lint_check: venv
-	TARGET_DIRS="src" bash ../../tools/bash_scripts/lint.sh --check
+	@TARGET_DIRS="src" bash ../../tools/bash_scripts/lint.sh --check
 
 clean:
-	find . -type f -name '*.py[co]' -delete -o -type d -name __pycache__ -delete
+	@find . -type f -name '*.py[co]' -delete -o -type d -name __pycache__ -delete
 
 tf_workspace:
 	@-cd infra/tf/aws/environment  && \
@@ -129,4 +128,4 @@ deploy: tf_workspace
 bastion: venv
 	@echo "Activating bastion port forwarding..."
 	cd ../../ && \
-	hexcli bastion 
+	hextech bastion 
