@@ -10,8 +10,10 @@ def example_data_missing_url():
 def test_example_create(client: TestClient, example_data):
     response = client.post("/api/v1/example/", json=example_data)
     assert response.status_code == 200
+    {% if cookiecutter.use_db == "y" %}
     assert response.json()["name"] == example_data["name"]
     assert response.json()["url"] == example_data["url"]
+    {% endif %}
 
 
 def test_example_create_missing_url(client: TestClient, example_data_missing_url):
@@ -35,10 +37,12 @@ def test_example_read_filter_name(client: TestClient, created_example):
     assert response.json()["total"] == 1
 
 
+{% if cookiecutter.use_db == "y" %}
 def test_example_read_filter_none(client: TestClient, created_example):
     response = client.get(f'/api/v1/example/?filters=%7B"name"%3A"doesntexist"%7D')
     assert response.status_code == 200
     assert response.json()["total"] == 0
+{% endif %}
 
 
 def test_example_update(client: TestClient, created_example):
@@ -46,12 +50,14 @@ def test_example_update(client: TestClient, created_example):
     updated_data = {"url": "test2.com"}
     response = client.patch(f"/api/v1/example/{company_id}", json=updated_data)
     assert response.status_code == 200
+    {% if cookiecutter.use_db == "y" %}
     assert response.json()["url"] == updated_data["url"]
 
     # Verify the update
     response = client.get(f"/api/v1/example/{company_id}")
     assert response.status_code == 200
     assert response.json()["url"] == updated_data["url"]
+    {% endif %}
 
 
 def test_example_delete(client: TestClient, created_example):
@@ -59,6 +65,8 @@ def test_example_delete(client: TestClient, created_example):
     response = client.delete(f"/api/v1/example/{company_id}")
     assert response.status_code == 204
 
+    {% if cookiecutter.use_db == "y" %}
     # Verify the delete
     response = client.get(f"/api/v1/example/{company_id}")
     assert response.status_code == 404
+    {% endif %}

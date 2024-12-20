@@ -1,10 +1,10 @@
 import logging
 import uuid
 from collections.abc import Generator
+from pydantic import BaseModel
 
 from monorepo_db import UOW, Repository
 from monorepo_db.sql.stub import StubbedRepository
-from pydantic import BaseModel
 
 from app.domain.example import ExampleDTO
 

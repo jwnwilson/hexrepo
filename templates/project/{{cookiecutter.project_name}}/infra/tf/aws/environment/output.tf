@@ -3,7 +3,7 @@
 #   value = module.migrate_db_task.lambda_function_name
 # }
 
-{% if cookiecutter.use_db %}
+{% if cookiecutter.use_db == "y" %}
 output "db_secret_name" {
   value = data.aws_secretsmanager_secret.db_secret.name
 }

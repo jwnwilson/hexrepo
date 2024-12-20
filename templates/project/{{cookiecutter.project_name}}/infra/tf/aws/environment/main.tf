@@ -32,6 +32,14 @@ data "aws_ecr_repository" "ecr_repo" {
   name                 = "monorepo-${var.project}"
 }
 
+{% if cookiecutter.use_db == "n" %}
+data "aws_security_group" "default_sg" {
+  tags = {
+    Name = "monorepo-vpc-${terraform.workspace}-default"
+  }
+}
+{% endif %}
+
 module "example_api" {
   source = "../../../../../../libs/infra/tf/aws/modules/lambda"
 
@@ -45,14 +53,18 @@ module "example_api" {
   {% else %}
   lambda_command    = ["uvicorn", "app.interactor.api.fastapi.main:app", "--host", "0.0.0.0", "--port", "8000"]
   {% endif %}
+  {% if cookiecutter.use_db == "y" %}
   security_group_ids = [module.example_postgres.db_security_group_id]
+  {% else %}
+  security_group_ids = [data.aws_security_group.default_sg.id]
+  {% endif %}
 
 
   
   environment_variables = {
     ENVIRONMENT                 = terraform.workspace
     CLOUD_PROVIDER              = "{{ cookiecutter.cloud_provider|upper }}"
-    {% if cookiecutter.use_db %}
+    {% if cookiecutter.use_db == "y" %}
     DB_URL                      = local.db_url
     DB_PASSWORD_SECRET_NAME     = data.aws_secretsmanager_secret.db_secret.name
     {% endif %}
@@ -70,7 +82,7 @@ module "example_api_gateway" {
   project           = "{{cookiecutter.project_slug}}"
 }
 
-{% if cookiecutter.use_db %}
+{% if cookiecutter.use_db == "y" %}
 module "example_postgres" {
   source = "../../../../../../libs/infra/tf/aws/modules/rds"
 

@@ -9,6 +9,9 @@ from fastapi.testclient import TestClient
 from monorepo_db.interface import UOW
 from app.adaptor.db.sql.uow import SqlUOW
 {% endif %}
+from monorepo_db import UOW
+
+from app.interactor.api.fastapi.dependencies import StubbedUOW
 from app.domain.example import ExampleDTO
 
 {% if cookiecutter.use_db == "y" %}
@@ -35,8 +38,8 @@ def create_tables(uow: UOW):
     uow.create_all()
 {% else %}
 @pytest.fixture
-def uow() -> Generator[Any, None, None]:
-    yield Mock()
+def uow() -> Generator[UOW, None, None]:
+    yield StubbedUOW(db_url="test")
 {% endif %}
 
 @pytest.fixture

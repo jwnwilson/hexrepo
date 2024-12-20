@@ -1,4 +1,4 @@
-def test_bake_custom_library(cookies, update_path_libs, monkey_patch_cookiecutter_hooks):
+def test_bake_library(cookies, update_path_libs, monkey_patch_cookiecutter_hooks):
     """Test for 'cookiecutter-template'."""
     result = cookies.bake(template="../../templates/library", extra_context={"testing": "True"})
 
