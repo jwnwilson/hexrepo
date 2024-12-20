@@ -135,7 +135,8 @@ def test_projects(run_all: bool = True):
 @app.command()
 def test_libs(libraries: Optional[List[str]] = None):
     repo_libs: List[str] = get_libraries()
-    libraries = libraries.remove("") if libraries else libraries
+    if "" in libraries :
+        libraries = libraries.remove("") 
 
     if not libraries:
         libraries: List[str] = get_libraries()
@@ -154,7 +155,8 @@ def test_libs(libraries: Optional[List[str]] = None):
 def deploy_libs(libraries: Optional[List[str]] = None, check_modified: bool = False, no_input: bool = False):
     config: MonorepoConfig
     config, _ = get_or_create_config(no_input=no_input)
-    libraries = libraries.remove("") if libraries else libraries
+    if libraries and "" in libraries :
+        libraries = libraries.remove("")
 
     publish_libs(config, libraries=libraries, check_modified=check_modified)
 
@@ -163,7 +165,8 @@ def deploy_libs(libraries: Optional[List[str]] = None, check_modified: bool = Fa
 def deploy_projects(env: str, projects: Optional[List[str]] = None, check_modified: bool = False, no_input: bool = False):
     config: MonorepoConfig
     config, _ = get_or_create_config(no_input=no_input)
-    projects = projects.remove("") if projects else projects
+    if projects and "" in projects:
+        projects = projects.remove("")
 
     deploy_projects_command(env, config, projects=projects, check_modified=check_modified, no_input=no_input)
 
