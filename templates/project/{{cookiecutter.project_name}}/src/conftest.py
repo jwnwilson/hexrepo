@@ -3,7 +3,9 @@ from collections.abc import Generator
 from typing import Any
 from unittest.mock import Mock
 import pytest
+{% elif cookiecutter.use_api %}
 from fastapi.testclient import TestClient
+{% endif %}
 
 {% if cookiecutter.use_db == "y" %}
 from monorepo_db.interface import UOW
@@ -37,12 +39,13 @@ def uow() -> Generator[UOW, None, None]:
 def create_tables(uow: UOW):
     uow.drop_all()
     uow.create_all()
-{% else %}
+{% elif cookiecutter.use_api %}
 @pytest.fixture
 def uow() -> Generator[UOW, None, None]:
     yield StubbedUOW(db_url="test")
 {% endif %}
 
+{% if cookiecutter.use_api == "y" %}
 @pytest.fixture
 def client(uow):
     from app.interactor.api.fastapi import app
@@ -68,3 +71,5 @@ def example_data():
 def created_example(client: TestClient, example_data) -> ExampleDTO:
     response = client.post("/api/v1/example/", json=example_data)
     return ExampleDTO(**response.json())
+
+{% endif %}
