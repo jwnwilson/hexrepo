@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "monorepo-cloud"
-version = "0.3.2"
+version = "0.3.3"
 description = ""
 authors = ["Noel Wilson <jwnwilson@hotmail.co.uk>"]
 readme = "README.md"

@@ -40,10 +40,10 @@ AWS_SECRET_ACCESS_KEY
 
 Bugs:
 - Setup backend
-    - deploy all projects command
     - back port fixes to template
         - Update terraform in template to remove db infra and locals
     - update git patch logic to create new files then apply patch
+    - Improve hextech cli with pipx
     - Setup project to schedule bastion up / down time based on ec2 and rds tags
     - Plan project env infra requires apply on shared infa first in pipeline 
     - Play with AI crawler project 
