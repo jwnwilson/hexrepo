@@ -152,6 +152,12 @@ def test_libs(libraries: Optional[List[str]] = None):
 
 
 @app.command()
+def test_tools():
+    typer.echo(f"Running tests for hextech...")
+    run_system_command(f"cd tools/hextech && make test")
+
+
+@app.command()
 def deploy_libs(libraries: Optional[List[str]] = None, check_modified: bool = False, no_input: bool = False):
     config: MonorepoConfig
     config, _ = get_or_create_config(no_input=no_input)

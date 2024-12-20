@@ -3,7 +3,7 @@ from collections.abc import Generator
 from typing import Any
 from unittest.mock import Mock
 import pytest
-{% elif cookiecutter.use_api %}
+{% if cookiecutter.use_api %}
 from fastapi.testclient import TestClient
 {% endif %}
 

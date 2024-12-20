@@ -52,6 +52,10 @@ test_libs: hextech
 	@echo "Testing libraries..."
 	hextech test-libs --libraries=$(LIBRARY)
 
+test_tools: hextech
+	@echo "Testing tools..."
+	hextech test-tools
+
 lint_projects: hextech
 	@echo "Linting projects..."
 	hextech lint_projects
