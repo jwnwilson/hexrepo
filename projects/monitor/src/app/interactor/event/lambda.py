@@ -1,29 +1,19 @@
-import boto3
+import json
+from typing import Any, List
 import os
 
-region = os.environ['region']
-tagname = os.environ['tagname']
-tagvalue = os.environ['tagvalue']
+from monorepo_cloud.compute import AWSComputeManager
+from monorepo_cloud.config import AWSConfig, load_aws_config
+from monorepo_cloud.db import AWSRDSManager
 
 
 def handler(event, context):
-    ec2 = boto3.client('ec2', region_name=region)
-    response = ec2.describe_instances(
-        Filters=[
-            {
-                'Name': 'tag:'+tagname,
-                'Values': [tagvalue]
-            }
-        ]
-    )
+    aws_config: AWSConfig = load_aws_config()
+    compute_manager: AWSComputeManager = AWSComputeManager(config=aws_config)
+    rds_manager: AWSRDSManager = AWSRDSManager(config=aws_config)
+    compute_instances: List[Any] = compute_manager.get_instances(tags={"": ""})
+    db_instances: List[Any] = rds_manager.get_db_ids(tags={"": ""})
 
-    instancelist = []
-    for reservation in (response["Reservations"]):
-        for instance in reservation["Instances"]:
-            if instance["State"]['Name'] == "running":
-                instancelist.append(instance["InstanceId"])
+    # Start instances that should be started
 
-    if instancelist != []:
-        ec2.stop_instances(InstanceIds=instancelist)
-        for i in instancelist:
-            print('stopped your instances: ' + str(i))
+    # Stop instances that should be stopped
