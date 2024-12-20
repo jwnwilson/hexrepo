@@ -119,7 +119,7 @@ tf_destroy:
 	cd infra/tf/aws/shared  && terraform destroy
 
 deploy: build tf_workspace
-	${PROJECT}={{cookiecutter.project_slug}} NO_INPUT=$(NO_INPUT) ENVIRONMENT=$(ENVIRONMENT) ../../tools/bash_scripts/deploy.sh 
+	PROJECT={{cookiecutter.project_slug}} NO_INPUT=$(NO_INPUT) ENVIRONMENT=$(ENVIRONMENT) ../../tools/bash_scripts/deploy.sh 
 
 bastion: venv
 	@echo "Activating bastion port forwarding..."

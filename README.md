@@ -40,13 +40,14 @@ AWS_SECRET_ACCESS_KEY
 
 Bugs:
 - Setup backend
+    - Improve hextech cli with pipx
     - Setup project to schedule bastion up / down time based on ec2 and rds tags
-        - Create stub UOW for api adaptor and port to project template.
-            - back port fixes to template
-            - Update terraform in template to remove db infra and locals
-        - update git patch logic to create new files then apply patch
     - Plan project env infra requires apply on shared infa first in pipeline 
     - Play with AI crawler project 
+    - Implement template -> project update:
+        - Look at cruft again
+        - Re-render template with project settings 
+        - Create Diff with changes
     - Add option for public access via domain
     - Combine shared infra + env infra pull add envs to config and pull them down 
     - Auto increment version in pipeline
