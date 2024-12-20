@@ -24,8 +24,10 @@ services:
       - "8000"
     ports:
       - 0.0.0.0:8000:8000
+    {% if cookiecutter.use_db == "y" %}
     depends_on:
       - postgres_db
+    {% endif %}
     {% if cookiecutter.cloud_provider == "aws" %}
     # Override lambda entry point to revert to default docker behaviour
     entrypoint: ""
