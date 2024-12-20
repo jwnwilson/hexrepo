@@ -124,4 +124,4 @@ deploy: build tf_workspace
 bastion: venv
 	@echo "Activating bastion port forwarding..."
 	cd ../../ && \
-	hexcli bastion 
+	hextech bastion 
