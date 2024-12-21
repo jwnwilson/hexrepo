@@ -122,8 +122,8 @@ def should_stop_db_instance(instance: Dict[str, Any]) -> bool:
 
 def handler(event, context):
     aws_config: AWSConfig = load_aws_config()
-    compute_manager: AWSComputeManager = get_compute_manager(config=aws_config)
-    rds_manager: AWSRDSManager = get_db_manager(config=aws_config)
+    compute_manager: AWSComputeManager = get_compute_manager(aws_config=aws_config)
+    rds_manager: AWSRDSManager = get_db_manager(aws_config=aws_config)
     compute_instances: List[Any] = compute_manager.get_instances(
         tags={"Type": "bastion"}
     )
@@ -134,13 +134,25 @@ def handler(event, context):
     # Start / stop compute instances
     for instance in compute_instances:
         if should_start_compute_instance(instance):
+            logger.info(f"Starting compute instance: {instance['InstanceId']}")
             compute_manager.start_instances(instance_ids=[instance["InstanceId"]])
         elif should_stop_compute_instance(instance):
+            logger.info(f"Stopping compute instance: {instance['InstanceId']}")
             compute_manager.stop_instances(instance_ids=[instance["InstanceId"]])
+        else:
+            logger.info(
+                f"No action needed for compute instance: {instance['InstanceId']}"
+            )
 
     # Stop / stop
     for instance in db_instances:
         if should_start_db_instance(instance):
+            logger.info(f"Starting RDS instance: {instance['DBInstanceIdentifier']}")
             rds_manager.start_dbs(instance_ids=[instance["DBInstanceIdentifier"]])
         elif should_stop_db_instance(instance):
+            logger.info(f"Stopping RDS instance: {instance['DBInstanceIdentifier']}")
             rds_manager.stop_rds(instance_ids=[instance["DBInstanceIdentifier"]])
+        else:
+            logger.info(
+                f"No action needed for RDS instance: {instance['DBInstanceIdentifier']}"
+            )

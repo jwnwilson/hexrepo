@@ -13,7 +13,7 @@ terraform {
 
 {% if cookiecutter.use_db == "y" %}
 locals {
-  db_url = "postgresql+psycopg2://postgres:{password}@${module.example_postgres.db_instance_endpoint}/${var.project}"
+  db_url = "postgresql+psycopg2://postgres:{password}@${module.{{cookiecutter.project_slug}}_postgres.db_instance_endpoint}/${var.project}"
 }
 {% endif %}
 
@@ -40,7 +40,7 @@ data "aws_security_group" "default_sg" {
 }
 {% endif %}
 
-module "example_api" {
+module "{{cookiecutter.project_slug}}_api" {
   source = "../../../../../../libs/infra/tf/aws/modules/lambda"
 
   environment       = terraform.workspace
@@ -51,12 +51,12 @@ module "example_api" {
   {% if (cookiecutter.cloud_provider == "aws" and cookiecutter.use_api == "y") %}
   lambda_command    = ["src.app.interactor.aws.lambda_api.handler"]
   {% elif cookiecutter.cloud_provider == "aws" %}
-  lambda_command    = ["src.app.interactor.event.lambda.handler"]
+  lambda_command    = ["src.app.interactor.event.aws.handler"]
   {% else %}
   lambda_command    = ["uvicorn", "app.interactor.api.fastapi.main:app", "--host", "0.0.0.0", "--port", "8000"]
   {% endif %}
   {% if cookiecutter.use_db == "y" %}
-  security_group_ids = [module.example_postgres.db_security_group_id]
+  security_group_ids = [module.{{cookiecutter.project_slug}}_postgres.db_security_group_id]
   {% else %}
   security_group_ids = [data.aws_security_group.default_sg.id]
   {% endif %}
@@ -73,19 +73,19 @@ module "example_api" {
   }
 }
 
-module "example_api_gateway" {
+module "{{cookiecutter.project_slug}}_api_gateway" {
   source = "../../../../../../libs/infra/tf/aws/modules/apigateway"
 
   environment       = terraform.workspace
-  lambda_invoke_arn = module.example_api.lambda_function_invoke_arn
-  lambda_name       = module.example_api.lambda_function_name
+  lambda_invoke_arn = module.{{cookiecutter.project_slug}}_api.lambda_function_invoke_arn
+  lambda_name       = module.{{cookiecutter.project_slug}}_api.lambda_function_name
   domain            = var.domain
   api_subdomain     = "{{cookiecutter.project_slug}}-${terraform.workspace}"
   project           = "{{cookiecutter.project_slug}}"
 }
 
 {% if cookiecutter.use_db == "y" %}
-module "example_postgres" {
+module "{{cookiecutter.project_slug}}_postgres" {
   source = "../../../../../../libs/infra/tf/aws/modules/rds"
 
   environment       = terraform.workspace
@@ -95,6 +95,6 @@ module "example_postgres" {
 }
 
 data "aws_secretsmanager_secret" "db_secret" {
-  arn = module.example_postgres.db_password_secret_arn
+  arn = module.{{cookiecutter.project_slug}}_postgres.db_password_secret_arn
 }
 {% endif %}

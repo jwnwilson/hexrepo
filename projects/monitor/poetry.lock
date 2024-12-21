@@ -1293,7 +1293,7 @@ files = [
 
 [[package]]
 name = "monorepo-api"
-version = "0.1.1"
+version = "0.1.2"
 description = "A short description of the project"
 optional = false
 python-versions = "^3.12"
@@ -1311,7 +1311,7 @@ url = "../../libs/src/interactor/api"
 
 [[package]]
 name = "monorepo-cloud"
-version = "0.3.3"
+version = "0.3.4"
 description = ""
 optional = false
 python-versions = "^3.12"
@@ -1332,7 +1332,7 @@ url = "../../libs/src/adaptor/cloud"
 
 [[package]]
 name = "monorepo-db"
-version = "0.1.1"
+version = "0.1.2"
 description = "A short description of the project"
 optional = false
 python-versions = "^3.12"
@@ -2244,4 +2244,4 @@ testing = ["coverage[toml]", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "6115a63a074444bee001fb794f320c197fe7076b64249dfe045be773c8048f85"
+content-hash = "588299df23c4c4d8106cc9f9d4659f8b65a64ee5cbae3a54e44d83be92a136f7"

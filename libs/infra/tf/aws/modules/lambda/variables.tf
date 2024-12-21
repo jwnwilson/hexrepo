@@ -25,3 +25,7 @@ variable "environment_variables"{
 variable "security_group_ids" {
   default = []
 }
+
+variable "lambda_schedule_expression" {
+  default = null
+}

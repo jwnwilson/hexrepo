@@ -40,6 +40,7 @@ class AWSRDSManager:
                 filters.append({"Name": "tag:" + tag, "Values": [tags[tag]]})
 
         db_instances: List[DBInstanceTypeDef] = []
+        logger.info(f"Getting RDS with filters: {filters}")
         db_instance_info = self.client.describe_db_instances()
         for each_db in db_instance_info["DBInstances"]:
             if not self.instance_has_tags(each_db, tags):
@@ -48,7 +49,7 @@ class AWSRDSManager:
                 db_instances.append(each_db)
             else:
                 db_instances.append(each_db)
-
+        logger.info(f"Found {len(db_instances)} RDS instance")
         return db_instances
 
     def get_db_ids(

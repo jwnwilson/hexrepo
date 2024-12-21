@@ -2,7 +2,7 @@ from typing import List
 
 import typer
 
-from hextech.domain.project import get_environments, get_projects
+from hextech.domain.project import get_environments, get_libraries, get_projects
 
 
 def prompt_cloud_provider() -> str:
@@ -17,6 +17,20 @@ def prompt_cloud_provider() -> str:
         typer.echo("Invalid cloud provider, please select an option, 1")
         return
     return cloud_provider
+
+
+def prompt_library() -> str:
+    print("Please choose library")
+    libraries: List[str] = get_libraries()
+    lib_map: List[str] = {str(i + 1): env for i, env in enumerate(libraries)}
+    options = "\n".join([f"{i} - {lib}" for i, lib in lib_map.items()])
+    selection: str = typer.prompt(f"Choose from:\n{options}\n", default="1")
+    try:
+        library = lib_map[selection]
+    except KeyError:
+        typer.echo(f"Invalid library type, please select an option: {options}")
+        return
+    return library
 
 
 def prompt_library_type() -> str:

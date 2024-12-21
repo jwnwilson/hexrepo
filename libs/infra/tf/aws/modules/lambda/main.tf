@@ -31,23 +31,42 @@ data "aws_security_group" "selected" {
   }
 }
 
+module "security_group" {
+  source  = "terraform-aws-modules/security-group/aws"
+  version = "~> 4"
+
+  name        = "${var.project}-sg-${var.environment}-internet-access"
+  description = "Internet access for lambda"
+  vpc_id      = var.vpc_id
+
+  egress_with_cidr_blocks = [
+    {
+      from_port   = 0
+      to_port     = 0
+      protocol    = -1
+      description = "Allow all outgoing connections"
+      cidr_blocks = "0.0.0.0/0"
+    }
+  ]
+}
+
 module "lambda" {
-  source                  = "terraform-aws-modules/lambda/aws"
+  source = "terraform-aws-modules/lambda/aws"
 
-  function_name           = "${var.project}_${var.environment}"
-  description             = var.description
+  function_name = "${var.project}_${var.environment}"
+  description   = var.description
 
-  create_package          = false
+  create_package = false
 
-  image_uri               = "${var.ecr_url}:${var.docker_tag}"
-  package_type            = "Image"
-  architectures          = ["x86_64"]
-  
-  attach_network_policy   = true
-  timeout                 = 30
+  image_uri     = "${var.ecr_url}:${var.docker_tag}"
+  package_type  = "Image"
+  architectures = ["x86_64"]
 
-  attach_tracing_policy   = true
-  tracing_mode            = "Active"
+  attach_network_policy = true
+  timeout               = 30
+
+  attach_tracing_policy = true
+  tracing_mode          = "Active"
 
   # This can be used to reduce the cold starts of lambda
   # provisioned_concurrent_executions = 10
@@ -63,31 +82,33 @@ module "lambda" {
   image_config_command = var.lambda_command
 
   vpc_subnet_ids         = data.aws_subnets.vpc_subnet_ids.ids
-  vpc_security_group_ids = var.security_group_ids
-
+  vpc_security_group_ids = concat(var.security_group_ids, [module.security_group.security_group_id])
 }
 
-# Lambda keep warm events, disabled to aid debugging
+# Schedule Lambda 
 
-# resource "aws_cloudwatch_event_rule" "every_one_minute" {
-#   name                = "every-one-minute"
-#   description         = "Fires every one minutes"
-#   schedule_expression = "rate(1 minute)"
-# }
+resource "aws_cloudwatch_event_rule" "schedule_lambda" {
+  count               = var.lambda_schedule_expression != null ? 1 : 0
+  name                = "${var.project}_${var.environment}_schedule_lambda"
+  description         = "Schedule perodic Lambda call"
+  schedule_expression = var.lambda_schedule_expression
+}
 
-# resource "aws_cloudwatch_event_target" "check_foo_every_one_minute" {
-#   rule      = "${aws_cloudwatch_event_rule.every_one_minute.name}"
-#   target_id = "lambda"
-#   arn       = "${module.lambda.lambda_function_arn}"
-# }
+resource "aws_cloudwatch_event_target" "schedule_lambda" {
+  count     = var.lambda_schedule_expression != null ? 1 : 0
+  rule      = aws_cloudwatch_event_rule.schedule_lambda[count.index].name
+  target_id = "lambda"
+  arn       = module.lambda.lambda_function_arn
+}
 
-# resource "aws_lambda_permission" "allow_cloudwatch" {
-#   statement_id  = "AllowExecutionFromCloudWatch"
-#   action        = "lambda:InvokeFunction"
-#   function_name = "${module.lambda.lambda_function_name}"
-#   principal     = "events.amazonaws.com"
-#   source_arn    = "${aws_cloudwatch_event_rule.every_one_minute.arn}"
-# }
+resource "aws_lambda_permission" "allow_cloudwatch" {
+  count         = var.lambda_schedule_expression != null ? 1 : 0
+  statement_id  = "AllowExecutionFromCloudWatch"
+  action        = "lambda:InvokeFunction"
+  function_name = module.lambda.lambda_function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.schedule_lambda[count.index].arn
+}
 
 resource "aws_iam_policy" "sqs-secret-lambda-policy" {
   name        = "sqs-secret-lambda-policy-${var.project}-${var.environment}"

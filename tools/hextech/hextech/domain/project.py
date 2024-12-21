@@ -32,10 +32,41 @@ def get_libraries() -> List[str]:
     return scan_folder(adaptor_folder) + scan_folder(interactor_folder)
 
 
+def validate_libraries(libraries: Optional[List[str]] = None) -> List[str]:
+    repo_libs: List[str] = get_libraries()
+    if libraries and "" in libraries:
+        libraries = libraries.remove("")
+
+    if not libraries:
+        libraries: List[str] = get_libraries()
+    else:
+        assert all(
+            lib in repo_libs for lib in libraries
+        ), "Invalid library name provided"
+    return libraries
+
+
+def library_version_bump_required(library: str) -> bool:
+    library_type: str = get_library_type(library)
+    modified_files = subprocess.getoutput(
+        "git fetch && git diff origin/main HEAD --name-only"
+    )
+    if f"libs/src/{library_type}/{library}" in modified_files:
+        pyproject_diff: str = subprocess.getoutput(
+            f"git diff origin/main HEAD libs/src/{library_type}/{library}/pyproject.toml"
+        )
+        if "version = " in pyproject_diff:
+            return False
+        return True
+    return False
+
+
 def get_modified_libraries(libraries: Optional[List[str]] = None) -> List[str]:
     libraries = libraries or get_libraries()
     modified_libs: List[str] = []
-    modified_files = subprocess.getoutput("git diff HEAD^ HEAD --name-only")
+    modified_files = subprocess.getoutput(
+        "git fetch && git diff origin/main HEAD --name-only"
+    )
     for lib in libraries:
         lib_type = get_library_type(lib)
         if f"libs/src/{lib_type}/{lib}" in modified_files:
@@ -45,7 +76,9 @@ def get_modified_libraries(libraries: Optional[List[str]] = None) -> List[str]:
 
 def get_modified_projects(projects: List[str]) -> List[str]:
     modified_projects: List[str] = []
-    modified_files = subprocess.getoutput("git diff HEAD^ HEAD --name-only")
+    modified_files = subprocess.getoutput(
+        "git fetch && git diff origin/main HEAD --name-only"
+    )
     for proj in projects:
         if f"projects/{proj}" in modified_files:
             modified_projects.append(proj)

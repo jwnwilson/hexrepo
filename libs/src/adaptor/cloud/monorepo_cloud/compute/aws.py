@@ -27,6 +27,7 @@ class AWSComputeManager:
             else:
                 filters.append({"Name": "tag:" + tag, "Values": [tags[tag]]})
 
+        logger.info(f"Getting instances with filters: {filters}")
         instance_data = self.client.describe_instances(Filters=filters)  # type: ignore
         instancelist: List[InstanceTypeDef] = []
         for reservation in instance_data["Reservations"]:
@@ -35,6 +36,8 @@ class AWSComputeManager:
                     instancelist.append(instance)
                 elif instance["State"]["Name"].lower() == state.lower():
                     instancelist.append(instance)
+
+        logger.info(f"Found {len(instancelist)} instances")
         return instancelist
 
     def get_instances_ids(

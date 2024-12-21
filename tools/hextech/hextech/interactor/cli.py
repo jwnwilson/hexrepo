@@ -31,9 +31,12 @@ from hextech.domain.project import (
     get_library_type,
     get_projects,
     install_library_in_project,
+    library_version_bump_required,
+    validate_libraries,
 )
 from hextech.domain.prompts.common import (
     prompt_environment,
+    prompt_library,
     prompt_library_type,
     prompt_project,
 )
@@ -163,16 +166,7 @@ def test_projects(run_all: bool = True):
 
 @app.command()
 def test_libs(libraries: Optional[List[str]] = None):
-    repo_libs: List[str] = get_libraries()
-    if "" in libraries:
-        libraries = libraries.remove("")
-
-    if not libraries:
-        libraries: List[str] = get_libraries()
-    else:
-        assert all(
-            lib in repo_libs for lib in libraries
-        ), "Invalid library name provided"
+    libraries: List[str] = validate_libraries(libraries)
 
     for lib in libraries:
         lib_type: str = get_library_type(lib)
@@ -186,6 +180,28 @@ def test_libs(libraries: Optional[List[str]] = None):
 def test_tools():
     typer.echo(f"Running tests for hextech...")
     run_system_command(f"cd tools/hextech && make test")
+
+
+@app.command()
+def check_version_bump(libraries: Optional[List[str]] = None):
+    libraries: List[str] = validate_libraries(libraries)
+    for lib in libraries:
+        if library_version_bump_required(lib):
+            typer.echo(f"Library: '{lib}' needs version bump")
+            raise typer.Abort(
+                f"library '{lib}' needs version bump, (please commit version bump)"
+            )
+        typer.echo(f"Library: '{lib}' version is valid...")
+
+
+@app.command()
+def bump_librariy_version():
+    library: str = prompt_library()
+    typer.echo(f"Bumping version for {library} library...")
+    lib_type: str = get_library_type(library)
+    run_system_command(
+        f"cd libs/src/{lib_type}/{library} && source .venv/bin/activate && poetry version patch"
+    )
 
 
 @app.command()
