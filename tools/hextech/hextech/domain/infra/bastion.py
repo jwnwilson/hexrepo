@@ -1,20 +1,25 @@
-
 import os
 import signal
 import subprocess
-from typing import Any, Dict, List, Optional
 from contextlib import contextmanager
+from typing import Any, Dict, List, Optional
 
 import typer
-from hextech.config import MonorepoConfig
 from monorepo_cloud.compute import AWSComputeManager
 from monorepo_cloud.db import AWSRDSManager
+
+from hextech.config import MonorepoConfig
+
 from ..system import run_system_command
 
 
-def bastion_ssh_tunnel(config: MonorepoConfig, env: str, project: str, background_task: bool = False) -> Optional[Any]:
+def bastion_ssh_tunnel(
+    config: MonorepoConfig, env: str, project: str, background_task: bool = False
+) -> Optional[Any]:
     if config.cloud_provider == "aws":
-        compute_manager: AWSComputeManager = AWSComputeManager(config.cloud_provider_config)
+        compute_manager: AWSComputeManager = AWSComputeManager(
+            config.cloud_provider_config
+        )
         rds_manageer: AWSRDSManager = AWSRDSManager(config.cloud_provider_config)
         instance_ids: List[str] = compute_manager.get_instances_ids(
             tags={"Type": "bastion", "Environment": env}
@@ -22,7 +27,7 @@ def bastion_ssh_tunnel(config: MonorepoConfig, env: str, project: str, backgroun
         rds_host: str = rds_manageer.get_rds_host(
             tags={"Project": project, "Environment": env}
         )
-        
+
         if not instance_ids:
             raise typer.Abort("No bastion instance found")
         if len(instance_ids) > 1:
@@ -52,12 +57,14 @@ def managed_bastion_ssh(config: MonorepoConfig, env: str, project: str):
         print("Shut down ssh tunnel to bastion")
 
 
-def db_exists(config: MonorepoConfig, project: str, env: str,) -> bool:
+def db_exists(
+    config: MonorepoConfig,
+    project: str,
+    env: str,
+) -> bool:
     rds_manageer: AWSRDSManager = AWSRDSManager(config.cloud_provider_config)
     try:
-        rds_manageer.get_rds_host(
-            tags={"Project": project, "Environment": env}
-        )
+        rds_manageer.get_rds_host(tags={"Project": project, "Environment": env})
     except IndexError:
         return False
     return True

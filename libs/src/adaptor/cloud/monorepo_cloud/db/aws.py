@@ -2,10 +2,10 @@ import logging
 import os
 from typing import Any, Dict, List, Optional
 
-import boto3 
+import boto3
+from mypy_boto3_rds.client import RDSClient
 
 from ..config import AWSConfig
-from mypy_boto3_rds.client import RDSClient
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +25,7 @@ class AWSRDSManager:
             if instance_tags[tag] not in tags[tag]:
                 return False
         return True
-    
+
     def get_db_instances(
         self, state: Optional[str] = None, tags: Optional[Dict[str, str]] = None
     ) -> List[Any]:
@@ -52,7 +52,10 @@ class AWSRDSManager:
     def get_db_ids(
         self, state: Optional[str] = None, tags: Optional[Dict[str, str]] = None
     ) -> List[str]:
-        return [db["DBInstanceIdentifier"] for db in self.get_db_instances(state=state, tags=tags)]
+        return [
+            db["DBInstanceIdentifier"]
+            for db in self.get_db_instances(state=state, tags=tags)
+        ]
 
     def get_rds_host(self, tags: Optional[Dict[str, str]] = None) -> str:
         db_instance_ids: List[str] = self.get_db_ids(tags=tags)
@@ -63,7 +66,7 @@ class AWSRDSManager:
         )
         return db_instance_info["DBInstances"][0]["Endpoint"]["Address"]  # type: ignore
 
-    def start_dbs(self, db_instance_ids: List[str]) -> List[str]: 
+    def start_dbs(self, db_instance_ids: List[str]) -> List[str]:
         for db_instance_id in db_instance_ids:
             self.client.start_db_instance(DBInstanceIdentifier=db_instance_id)
             logger.info(f"Started RDS instance: {db_instance_id}")
@@ -74,8 +77,7 @@ class AWSRDSManager:
             self.client.stop_db_instance(DBInstanceIdentifier=db_instance_id)
             logger.info(f"Stopped RDS instance: {db_instance_id}")
         return db_instance_ids
-    
+
     @classmethod
     def instance_tags_to_dict(cls, instance: Dict[str, Any]) -> Dict[str, str]:
         return {tag["Key"]: tag["Value"] for tag in instance.get("TagList", [])}
-

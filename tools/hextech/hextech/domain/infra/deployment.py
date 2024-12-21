@@ -1,17 +1,24 @@
-from contextlib import chdir
 import json
+import os
 import signal
 import subprocess
+from contextlib import chdir
 from typing import Dict, List, Optional
-import os
 
 import typer
 
-from hextech.domain.infra.code_repo import authenticate_lib_repo
 from hextech.config import MonorepoConfig
-from hextech.domain.project import get_libraries, get_library_type, get_modified_libraries, get_modified_projects, get_projects, get_projects_usings_libraries
-from hextech.domain.system import run_system_command, run_system_command_with_output
 from hextech.domain.infra.bastion import db_exists, managed_bastion_ssh
+from hextech.domain.infra.code_repo import authenticate_lib_repo
+from hextech.domain.project import (
+    get_libraries,
+    get_library_type,
+    get_modified_libraries,
+    get_modified_projects,
+    get_projects,
+    get_projects_usings_libraries,
+)
+from hextech.domain.system import run_system_command, run_system_command_with_output
 
 
 def create_lib_infra(config: MonorepoConfig) -> None:
@@ -21,12 +28,18 @@ def create_lib_infra(config: MonorepoConfig) -> None:
         run_system_command("make tf_shared_init")
         run_system_command("make tf_shared_apply")
         code_repo_data = subprocess.getoutput("make tf_shared_output")
-        code_repo_url = json.loads(code_repo_data)["aws_codeartifact_repository_endpoint"]["value"]
+        code_repo_url = json.loads(code_repo_data)[
+            "aws_codeartifact_repository_endpoint"
+        ]["value"]
         config.set_config_var("monorepo_lib_repo_url", code_repo_url, set_env=True)
     typer.echo("Infrastructure setup complete.")
 
 
-def publish_libs(config: MonorepoConfig, libraries: Optional[List[str]] = None, check_modified: bool = False) -> None:
+def publish_libs(
+    config: MonorepoConfig,
+    libraries: Optional[List[str]] = None,
+    check_modified: bool = False,
+) -> None:
     typer.echo("Publishing libraries to repo...")
     # Get code repo token
     assert os.environ.get("MONOREPO_LIB_REPO_URL"), "Library repo url not found."
@@ -49,7 +62,13 @@ def publish_libs(config: MonorepoConfig, libraries: Optional[List[str]] = None, 
     typer.echo("Libraries published successfully.")
 
 
-def deploy_projects(env: str, config: MonorepoConfig, projects: Optional[List[str]], check_modified: bool = False, no_input: bool = False) -> None:
+def deploy_projects(
+    env: str,
+    config: MonorepoConfig,
+    projects: Optional[List[str]],
+    check_modified: bool = False,
+    no_input: bool = False,
+) -> None:
     typer.echo("Publishing projects to repo...")
     # Publish all libraries if none specified
     projects = projects if projects else get_projects()
@@ -128,8 +147,12 @@ def env_infra_apply_command(config: MonorepoConfig, env: str) -> None:
 
 
 def get_terrform_output(env: str, project: str) -> str:
-    run_system_command(f"cd projects/{project} && make tf_init && make tf_refresh ENVIRONMENT={env}")
-    tf_str: str = run_system_command_with_output(f"cd projects/{project} && make --no-print-directory tf_output ENVIRONMENT={env}")
+    run_system_command(
+        f"cd projects/{project} && make tf_init && make tf_refresh ENVIRONMENT={env}"
+    )
+    tf_str: str = run_system_command_with_output(
+        f"cd projects/{project} && make --no-print-directory tf_output ENVIRONMENT={env}"
+    )
     typer.echo(f"Loading Terraform output")
     try:
         return json.loads(tf_str)
@@ -140,25 +163,34 @@ def get_terrform_output(env: str, project: str) -> str:
 def migrate_db(config: MonorepoConfig, env: str, project: str):
     if config.cloud_provider == "aws" and env != "local":
         if not db_exists(config, project, env):
-            typer.echo(f"DB not found for project {project} in environment {env}, skipping migration")
+            typer.echo(
+                f"DB not found for project {project} in environment {env}, skipping migration"
+            )
             return
         # Start bastion
         with managed_bastion_ssh(config, env, project) as bastion_process:
             try:
                 tf_output: Dict[str, str] = get_terrform_output(env, project)
                 secret_name = tf_output["db_secret_name"]["value"]
-                db_url = "postgresql+psycopg2://postgres:{password}@127.0.0.1:5432/" + project
+                db_url = (
+                    "postgresql+psycopg2://postgres:{password}@127.0.0.1:5432/"
+                    + project
+                )
 
                 # Run migration with secret name set
                 # stop making docker db call
                 typer.echo(f"Running migration for project {project}")
-                run_system_command(f"""
+                run_system_command(
+                    f"""
                     cd projects/{project} && \
                     make --no-print-directory db_migrate DB_PASSWORD_SECRET_NAME={secret_name} DB_URL={db_url} CLOUD_PROVIDER={config.cloud_provider}
-                """)
+                """
+                )
             except Exception as err:
                 typer.echo(f"Error running migration: {err}")
 
     elif env == "local":
         typer.echo("Running migration locally")
-        run_system_command(f"cd projects/{project} && make --no-print-directory db_migrate")
+        run_system_command(
+            f"cd projects/{project} && make --no-print-directory db_migrate"
+        )

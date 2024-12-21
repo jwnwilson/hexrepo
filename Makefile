@@ -56,13 +56,9 @@ test_tools: hextech
 	@echo "Testing tools..."
 	hextech test-tools
 
-lint_projects: hextech
+lint: hextech
 	@echo "Linting projects..."
-	hextech lint_projects
-
-lint_libs: hextech
-	@echo "Linting libraries..."
-	hextech lint_libs
+	hextech lint
 
 deploy_projects: hextech
 	@echo "Deploying projects..."

@@ -1,6 +1,7 @@
 import typer
-from hextech.config import MonorepoConfig
 from monorepo_cloud.code_repo import authenticate_repo
+
+from hextech.config import MonorepoConfig
 
 
 def authenticate_lib_repo(config: MonorepoConfig) -> str:
@@ -10,6 +11,6 @@ def authenticate_lib_repo(config: MonorepoConfig) -> str:
         typer.echo("Authenticating with cloud provider...")
         auth_token = authenticate_repo(config.cloud_provider_config)
         typer.echo("Authentication successful.")
-        config.set_env_var( "MONOREPO_LIB_REPO_PASSWORD", auth_token)
+        config.set_env_var("MONOREPO_LIB_REPO_PASSWORD", auth_token)
         config.set_env_var("MONOREPO_LIB_REPO_USERNAME", "aws")
     return auth_token

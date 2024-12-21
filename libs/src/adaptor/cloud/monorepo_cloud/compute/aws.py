@@ -3,10 +3,9 @@ import os
 from typing import Any, Dict, List, Optional
 
 import boto3
+from mypy_boto3_ec2.client import EC2Client
 
 from monorepo_cloud.config import AWSConfig
-from mypy_boto3_ec2.client import EC2Client
-    
 
 logger = logging.getLogger()
 
@@ -40,15 +39,17 @@ class AWSComputeManager:
     def get_instances_ids(
         self, state: Optional[str] = None, tags: Optional[Dict[str, Any]] = None
     ) -> List[str]:
-        return [inst["InstanceId"] for inst in self.get_instances(state=state, tags=tags)]
+        return [
+            inst["InstanceId"] for inst in self.get_instances(state=state, tags=tags)
+        ]
 
-    def start_instances(self, instance_ids: List[str]) -> List[str]:        
+    def start_instances(self, instance_ids: List[str]) -> List[str]:
         self.client.start_instances(InstanceIds=instance_ids)
         logger.info("Started instances: " + str(instance_ids))
 
         return instance_ids
 
-    def stop_instances(self, instance_ids: List[str]) -> List[str]:        
+    def stop_instances(self, instance_ids: List[str]) -> List[str]:
         self.client.stop_instances(InstanceIds=instance_ids)
         logger.info("Stopped instances: " + str(instance_ids))
 

@@ -1,9 +1,9 @@
-
-from contextlib import chdir
-import os
 import json
+import os
 import subprocess
+from contextlib import chdir
 from typing import List, Optional, Set
+
 import typer
 
 from .system import run_system_command
@@ -26,7 +26,7 @@ def get_projects() -> List[str]:
     return scan_folder(project_folder)
 
 
-def get_libraries()-> List[str]:
+def get_libraries() -> List[str]:
     adaptor_folder = "libs/src/adaptor"
     interactor_folder = "libs/src/interactor"
     return scan_folder(adaptor_folder) + scan_folder(interactor_folder)
@@ -73,7 +73,7 @@ def get_library_type(library: str) -> str:
         return "interactor"
     else:
         raise RuntimeError(f"Library {library} not found")
-    
+
 
 def install_library_in_project(library: str, project: str):
     # Install library locally in poetry dev group
@@ -85,7 +85,8 @@ def install_library_in_project(library: str, project: str):
 
     library_type = get_library_type(library)
     with chdir(f"projects/{project}"):
-        run_system_command(f"poetry add --editable ../../libs/src/{library_type}/{library} -G dev")
+        run_system_command(
+            f"poetry add --editable ../../libs/src/{library_type}/{library} -G dev"
+        )
         run_system_command(f"poetry add {library} -G prod")
     typer.echo(f"Library {library} installed in project {project}")
-

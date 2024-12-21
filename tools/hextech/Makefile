@@ -14,3 +14,6 @@ test: venv
 	@echo "Running unit tests"
 	. $(VENV_DIR)/bin/activate; \
 	pytest
+
+lint:
+	@TARGET_DIRS="hextech" bash ../../tools/bash_scripts/lint.sh
