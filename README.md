@@ -45,9 +45,6 @@ AWS_SECRET_ACCESS_KEY
 
 - Setup backend
     - Setup project to schedule bastion up / down time based on ec2 and rds tags
-    - Auto increment library version in pipeline
-        - Add githook and pipeline check to check if version needs to be increased
-        - Add command to bump library version
     - Add cookiecutter option for public access via api gateway + domain
         - Use single domain per project by default
     - Play with AI crawler project 
