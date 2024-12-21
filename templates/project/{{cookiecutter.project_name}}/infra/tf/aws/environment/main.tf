@@ -51,7 +51,7 @@ module "example_api" {
   {% if (cookiecutter.cloud_provider == "aws" and cookiecutter.use_api == "y") %}
   lambda_command    = ["src.app.interactor.aws.lambda_api.handler"]
   {% elif cookiecutter.cloud_provider == "aws" %}
-  lambda_command    = ["src.app.interactor.event.lambda.handler"]
+  lambda_command    = ["src.app.interactor.event.aws.handler"]
   {% else %}
   lambda_command    = ["uvicorn", "app.interactor.api.fastapi.main:app", "--host", "0.0.0.0", "--port", "8000"]
   {% endif %}

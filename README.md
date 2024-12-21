@@ -45,25 +45,25 @@ AWS_SECRET_ACCESS_KEY
 
 - Setup backend
     - Setup project to schedule bastion up / down time based on ec2 and rds tags
-    - Play with AI crawler project 
-    - Plan project env infra requires apply on shared infa first in pipeline 
+    - Auto increment library version in pipeline
+        - Add githook and pipeline check to check if version needs to be increased
+        - Add command to bump library version
     - Add cookiecutter option for public access via api gateway + domain
         - Use single domain per project by default
+    - Play with AI crawler project 
+    - Plan project env infra requires apply on shared infa first in pipeline 
     - Combine shared infra + env infra pull add envs to config and pull them down 
-    - Implement template -> project update:
-        - Look at cruft again
-        - Re-render template with project settings 
-        - Create Diff with changes
-        - Add CI job to detect template changes and add a new PR with applied patch to projects
-    - Auto increment version in pipeline
-        - Add githook to check if version needs to be increased
-        - Add command to bump library version
     - Setup async tasks
         - migrate hex lib into this repo
             https://github.com/jwnwilson/hex-lib/tree/main/src/hex_lib/adapter/out
         - SQS + lambda
         - Setup task chaining with idempotent re-run
     - Setup auth / cross project auth / authorisation
+    - Implement template -> project update:
+        - Look at cruft again
+        - Re-render template with project settings 
+        - Create Diff with changes
+        - Add CI job to detect template changes and add a new PR with applied patch to projects
     - Setup command to run local against bastion db
     - Improve docker container builds
         - Reduce image size
@@ -80,6 +80,7 @@ AWS_SECRET_ACCESS_KEY
         - Look at https://github.com/nektos/act
         - Port changes to all libs and projects
         - Switch to bastion to access all dbs as needed
+    - Add smoke test / E2E tests
     - Add another cloud provider - GCP
 
 - Full monorepo setup with hextech cli command like turbo repo

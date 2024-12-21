@@ -19,5 +19,5 @@ ENV PYTHONPATH ${LAMBDA_TASK_ROOT}/src
 {% if cookiecutter.use_api == 'y' %}
 CMD ["src.app.interactor.aws.lambda_api.handler"]
 {% else %}
-CMD ["src.app.interactor.event.lambda.handler"]
+CMD ["src.app.interactor.event.aws.handler"]
 {% endif %}
