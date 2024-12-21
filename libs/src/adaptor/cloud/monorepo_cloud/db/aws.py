@@ -1,9 +1,11 @@
 import logging
+import os
 from typing import Any, Dict, List, Optional
 
-import boto3  # type: ignore
+import boto3 
 
 from ..config import AWSConfig
+from mypy_boto3_rds.client import RDSClient
 
 logger = logging.getLogger(__name__)
 
@@ -11,7 +13,8 @@ logger = logging.getLogger(__name__)
 class AWSRDSManager:
     def __init__(self, config: AWSConfig):
         self.config: AWSConfig = config
-        self.client = boto3.client("rds", self.config.AWS_REGION)
+        self.client: RDSClient = boto3.client("rds", self.config.AWS_REGION)
+        self.disable_writes: bool = os.environ.get("DISABLE_CLOUD_WRITES", "false") == "true"
 
     def instance_has_tags(self, instance: Dict[str, Any], tags: Dict[str, str]) -> bool:
         instance_tags: Dict[str, str] = {
@@ -53,15 +56,21 @@ class AWSRDSManager:
         )
         return db_instance_info["DBInstances"][0]["Endpoint"]["Address"]  # type: ignore
 
-    def start_dbs(self, state: str) -> List[str]:
-        db_instance_ids: List[str] = self.get_db_ids(state=state)
+    def start_dbs(self, db_instance_ids: List[str]) -> List[str]:
+        if self.disable_writes:
+            logger.info("Skipping starting instances due to DISABLE_CLOUD_WRITES")
+            return db_instance_ids
+        
         for db_instance_id in db_instance_ids:
             self.client.start_db_instance(DBInstanceIdentifier=db_instance_id)
             logger.info(f"Started RDS instance: {db_instance_id}")
         return db_instance_ids
 
-    def stop_rds(self, state: str) -> List[str]:
-        db_instance_ids: List[str] = self.get_db_ids(state=state)
+    def stop_rds(self, db_instance_ids: List[str]) -> List[str]:
+        if self.disable_writes:
+            logger.info("Skipping stopping instances due to DISABLE_CLOUD_WRITES")
+            return db_instance_ids
+        
         for db_instance_id in db_instance_ids:
             self.client.stop_db_instance(DBInstanceIdentifier=db_instance_id)
             logger.info(f"Stopped RDS instance: {db_instance_id}")

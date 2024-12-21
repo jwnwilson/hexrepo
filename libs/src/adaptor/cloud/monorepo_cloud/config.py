@@ -1,7 +1,7 @@
 import json
 import logging
 import os
-from typing import Optional
+from pathlib import Path
 
 from pydantic import BaseModel
 from pydantic_settings import BaseSettings
@@ -30,8 +30,9 @@ config: Config = Config()
 
 
 def load_aws_config() -> AWSConfig:
-    # Get config dir
-    config_path: str = "config.json"
+    # Get config dir relatieve to this file
+    script_path: Path = Path(os.path.realpath(__file__))
+    config_path: str = script_path.parent.parent.parent.parent.parent / "config.json"
     try:
         with open(config_path) as f:
             config = json.load(f)
