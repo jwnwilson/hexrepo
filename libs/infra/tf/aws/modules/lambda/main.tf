@@ -85,27 +85,29 @@ module "lambda" {
   vpc_security_group_ids = concat(var.security_group_ids, [module.security_group.security_group_id])
 }
 
-# Lambda keep warm events, disabled to aid debugging
+# Schedule Lambda 
 
-# resource "aws_cloudwatch_event_rule" "every_one_minute" {
-#   name                = "every-one-minute"
-#   description         = "Fires every one minutes"
-#   schedule_expression = "rate(1 minute)"
-# }
+resource "aws_cloudwatch_event_rule" "schedule_lambda" {
+  count               = var.lambda_schedule_expression ? 1 : 0
+  name                = "every-one-minute"
+  description         = "Fires every one minutes"
+  # schedule_expression = "rate(1 minute)"
+  schedule_expression = var.lambda_schedule_expression ? var.lambda_schedule_expression : null
+}
 
-# resource "aws_cloudwatch_event_target" "check_foo_every_one_minute" {
-#   rule      = "${aws_cloudwatch_event_rule.every_one_minute.name}"
-#   target_id = "lambda"
-#   arn       = "${module.lambda.lambda_function_arn}"
-# }
+resource "aws_cloudwatch_event_target" "check_foo_every_one_minute" {
+  rule      = "${aws_cloudwatch_event_rule.every_one_minute.name}"
+  target_id = "lambda"
+  arn       = "${module.lambda.lambda_function_arn}"
+}
 
-# resource "aws_lambda_permission" "allow_cloudwatch" {
-#   statement_id  = "AllowExecutionFromCloudWatch"
-#   action        = "lambda:InvokeFunction"
-#   function_name = "${module.lambda.lambda_function_name}"
-#   principal     = "events.amazonaws.com"
-#   source_arn    = "${aws_cloudwatch_event_rule.every_one_minute.arn}"
-# }
+resource "aws_lambda_permission" "allow_cloudwatch" {
+  statement_id  = "AllowExecutionFromCloudWatch"
+  action        = "lambda:InvokeFunction"
+  function_name = "${module.lambda.lambda_function_name}"
+  principal     = "events.amazonaws.com"
+  source_arn    = "${aws_cloudwatch_event_rule.every_one_minute.arn}"
+}
 
 resource "aws_iam_policy" "sqs-secret-lambda-policy" {
   name        = "sqs-secret-lambda-policy-${var.project}-${var.environment}"
