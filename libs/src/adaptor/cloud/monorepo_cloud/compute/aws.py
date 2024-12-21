@@ -3,7 +3,7 @@ import os
 from typing import Any, Dict, List, Optional
 
 import boto3
-from mypy_boto3_ec2.client import EC2Client
+from mypy_boto3_ec2.client import EC2Client  # type: ignore
 
 from monorepo_cloud.config import AWSConfig
 

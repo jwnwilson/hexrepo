@@ -3,7 +3,7 @@ import os
 from typing import Any, Dict, List, Optional
 
 import boto3
-from mypy_boto3_rds.client import RDSClient
+from mypy_boto3_rds.client import RDSClient  # type: ignore
 
 from ..config import AWSConfig
 

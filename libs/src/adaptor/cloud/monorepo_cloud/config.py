@@ -2,6 +2,7 @@ import json
 import logging
 import os
 from pathlib import Path
+from typing import Any, Dict
 
 from pydantic import BaseModel
 from pydantic_settings import BaseSettings
@@ -32,9 +33,11 @@ config: Config = Config()
 def load_aws_config() -> AWSConfig:
     # Get config dir relatieve to this file
     script_path: Path = Path(os.path.realpath(__file__))
-    config_path: str = script_path.parent.parent.parent.parent.parent / "config.json"
+    config_path: str = str(
+        script_path.parent.parent.parent.parent.parent / "config.json"
+    )
     try:
-        with open(str(config_path)) as f:
+        with open(config_path) as f:
             config: Dict[str, Any] = json.load(f)
     except FileNotFoundError:
         raise Exception(

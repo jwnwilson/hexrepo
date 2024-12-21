@@ -2,7 +2,7 @@ import logging
 import os
 from typing import Any, List, Optional
 
-import boto3  # type: ignore
+import boto3
 
 from ..config import AWSConfig, config
 from .exceptions import StorageAlreadyExists, StorageInvalid
