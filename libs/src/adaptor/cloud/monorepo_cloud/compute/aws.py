@@ -3,7 +3,8 @@ import os
 from typing import Any, Dict, List, Optional
 
 import boto3
-from mypy_boto3_ec2.client import EC2Client  # type: ignore
+from mypy_boto3_ec2.client import EC2Client
+from mypy_boto3_ec2.type_defs import InstanceTypeDef
 
 from monorepo_cloud.config import AWSConfig
 
@@ -17,7 +18,7 @@ class AWSComputeManager:
 
     def get_instances(
         self, state: Optional[str] = None, tags: Optional[Dict[str, Any]] = None
-    ) -> List[Dict[str, Any]]:
+    ) -> List[InstanceTypeDef]:
         filters: List[Dict[str, Any]] = []
         tags = tags or {}
         for tag in tags:
@@ -26,8 +27,8 @@ class AWSComputeManager:
             else:
                 filters.append({"Name": "tag:" + tag, "Values": [tags[tag]]})
 
-        instance_data = self.client.describe_instances(Filters=filters)
-        instancelist = []
+        instance_data = self.client.describe_instances(Filters=filters)  # type: ignore
+        instancelist: List[InstanceTypeDef] = []
         for reservation in instance_data["Reservations"]:
             for instance in reservation["Instances"]:
                 if not state:
@@ -56,5 +57,5 @@ class AWSComputeManager:
         return instance_ids
 
     @classmethod
-    def instance_tags_to_dict(cls, instance: Dict[str, Any]) -> Dict[str, str]:
+    def instance_tags_to_dict(cls, instance: InstanceTypeDef) -> Dict[str, str]:
         return {tag["Key"]: tag["Value"] for tag in instance.get("Tags", [])}

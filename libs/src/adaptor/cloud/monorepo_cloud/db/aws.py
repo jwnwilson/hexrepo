@@ -1,9 +1,9 @@
 import logging
-import os
 from typing import Any, Dict, List, Optional
 
 import boto3
-from mypy_boto3_rds.client import RDSClient  # type: ignore
+from mypy_boto3_rds.client import RDSClient
+from mypy_boto3_rds.type_defs import DBInstanceTypeDef
 
 from ..config import AWSConfig
 
@@ -15,7 +15,9 @@ class AWSRDSManager:
         self.config: AWSConfig = config
         self.client: RDSClient = boto3.client("rds", self.config.AWS_REGION)
 
-    def instance_has_tags(self, instance: Dict[str, Any], tags: Dict[str, str]) -> bool:
+    def instance_has_tags(
+        self, instance: DBInstanceTypeDef, tags: Dict[str, str]
+    ) -> bool:
         instance_tags: Dict[str, str] = {
             tag["Key"]: tag["Value"] for tag in instance["TagList"]
         }
@@ -28,7 +30,7 @@ class AWSRDSManager:
 
     def get_db_instances(
         self, state: Optional[str] = None, tags: Optional[Dict[str, str]] = None
-    ) -> List[Any]:
+    ) -> List[DBInstanceTypeDef]:
         filters: List[Dict[str, Any]] = []
         tags = tags or {}
         for tag in tags:
@@ -37,7 +39,7 @@ class AWSRDSManager:
             else:
                 filters.append({"Name": "tag:" + tag, "Values": [tags[tag]]})
 
-        db_instances = []
+        db_instances: List[DBInstanceTypeDef] = []
         db_instance_info = self.client.describe_db_instances()
         for each_db in db_instance_info["DBInstances"]:
             if not self.instance_has_tags(each_db, tags):
@@ -64,7 +66,7 @@ class AWSRDSManager:
         db_instance_info = self.client.describe_db_instances(
             DBInstanceIdentifier=db_instance_ids[0]
         )
-        return db_instance_info["DBInstances"][0]["Endpoint"]["Address"]  # type: ignore
+        return db_instance_info["DBInstances"][0]["Endpoint"]["Address"]
 
     def start_dbs(self, db_instance_ids: List[str]) -> List[str]:
         for db_instance_id in db_instance_ids:

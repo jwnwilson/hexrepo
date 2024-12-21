@@ -3,7 +3,7 @@ import os
 from typing import Any, List, Optional
 
 import boto3
-from mypy_boto3_s3.client import S3Client  # type: ignore
+from mypy_boto3_s3.client import S3Client
 
 from ..config import AWSConfig, config
 from .exceptions import StorageAlreadyExists, StorageInvalid
@@ -115,7 +115,7 @@ class S3Adaptor(StorageAdaptor):
             # Create S3 bucket
             client.create_bucket(
                 Bucket=bucket_name,
-                CreateBucketConfiguration={"LocationConstraint": config.AWS_REGION},
+                CreateBucketConfiguration={"LocationConstraint": config.AWS_REGION},  # type: ignore
             )
         except Exception as err:
             if "BucketAlreadyOwnedByYou" in str(err):
