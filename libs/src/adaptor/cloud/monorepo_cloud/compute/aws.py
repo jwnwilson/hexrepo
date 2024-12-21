@@ -27,7 +27,9 @@ class AWSComputeManager:
             else:
                 filters.append({"Name": "tag:" + tag, "Values": [tags[tag]]})
 
+        logger.info(f"Getting instances with filters: {filters}")
         instance_data = self.client.describe_instances(Filters=filters)  # type: ignore
+        logger.info(f"Found {len(instance_data)} instances")
         instancelist: List[InstanceTypeDef] = []
         for reservation in instance_data["Reservations"]:
             for instance in reservation["Instances"]:

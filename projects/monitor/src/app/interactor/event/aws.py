@@ -122,8 +122,8 @@ def should_stop_db_instance(instance: Dict[str, Any]) -> bool:
 
 def handler(event, context):
     aws_config: AWSConfig = load_aws_config()
-    compute_manager: AWSComputeManager = get_compute_manager(config=aws_config)
-    rds_manager: AWSRDSManager = get_db_manager(config=aws_config)
+    compute_manager: AWSComputeManager = get_compute_manager(aws_config=aws_config)
+    rds_manager: AWSRDSManager = get_db_manager(aws_config=aws_config)
     compute_instances: List[Any] = compute_manager.get_instances(
         tags={"Type": "bastion"}
     )

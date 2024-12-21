@@ -9,8 +9,6 @@ from ..config import AWSConfig
 
 logger = logging.getLogger(__name__)
 
-print("test")
-
 
 class AWSRDSManager:
     def __init__(self, config: AWSConfig):
@@ -42,7 +40,9 @@ class AWSRDSManager:
                 filters.append({"Name": "tag:" + tag, "Values": [tags[tag]]})
 
         db_instances: List[DBInstanceTypeDef] = []
+        logger.info(f"Getting RDS with filters: {filters}")
         db_instance_info = self.client.describe_db_instances()
+        logger.info(f"Found {len(db_instance_info)} RDS instance")
         for each_db in db_instance_info["DBInstances"]:
             if not self.instance_has_tags(each_db, tags):
                 continue

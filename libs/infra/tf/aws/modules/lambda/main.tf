@@ -31,6 +31,25 @@ data "aws_security_group" "selected" {
   }
 }
 
+module "security_group" {
+  source  = "terraform-aws-modules/security-group/aws"
+  version = "~> 4"
+
+  name        = "${var.project}-sg-${var.environment}-internet-access"
+  description = "Internet access for lambda"
+  vpc_id      = var.vpc_id
+
+  egress_with_cidr_blocks = [
+    {
+      from_port   = 0
+      to_port     = 0
+      protocol    = -1
+      description = "Allow all outgoing connections"
+      cidr_blocks = "0.0.0.0/0"
+    }
+  ]
+}
+
 module "lambda" {
   source                  = "terraform-aws-modules/lambda/aws"
 
@@ -63,8 +82,7 @@ module "lambda" {
   image_config_command = var.lambda_command
 
   vpc_subnet_ids         = data.aws_subnets.vpc_subnet_ids.ids
-  vpc_security_group_ids = var.security_group_ids
-
+  vpc_security_group_ids = concat(var.security_group_ids, [module.security_group.security_group_id])
 }
 
 # Lambda keep warm events, disabled to aid debugging

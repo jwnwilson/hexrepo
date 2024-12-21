@@ -2,7 +2,7 @@ import json
 import logging
 import os
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 from pydantic import BaseModel
 from pydantic_settings import BaseSettings
@@ -22,9 +22,9 @@ class Config(BaseSettings):
 
 
 class AWSConfig(BaseModel):
-    AWS_ACCOUNT: str
     AWS_REGION: str
-    AWS_TF_STATE_BUCKET: str
+    AWS_ACCOUNT: Optional[str] = ""
+    AWS_TF_STATE_BUCKET: Optional[str] = ""
 
 
 config: Config = Config()
@@ -34,8 +34,8 @@ def load_aws_config() -> AWSConfig:
     try:
         return AWSConfig(
             AWS_REGION=os.environ["AWS_REGION"],
-            AWS_ACCOUNT=os.environ["AWS_ACCOUNT"],
-            AWS_TF_STATE_BUCKET=os.environ["AWS_TF_STATE_BUCKET"],
+            AWS_ACCOUNT=os.environ.get("AWS_ACCOUNT", ""),
+            AWS_TF_STATE_BUCKET=os.environ.get("AWS_TF_STATE_BUCKET", ""),
         )
     except KeyError:
         pass
