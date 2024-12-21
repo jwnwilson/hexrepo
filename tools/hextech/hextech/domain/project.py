@@ -49,9 +49,8 @@ def validate_libraries(libraries: Optional[List[str]] = None) -> List[str]:
 def library_version_bump_required(library: str) -> bool:
     library_type: str = get_library_type(library)
     modified_files = subprocess.getoutput("git fetch && git diff origin/main HEAD --name-only")
-    breakpoint()
     if f"libs/src/{library_type}/{library}" in modified_files:
-        pyproject_diff = subprocess.getoutput(f"git diff origin/main HEAD libs/src/{library_type}/{library}/pyproject.toml")
+        pyproject_diff: str = subprocess.getoutput(f"git diff origin/main HEAD libs/src/{library_type}/{library}/pyproject.toml")
         if "version = " in pyproject_diff:
             return False
         return True

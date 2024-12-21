@@ -187,7 +187,8 @@ def check_version_bump(libraries: Optional[List[str]] = None):
     libraries: List[str] = validate_libraries(libraries)
     for lib in libraries:
         if library_version_bump_required(lib):
-            raise typer.Abort(f"library '{lib}' needs version bump")
+            typer.echo(f"Library: '{lib}' needs version bump")
+            raise typer.Abort(f"library '{lib}' needs version bump, (please commit version bump)")
         typer.echo(f"Library: '{lib}' version is valid...")
 
 
@@ -197,7 +198,7 @@ def bump_librariy_version():
     library: str = prompt_library()
     typer.echo(f"Bumping version for {library} library...")
     lib_type: str = get_library_type(library)
-    run_system_command(f"cd libs/src/{lib_type}/{library} && source ~/.venv/bin/activate && poetry version patch")
+    run_system_command(f"cd libs/src/{lib_type}/{library} && source .venv/bin/activate && poetry version patch")
 
 
 @app.command()
