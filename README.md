@@ -44,12 +44,10 @@ AWS_SECRET_ACCESS_KEY
 # To Do
 
 - Setup backend
-    - Setup project to schedule bastion up / down time based on ec2 and rds tags
+    - Combine shared infra + env infra pull add envs to config and pull them down 
     - Add cookiecutter option for public access via api gateway + domain
         - Use single domain per project by default
     - Play with AI crawler project 
-    - Plan project env infra requires apply on shared infa first in pipeline 
-    - Combine shared infra + env infra pull add envs to config and pull them down 
     - Setup async tasks
         - migrate hex lib into this repo
             https://github.com/jwnwilson/hex-lib/tree/main/src/hex_lib/adapter/out
