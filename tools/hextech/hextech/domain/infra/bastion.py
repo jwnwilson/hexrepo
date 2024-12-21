@@ -16,7 +16,7 @@ def bastion_ssh_tunnel(config: MonorepoConfig, env: str, project: str, backgroun
     if config.cloud_provider == "aws":
         compute_manager: AWSComputeManager = AWSComputeManager(config.cloud_provider_config)
         rds_manageer: AWSRDSManager = AWSRDSManager(config.cloud_provider_config)
-        instance_ids: List[str] = compute_manager.get_instances(
+        instance_ids: List[str] = compute_manager.get_instances_ids(
             tags={"Type": "bastion", "Environment": env}
         )
         rds_host: str = rds_manageer.get_rds_host(

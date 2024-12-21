@@ -16,7 +16,7 @@ def start_infra_command(config: MonorepoConfig):
         aws_compute_manager = AWSComputeManager(config.cloud_provider_config)
         aws_rds_manager = AWSRDSManager(config.cloud_provider_config)
         # start bastion instances that are not running
-        stopped_instances: List[str] = aws_compute_manager.get_instances(state='stopped')
+        stopped_instances: List[str] = aws_compute_manager.get_instances_ids(state='stopped')
         started_instances: List[str] = aws_compute_manager.start_instances(instance_ids=stopped_instances)
         typer.echo(f"Started instances: {started_instances}")
 
@@ -31,7 +31,7 @@ def stop_infra_command(config: MonorepoConfig):
         aws_compute_manager = AWSComputeManager(config.cloud_provider_config)
         aws_rds_manager = AWSRDSManager(config.cloud_provider_config)
         # start bastion instances that are not running
-        running_instances: List[str] = aws_compute_manager.get_instances(state='running')
+        running_instances: List[str] = aws_compute_manager.get_instances_ids(state='running')
         stopped_instances: List[str] = aws_compute_manager.stop_instances(instance_ids=running_instances)
         typer.echo(f"Stopped instances: {stopped_instances}")
 

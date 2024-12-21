@@ -34,8 +34,8 @@ def load_aws_config() -> AWSConfig:
     script_path: Path = Path(os.path.realpath(__file__))
     config_path: str = script_path.parent.parent.parent.parent.parent / "config.json"
     try:
-        with open(config_path) as f:
-            config = json.load(f)
+        with open(str(config_path)) as f:
+            config: Dict[str, Any] = json.load(f)
     except FileNotFoundError:
         raise Exception(
             "Hexrepo config file not found: Please run `make setup` at project root to create config.json"
@@ -44,7 +44,7 @@ def load_aws_config() -> AWSConfig:
         raise Exception("Hexrepo config file is not valid JSON: {err}")
 
     return AWSConfig(
-        AWS_REGION=config["AWS_REGION"],
-        AWS_ACCOUNT=config["AWS_ACCOUNT"],
-        AWS_TF_STATE_BUCKET=config["AWS_TF_STATE_BUCKET"],
+        AWS_REGION=config["cloud_provider_config"]["AWS_REGION"],
+        AWS_ACCOUNT=config["cloud_provider_config"]["AWS_ACCOUNT"],
+        AWS_TF_STATE_BUCKET=config["cloud_provider_config"]["AWS_TF_STATE_BUCKET"],
     )

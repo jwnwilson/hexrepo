@@ -1,0 +1,130 @@
+{
+    "DBInstances": [
+        {
+            "ActivityStreamStatus": "stopped",
+            "AllocatedStorage": 20,
+            "AssociatedRoles": [],
+            "AutoMinorVersionUpgrade": true,
+            "AvailabilityZone": "eu-west-1a",
+            "BackupRetentionPeriod": 0,
+            "BackupTarget": "region",
+            "CACertificateIdentifier": "rds-ca-rsa2048-g1",
+            "CertificateDetails": {
+                "CAIdentifier": "rds-ca-rsa2048-g1",
+                "ValidTill": "2025-11-19 10:46:41+00:00"
+            },
+            "CopyTagsToSnapshot": false,
+            "CustomerOwnedIpEnabled": false,
+            "DBInstanceArn": "arn:aws:rds:eu-west-1:675468650888:db:example-db-default",
+            "DBInstanceClass": "db.t3.micro",
+            "DBInstanceIdentifier": "example-db-default",
+            "DBInstanceStatus": "available",
+            "DBName": "example",
+            "DBParameterGroups": [
+                {
+                    "DBParameterGroupName": "example-db-default-20241119200628658500000001",
+                    "ParameterApplyStatus": "in-sync"
+                }
+            ],
+            "DBSecurityGroups": [],
+            "DBSubnetGroup": {
+                "DBSubnetGroupDescription": "Managed by Terraform",
+                "DBSubnetGroupName": "monorepo-default",
+                "SubnetGroupStatus": "Complete",
+                "Subnets": [
+                    {
+                        "SubnetAvailabilityZone": {
+                            "Name": "eu-west-1a"
+                        },
+                        "SubnetIdentifier": "subnet-0e83d6f735389fc46",
+                        "SubnetOutpost": {},
+                        "SubnetStatus": "Active"
+                    },
+                    {
+                        "SubnetAvailabilityZone": {
+                            "Name": "eu-west-1c"
+                        },
+                        "SubnetIdentifier": "subnet-0cfb6cb1ccb79cc3e",
+                        "SubnetOutpost": {},
+                        "SubnetStatus": "Active"
+                    },
+                    {
+                        "SubnetAvailabilityZone": {
+                            "Name": "eu-west-1b"
+                        },
+                        "SubnetIdentifier": "subnet-0c52b6ed24b35dc6a",
+                        "SubnetOutpost": {},
+                        "SubnetStatus": "Active"
+                    }
+                ],
+                "VpcId": "vpc-0111bd3b54cb526aa"
+            },
+            "DbInstancePort": 0,
+            "DbiResourceId": "db-Q6HOB4Z6WVSOR7DJVBJRREPBQE",
+            "DedicatedLogVolume": false,
+            "DeletionProtection": false,
+            "DomainMemberships": [],
+            "Endpoint": {
+                "Address": "example-db-default.clfqqiusnlbr.eu-west-1.rds.amazonaws.com",
+                "HostedZoneId": "Z29XKXDKYMONMX",
+                "Port": 5432
+            },
+            "Engine": "postgres",
+            "EngineLifecycleSupport": "open-source-rds-extended-support",
+            "EngineVersion": "16.3",
+            "IAMDatabaseAuthenticationEnabled": false,
+            "InstanceCreateTime": "2024-11-19 10:47:30.294000+00:00",
+            "IsStorageConfigUpgradeAvailable": false,
+            "LicenseModel": "postgresql-license",
+            "MasterUserSecret": {
+                "KmsKeyId": "arn:aws:kms:eu-west-1:675468650888:key/4610b7c9-fc85-4939-929e-d05cdaff1baa",
+                "SecretArn": "arn:aws:secretsmanager:eu-west-1:675468650888:secret:rds!db-1a8f04f8-e935-42ff-8c76-5e8bf1fb462d-k0Fejs",
+                "SecretStatus": "active"
+            },
+            "MasterUsername": "postgres",
+            "MaxAllocatedStorage": 100,
+            "MonitoringInterval": 0,
+            "MultiAZ": false,
+            "NetworkType": "IPV4",
+            "OptionGroupMemberships": [
+                {
+                    "OptionGroupName": "default:postgres-16",
+                    "Status": "in-sync"
+                }
+            ],
+            "PendingModifiedValues": {},
+            "PerformanceInsightsEnabled": false,
+            "PreferredBackupWindow": "01:17-01:47",
+            "PreferredMaintenanceWindow": "tue:22:59-tue:23:29",
+            "PubliclyAccessible": false,
+            "ReadReplicaDBInstanceIdentifiers": [],
+            "StorageEncrypted": false,
+            "StorageThroughput": 0,
+            "StorageType": "gp2",
+            "TagList": [
+                {
+                    "Key": "StartTime",
+                    "Value": ""
+                },
+                {
+                    "Key": "Project",
+                    "Value": "example"
+                },
+                {
+                    "Key": "Environment",
+                    "Value": "default"
+                },
+                {
+                    "Key": "StopTime",
+                    "Value": ""
+                }
+            ],
+            "VpcSecurityGroups": [
+                {
+                    "Status": "active",
+                    "VpcSecurityGroupId": "sg-0e3c69c25d94daca1"
+                }
+            ]
+        }
+    ]
+}

@@ -44,7 +44,6 @@ profile = "black"
 
 [tool.pytest.ini_options]
 addopts = "-vv --cov --cov-report xml --cov-report term-missing --cov-fail-under=50"
-asyncio_mode = "auto"
 testpaths = ["app/tests"]
 env_files = ["env/local.env"]
 pythonpath = [
