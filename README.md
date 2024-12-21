@@ -1,6 +1,6 @@
 # Hextech Monorepo
 
-This is my python monorepo inspired by turborepo that uses hexagonal architecture to manage complexity. 
+This is my python monorepo inspired by tools like turborepo that uses hexagonal architecture to manage complexity to create modular reuseable code. 
 
 ![alt text](docs/hextech.png)
 
