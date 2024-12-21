@@ -10,7 +10,7 @@ COPY ./libs/src /libs/src
 COPY ./projects/example/pyproject.toml ./projects/example/poetry.lock* ${LAMBDA_TASK_ROOT}/
 
 # Allow installing dev dependencies to run tests
-RUN poetry lock && poetry install --no-root
+RUN poetry lock && poetry install --no-root --without dev
 
 COPY ./projects/example/src ./src
 COPY ./projects/example/alembic.ini ./

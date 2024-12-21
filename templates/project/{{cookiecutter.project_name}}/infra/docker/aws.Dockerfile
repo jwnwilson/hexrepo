@@ -10,7 +10,7 @@ COPY ./libs/src /libs/src
 COPY ./projects/{{cookiecutter.project_slug}}/pyproject.toml ./projects/{{cookiecutter.project_slug}}/poetry.lock* ${LAMBDA_TASK_ROOT}/
 
 # Allow installing dev dependencies to run tests
-RUN poetry lock && poetry install --no-root
+RUN poetry lock && poetry install --no-root --without dev
 
 COPY ./projects/{{cookiecutter.project_slug}}/src ./src
 COPY ./projects/{{cookiecutter.project_slug}}/alembic.ini ./
