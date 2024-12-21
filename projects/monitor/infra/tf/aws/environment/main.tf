@@ -44,7 +44,9 @@ module "example_api" {
   security_group_ids = [data.aws_security_group.default_sg.id]
 
   environment_variables = {
-    ENVIRONMENT    = terraform.workspace
-    CLOUD_PROVIDER = "AWS"
+    ENVIRONMENT         = terraform.workspace
+    CLOUD_PROVIDER      = "AWS"
+    AWS_ACCOUNT         = "675468650888"
+    AWS_TF_STATE_BUCKET = "monorepo-jwn"
   }
 }

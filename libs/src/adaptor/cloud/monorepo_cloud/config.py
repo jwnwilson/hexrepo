@@ -31,6 +31,15 @@ config: Config = Config()
 
 
 def load_aws_config() -> AWSConfig:
+    try:
+        return AWSConfig(
+            AWS_REGION=os.environ["AWS_REGION"],
+            AWS_ACCOUNT=os.environ["AWS_ACCOUNT"],
+            AWS_TF_STATE_BUCKET=os.environ["AWS_TF_STATE_BUCKET"],
+        )
+    except KeyError:
+        pass
+
     # Get config dir relatieve to this file
     script_path: Path = Path(os.path.realpath(__file__))
     config_path: str = str(
