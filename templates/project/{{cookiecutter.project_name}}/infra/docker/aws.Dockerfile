@@ -7,13 +7,13 @@ RUN curl -sSL https://install.python-poetry.org | python - && \
 
 # Copy poetry.lock* in case it doesn't exist in the repo
 COPY ./libs/src /libs/src
-COPY ./projects/example/pyproject.toml ./projects/example/poetry.lock* ${LAMBDA_TASK_ROOT}/
+COPY ./projects/{{cookiecutter.project_slug}}/pyproject.toml ./projects/{{cookiecutter.project_slug}}/poetry.lock* ${LAMBDA_TASK_ROOT}/
 
 # Allow installing dev dependencies to run tests
 RUN poetry lock && poetry install --no-root
 
-COPY ./projects/example/src ./src
-COPY ./projects/example/alembic.ini ./
+COPY ./projects/{{cookiecutter.project_slug}}/src ./src
+COPY ./projects/{{cookiecutter.project_slug}}/alembic.ini ./
 
 ENV PYTHONPATH ${LAMBDA_TASK_ROOT}/src
 {% if cookiecutter.use_api == 'y' %}
