@@ -151,7 +151,7 @@ def handler(event, context):
             rds_manager.start_dbs(instance_ids=[instance["DBInstanceIdentifier"]])
         elif should_stop_db_instance(instance):
             logger.info(f"Stopping RDS instance: {instance['DBInstanceIdentifier']}")
-            rds_manager.stop_rds(instance_ids=[instance["DBInstanceIdentifier"]])
+            rds_manager.stop_rds(db_instance_ids=[instance["DBInstanceIdentifier"]])
         else:
             logger.info(
                 f"No action needed for RDS instance: {instance['DBInstanceIdentifier']}"

@@ -45,5 +45,5 @@ def stop_infra_command(config: MonorepoConfig):
 
         # start rds instances that are not running
         running_dbs: List[str] = aws_rds_manager.get_db_ids(state="running")
-        stopped_dbs: List[str] = aws_rds_manager.stop_rds(instance_ids=running_dbs)
+        stopped_dbs: List[str] = aws_rds_manager.stop_rds(db_instance_ids=running_dbs)
         typer.echo(f"Stopped dbs: {stopped_dbs}")
