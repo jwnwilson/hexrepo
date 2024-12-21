@@ -3,6 +3,7 @@ import os
 from typing import Any, List, Optional
 
 import boto3
+from mypy_boto3_s3.client import S3Client  # type: ignore
 
 from ..config import AWSConfig, config
 from .exceptions import StorageAlreadyExists, StorageInvalid
@@ -16,11 +17,11 @@ class S3Adaptor(StorageAdaptor):
         self.aws_config: AWSConfig = config
         self.bucket_name = storage_config.aws_bucket
         self.s3 = boto3.resource("s3")
-        self.client = boto3.client("s3")
+        self.client: S3Client = boto3.client("s3")
         self.bucket = self.s3.Bucket(self.bucket_name)
         self.upload_prefix = storage_config.aws_upload_prefix
         self.public_url_timeout: Optional[int] = storage_config.public_url_timeout
-        self._upload_client: Optional[str] = None
+        self._upload_client: Optional[S3Client] = None
 
         if not self.upload_prefix:
             raise RuntimeError("Upload prefix is not set")

@@ -1319,6 +1319,7 @@ files = []
 develop = true
 
 [package.dependencies]
+boto3-stubs = {version = "^1.35.86", extras = ["essential"]}
 pydantic = "^2.9.2"
 pydantic-settings = "^2.6.1"
 
@@ -2243,4 +2244,4 @@ testing = ["coverage[toml]", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "eadf64625a5be74cdc1070e6399cba61adcb23102d67d10a2487276e2cc77f13"
+content-hash = "d12ba8d2fda7de1ec37d7b675e0e1ba6bcd298e0d4b71138ebfad73a651fd52a"

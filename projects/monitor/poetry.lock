@@ -1319,6 +1319,7 @@ files = []
 develop = true
 
 [package.dependencies]
+boto3-stubs = {version = "^1.35.86", extras = ["essential"]}
 pydantic = "^2.9.2"
 pydantic-settings = "^2.6.1"
 
