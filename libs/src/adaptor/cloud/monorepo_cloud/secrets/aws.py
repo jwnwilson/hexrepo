@@ -1,7 +1,7 @@
 import logging
 from typing import Dict
 
-import boto3  # type: ignore
+import boto3
 
 from .interface import SecretAdaptor
 

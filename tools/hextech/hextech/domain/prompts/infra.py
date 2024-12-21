@@ -10,7 +10,9 @@ def prompt_setup_lib_infra() -> bool:
 
 
 def prompt_setup_shared_infra() -> bool:
-    return typer.confirm("Would you like to setup shared infrastructure for environments?")
+    return typer.confirm(
+        "Would you like to setup shared infrastructure for environments?"
+    )
 
 
 def prompt_setup_project_infra() -> bool:

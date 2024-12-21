@@ -1,25 +1,54 @@
 import contextlib
 import os
-from contextlib import chdir
 import sys
+from contextlib import chdir
 from typing import List, Optional
-from typing_extensions import Annotated
-from cookiecutter.main import cookiecutter
+
 import typer
+from cookiecutter.main import cookiecutter
+from typing_extensions import Annotated
 
 from hextech.config import MonorepoConfig, get_or_create_config
-from hextech.domain.infra.manage import start_infra_command, stop_infra_command
-from hextech.domain.infra.code_repo import authenticate_lib_repo
-from hextech.domain.infra.deployment import create_lib_infra, deploy_projects as deploy_projects_command, env_infra_apply_command, env_infra_plan_command, publish_libs, setup_global_env_infra, shared_infra_apply_command, shared_infra_plan_command, migrate_db as migrate_db_func
-from hextech.domain.infra.storage import create_tf_state
-from hextech.domain.project import get_libraries, get_library_type, get_projects, install_library_in_project
-from hextech.domain.prompts.common import prompt_environment, prompt_library_type, prompt_project
-from hextech.domain.prompts.infra import prompt_deploy_libs, prompt_setup_lib_infra, prompt_setup_project_infra, prompt_setup_shared_infra, prompt_setup_tf
-from hextech.domain.templates.libs import generate_libs_makefile
-from hextech.domain.system import run_system_command
 from hextech.domain.infra.bastion import bastion_ssh_tunnel
+from hextech.domain.infra.code_repo import authenticate_lib_repo
+from hextech.domain.infra.deployment import create_lib_infra
+from hextech.domain.infra.deployment import deploy_projects as deploy_projects_command
+from hextech.domain.infra.deployment import (
+    env_infra_apply_command,
+    env_infra_plan_command,
+)
+from hextech.domain.infra.deployment import migrate_db as migrate_db_func
+from hextech.domain.infra.deployment import (
+    publish_libs,
+    setup_global_env_infra,
+    shared_infra_apply_command,
+    shared_infra_plan_command,
+)
+from hextech.domain.infra.manage import start_infra_command, stop_infra_command
+from hextech.domain.infra.storage import create_tf_state
+from hextech.domain.project import (
+    get_libraries,
+    get_library_type,
+    get_projects,
+    install_library_in_project,
+)
+from hextech.domain.prompts.common import (
+    prompt_environment,
+    prompt_library_type,
+    prompt_project,
+)
+from hextech.domain.prompts.infra import (
+    prompt_deploy_libs,
+    prompt_setup_lib_infra,
+    prompt_setup_project_infra,
+    prompt_setup_shared_infra,
+    prompt_setup_tf,
+)
+from hextech.domain.system import run_system_command
+from hextech.domain.templates.libs import generate_libs_makefile
 
 app = typer.Typer()
+
 
 @app.command()
 def setup():
@@ -39,7 +68,7 @@ def setup():
     # Add options to deploy repo to cloud provider
     if prompt_setup_lib_infra():
         create_lib_infra(config)
-    
+
     authenticate_lib_repo(config)
 
     # Publish libraries to repo
@@ -135,14 +164,16 @@ def test_projects(run_all: bool = True):
 @app.command()
 def test_libs(libraries: Optional[List[str]] = None):
     repo_libs: List[str] = get_libraries()
-    if "" in libraries :
-        libraries = libraries.remove("") 
+    if "" in libraries:
+        libraries = libraries.remove("")
 
     if not libraries:
         libraries: List[str] = get_libraries()
     else:
-        assert all(lib in repo_libs for lib in libraries), "Invalid library name provided"
-    
+        assert all(
+            lib in repo_libs for lib in libraries
+        ), "Invalid library name provided"
+
     for lib in libraries:
         lib_type: str = get_library_type(lib)
         typer.echo(f"Running linting for {lib} library...")
@@ -152,23 +183,57 @@ def test_libs(libraries: Optional[List[str]] = None):
 
 
 @app.command()
-def deploy_libs(libraries: Optional[List[str]] = None, check_modified: bool = False, no_input: bool = False):
+def test_tools():
+    typer.echo(f"Running tests for hextech...")
+    run_system_command(f"cd tools/hextech && make test")
+
+
+@app.command()
+def lint():
+    typer.echo(f"Running linting for hextech...")
+    run_system_command(f"cd tools/hextech && make lint")
+    typer.echo(f"Running linting for projects...")
+    projects: List[str] = get_projects()
+    for project in projects:
+        typer.echo(f"Running linting for {project} project...")
+        run_system_command(f"cd projects/{project} && make lint")
+    typer.echo(f"Running linting for libraries...")
+    libraries: List[str] = get_libraries()
+    for lib in libraries:
+        lib_type: str = get_library_type(lib)
+        typer.echo(f"Running linting for {lib_type}/{lib} library...")
+        run_system_command(f"cd libs/src/{lib_type}/{lib} && make lint")
+
+
+@app.command()
+def deploy_libs(
+    libraries: Optional[List[str]] = None,
+    check_modified: bool = False,
+    no_input: bool = False,
+):
     config: MonorepoConfig
     config, _ = get_or_create_config(no_input=no_input)
-    if libraries and "" in libraries :
+    if libraries and "" in libraries:
         libraries = libraries.remove("")
 
     publish_libs(config, libraries=libraries, check_modified=check_modified)
 
 
 @app.command()
-def deploy_projects(env: str, projects: Optional[List[str]] = None, check_modified: bool = False, no_input: bool = False):
+def deploy_projects(
+    env: str,
+    projects: Optional[List[str]] = None,
+    check_modified: bool = False,
+    no_input: bool = False,
+):
     config: MonorepoConfig
     config, _ = get_or_create_config(no_input=no_input)
     if projects and "" in projects:
         projects = projects.remove("")
 
-    deploy_projects_command(env, config, projects=projects, check_modified=check_modified, no_input=no_input)
+    deploy_projects_command(
+        env, config, projects=projects, check_modified=check_modified, no_input=no_input
+    )
 
 
 @app.command()
@@ -186,7 +251,10 @@ def stop_infra():
 
 
 @app.command()
-def bastion(env: Annotated[Optional[str], typer.Argument()] = None, project: Annotated[Optional[str], typer.Argument()] = None):
+def bastion(
+    env: Annotated[Optional[str], typer.Argument()] = None,
+    project: Annotated[Optional[str], typer.Argument()] = None,
+):
     config: MonorepoConfig
     config, _ = get_or_create_config(no_input=True)
     env: str = env or prompt_environment()
@@ -195,7 +263,10 @@ def bastion(env: Annotated[Optional[str], typer.Argument()] = None, project: Ann
 
 
 @app.command()
-def migrate_db(env: Annotated[Optional[str], typer.Argument()] = None, project: Annotated[Optional[str], typer.Argument()] = None):
+def migrate_db(
+    env: Annotated[Optional[str], typer.Argument()] = None,
+    project: Annotated[Optional[str], typer.Argument()] = None,
+):
     config: MonorepoConfig
     config, _ = get_or_create_config(no_input=True)
     env: str = env or prompt_environment()
@@ -211,7 +282,7 @@ def update_projects_from_template():
 
     for project in get_projects():
         os.system(f"git apply --3way --directory projects/{project}/ ./patch")
-    
+
     os.system("rm patch")
 
 

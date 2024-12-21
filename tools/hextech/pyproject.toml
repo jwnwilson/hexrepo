@@ -13,6 +13,7 @@ pyyaml = "^6.0.2"
 boto3 = "^1.35.58"
 pydantic-settings = "^2.6.1"
 monorepo-cloud = {path = "../../libs/src/adaptor/cloud", develop = true}
+boto3-stubs = {extras = ["essential"], version = "^1.35.86"}
 
 [tool.poetry.scripts]
 hextech = "hextech.interactor.cli:app"
@@ -20,6 +21,13 @@ hextech = "hextech.interactor.cli:app"
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.4"
 pytest-cookies = "^0.7.0"
+mypy = "^1.13.0"
+black = "^24.10.0"
+isort = "^5.13.2"
+httpx = "^0.27.2"
+pytest-dotenv = "^0.5.2"
+pytest-cov = "^6.0.0"
+pytest-xdist = "^3.6.1"
 
 [build-system]
 requires = ["poetry-core"]

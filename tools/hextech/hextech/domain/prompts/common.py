@@ -1,4 +1,5 @@
 from typing import List
+
 import typer
 
 from hextech.domain.project import get_environments, get_projects
@@ -9,13 +10,14 @@ def prompt_cloud_provider() -> str:
     print("1 - aws")
     # print("2 - gcp")
     # print("3 - azure")
-    cloud_provider_optio : str = typer.prompt("Choose from [1]")
+    cloud_provider_optio: str = typer.prompt("Choose from [1]")
     try:
         cloud_provider = {"1": "aws"}[cloud_provider_optio]
     except KeyError:
         typer.echo("Invalid cloud provider, please select an option, 1")
         return
     return cloud_provider
+
 
 def prompt_library_type() -> str:
     print("Please enter the library type:")
@@ -46,7 +48,7 @@ def prompt_shell_file() -> str:
 def prompt_environment() -> str:
     print("Please enter environment:")
     enironments: List[str] = get_environments()
-    env_map: List[str] = {str(i+1): env for i, env in enumerate(enironments)}
+    env_map: List[str] = {str(i + 1): env for i, env in enumerate(enironments)}
     options = "\n".join([f"{i} - {project}" for i, project in env_map.items()])
     selection: str = typer.prompt(f"Choose from [{options}]", default="1")
     try:
@@ -60,7 +62,7 @@ def prompt_environment() -> str:
 def prompt_project() -> str:
     print("Please enter project:")
     projects: List[str] = get_projects()
-    project_map: List[str] = {str(i+1): project for i, project in enumerate(projects)}
+    project_map: List[str] = {str(i + 1): project for i, project in enumerate(projects)}
     options = "\n".join([f"{i} - {project}" for i, project in project_map.items()])
     selection: str = typer.prompt(f"Choose from [{options}]", default="1")
     try:

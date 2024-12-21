@@ -52,13 +52,13 @@ test_libs: hextech
 	@echo "Testing libraries..."
 	hextech test-libs --libraries=$(LIBRARY)
 
-lint_projects: hextech
-	@echo "Linting projects..."
-	hextech lint_projects
+test_tools: hextech
+	@echo "Testing tools..."
+	hextech test-tools
 
-lint_libs: hextech
-	@echo "Linting libraries..."
-	hextech lint_libs
+lint: hextech
+	@echo "Linting hextech repo..."
+	hextech lint
 
 deploy_projects: hextech
 	@echo "Deploying projects..."

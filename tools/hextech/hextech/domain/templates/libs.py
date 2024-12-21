@@ -1,5 +1,6 @@
-import jinja2
 from typing import TYPE_CHECKING
+
+import jinja2
 
 if TYPE_CHECKING:
     from hextech.domain.config import MonorepoConfig
