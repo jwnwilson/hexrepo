@@ -51,22 +51,22 @@ module "security_group" {
 }
 
 module "lambda" {
-  source                  = "terraform-aws-modules/lambda/aws"
+  source = "terraform-aws-modules/lambda/aws"
 
-  function_name           = "${var.project}_${var.environment}"
-  description             = var.description
+  function_name = "${var.project}_${var.environment}"
+  description   = var.description
 
-  create_package          = false
+  create_package = false
 
-  image_uri               = "${var.ecr_url}:${var.docker_tag}"
-  package_type            = "Image"
-  architectures          = ["x86_64"]
-  
-  attach_network_policy   = true
-  timeout                 = 30
+  image_uri     = "${var.ecr_url}:${var.docker_tag}"
+  package_type  = "Image"
+  architectures = ["x86_64"]
 
-  attach_tracing_policy   = true
-  tracing_mode            = "Active"
+  attach_network_policy = true
+  timeout               = 30
+
+  attach_tracing_policy = true
+  tracing_mode          = "Active"
 
   # This can be used to reduce the cold starts of lambda
   # provisioned_concurrent_executions = 10
@@ -88,25 +88,26 @@ module "lambda" {
 # Schedule Lambda 
 
 resource "aws_cloudwatch_event_rule" "schedule_lambda" {
-  count               = var.lambda_schedule_expression ? 1 : 0
-  name                = "every-one-minute"
-  description         = "Fires every one minutes"
-  # schedule_expression = "rate(1 minute)"
-  schedule_expression = var.lambda_schedule_expression ? var.lambda_schedule_expression : null
+  count               = var.lambda_schedule_expression != null ? 1 : 0
+  name                = "${var.project}_${var.environment}_schedule_lambda"
+  description         = "Schedule perodic Lambda call"
+  schedule_expression = var.lambda_schedule_expression
 }
 
-resource "aws_cloudwatch_event_target" "check_foo_every_one_minute" {
-  rule      = "${aws_cloudwatch_event_rule.every_one_minute.name}"
+resource "aws_cloudwatch_event_target" "schedule_lambda" {
+  count     = var.lambda_schedule_expression != null ? 1 : 0
+  rule      = aws_cloudwatch_event_rule.schedule_lambda[count.index].name
   target_id = "lambda"
-  arn       = "${module.lambda.lambda_function_arn}"
+  arn       = module.lambda.lambda_function_arn
 }
 
 resource "aws_lambda_permission" "allow_cloudwatch" {
+  count         = var.lambda_schedule_expression != null ? 1 : 0
   statement_id  = "AllowExecutionFromCloudWatch"
   action        = "lambda:InvokeFunction"
-  function_name = "${module.lambda.lambda_function_name}"
+  function_name = module.lambda.lambda_function_name
   principal     = "events.amazonaws.com"
-  source_arn    = "${aws_cloudwatch_event_rule.every_one_minute.arn}"
+  source_arn    = aws_cloudwatch_event_rule.schedule_lambda[count.index].arn
 }
 
 resource "aws_iam_policy" "sqs-secret-lambda-policy" {

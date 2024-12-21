@@ -67,14 +67,14 @@ resource "aws_iam_role_policy_attachment" "manage_ec2_rds_attach" {
 module "monitor_lambda" {
   source = "../../../../../../libs/infra/tf/aws/modules/lambda"
 
-  environment        = terraform.workspace
-  project            = "monitor"
-  ecr_url            = data.aws_ecr_repository.ecr_repo.repository_url
-  docker_tag         = var.docker_tag
-  vpc_id             = data.aws_vpc.monorepo.id
-  lambda_command     = ["src.app.interactor.event.aws.handler"]
-  security_group_ids = [data.aws_security_group.default_sg.id]
-  lambda_role        = aws_iam_policy.manage_ec2_rds.arn
+  environment                = terraform.workspace
+  project                    = "monitor"
+  ecr_url                    = data.aws_ecr_repository.ecr_repo.repository_url
+  docker_tag                 = var.docker_tag
+  vpc_id                     = data.aws_vpc.monorepo.id
+  lambda_command             = ["src.app.interactor.event.aws.handler"]
+  security_group_ids         = [data.aws_security_group.default_sg.id]
+  lambda_schedule_expression = "cron(5 * * * ? *)"
 
   environment_variables = {
     ENVIRONMENT         = terraform.workspace

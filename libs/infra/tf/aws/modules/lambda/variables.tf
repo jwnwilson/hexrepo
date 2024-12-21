@@ -26,7 +26,6 @@ variable "security_group_ids" {
   default = []
 }
 
-variable "lambda_role" {
-  default = null 
-  
+variable "lambda_schedule_expression" {
+  default = null
 }
