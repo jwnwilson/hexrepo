@@ -36,7 +36,7 @@ class AWSComputeManager:
                     instancelist.append(instance)
                 elif instance["State"]["Name"].lower() == state.lower():
                     instancelist.append(instance)
-        
+
         logger.info(f"Found {len(instancelist)} instances")
         return instancelist
 

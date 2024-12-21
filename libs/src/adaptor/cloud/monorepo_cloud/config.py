@@ -23,8 +23,8 @@ class Config(BaseSettings):
 
 class AWSConfig(BaseModel):
     AWS_REGION: str
-    AWS_ACCOUNT: Optional[str] = ""
-    AWS_TF_STATE_BUCKET: Optional[str] = ""
+    AWS_ACCOUNT: str
+    AWS_TF_STATE_BUCKET: str
 
 
 config: Config = Config()
