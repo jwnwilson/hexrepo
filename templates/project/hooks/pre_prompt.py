@@ -1,4 +1,5 @@
 import os
+import shutil
 import sys
 import json
 import functools
@@ -103,7 +104,14 @@ class PromptProcess(metaclass=SingletonMeta):
         return func(key, *args, **kwargs)
 
 
+def copy_pyproject_template():
+    # Work around to avoid breaking github actions
+    shutil.copyfile(r"./{{cookiecutter.project_name}}/pyproject_template.toml", r"./{{cookiecutter.project_name}}/pyproject.toml")
+    os.remove(r"./{{cookiecutter.project_name}}/pyproject_template.toml")
+
+
 def main():
+    copy_pyproject_template()
     initial = generate_context()
     context = generate_context(context_file='cookiecutter.pre.json')
     testing: bool = bool(os.getenv("TESTING", False))
