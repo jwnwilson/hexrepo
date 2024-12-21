@@ -140,7 +140,9 @@ def handler(event, context):
             logger.info(f"Stopping compute instance: {instance['InstanceId']}")
             compute_manager.stop_instances(instance_ids=[instance["InstanceId"]])
         else:
-            logger.info(f"No action needed for compute instance: {instance['InstanceId']}")
+            logger.info(
+                f"No action needed for compute instance: {instance['InstanceId']}"
+            )
 
     # Stop / stop
     for instance in db_instances:
@@ -151,4 +153,6 @@ def handler(event, context):
             logger.info(f"Stopping RDS instance: {instance['DBInstanceIdentifier']}")
             rds_manager.stop_rds(instance_ids=[instance["DBInstanceIdentifier"]])
         else:
-            logger.info(f"No action needed for RDS instance: {instance['DBInstanceIdentifier']}")
+            logger.info(
+                f"No action needed for RDS instance: {instance['DBInstanceIdentifier']}"
+            )

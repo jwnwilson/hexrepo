@@ -11,6 +11,7 @@ logger = logging.getLogger(__name__)
 
 print("test")
 
+
 class AWSRDSManager:
     def __init__(self, config: AWSConfig):
         self.config: AWSConfig = config
