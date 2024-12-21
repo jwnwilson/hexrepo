@@ -52,6 +52,14 @@ test_libs: hextech
 	@echo "Testing libraries..."
 	hextech test-libs --libraries=$(LIBRARY)
 
+check_version_bump: hextech
+	@echo "Checking version bump..."
+	hextech check-version-bump
+
+bump_library_version: hextech
+	@echo "Bumping version..."
+	hextech bump-librariy-version
+
 test_tools: hextech
 	@echo "Testing tools..."
 	hextech test-tools
