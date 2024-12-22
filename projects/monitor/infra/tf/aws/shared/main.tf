@@ -16,7 +16,7 @@ provider "aws" {
 }
 
 module "example_ecr" {
-  source = "../../../../infra/tf/aws/modules/ecr"
+  source = "../../../../../../infra/tf/aws/modules/ecr"
   project           = "monorepo-${var.project}"
 }
 

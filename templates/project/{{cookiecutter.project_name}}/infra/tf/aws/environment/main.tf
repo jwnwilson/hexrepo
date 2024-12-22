@@ -41,7 +41,7 @@ data "aws_security_group" "default_sg" {
 {% endif %}
 
 module "{{cookiecutter.project_slug}}_api" {
-  source = "../../../../infra/tf/aws/modules/lambda"
+  source = "../../../../../../infra/tf/aws/modules/lambda"
 
   environment       = terraform.workspace
   project           = "{{cookiecutter.project_slug}}"
@@ -74,7 +74,7 @@ module "{{cookiecutter.project_slug}}_api" {
 }
 
 module "{{cookiecutter.project_slug}}_api_gateway" {
-  source = "../../../../infra/tf/aws/modules/apigateway"
+  source = "../../../../../../infra/tf/aws/modules/apigateway"
 
   environment       = terraform.workspace
   lambda_invoke_arn = module.{{cookiecutter.project_slug}}_api.lambda_function_invoke_arn
@@ -86,7 +86,7 @@ module "{{cookiecutter.project_slug}}_api_gateway" {
 
 {% if cookiecutter.use_db == "y" %}
 module "{{cookiecutter.project_slug}}_postgres" {
-  source = "../../../../infra/tf/aws/modules/rds"
+  source = "../../../../../../infra/tf/aws/modules/rds"
 
   environment       = terraform.workspace
   project           = "{{cookiecutter.project_slug}}"
