@@ -65,7 +65,7 @@ resource "aws_iam_role_policy_attachment" "manage_ec2_rds_attach" {
 }
 
 module "monitor_lambda" {
-  source = "../../../../../infra/tf/aws/modules/lambda"
+  source = "../../../../infra/tf/aws/modules/lambda"
 
   environment                = terraform.workspace
   project                    = "monitor"
