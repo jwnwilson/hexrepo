@@ -80,7 +80,7 @@ def setup_project_config() -> MonorepoConfig:
         shell_file=shell_file,
         cloud_provider=cloud_provider,
         environments=environments,
-        domain=domain
+        domain=domain,
     )
 
     if cloud_provider == "aws":

@@ -10,14 +10,11 @@ from typing_extensions import Annotated
 
 from hextech.config import MonorepoConfig, get_or_create_config
 from hextech.domain.infra.bastion import bastion_ssh_tunnel
-from hextech.domain.infra.deployment import create_shared_infra
+from hextech.domain.infra.deployment import create_env_infra, create_shared_infra
 from hextech.domain.infra.deployment import deploy_projects as deploy_projects_command
-from hextech.domain.infra.deployment import (
-    create_env_infra,
-    plan_env_infra_command,
-)
 from hextech.domain.infra.deployment import migrate_db as migrate_db_func
 from hextech.domain.infra.deployment import (
+    plan_env_infra_command,
     publish_libs,
     shared_infra_apply_command,
     shared_infra_plan_command,
@@ -46,7 +43,10 @@ from hextech.domain.prompts.infra import (
     prompt_setup_tf,
 )
 from hextech.domain.system import run_system_command
-from hextech.domain.templates.libs import generate_libs_makefile, generate_project_makefile
+from hextech.domain.templates.libs import (
+    generate_libs_makefile,
+    generate_project_makefile,
+)
 
 app = typer.Typer()
 

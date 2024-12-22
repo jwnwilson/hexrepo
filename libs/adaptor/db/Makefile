@@ -7,11 +7,11 @@ VENV_DIR = $(MKFILE_DIR)$(VENV)
 
 # Setup commands
 venv:
-	@../../../../tools/bash_scripts/setup_env.sh
+	@../../../tools/bash_scripts/setup_env.sh
 
 test: db venv
 	@echo "Running tests..."
-	@../../../../tools/bash_scripts/test.sh
+	@../../../tools/bash_scripts/test.sh
 
 # Setup docker db for tests
 db: db_down
@@ -29,14 +29,14 @@ coverage:
 	pytest --cov-report html	
 
 lint: venv
-	@TARGET_DIRS="monorepo_db tests" bash ../../../../tools/bash_scripts/lint.sh 
+	@TARGET_DIRS="monorepo_db tests" bash ../../../tools/bash_scripts/lint.sh 
 
 lint_check: venv
-	@TARGET_DIRS="monorepo_db tests" bash ../../../../tools/bash_scripts/lint.sh --check
+	@TARGET_DIRS="monorepo_db tests" bash ../../../tools/bash_scripts/lint.sh --check
 
 clean:
 	@find . -type f -name '*.py[co]' -delete -o -type d -name __pycache__ -delete
 
 publish: venv
 	@echo "Publishing package..."
-	@../../../../tools/bash_scripts/publish.sh
+	@../../../tools/bash_scripts/publish.sh
