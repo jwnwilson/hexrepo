@@ -21,8 +21,8 @@ from hextech.domain.project import (
 from hextech.domain.system import run_system_command, run_system_command_with_output
 
 
-def create_lib_infra(config: MonorepoConfig) -> None:
-    typer.echo("Creating infrastructure for libraries...")
+def create_shared_infra(config: MonorepoConfig) -> None:
+    typer.echo("Creating initial monorepo infrastructure...")
     # Placeholder for library infra setup
     with chdir("libs"):
         run_system_command("make tf_shared_init")
@@ -31,7 +31,7 @@ def create_lib_infra(config: MonorepoConfig) -> None:
         code_repo_url = json.loads(code_repo_data)[
             "aws_codeartifact_repository_endpoint"
         ]["value"]
-        config.set_config_var("monorepo_lib_repo_url", code_repo_url, set_env=True)
+    config.set_config_var("monorepo_lib_repo_url", code_repo_url, set_env=True)
     typer.echo("Infrastructure setup complete.")
 
 
@@ -91,8 +91,8 @@ def deploy_projects(
     typer.echo("Projects deployed successfully.")
 
 
-def setup_global_env_infra(config: MonorepoConfig) -> None:
-    typer.echo("Setting up global env infrastructure...")
+def create_per_env_infra(config: MonorepoConfig) -> None:
+    typer.echo("Setting up per env infrastructure...")
     # Placeholder for shared infra setup
     with chdir("libs"):
         run_system_command(f"make tf_env_init ENV=dev")
@@ -122,7 +122,7 @@ def shared_infra_apply_command(config: MonorepoConfig) -> None:
     typer.echo("Shared infrastructure apply complete.")
 
 
-def env_infra_plan_command(config: MonorepoConfig, env: str) -> None:
+def plan_env_infra_command(config: MonorepoConfig, env: str) -> None:
     typer.echo("Planning shared infrastructure...")
     with chdir("libs"):
         run_system_command("make tf_env_init")
@@ -134,7 +134,7 @@ def env_infra_plan_command(config: MonorepoConfig, env: str) -> None:
     typer.echo("Shared infrastructure plan complete.")
 
 
-def env_infra_apply_command(config: MonorepoConfig, env: str) -> None:
+def create_env_infra(config: MonorepoConfig, env: str) -> None:
     typer.echo("Applying shared infrastructure...")
     with chdir("libs"):
         run_system_command("make tf_env_init")

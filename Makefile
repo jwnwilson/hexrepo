@@ -14,7 +14,7 @@ hextech:
 
 setup: hextech
 	@echo "Setting up hexrepo..."
-	hex setup
+	hextech setup
 
 shared_infra_plan: hextech
 	@echo "Planning shared infra..."

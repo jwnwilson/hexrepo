@@ -71,4 +71,6 @@ module "example_postgres" {
   project     = "example"
   vpc_id      = data.aws_vpc.monorepo.id
   username    = "postgres"
+  start_time  = "09:00:00"
+  stop_time   = "17:00:00"  
 }
