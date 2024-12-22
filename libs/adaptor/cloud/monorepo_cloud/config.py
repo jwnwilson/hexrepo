@@ -43,7 +43,7 @@ def load_aws_config() -> AWSConfig:
     # Get config dir relatieve to this file
     script_path: Path = Path(os.path.realpath(__file__))
     config_path: str = str(
-        script_path.parent.parent.parent.parent.parent.parent / "config.json"
+        script_path.parent.parent.parent.parent.parent / "config.json"
     )
     try:
         with open(config_path) as f:

@@ -20,9 +20,9 @@ sqlalchemy = "^2.0.36"
 alembic = "^1.13.3"
 psycopg2-binary = "^2.9.10"
 {% endif %}
-monorepo-cloud = {path = "../../libs/src/adaptor/cloud", develop = true}
-monorepo-db = {path = "../../libs/src/adaptor/db", develop = true}
-monorepo-api = {path = "../../libs/src/interactor/api", develop = true}
+monorepo-cloud = {path = "../../libs/adaptor/cloud", develop = true}
+monorepo-db = {path = "../../libs/adaptor/db", develop = true}
+monorepo-api = {path = "../../libs/interactor/api", develop = true}
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.3"

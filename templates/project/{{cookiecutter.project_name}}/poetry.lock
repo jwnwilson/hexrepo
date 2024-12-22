@@ -807,7 +807,7 @@ pydantic-settings = "^2.6.1"
 
 [package.source]
 type = "directory"
-url = "../../libs/src/interactor/api"
+url = "../../libs/interactor/api"
 
 [[package]]
 name = "monorepo-db"
@@ -824,7 +824,7 @@ pydantic-settings = "^2.6.1"
 
 [package.source]
 type = "directory"
-url = "../../libs/src/adaptor/db"
+url = "../../libs/adaptor/db"
 
 [[package]]
 name = "monorepo-cloud"
@@ -844,7 +844,7 @@ aws = ["boto3 (>=1.35.54,<2.0.0)"]
 
 [package.source]
 type = "directory"
-url = "../../libs/src/adaptor/cloud"
+url = "../../libs/adaptor/cloud"
 
 [[package]]
 name = "mypy"

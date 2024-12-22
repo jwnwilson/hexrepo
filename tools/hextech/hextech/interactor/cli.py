@@ -10,14 +10,11 @@ from typing_extensions import Annotated
 
 from hextech.config import MonorepoConfig, get_or_create_config
 from hextech.domain.infra.bastion import bastion_ssh_tunnel
-from hextech.domain.infra.deployment import create_shared_infra
+from hextech.domain.infra.deployment import create_env_infra, create_shared_infra
 from hextech.domain.infra.deployment import deploy_projects as deploy_projects_command
-from hextech.domain.infra.deployment import (
-    create_env_infra,
-    plan_env_infra_command,
-)
 from hextech.domain.infra.deployment import migrate_db as migrate_db_func
 from hextech.domain.infra.deployment import (
+    plan_env_infra_command,
     publish_libs,
     shared_infra_apply_command,
     shared_infra_plan_command,
@@ -46,7 +43,10 @@ from hextech.domain.prompts.infra import (
     prompt_setup_tf,
 )
 from hextech.domain.system import run_system_command
-from hextech.domain.templates.libs import generate_libs_makefile, generate_project_makefile
+from hextech.domain.templates.libs import (
+    generate_libs_makefile,
+    generate_project_makefile,
+)
 
 app = typer.Typer()
 
@@ -78,8 +78,8 @@ def setup():
 @app.command()
 def create_library():
     library_type = prompt_library_type()
-    # CD to libs/src/adaptor or libs/src/interactor folder
-    with chdir(f"libs/src/{library_type}"):
+    # CD to libs/adaptor or libs/interactor folder
+    with chdir(f"libs/{library_type}"):
         # Run cookie cutter command to copy template
         cookiecutter("../../../templates/library")
         # Setup infra for libray
@@ -163,9 +163,9 @@ def test_libs(libraries: Optional[List[str]] = None):
     for lib in libraries:
         lib_type: str = get_library_type(lib)
         typer.echo(f"Running linting for {lib} library...")
-        run_system_command(f"cd libs/src/{lib_type}/{lib} && make lint_check")
+        run_system_command(f"cd libs/{lib_type}/{lib} && make lint_check")
         typer.echo(f"Running tests for {lib} library...")
-        run_system_command(f"cd libs/src/{lib_type}/{lib} && make test")
+        run_system_command(f"cd libs/{lib_type}/{lib} && make test")
 
 
 @app.command()
@@ -192,7 +192,7 @@ def bump_librariy_version():
     typer.echo(f"Bumping version for {library} library...")
     lib_type: str = get_library_type(library)
     run_system_command(
-        f"cd libs/src/{lib_type}/{library} && source .venv/bin/activate && poetry version patch"
+        f"cd libs/{lib_type}/{library} && source .venv/bin/activate && poetry version patch"
     )
 
 
@@ -210,7 +210,7 @@ def lint():
     for lib in libraries:
         lib_type: str = get_library_type(lib)
         typer.echo(f"Running linting for {lib_type}/{lib} library...")
-        run_system_command(f"cd libs/src/{lib_type}/{lib} && make lint")
+        run_system_command(f"cd libs/{lib_type}/{lib} && make lint")
 
 
 @app.command()

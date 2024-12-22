@@ -44,8 +44,6 @@ AWS_SECRET_ACCESS_KEY
 # To Do
 
 - Setup backend
-    - Add cookiecutter option for public access via api gateway + domain
-        - Use single domain per project by default
     - Play with AI crawler project 
     - Setup async tasks
         - migrate hex lib into this repo

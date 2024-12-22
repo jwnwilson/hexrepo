@@ -276,7 +276,7 @@ develop = true
 [package.dependencies]
 boto3 = "^1.35.58"
 cookiecutter = "^2.6.0"
-monorepo-cloud = {path = "../../libs/src/adaptor/cloud", develop = true}
+monorepo-cloud = {path = "../../libs/adaptor/cloud", develop = true}
 pydantic-settings = "^2.6.1"
 pyyaml = "^6.0.2"
 typer = "^0.15.1"
@@ -450,7 +450,7 @@ aws = ["boto3 (>=1.35.54,<2.0.0)"]
 
 [package.source]
 type = "directory"
-url = "libs/src/adaptor/cloud"
+url = "libs/adaptor/cloud"
 
 [[package]]
 name = "pydantic"

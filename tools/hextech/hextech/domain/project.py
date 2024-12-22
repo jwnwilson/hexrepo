@@ -27,8 +27,8 @@ def get_projects() -> List[str]:
 
 
 def get_libraries() -> List[str]:
-    adaptor_folder = "libs/src/adaptor"
-    interactor_folder = "libs/src/interactor"
+    adaptor_folder = "libs/adaptor"
+    interactor_folder = "libs/interactor"
     return scan_folder(adaptor_folder) + scan_folder(interactor_folder)
 
 
@@ -51,9 +51,9 @@ def library_version_bump_required(library: str) -> bool:
     modified_files = subprocess.getoutput(
         "git fetch && git diff origin/main HEAD --name-only"
     )
-    if f"libs/src/{library_type}/{library}" in modified_files:
+    if f"libs/{library_type}/{library}" in modified_files:
         pyproject_diff: str = subprocess.getoutput(
-            f"git diff origin/main HEAD libs/src/{library_type}/{library}/pyproject.toml"
+            f"git diff origin/main HEAD libs/{library_type}/{library}/pyproject.toml"
         )
         if "version = " in pyproject_diff:
             return False
@@ -69,7 +69,7 @@ def get_modified_libraries(libraries: Optional[List[str]] = None) -> List[str]:
     )
     for lib in libraries:
         lib_type = get_library_type(lib)
-        if f"libs/src/{lib_type}/{lib}" in modified_files:
+        if f"libs/{lib_type}/{lib}" in modified_files:
             modified_libs.append(lib)
     return modified_libs
 
@@ -98,8 +98,8 @@ def get_projects_usings_libraries(libraries: List[str]) -> List[str]:
 
 
 def get_library_type(library: str) -> str:
-    adaptor_folder = "libs/src/adaptor"
-    interactor_folder = "libs/src/interactor"
+    adaptor_folder = "libs/adaptor"
+    interactor_folder = "libs/interactor"
     if library in scan_folder(adaptor_folder):
         return "adaptor"
     elif library in scan_folder(interactor_folder):
@@ -119,7 +119,7 @@ def install_library_in_project(library: str, project: str):
     library_type = get_library_type(library)
     with chdir(f"projects/{project}"):
         run_system_command(
-            f"poetry add --editable ../../libs/src/{library_type}/{library} -G dev"
+            f"poetry add --editable ../../libs/{library_type}/{library} -G dev"
         )
         run_system_command(f"poetry add {library} -G prod")
     typer.echo(f"Library {library} installed in project {project}")

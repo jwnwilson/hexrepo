@@ -24,7 +24,7 @@ from hextech.domain.system import run_system_command, run_system_command_with_ou
 def create_shared_infra(config: MonorepoConfig) -> None:
     typer.echo("Creating initial monorepo infrastructure...")
     # Placeholder for library infra setup
-    with chdir("libs"):
+    with chdir("infra"):
         run_system_command("make tf_shared_init")
         run_system_command("make tf_shared_apply")
         code_repo_data = subprocess.getoutput("make tf_shared_output")
@@ -56,7 +56,7 @@ def publish_libs(
 
     for lib in libraries:
         lib_type = get_library_type(lib)
-        with chdir(f"libs/src/{lib_type}/{lib}"):
+        with chdir(f"libs/{lib_type}/{lib}"):
             run_system_command("make publish")
     # Placeholder for publishing libraries to repo
     typer.echo("Libraries published successfully.")
@@ -94,7 +94,7 @@ def deploy_projects(
 def create_per_env_infra(config: MonorepoConfig) -> None:
     typer.echo("Setting up per env infrastructure...")
     # Placeholder for shared infra setup
-    with chdir("libs"):
+    with chdir("infra"):
         run_system_command(f"make tf_env_init ENV=dev")
         for env in config.environments:
             try:
@@ -108,7 +108,7 @@ def create_per_env_infra(config: MonorepoConfig) -> None:
 
 def shared_infra_plan_command(config: MonorepoConfig) -> None:
     typer.echo("Planning shared infrastructure...")
-    with chdir("libs"):
+    with chdir("infra"):
         run_system_command("make tf_shared_init")
         run_system_command("make tf_shared_plan")
     typer.echo("Shared infrastructure plan complete.")
@@ -116,7 +116,7 @@ def shared_infra_plan_command(config: MonorepoConfig) -> None:
 
 def shared_infra_apply_command(config: MonorepoConfig) -> None:
     typer.echo("Applying shared infrastructure...")
-    with chdir("libs"):
+    with chdir("infra"):
         run_system_command("make tf_shared_init")
         run_system_command("make tf_shared_apply")
     typer.echo("Shared infrastructure apply complete.")
@@ -124,7 +124,7 @@ def shared_infra_apply_command(config: MonorepoConfig) -> None:
 
 def plan_env_infra_command(config: MonorepoConfig, env: str) -> None:
     typer.echo("Planning shared infrastructure...")
-    with chdir("libs"):
+    with chdir("infra"):
         run_system_command("make tf_env_init")
         try:
             run_system_command(f"ENVIRONMENT={env} make tf_workspace")
@@ -136,7 +136,7 @@ def plan_env_infra_command(config: MonorepoConfig, env: str) -> None:
 
 def create_env_infra(config: MonorepoConfig, env: str) -> None:
     typer.echo("Applying shared infrastructure...")
-    with chdir("libs"):
+    with chdir("infra"):
         run_system_command("make tf_env_init")
         try:
             run_system_command(f"ENVIRONMENT={env} make tf_workspace")

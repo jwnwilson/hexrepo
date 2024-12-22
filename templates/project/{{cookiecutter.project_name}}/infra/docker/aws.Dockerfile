@@ -6,7 +6,7 @@ RUN curl -sSL https://install.python-poetry.org | python - && \
     poetry config virtualenvs.create false
 
 # Copy poetry.lock* in case it doesn't exist in the repo
-COPY ./libs/src /libs/src
+COPY ./libs /libs
 COPY ./projects/{{cookiecutter.project_slug}}/pyproject.toml ./projects/{{cookiecutter.project_slug}}/poetry.lock* ${LAMBDA_TASK_ROOT}/
 
 # Allow installing dev dependencies to run tests
