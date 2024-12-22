@@ -35,7 +35,7 @@ data "aws_secretsmanager_secret" "db_secret" {
 }
 
 module "example_api" {
-  source = "../../../../../../libs/infra/tf/aws/modules/lambda"
+  source = "../../../../../../infra/tf/aws/modules/lambda"
 
   environment        = terraform.workspace
   project            = "example"
@@ -54,7 +54,7 @@ module "example_api" {
 }
 
 module "example_api_gateway" {
-  source = "../../../../../../libs/infra/tf/aws/modules/apigateway"
+  source = "../../../../../../infra/tf/aws/modules/apigateway"
 
   environment       = terraform.workspace
   lambda_invoke_arn = module.example_api.lambda_function_invoke_arn
@@ -65,7 +65,7 @@ module "example_api_gateway" {
 }
 
 module "example_postgres" {
-  source = "../../../../../../libs/infra/tf/aws/modules/rds"
+  source = "../../../../../../infra/tf/aws/modules/rds"
 
   environment = terraform.workspace
   project     = "example"

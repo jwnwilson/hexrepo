@@ -4,8 +4,8 @@
     "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
     "python.analysis.extraPaths": [
         "${workspaceFolder}/tools/hextech/hextech",
-        "${workspaceFolder}/libs/src/adaptor/cloud",
-        "${workspaceFolder}/libs/src/adaptor/db",
-        "${workspaceFolder}/libs/src/interactor/api",
+        "${workspaceFolder}/libs/adaptor/cloud",
+        "${workspaceFolder}/libs/adaptor/db",
+        "${workspaceFolder}/libs/interactor/api",
     ]
 }

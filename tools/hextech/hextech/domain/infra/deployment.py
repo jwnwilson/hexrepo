@@ -56,7 +56,7 @@ def publish_libs(
 
     for lib in libraries:
         lib_type = get_library_type(lib)
-        with chdir(f"libs/src/{lib_type}/{lib}"):
+        with chdir(f"libs/{lib_type}/{lib}"):
             run_system_command("make publish")
     # Placeholder for publishing libraries to repo
     typer.echo("Libraries published successfully.")
