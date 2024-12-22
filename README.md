@@ -44,7 +44,6 @@ AWS_SECRET_ACCESS_KEY
 # To Do
 
 - Setup backend
-    - Combine shared infra + env infra pull add envs to config and pull them down 
     - Add cookiecutter option for public access via api gateway + domain
         - Use single domain per project by default
     - Play with AI crawler project 
@@ -69,6 +68,7 @@ AWS_SECRET_ACCESS_KEY
     - Enforce architecture rules:
         - https://roman.pt/posts/python-architecture-linter/
         - [deply](https://github.com/Vashkatsi/deply)
+    - Combine shared infra + env infra pull add envs to config and pull them down 
     - Setup test / lint build image
         - Setup ruff
         - Setup UV
@@ -80,6 +80,7 @@ AWS_SECRET_ACCESS_KEY
 
 - Full monorepo setup with hextech cli command like turbo repo
 - Investigate setting up company services
+    - Create generic monorepo setup cli tool to setup projects like turborepo
     - Feature Flagging / A / B testing
     - Switching calculation verisons
     - Analytics
