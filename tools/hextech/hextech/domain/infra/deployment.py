@@ -31,7 +31,7 @@ def create_shared_infra(config: MonorepoConfig) -> None:
         code_repo_url = json.loads(code_repo_data)[
             "aws_codeartifact_repository_endpoint"
         ]["value"]
-        config.set_config_var("monorepo_lib_repo_url", code_repo_url, set_env=True)
+    config.set_config_var("monorepo_lib_repo_url", code_repo_url, set_env=True)
     typer.echo("Infrastructure setup complete.")
 
 
