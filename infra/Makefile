@@ -10,37 +10,37 @@ TF_STATE_BUCKET=${AWS_TF_STATE_BUCKET}
 TF_STATE_REGION=${AWS_DEFAULT_REGION}
 
 tf_shared_init:
-	@cd infra/tf/aws/shared  && terraform init -input=false
+	@cd tf/aws/shared  && terraform init -input=false
 
 tf_shared_plan:
-	@cd infra/tf/aws/shared  && terraform plan -out tfapply
+	@cd tf/aws/shared  && terraform plan -out tfapply
 
 tf_shared_apply:
-	@cd infra/tf/aws/shared  && terraform apply
+	@cd tf/aws/shared  && terraform apply
 
 tf_shared_destroy:
-	@cd infra/tf/aws/shared  && terraform destroy
+	@cd tf/aws/shared  && terraform destroy
 
 tf_shared_output:
-	@cd infra/tf/aws/shared && terraform output -json
+	@cd tf/aws/shared && terraform output -json
 
 tf_workspace:
-	@-cd infra/tf/aws/environment  && \
+	@-cd tf/aws/environment  && \
 	terraform workspace new $(ENVIRONMENT)
-	@cd infra/tf/aws/environment  && \
+	@cd tf/aws/environment  && \
 	terraform workspace select $(ENVIRONMENT) 
 
 tf_env_init:
-	@cd infra/tf/aws/environment  && terraform init -input=false
+	@cd tf/aws/environment  && terraform init -input=false
 
 tf_env_plan:
-	@cd infra/tf/aws/environment  && terraform plan -out tfapply
+	@cd tf/aws/environment  && terraform plan -out tfapply
 
 tf_env_apply:
-	@cd infra/tf/aws/environment  && terraform apply
+	@cd tf/aws/environment  && terraform apply
 
 tf_env_destroy:
-	@cd infra/tf/aws/environment  && terraform destroy
+	@cd tf/aws/environment  && terraform destroy
 
 tf_env_output:
-	@cd infra/tf/aws/environment && terraform output -json
+	@cd tf/aws/environment && terraform output -json
