@@ -10,17 +10,15 @@ from typing_extensions import Annotated
 
 from hextech.config import MonorepoConfig, get_or_create_config
 from hextech.domain.infra.bastion import bastion_ssh_tunnel
-from hextech.domain.infra.code_repo import authenticate_lib_repo
-from hextech.domain.infra.deployment import create_lib_infra
+from hextech.domain.infra.deployment import create_shared_infra
 from hextech.domain.infra.deployment import deploy_projects as deploy_projects_command
 from hextech.domain.infra.deployment import (
-    env_infra_apply_command,
-    env_infra_plan_command,
+    create_env_infra,
+    plan_env_infra_command,
 )
 from hextech.domain.infra.deployment import migrate_db as migrate_db_func
 from hextech.domain.infra.deployment import (
     publish_libs,
-    setup_global_env_infra,
     shared_infra_apply_command,
     shared_infra_plan_command,
 )
@@ -48,7 +46,7 @@ from hextech.domain.prompts.infra import (
     prompt_setup_tf,
 )
 from hextech.domain.system import run_system_command
-from hextech.domain.templates.libs import generate_libs_makefile
+from hextech.domain.templates.libs import generate_libs_makefile, generate_project_makefile
 
 app = typer.Typer()
 
@@ -61,26 +59,20 @@ def setup():
     config, created_config = get_or_create_config()
 
     # Copy libs makefile to libs
+    # Move these to cookie cutter pre-gen hooks
     if created_config:
         generate_libs_makefile(config)
+    generate_project_makefile(config)
 
     # Create initial terraform state infra
     if prompt_setup_tf():
         create_tf_state(config)
 
-    # Add options to deploy repo to cloud provider
-    if prompt_setup_lib_infra():
-        create_lib_infra(config)
-
-    authenticate_lib_repo(config)
-
-    # Publish libraries to repo
-    if prompt_deploy_libs():
-        publish_libs(config)
-
-    # Setup shared infra for environments
+    # Setup initial infra for all projects
     if prompt_setup_shared_infra():
-        setup_global_env_infra(config)
+        create_shared_infra(config)
+        for env in config.environments:
+            create_env_infra(config, env)
 
 
 @app.command()
@@ -138,14 +130,14 @@ def shared_infra_apply():
 def env_infra_plan(env: str):
     config: MonorepoConfig
     config, _ = get_or_create_config(no_input=True)
-    env_infra_plan_command(config, env)
+    plan_env_infra_command(config, env)
 
 
 @app.command()
 def env_infra_apply(env: str):
     config: MonorepoConfig
     config, _ = get_or_create_config(no_input=True)
-    env_infra_apply_command(config, env)
+    create_env_infra(config, env)
 
 
 @app.command()

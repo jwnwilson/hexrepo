@@ -5,14 +5,14 @@
     "use_api": "y",
     "use_db": "y",
     "use_cloud": "y",
-    "api_domain": "jwnwilson.co.uk",
+    "api_domain": "{{ domain }}",
     "use_db_logic": [
         "sql",
         "nosql"
     ],
     "__conditions__": {
-        "use_db_logic": "{{ cookiecutter.use_db != 'n' }}",
-        "api_domain": "{{ cookiecutter.use_api != 'n' }}"
+        "use_db_logic": "{% raw %}{{ cookiecutter.use_db != 'n' }}{% endraw %}",
+        "api_domain": "{% raw %}{{ cookiecutter.use_api != 'n' }}{% endraw %}"
     },
     "__prompts__": {
         "use_api": "Do you want fastapi?",

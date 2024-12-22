@@ -18,6 +18,7 @@ class MonorepoConfig(BaseSettings):
     environments: List[str] = ["dev", "prd"]
     monorepo_lib_repo_url: str = ""
     monorepo_lib_repo_username: str = ""
+    domain: str = ""
 
     def set_config_var(self, key: str, value: str, set_env: bool = False):
         setattr(self, key, value)
@@ -73,11 +74,13 @@ def setup_project_config() -> MonorepoConfig:
     shell_file = prompt_shell_file()
     cloud_provider = prompt_cloud_provider()
     environments = prompt_environments()
+    domain = typer.prompt("Please enter your registered domain name")
 
     config: MonorepoConfig = MonorepoConfig(
         shell_file=shell_file,
         cloud_provider=cloud_provider,
         environments=environments,
+        domain=domain
     )
 
     if cloud_provider == "aws":
