@@ -23,6 +23,6 @@
             "sql": "Add Sqlalchemy to project",
             "nosql": "Add NoSQL wrapper to project"
         },
-        "api_domain": "Enter domain for project"
+        "api_domain": "This needs to be a registered domain:"
     }
 }
