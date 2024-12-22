@@ -17,7 +17,7 @@
     "__prompts__": {
         "use_api": "Do you want fastapi?",
         "use_db": "Do you want a database?",
-        "use_cloud": "Do you want a storage service?",
+        "use_cloud": "Do you want to install cloud libraries?",
         "use_db_logic": {
             "__prompt__": "Select the db storage method",
             "sql": "Add Sqlalchemy to project",
