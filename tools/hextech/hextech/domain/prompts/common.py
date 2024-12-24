@@ -10,9 +10,9 @@ def prompt_cloud_provider() -> str:
     print("1 - aws")
     # print("2 - gcp")
     # print("3 - azure")
-    cloud_provider_optio: str = typer.prompt("Choose from [1]")
+    cloud_provider_option: str = typer.prompt("Choose from [1]")
     try:
-        cloud_provider = {"1": "aws"}[cloud_provider_optio]
+        cloud_provider = {"1": "aws"}[cloud_provider_option]
     except KeyError:
         typer.echo("Invalid cloud provider, please select an option, 1")
         return
@@ -64,7 +64,7 @@ def prompt_environment() -> str:
     enironments: List[str] = get_environments()
     env_map: List[str] = {str(i + 1): env for i, env in enumerate(enironments)}
     options = "\n".join([f"{i} - {project}" for i, project in env_map.items()])
-    selection: str = typer.prompt(f"Choose from [{options}]", default="1")
+    selection: str = typer.prompt(f"Choose from:\n{options}\n", default="1")
     try:
         environment = env_map[selection]
     except KeyError:
@@ -78,7 +78,7 @@ def prompt_project() -> str:
     projects: List[str] = get_projects()
     project_map: List[str] = {str(i + 1): project for i, project in enumerate(projects)}
     options = "\n".join([f"{i} - {project}" for i, project in project_map.items()])
-    selection: str = typer.prompt(f"Choose from [{options}]", default="1")
+    selection: str = typer.prompt(f"Choose from:\n{options}\n", default="1")
     try:
         project = project_map[selection]
     except KeyError:

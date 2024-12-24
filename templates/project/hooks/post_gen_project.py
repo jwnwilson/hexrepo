@@ -30,5 +30,10 @@ def delete_resource(resource):
         shutil.rmtree(resource)
 
 
+def update_poetry_lock():
+    os.system("poetry lock")
+
+
 if __name__ == "__main__":
     delete_resources_for_disabled_features()
+    update_poetry_lock()

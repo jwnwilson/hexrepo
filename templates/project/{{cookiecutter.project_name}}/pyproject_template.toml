@@ -1,13 +1,13 @@
 [tool.poetry]
-name = "example"
-version = "0.1.0"
-description = "A short description of the project"
-authors = ["Your name <Your address email (you@example.com)>"]
+name = "{{cookiecutter.project_slug}}"
+version = "{{cookiecutter.version}}"
+description = "{{cookiecutter.description}}"
+authors = ["{{cookiecutter.full_name}} <{{cookiecutter.email}}>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.12"
-{% if cookiecutter.use_api %}
+{% if cookiecutter.use_api == 'y' %}
 fastapi = "^0.115.3"
 uvicorn = "^0.32.0"
 gevent = "^24.10.3"
@@ -15,14 +15,20 @@ gevent = "^24.10.3"
 requests = "^2.32.3"
 python-dotenv = "^1.0.1"
 pydantic-settings = "^2.6.0"
-{% if cookiecutter.use_db %}
+{% if cookiecutter.use_db == 'y' %}
 sqlalchemy = "^2.0.36"
 alembic = "^1.13.3"
 psycopg2-binary = "^2.9.10"
 {% endif %}
+{% if cookiecutter.use_cloud == 'y' %}
 monorepo-cloud = {path = "../../libs/adaptor/cloud", develop = true}
+{% endif %}
+{% if cookiecutter.use_db == 'y' %}
 monorepo-db = {path = "../../libs/adaptor/db", develop = true}
+{% endif %}
+{% if cookiecutter.use_api == 'y' %}
 monorepo-api = {path = "../../libs/interactor/api", develop = true}
+{% endif %}
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.3"

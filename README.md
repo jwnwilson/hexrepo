@@ -45,11 +45,12 @@ AWS_SECRET_ACCESS_KEY
 
 - Setup backend
     - Play with AI crawler project 
-    - Setup async tasks
-        - migrate hex lib into this repo
-            https://github.com/jwnwilson/hex-lib/tree/main/src/hex_lib/adapter/out
-        - SQS + lambda
-        - Setup task chaining with idempotent re-run
+        - Setup async tasks
+            - migrate hex lib into this repo
+                https://github.com/jwnwilson/hex-lib/tree/main/src/hex_lib/adapter/out
+            - SQS + lambda
+            - Setup task chaining with idempotent re-run
+        - Setup no sql DB
     - Setup auth / cross project auth / authorisation
     - Implement template -> project update:
         - Look at cruft again
