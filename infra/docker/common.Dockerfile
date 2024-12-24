@@ -4,14 +4,16 @@ ARG PROJECT
 WORKDIR /code
 ENV PYTHONPATH=/code/src
 
-RUN pip install poetry && \
-    poetry config virtualenvs.create false
+# Download the latest installer
+ADD https://astral.sh/uv/install.sh /uv-installer.sh
+# Run the installer then remove it
+RUN sh /uv-installer.sh && rm /uv-installer.sh
 
 COPY ./projects/${PROJECT}/pyproject.toml ./projects/${PROJECT}/poetry.lock ./
 COPY ./libs /libs
 
 # RUN poetry self add keyrings.google-artifactregistry-auth
-RUN poetry lock && poetry install --no-root
+RUN uv sync --frozen --no-group dev
 
 COPY ./projects/${PROJECT}/src ./src
 COPY ./projects/${PROJECT}/alembic.ini ./

@@ -193,9 +193,13 @@ def bump_librariy_version():
     library: str = prompt_library()
     typer.echo(f"Bumping version for {library} library...")
     lib_type: str = get_library_type(library)
-    run_system_command(
-        f"cd libs/{lib_type}/{library} && source .venv/bin/activate && poetry version patch"
-    )
+    # run_system_command(
+    #     f"""cd libs/{lib_type}/{library} && \\
+    #     VERSION=$(uvx --from=toml-cli toml get --toml-path=pyproject.toml project.version) && \\
+    #     VERSION=$(echo $VERSION | awk -F. '/[0-9]+\./{{$NF++;print}}' OFS=.) && \\
+    #     uvx --from=toml-cli toml set --toml-path=pyproject.toml project.version $VERISON
+    #     """
+    # )
 
 
 @app.command()

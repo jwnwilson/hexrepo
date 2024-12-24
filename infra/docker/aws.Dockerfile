@@ -16,7 +16,7 @@ COPY ./libs /libs
 COPY ./projects/${PROJECT}/pyproject.toml ./projects/${PROJECT}/uv.lock* ${LAMBDA_TASK_ROOT}/
 
 # Allow installing dev dependencies to run tests
-RUN ux sync --frozen
+RUN ux sync --frozen --no-group dev
 
 COPY ./projects/${PROJECT}/src ./src
 COPY ./projects/${PROJECT}/alembic.ini ./

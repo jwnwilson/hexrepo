@@ -6,7 +6,7 @@ if [[ -z "${GITHUB_ACTIONS}" ]]; then
     . ${VENV_DIR}/bin/activate
 else
     echo "Running on github skipping venv activation."
-    . $(poetry env info --path)/bin/activate
+    . ${VENV_DIR}/bin/activate
 fi
 
 pytest

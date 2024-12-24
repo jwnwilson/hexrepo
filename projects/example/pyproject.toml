@@ -4,6 +4,10 @@ authors = [
     {name = "Noel Wilson", email = "jwnwilson@hotmail.co.uk"},
 ]
 requires-python = "<4.0,>=3.12"
+name = "example"
+version = "0.1.0"
+description = "A short description of the project"
+readme = "README.md"
 dependencies = [
     "fastapi<1.0.0,>=0.115.3",
     "uvicorn<1.0.0,>=0.32.0",
@@ -19,10 +23,6 @@ dependencies = [
     "monorepo-api @ file:///${PROJECT_ROOT}/../../libs/interactor/api",
     "boto3-stubs[essential]<2.0.0,>=1.35.86",
 ]
-name = "example"
-version = "0.1.0"
-description = "A short description of the project"
-readme = "README.md"
 
 [dependency-groups]
 dev = [

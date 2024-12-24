@@ -4,7 +4,6 @@ This is my python monorepo inspired by tools like turborepo that uses hexagonal 
 
 ![alt text](docs/hextech.png)
 
-
 Features include:
 
 - CLI commands to setup projects

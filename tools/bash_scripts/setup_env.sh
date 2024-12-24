@@ -12,7 +12,4 @@ echo "Activating virtual environment in directory: ${PWD}"
 
 python3.12 -m venv ${VENV}; \
 source ${CURRENT_DIR}/${VENV}/bin/activate && \
-export SYSTEM_VERSION_COMPAT=1 && \
-pip install poetry && \
-poetry lock && \
-poetry install --with dev --all-extras
+uv sync
