@@ -1,0 +1,61 @@
+[tool.poetry]
+name = "web_crawler"
+version = "0.1.0"
+description = "Generic web crawler"
+authors = ["Noel Wilson <jwnwilson@hotmail.co.uk>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+fastapi = "^0.115.3"
+uvicorn = "^0.32.0"
+gevent = "^24.10.3"
+requests = "^2.32.3"
+python-dotenv = "^1.0.1"
+pydantic-settings = "^2.6.0"
+monorepo-cloud = {path = "../../libs/adaptor/cloud", develop = true}
+monorepo-api = {path = "../../libs/interactor/api", develop = true}
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.3"
+mypy = "^1.13.0"
+black = "^24.10.0"
+isort = "^5.13.2"
+httpx = "^0.27.2"
+pytest-dotenv = "^0.5.2"
+pytest-cov = "^6.0.0"
+pytest-xdist = "^3.6.1"
+polyfactory = "^2.17.0"
+monorepo-db = {path = "../../libs/adaptor/db", develop = true}
+
+[tool.poetry.group.aws.dependencies]
+mangum = "^0.19.0"
+
+
+[tool.poetry.group.prod.dependencies]
+db = "^0.1.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.isort]
+profile = "black"
+
+[tool.pytest.ini_options]
+addopts = "-vv --cov --cov-report xml --cov-report term-missing --cov-fail-under=50"
+asyncio_mode = "auto"
+testpaths = ["app/tests"]
+env_files = ["env/local.env"]
+pythonpath = [
+  "src"
+]
+
+[tool.coverage.run]
+concurrency = ["gevent"]
+omit = ["app/tests/*"]
+source = ["app"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true

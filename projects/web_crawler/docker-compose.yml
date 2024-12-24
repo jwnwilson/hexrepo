@@ -1,0 +1,30 @@
+# For local development, only database is running
+#
+# docker compose up -d
+# uvicorn app.main:app --reload
+#
+version: '3'
+services:
+  api:
+    container_name: web_crawler
+    platform: "linux/amd64"
+    env_file:
+      - env/docker.env
+    image: "web_crawler"
+    build: 
+      context: ../../
+      dockerfile: projects/web_crawler/infra/docker/aws.Dockerfile
+    # Run this contain as if it's in the terminal, useful for debugging
+    tty: true
+    # Mount local files into the container so we can update files inside the container
+    volumes:
+      - ../../libs:/libs
+      - ./src:/code/src
+    expose:
+      - "8000"
+    ports:
+      - 0.0.0.0:8000:8000
+    # Override lambda entry point to revert to default docker behaviour
+    entrypoint: ""
+    command: "uvicorn app.adapter.into.fastapi.main:app --host 0.0.0.0 --port 80 --reload --debug"
+
