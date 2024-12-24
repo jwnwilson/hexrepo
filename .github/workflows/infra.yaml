@@ -37,7 +37,6 @@ jobs:
       name: Cache venv
       uses: ./.github/actions/be_venv
       with:
-        venv_path: "."
         lock_file: "./uv.lock"
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v3
