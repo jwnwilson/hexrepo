@@ -42,7 +42,7 @@ create_library: hextech
 
 add_library: hextech
 	@echo "Adding library to project..."
-	hextech add_library
+	hextech add-library
 
 test_projects: hextech
 	@echo "Testing projects..."

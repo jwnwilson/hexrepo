@@ -64,7 +64,7 @@ def prompt_environment() -> str:
     enironments: List[str] = get_environments()
     env_map: List[str] = {str(i + 1): env for i, env in enumerate(enironments)}
     options = "\n".join([f"{i} - {project}" for i, project in env_map.items()])
-    selection: str = typer.prompt(f"Choose from [{options}]", default="1")
+    selection: str = typer.prompt(f"Choose from:\n{options}\n", default="1")
     try:
         environment = env_map[selection]
     except KeyError:
@@ -78,7 +78,7 @@ def prompt_project() -> str:
     projects: List[str] = get_projects()
     project_map: List[str] = {str(i + 1): project for i, project in enumerate(projects)}
     options = "\n".join([f"{i} - {project}" for i, project in project_map.items()])
-    selection: str = typer.prompt(f"Choose from [{options}]", default="1")
+    selection: str = typer.prompt(f"Choose from:\n{options}\n", default="1")
     try:
         project = project_map[selection]
     except KeyError:

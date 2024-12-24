@@ -107,7 +107,9 @@ def create_project():
 
 
 @app.command()
-def add_library(project: str, library: str):
+def add_library():
+    library: str = prompt_library()
+    project: str = prompt_project()
     # Install library from repo if available
     install_library_in_project(library, project)
 
