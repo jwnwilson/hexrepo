@@ -3,6 +3,7 @@
 **/.mypy_cache
 **/__pycache__
 **/.coverage
+**/.pdm-build
 **/dist
 **/infra	
 templates
