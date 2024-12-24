@@ -10,9 +10,9 @@ def prompt_cloud_provider() -> str:
     print("1 - aws")
     # print("2 - gcp")
     # print("3 - azure")
-    cloud_provider_optio: str = typer.prompt("Choose from [1]")
+    cloud_provider_option: str = typer.prompt("Choose from [1]")
     try:
-        cloud_provider = {"1": "aws"}[cloud_provider_optio]
+        cloud_provider = {"1": "aws"}[cloud_provider_option]
     except KeyError:
         typer.echo("Invalid cloud provider, please select an option, 1")
         return

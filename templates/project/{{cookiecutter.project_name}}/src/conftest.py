@@ -3,7 +3,7 @@ from collections.abc import Generator
 from typing import Any
 from unittest.mock import Mock
 import pytest
-{% if cookiecutter.use_api %}
+{% if cookiecutter.use_api == 'y' %}
 from fastapi.testclient import TestClient
 {% endif %}
 
@@ -39,7 +39,7 @@ def uow() -> Generator[UOW, None, None]:
 def create_tables(uow: UOW):
     uow.drop_all()
     uow.create_all()
-{% elif cookiecutter.use_api %}
+{% elif cookiecutter.use_api == 'y' %}
 @pytest.fixture
 def uow() -> Generator[UOW, None, None]:
     yield StubbedUOW(db_url="test")
