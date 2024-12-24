@@ -81,7 +81,7 @@ def create_library():
     # CD to libs/adaptor or libs/interactor folder
     with chdir(f"libs/{library_type}"):
         # Run cookie cutter command to copy template
-        cookiecutter("../../../templates/library")
+        cookiecutter("../../templates/library")
         # Setup infra for libray
         if prompt_setup_lib_infra():
             typer.echo("Setting up library infrastructure...")
