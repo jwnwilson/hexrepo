@@ -12,4 +12,4 @@ echo "Activating virtual environment in directory: ${PWD}"
 
 python3.12 -m venv ${VENV}; \
 source ${CURRENT_DIR}/${VENV}/bin/activate && \
-uv sync
+uv sync --all-extras
