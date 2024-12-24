@@ -41,8 +41,7 @@ jobs:
       name: Cache project venv
       uses: ./.github/actions/be_venv
       with:
-        venv_path: ${{ matrix.library }}
-        poetry_lock_file: "${{ matrix.library }}/poetry.lock"
+        lock_file: "${{ matrix.library }}/uv.lock"
     - name: Test Library
       run: |
         export LIB=`basename "${{ matrix.library }}"`
@@ -63,8 +62,7 @@ jobs:
       name: Cache project venv
       uses: ./.github/actions/be_venv
       with:
-        venv_path: ${{ matrix.library }}
-        poetry_lock_file: "${{ matrix.library }}/poetry.lock"
+        lock_file: "${{ matrix.library }}/uv.lock"
     - name: Check Version Bump Needed
       run: |
         export LIB=`basename "${{ matrix.library }}"`
@@ -87,8 +85,7 @@ jobs:
       name: Cache project venv
       uses: ./.github/actions/be_venv
       with:
-        venv_path: ${{ matrix.library }}
-        poetry_lock_file: "${{ matrix.library }}/poetry.lock"
+        lock_file: "${{ matrix.library }}/uv.lock"
     - name: Deploy Library
       run: |
         export LIB=`basename "${{ matrix.library }}"`
