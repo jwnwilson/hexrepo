@@ -11,7 +11,7 @@ ADD https://astral.sh/uv/install.sh /uv-installer.sh
 # Run the installer then remove it
 RUN sh /uv-installer.sh && rm /uv-installer.sh
 
-# Copy poetry.lock* in case it doesn't exist in the repo
+# Copy uv.lock* in case it doesn't exist in the repo
 COPY ./libs /libs
 COPY ./projects/${PROJECT}/pyproject.toml ./projects/${PROJECT}/uv.lock* ${LAMBDA_TASK_ROOT}/
 
