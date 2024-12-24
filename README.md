@@ -44,8 +44,9 @@ AWS_SECRET_ACCESS_KEY
 
 - Setup backend
     - Setup test / lint build image
-        - Setup ruff
         - Setup UV
+            - Fix uv cache
+        - Setup ruff
         - Look at https://github.com/nektos/act
     - Play with AI crawler project 
         - Setup async tasks
