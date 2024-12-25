@@ -29,10 +29,10 @@ jobs:
       name: Cache project venv
       uses: ./.github/actions/be_venv
       with:
-        venv_path: ${{ matrix.template }}
-        poetry_lock_file: "${{ matrix.template }}/poetry.lock"
+        lock_file: "${{ matrix.template }}/uv.lock"
     - name: Test Templates
+      working-directory: ${{ matrix.template }}
       run: |
-        cd ${{ matrix.template }}
+        make lint
         make test
   

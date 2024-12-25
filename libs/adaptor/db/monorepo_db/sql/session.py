@@ -1,5 +1,5 @@
 import contextlib
-from typing import Any, ContextManager, Dict, Generator, Iterator, Optional
+from typing import Any, Dict, Generator, Iterator, Optional
 
 import sqlalchemy
 from sqlalchemy import create_engine, event

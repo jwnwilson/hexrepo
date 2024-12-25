@@ -63,7 +63,7 @@ def test_aws_storage_e2e(
     assert f"{aws_folder}/{test_file_name}" in listed_files
 
     # Load file
-    test_file_path = f"tests/test_data/downloaded_test_file.txt"
+    test_file_path = "tests/test_data/downloaded_test_file.txt"
     storage_adaptor.load(f"{aws_folder}/{test_file_name}", test_file_path)
     with open(test_file_path, "r") as f:
         assert f.read() == "test file content"

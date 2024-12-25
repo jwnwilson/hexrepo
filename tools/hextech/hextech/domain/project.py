@@ -109,7 +109,7 @@ def get_library_type(library: str) -> str:
 
 
 def install_library_in_project(library: str, project: str):
-    # Install library locally in poetry dev group
+    # Install library locally in uv dev group
     libraries: List[str] = get_libraries()
     projects: List[str] = get_projects()
 
@@ -118,8 +118,5 @@ def install_library_in_project(library: str, project: str):
 
     library_type = get_library_type(library)
     with chdir(f"projects/{project}"):
-        run_system_command(
-            f"poetry add --editable ../../libs/{library_type}/{library} -G dev"
-        )
-        run_system_command(f"poetry add {library} -G prod")
+        run_system_command(f"uv add --editable ../../libs/{library_type}/{library}")
     typer.echo(f"Library {library} installed in project {project}")

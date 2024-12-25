@@ -39,7 +39,7 @@ class MonorepoConfig(BaseSettings):
             with open("config.json", "r") as f:
                 config = json.loads(f.read())
             return MonorepoConfig(**config)
-        except Exception as err:
+        except Exception:
             print("Unable to load config file.")
             return None
 

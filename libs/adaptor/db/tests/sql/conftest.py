@@ -11,7 +11,7 @@ from monorepo_db.sql.models.example import ExampleCreateDTO, ExampleDTO, SqlUOW
 def uow() -> Generator[UOW, None, None]:
     db_url = get_sql_db_url()
     uow = SqlUOW(db_url=db_url)
-    with uow.transaction() as session:
+    with uow.transaction():
         yield uow
 
 

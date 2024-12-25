@@ -1,6 +1,5 @@
 import contextlib
 import os
-import sys
 from contextlib import chdir
 from typing import List, Optional
 
@@ -10,15 +9,16 @@ from typing_extensions import Annotated
 
 from hextech.config import MonorepoConfig, get_or_create_config
 from hextech.domain.infra.bastion import bastion_ssh_tunnel
-from hextech.domain.infra.deployment import create_env_infra, create_shared_infra
-from hextech.domain.infra.deployment import deploy_projects as deploy_projects_command
-from hextech.domain.infra.deployment import migrate_db as migrate_db_func
 from hextech.domain.infra.deployment import (
+    create_env_infra,
+    create_shared_infra,
     plan_env_infra_command,
     publish_libs,
     shared_infra_apply_command,
     shared_infra_plan_command,
 )
+from hextech.domain.infra.deployment import deploy_projects as deploy_projects_command
+from hextech.domain.infra.deployment import migrate_db as migrate_db_func
 from hextech.domain.infra.manage import start_infra_command, stop_infra_command
 from hextech.domain.infra.storage import create_tf_state
 from hextech.domain.project import (
@@ -36,7 +36,6 @@ from hextech.domain.prompts.common import (
     prompt_project,
 )
 from hextech.domain.prompts.infra import (
-    prompt_deploy_libs,
     prompt_setup_lib_infra,
     prompt_setup_project_infra,
     prompt_setup_shared_infra,
@@ -81,7 +80,7 @@ def create_library():
     # CD to libs/adaptor or libs/interactor folder
     with chdir(f"libs/{library_type}"):
         # Run cookie cutter command to copy template
-        cookiecutter("../../../templates/library")
+        cookiecutter("../../templates/library")
         # Setup infra for libray
         if prompt_setup_lib_infra():
             typer.echo("Setting up library infrastructure...")
@@ -94,7 +93,7 @@ def create_library():
 @app.command()
 def create_project():
     # CD to projects folder
-    with chdir(f"projects"):
+    with chdir("projects"):
         # Run cookie cutter command to copy template
         cookiecutter("../templates/project")
         # Setup infra for service
@@ -125,7 +124,7 @@ def shared_infra_plan():
 def shared_infra_apply():
     config: MonorepoConfig
     config, _ = get_or_create_config(no_input=True)
-    shared_infra_apply_command(config)
+    shared_infra_apply_command(config, no_input=True)
 
 
 @app.command()
@@ -139,7 +138,7 @@ def env_infra_plan(env: str):
 def env_infra_apply(env: str):
     config: MonorepoConfig
     config, _ = get_or_create_config(no_input=True)
-    create_env_infra(config, env)
+    create_env_infra(config, env, no_input=True)
 
 
 @app.command()
@@ -172,8 +171,8 @@ def test_libs(libraries: Optional[List[str]] = None):
 
 @app.command()
 def test_tools():
-    typer.echo(f"Running tests for hextech...")
-    run_system_command(f"cd tools/hextech && make test")
+    typer.echo("Running tests for hextech...")
+    run_system_command("cd tools/hextech && make test")
 
 
 @app.command()
@@ -193,21 +192,26 @@ def bump_librariy_version():
     library: str = prompt_library()
     typer.echo(f"Bumping version for {library} library...")
     lib_type: str = get_library_type(library)
+    # Work around to bump uv version until uv version managment function is added
     run_system_command(
-        f"cd libs/{lib_type}/{library} && source .venv/bin/activate && poetry version patch"
+        f"""cd libs/{lib_type}/{library} && \\
+        VERSION=$(uvx --from=toml-cli toml get --toml-path=pyproject.toml project.version) && \\
+        VERSION=$(echo $VERSION | awk -F. '/[0-9]+\\./{{$NF++;print}}' OFS=.) && \\
+        uvx --from=toml-cli toml set --toml-path=pyproject.toml project.version $VERSION
+        """
     )
 
 
 @app.command()
 def lint():
-    typer.echo(f"Running linting for hextech...")
-    run_system_command(f"cd tools/hextech && make lint")
-    typer.echo(f"Running linting for projects...")
+    typer.echo("Running linting for hextech...")
+    run_system_command("cd tools/hextech && make lint")
+    typer.echo("Running linting for projects...")
     projects: List[str] = get_projects()
     for project in projects:
         typer.echo(f"Running linting for {project} project...")
         run_system_command(f"cd projects/{project} && make lint")
-    typer.echo(f"Running linting for libraries...")
+    typer.echo("Running linting for libraries...")
     libraries: List[str] = get_libraries()
     for lib in libraries:
         lib_type: str = get_library_type(lib)

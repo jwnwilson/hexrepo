@@ -18,6 +18,9 @@ tf_shared_plan:
 tf_shared_apply:
 	@cd tf/aws/shared  && terraform apply
 
+tf_shared_apply_no_input:
+	@cd tf/aws/shared  && terraform apply -auto-approve
+
 tf_shared_destroy:
 	@cd tf/aws/shared  && terraform destroy
 
@@ -38,6 +41,9 @@ tf_env_plan:
 
 tf_env_apply:
 	@cd tf/aws/environment  && terraform apply
+
+tf_env_apply_no_input:
+	@cd tf/aws/environment  && terraform apply -auto-approve
 
 tf_env_destroy:
 	@cd tf/aws/environment  && terraform destroy

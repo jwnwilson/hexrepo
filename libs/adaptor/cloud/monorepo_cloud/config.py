@@ -2,7 +2,7 @@ import json
 import logging
 import os
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 
 from pydantic import BaseModel
 from pydantic_settings import BaseSettings
@@ -52,7 +52,7 @@ def load_aws_config() -> AWSConfig:
         raise Exception(
             "Hexrepo config file not found: Please run `make setup` at project root to create config.json"
         )
-    except json.JSONDecodeError as err:
+    except json.JSONDecodeError:
         raise Exception("Hexrepo config file is not valid JSON: {err}")
 
     return AWSConfig(

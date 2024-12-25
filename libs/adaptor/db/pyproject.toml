@@ -1,37 +1,42 @@
-[tool.poetry]
+[project]
+authors = [
+    {name = "Noel Wilson", email = "jwnwilson@hotmail.co.uk"},
+]
+requires-python = "<4.0,>=3.12"
 name = "monorepo_db"
-version = "0.1.2"
+version = "0.1.4"
 description = "A short description of the project"
-authors = ["Noel Wilson <jwnwilson@hotmail.co.uk>"]
 readme = "README.md"
+dependencies = [
+    "pydantic<3.0.0,>=2.9.2",
+    "pydantic-settings<3.0.0,>=2.6.1",
+    "psycopg2-binary<3.0.0,>=2.9.10",
+    "sqlalchemy<3.0.0,>=2.0.36",
+    "boto3<2.0.0,>=1.35.68",
+    "alembic<2.0.0,>=1.14.0",
+    "monorepo-cloud",
+]
 
-[tool.poetry.dependencies]
-python = "^3.12"
-pydantic = "^2.9.2"
-pydantic-settings = "^2.6.1"
-psycopg2-binary = "^2.9.10"
-monorepo-cloud = {path = "../cloud", develop = true}
-sqlalchemy = "^2.0.36"
-boto3 = "^1.35.68"
-alembic = "^1.14.0"
+[tool.uv.sources]
+monorepo-cloud = { path = "../cloud", editable = true }
 
-[tool.poetry.group.dev.dependencies]
-pytest = "^8.3.3"
-mypy = "^1.13.0"
-black = "^24.10.0"
-isort = "^5.13.2"
-httpx = "^0.27.2"
-pytest-dotenv = "^0.5.2"
-pytest-cov = "^6.0.0"
-pytest-xdist = "^3.6.1"
-gevent = "^24.10.3"
+[dependency-groups]
+dev = [
+    "pytest<9.0.0,>=8.3.3",
+    "mypy<2.0.0,>=1.13.0",
+    "ruff>=0.8.4",
+    "httpx<1.0.0,>=0.27.2",
+    "pytest-dotenv<1.0.0,>=0.5.2",
+    "pytest-cov<7.0.0,>=6.0.0",
+    "pytest-xdist<4.0.0,>=3.6.1",
+    "gevent<25.0.0,>=24.10.3",
+]
 
+[tool.pdm.build]
+includes = []
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
-
-[tool.isort]
-profile = "black"
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
 
 [tool.pytest.ini_options]
 addopts = "-vv --cov --cov-report xml --cov-report term-missing --cov-fail-under=50"
