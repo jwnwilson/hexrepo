@@ -31,7 +31,7 @@ jobs:
       with:
         lock_file: "${{ matrix.template }}/uv.lock"
     - name: Test Templates
+      working-directory: ${{ matrix.template }}
       run: |
-        cd ${{ matrix.template }}
         make test
   

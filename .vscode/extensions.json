@@ -3,7 +3,6 @@
         "Boto3typed.boto3-ide",
         "ms-python.python",
         "ms-azuretools.vscode-docker",
-        "hashicorp.terraform",
-        "SanjulaGanepola.github-local-actions"
+        "hashicorp.terraform"
     ]
 }

@@ -43,9 +43,9 @@ jobs:
       with:
         lock_file: "${{ matrix.library }}/uv.lock"
     - name: Test Library
+      working-directory: ${{ matrix.library }}
       run: |
-        export LIB=`basename "${{ matrix.library }}"`
-        make test_libs LIBRARY=${LIB}
+        make test
   check_version_bump:
     strategy:
       matrix:

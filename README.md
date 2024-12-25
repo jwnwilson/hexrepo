@@ -47,8 +47,6 @@ AWS_SECRET_ACCESS_KEY
         - Setup UV
             - Fix uv cache
                 - Use act to validate?
-            - validate deploy to lambda
-                - Need additional deps installed on docker
             - improve docker image:
                 https://github.com/astral-sh/uv/issues/8935
         - Setup ruff
