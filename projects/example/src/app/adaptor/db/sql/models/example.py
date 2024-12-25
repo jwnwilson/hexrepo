@@ -1,10 +1,8 @@
-from typing import TYPE_CHECKING, Dict, List
 
 from monorepo_db.sql.models.base_model import Base
 from monorepo_db.sql.repository import SQLRepository
-from pydantic import UUID4
-from sqlalchemy import UUID, Column, ForeignKey, Integer, String, Table, Text
-from sqlalchemy.orm import Mapped, joinedload, mapped_column, relationship
+from sqlalchemy import String, Text
+from sqlalchemy.orm import Mapped, mapped_column
 
 from app.domain.example import ExampleDTO
 

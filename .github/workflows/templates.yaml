@@ -33,5 +33,6 @@ jobs:
     - name: Test Templates
       working-directory: ${{ matrix.template }}
       run: |
+        make lint
         make test
   

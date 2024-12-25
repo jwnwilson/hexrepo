@@ -2,7 +2,7 @@ import os
 import signal
 import subprocess
 from contextlib import contextmanager
-from typing import Any, Dict, List, Optional
+from typing import Any, List, Optional
 
 import typer
 from monorepo_cloud.compute import AWSComputeManager
@@ -47,12 +47,12 @@ def bastion_ssh_tunnel(
 
 @contextmanager
 def managed_bastion_ssh(config: MonorepoConfig, env: str, project: str):
-    typer.echo(f"Starting ssh tunnel to bastion")
+    typer.echo("Starting ssh tunnel to bastion")
     bastion_process = bastion_ssh_tunnel(config, env, project, background_task=True)
     try:
         yield bastion_process
     finally:
-        typer.echo(f"Shutting down ssh tunnel to bastion")
+        typer.echo("Shutting down ssh tunnel to bastion")
         os.killpg(os.getpgid(bastion_process.pid), signal.SIGTERM)
         print("Shut down ssh tunnel to bastion")
 

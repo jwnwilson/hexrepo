@@ -6,8 +6,6 @@ from monorepo_db.sql import get_sql_db_url
 from monorepo_db.sql.models.base_model import Base
 from sqlalchemy import Connection, engine_from_config, pool
 
-from app.config import config as app_config
-
 
 def get_db_url_alembic():
     # Escape % in the db_url

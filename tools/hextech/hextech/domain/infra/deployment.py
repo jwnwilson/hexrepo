@@ -1,6 +1,5 @@
 import json
 import os
-import signal
 import subprocess
 from contextlib import chdir
 from typing import Dict, List, Optional
@@ -95,14 +94,14 @@ def create_per_env_infra(config: MonorepoConfig) -> None:
     typer.echo("Setting up per env infrastructure...")
     # Placeholder for shared infra setup
     with chdir("infra"):
-        run_system_command(f"make tf_env_init ENV=dev")
+        run_system_command("make tf_env_init ENV=dev")
         for env in config.environments:
             try:
                 run_system_command(f"ENVIRONMENT={env} make tf_workspace")
-            except:
+            except:  # noqa
                 pass
             # run_system_command(f"make tf_env_plan ")
-            run_system_command(f"make tf_env_apply ")
+            run_system_command("make tf_env_apply ")
     typer.echo("Shared infrastructure setup complete.")
 
 
@@ -131,7 +130,7 @@ def plan_env_infra_command(config: MonorepoConfig, env: str) -> None:
         run_system_command("make tf_env_init")
         try:
             run_system_command(f"ENVIRONMENT={env} make tf_workspace")
-        except:
+        except:  # noqa
             pass
         run_system_command("make tf_env_plan")
     typer.echo("Shared infrastructure plan complete.")
@@ -143,7 +142,7 @@ def create_env_infra(config: MonorepoConfig, env: str, no_input: bool = False) -
         run_system_command("make tf_env_init")
         try:
             run_system_command(f"ENVIRONMENT={env} make tf_workspace")
-        except:
+        except:  # noqa
             pass
         if no_input:
             run_system_command("make tf_env_appl_no_input")
@@ -159,7 +158,7 @@ def get_terrform_output(env: str, project: str) -> str:
     tf_str: str = run_system_command_with_output(
         f"cd projects/{project} && make --no-print-directory tf_output ENVIRONMENT={env}"
     )
-    typer.echo(f"Loading Terraform output")
+    typer.echo("Loading Terraform output")
     try:
         return json.loads(tf_str)
     except json.JSONDecodeError as err:
@@ -174,7 +173,7 @@ def migrate_db(config: MonorepoConfig, env: str, project: str):
             )
             return
         # Start bastion
-        with managed_bastion_ssh(config, env, project) as bastion_process:
+        with managed_bastion_ssh(config, env, project):
             try:
                 tf_output: Dict[str, str] = get_terrform_output(env, project)
                 secret_name = tf_output["db_secret_name"]["value"]

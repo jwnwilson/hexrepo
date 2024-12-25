@@ -16,13 +16,12 @@ while [[ "$#" -gt 0 ]]; do
 done
 
 
-. ${VENV}/bin/activate
-
 if [[ -z "${check}" ]]; then
-    black ${TARGET_DIRS} 
-    isort ${TARGET_DIRS} --profile black
+    uv run ruff check --select I --fix ${TARGET_DIRS}
+    uv run ruff check --fix ${TARGET_DIRS}
+    uv run ruff format ${TARGET_DIRS}
 else
+    uv run ruff check --select I ${TARGET_DIRS}
+    uv run ruff check ${TARGET_DIRS}
     mypy ${TARGET_DIRS}
-    black --check ${TARGET_DIRS}
-    isort --check-only ${TARGET_DIRS} --profile black
 fi
