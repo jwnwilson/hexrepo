@@ -38,6 +38,7 @@ share/python-wheels/
 MANIFEST
 .DS_Store
 .pdm-build
+.ruff_cache
 
 patch
 .testing
