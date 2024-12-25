@@ -45,9 +45,10 @@ AWS_SECRET_ACCESS_KEY
 - Setup backend
     - Setup test / lint build image
         - Setup UV
-            - Fix db migrate
             - Fix uv cache
+                - Use act to validate?
             - validate deploy to lambda
+                - Need additional deps installed on docker
             - improve docker image:
                 https://github.com/astral-sh/uv/issues/8935
         - Setup ruff

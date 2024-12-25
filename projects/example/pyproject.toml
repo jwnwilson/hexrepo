@@ -22,6 +22,7 @@ dependencies = [
     "monorepo-db @ file:///${PROJECT_ROOT}/../../libs/adaptor/db",
     "monorepo-api @ file:///${PROJECT_ROOT}/../../libs/interactor/api",
     "boto3-stubs[essential]<2.0.0,>=1.35.86",
+    "mangum<1.0.0,>=0.19.0",
 ]
 
 [dependency-groups]
@@ -35,9 +36,6 @@ dev = [
     "pytest-cov<7.0.0,>=6.0.0",
     "pytest-xdist<4.0.0,>=3.6.1",
     "polyfactory<3.0.0,>=2.17.0",
-]
-aws = [
-    "mangum<1.0.0,>=0.19.0",
 ]
 
 [tool.pdm.build]
