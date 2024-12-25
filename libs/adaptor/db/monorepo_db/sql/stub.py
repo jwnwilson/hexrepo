@@ -1,11 +1,10 @@
 import logging
 import uuid
-from collections.abc import Generator
 from typing import Any, Dict, Optional, Type
 
 from pydantic import BaseModel
 
-from monorepo_db import UOW, PaginatedData, Repository
+from monorepo_db import Repository
 from monorepo_db.interface import PaginatedData
 
 logger = logging.getLogger(__name__)

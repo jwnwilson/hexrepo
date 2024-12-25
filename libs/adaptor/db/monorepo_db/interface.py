@@ -1,6 +1,6 @@
 import contextlib
 from abc import ABC
-from typing import TYPE_CHECKING, Any, Dict, Generator, Generic, Optional, Type, TypeVar
+from typing import Any, Dict, Generator, Generic, Optional, Type, TypeVar
 from uuid import UUID
 
 from pydantic import BaseModel

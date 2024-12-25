@@ -1,4 +1,3 @@
-
 from monorepo_db.sql.models.base_model import Base
 from monorepo_db.sql.repository import SQLRepository
 from sqlalchemy import String, Text

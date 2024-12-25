@@ -5,7 +5,7 @@ from uuid import UUID
 from sqlalchemy import Row, Select
 from sqlalchemy.orm import Session
 
-from ..interface import ModelDTO, ModelDTOType, UpdateModelDTO
+from ..interface import ModelDTO, ModelDTOType
 from .models.base_model import Base
 
 BaseSQLModel = TypeVar("BaseSQLModel", bound=Base)

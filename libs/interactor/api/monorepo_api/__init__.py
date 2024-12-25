@@ -1,1 +1,1 @@
-from .crud import CrudRouter
+from .crud import CrudRouter as CrudRouter

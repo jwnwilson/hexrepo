@@ -20,7 +20,7 @@ class AWSSecretAdaptor(SecretAdaptor):
             )
             logger.info(f"Secret: {secret_name} retrieved successfully.")
             return get_secret_value_response["SecretString"]
-        except Exception as e:
+        except Exception:
             msg = f"The requested secret {secret_name} was not found."
             logger.exception(msg)
             raise
