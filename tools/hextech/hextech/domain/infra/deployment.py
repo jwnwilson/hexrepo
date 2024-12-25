@@ -114,11 +114,14 @@ def shared_infra_plan_command(config: MonorepoConfig) -> None:
     typer.echo("Shared infrastructure plan complete.")
 
 
-def shared_infra_apply_command(config: MonorepoConfig) -> None:
+def shared_infra_apply_command(config: MonorepoConfig, no_input: bool = False) -> None:
     typer.echo("Applying shared infrastructure...")
     with chdir("infra"):
         run_system_command("make tf_shared_init")
-        run_system_command("make tf_shared_apply")
+        if no_input:
+            run_system_command("make tf_shared_apply_no_input")
+        else:
+            run_system_command("make tf_shared_apply")
     typer.echo("Shared infrastructure apply complete.")
 
 
@@ -134,7 +137,7 @@ def plan_env_infra_command(config: MonorepoConfig, env: str) -> None:
     typer.echo("Shared infrastructure plan complete.")
 
 
-def create_env_infra(config: MonorepoConfig, env: str) -> None:
+def create_env_infra(config: MonorepoConfig, env: str, no_input: bool = False) -> None:
     typer.echo("Applying shared infrastructure...")
     with chdir("infra"):
         run_system_command("make tf_env_init")
@@ -142,7 +145,10 @@ def create_env_infra(config: MonorepoConfig, env: str) -> None:
             run_system_command(f"ENVIRONMENT={env} make tf_workspace")
         except:
             pass
-        run_system_command("make tf_env_apply")
+        if no_input:
+            run_system_command("make tf_env_appl_no_input")
+        else:
+            run_system_command("make tf_env_apply")
     typer.echo("Shared infrastructure apply complete.")
 
 

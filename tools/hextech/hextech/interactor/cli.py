@@ -125,7 +125,7 @@ def shared_infra_plan():
 def shared_infra_apply():
     config: MonorepoConfig
     config, _ = get_or_create_config(no_input=True)
-    shared_infra_apply_command(config)
+    shared_infra_apply_command(config, no_input=True)
 
 
 @app.command()
@@ -139,7 +139,7 @@ def env_infra_plan(env: str):
 def env_infra_apply(env: str):
     config: MonorepoConfig
     config, _ = get_or_create_config(no_input=True)
-    create_env_infra(config, env)
+    create_env_infra(config, env, no_input=True)
 
 
 @app.command()
