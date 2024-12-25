@@ -5,6 +5,7 @@
 **/.coverage
 **/htmlcov
 **/.pdm-build
+**/.ruff_cache
 **/dist
 **/infra	
 templates
