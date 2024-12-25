@@ -1,35 +1,16 @@
 name: 'Python cache'
 description: 'Cache Python dependencies'
 inputs:
-  venv_path: 
-    description: 'Path to the virtual environment'
-    required: true
-  poetry_lock_file:
-    description: 'Path to the poetry.lock file'
+  lock_file:
+    description: 'Path to the uv.lock file'
     required: true
 runs:
   using: "composite"
   steps:
-    - name: Install poetry
-      run: pipx install poetry
-      shell: bash
-    - uses: actions/setup-python@v5
+    - name: Setup Python + uv
+      uses: astral-sh/setup-uv@v5
       with:
-        python-version: '3.12'
-        cache: 'poetry'
-    - name: Cache cli venv
-      id: cache-cli-poetry
-      uses: actions/cache@v3
-      env:
-        cache-name: cache-cli-poetry
-      with:
-        path: .venv
-        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles( 'tools/hextech/poetry.lock' ) }}
-    - name: Cache target venv
-      id: cache-target-poetry
-      uses: actions/cache@v3
-      env:
-        cache-name: cache-target-poetry
-      with:
-        path: "${{ inputs.venv_path }}/.venv"
-        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ inputs.venv_path }}-${{ hashFiles( inputs.poetry_lock_file ) }}
+        enable-cache: true
+        cache-dependency-glob: |
+          tools/hextech/uv.lock
+          ${{ inputs.lock_file }}

@@ -5,7 +5,7 @@ ROOT_DIR=$(dirname $(dirname $SCRIPT_DIR))
 
 if ! [ -x "$(command -v hextech)" ]; then
     echo "Installing Hextech cli..."
-    pipx install --editable ./tools/hextech
+    uv tool install -e  ./tools/hextech
 else
     # Hextech is installed
     exit 0

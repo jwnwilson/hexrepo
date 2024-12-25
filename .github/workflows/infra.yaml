@@ -37,8 +37,7 @@ jobs:
       name: Cache venv
       uses: ./.github/actions/be_venv
       with:
-        venv_path: "."
-        poetry_lock_file: "./poetry.lock"
+        lock_file: "./tools/hextech/uv.lock"
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v3
       with:
@@ -63,8 +62,7 @@ jobs:
       name: Cache venv
       uses: ./.github/actions/be_venv
       with:
-        venv_path: "."
-        poetry_lock_file: "./poetry.lock"
+        lock_file: "./tools/hextech/uv.lock"
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v3
       with:
@@ -90,8 +88,7 @@ jobs:
       name: Cache venv
       uses: ./.github/actions/be_venv
       with:
-        venv_path: "."
-        poetry_lock_file: "./poetry.lock"
+        lock_file: "./tools/hextech/uv.lock"
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v3
       with:
@@ -120,8 +117,7 @@ jobs:
       name: Cache venv
       uses: ./.github/actions/be_venv
       with:
-        venv_path: "."
-        poetry_lock_file: "./poetry.lock"
+        lock_file: "./tools/hextech/uv.lock"
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v3
       with:

@@ -81,7 +81,7 @@ def create_library():
     # CD to libs/adaptor or libs/interactor folder
     with chdir(f"libs/{library_type}"):
         # Run cookie cutter command to copy template
-        cookiecutter("../../../templates/library")
+        cookiecutter("../../templates/library")
         # Setup infra for libray
         if prompt_setup_lib_infra():
             typer.echo("Setting up library infrastructure...")
@@ -193,8 +193,13 @@ def bump_librariy_version():
     library: str = prompt_library()
     typer.echo(f"Bumping version for {library} library...")
     lib_type: str = get_library_type(library)
+    # Work around to bump uv version until uv version managment function is added
     run_system_command(
-        f"cd libs/{lib_type}/{library} && source .venv/bin/activate && poetry version patch"
+        f"""cd libs/{lib_type}/{library} && \\
+        VERSION=$(uvx --from=toml-cli toml get --toml-path=pyproject.toml project.version) && \\
+        VERSION=$(echo $VERSION | awk -F. '/[0-9]+\\./{{$NF++;print}}' OFS=.) && \\
+        uvx --from=toml-cli toml set --toml-path=pyproject.toml project.version $VERSION
+        """
     )
 
 

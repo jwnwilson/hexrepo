@@ -4,7 +4,6 @@ This is my python monorepo inspired by tools like turborepo that uses hexagonal 
 
 ![alt text](docs/hextech.png)
 
-
 Features include:
 
 - CLI commands to setup projects
@@ -44,6 +43,11 @@ AWS_SECRET_ACCESS_KEY
 # To Do
 
 - Setup backend
+    - Setup test / lint build image
+        - Setup UV
+            - improve docker image:
+                https://github.com/astral-sh/uv/issues/8935
+        - Setup ruff
     - Play with AI crawler project 
         - Setup async tasks
             - migrate hex lib into this repo
@@ -67,13 +71,7 @@ AWS_SECRET_ACCESS_KEY
     - Enforce architecture rules:
         - https://roman.pt/posts/python-architecture-linter/
         - [deply](https://github.com/Vashkatsi/deply)
-    - Combine shared infra + env infra pull add envs to config and pull them down 
-    - Setup test / lint build image
-        - Setup ruff
-        - Setup UV
-        - Look at https://github.com/nektos/act
-        - Port changes to all libs and projects
-        - Switch to bastion to access all dbs as needed
+    - Combine shared infra + env infra pull add envs to config and pull them down
     - Add smoke test / E2E tests
     - Add another cloud provider - GCP
 
