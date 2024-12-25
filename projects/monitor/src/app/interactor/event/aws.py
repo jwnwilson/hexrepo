@@ -25,7 +25,7 @@ def get_db_manager(aws_config: AWSRDSManager) -> AWSRDSManager:
 
 
 def instance_tag_to_datetime(
-    tags: Dict[str, str]
+    tags: Dict[str, str],
 ) -> Tuple[datetime.datetime, datetime.datetime]:
     tag_start_hour: int = int(tags["StartTime"].split(":")[0])
     tag_start_minute: int = int(tags["StartTime"].split(":")[1])

@@ -1,7 +1,6 @@
 import logging
-from typing import List, Optional
+from typing import List
 
-import boto3
 import typer
 from monorepo_cloud.compute import AWSComputeManager
 from monorepo_cloud.db import AWSRDSManager

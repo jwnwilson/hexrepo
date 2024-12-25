@@ -1,1 +1,1 @@
-from .upgrade import update_db
+from .upgrade import update_db as update_db

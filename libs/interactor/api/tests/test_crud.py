@@ -4,7 +4,7 @@ from unittest.mock import Mock
 from uuid import UUID
 
 import pytest
-from fastapi import APIRouter, FastAPI
+from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from monorepo_db.exception import RecordNotFound
 from monorepo_db.interface import UOW, PaginatedData, Repository
@@ -71,8 +71,8 @@ class MockRepository(Repository):
             key=lambda x: getattr(x, order_by.lstrip("-")),
             reverse=(order_by.startswith("-")),
         )
-        start = (page_number - 1) * page_size
-        end = start + page_size
+        # start = (page_number - 1) * page_size
+        # end = start + page_size
         return PaginatedData(results=results, total=len(self.data))
 
     def update(self, id: UUID, obj_in: Any, merge_objects: bool = False) -> Any:

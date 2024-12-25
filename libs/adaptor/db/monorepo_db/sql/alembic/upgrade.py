@@ -7,7 +7,7 @@ logger = logging.getLogger(__name__)
 
 
 def update_db() -> None:
-    logger.info(f"Running DB migrations")
+    logger.info("Running DB migrations")
     alembic_cfg = Config("alembic.ini")
 
     try:
@@ -15,4 +15,4 @@ def update_db() -> None:
     except Exception as err:
         logger.error(f"Error running DB migrations. {err}")
         raise
-    logger.info(f"DB migrations complete")
+    logger.info("DB migrations complete")

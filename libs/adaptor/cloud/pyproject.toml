@@ -4,7 +4,7 @@ authors = [
 ]
 requires-python = "<4.0,>=3.12"
 name = "monorepo-cloud"
-version = "0.3.6"
+version = "0.3.7"
 description = ""
 readme = "README.md"
 dependencies = [
@@ -22,8 +22,7 @@ aws = [
 dev = [
     "pytest<9.0.0,>=8.3.3",
     "mypy<2.0.0,>=1.13.0",
-    "black<25.0.0,>=24.10.0",
-    "isort<6.0.0,>=5.13.2",
+    "ruff>=0.8.4",
     "httpx<1.0.0,>=0.27.2",
     "pytest-dotenv<1.0.0,>=0.5.2",
     "pytest-cov<7.0.0,>=6.0.0",
@@ -36,9 +35,6 @@ includes = []
 [build-system]
 requires = ["pdm-backend"]
 build-backend = "pdm.backend"
-
-[tool.isort]
-profile = "black"
 
 [tool.pytest.ini_options]
 addopts = "-vv --cov --cov-report xml --cov-report term-missing --cov-fail-under=30"

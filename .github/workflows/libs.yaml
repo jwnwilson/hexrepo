@@ -45,6 +45,7 @@ jobs:
     - name: Test Library
       working-directory: ${{ matrix.library }}
       run: |
+        make lint
         make test
   check_version_bump:
     strategy:

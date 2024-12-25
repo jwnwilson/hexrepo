@@ -1,8 +1,8 @@
 import logging
-from typing import Any, Dict, List, Optional, Union, cast
+from typing import Any, Dict, List, Optional, Union
 from uuid import UUID
 
-from pydantic import UUID4, BaseModel
+from pydantic import BaseModel
 from sqlalchemy import Row, Select, asc, desc, func, select
 from sqlalchemy.exc import IntegrityError as SQLIntegrityError
 from sqlalchemy.exc import MultipleResultsFound

@@ -5,7 +5,7 @@ from typing import Any, List, Optional
 import boto3
 from mypy_boto3_s3.client import S3Client
 
-from ..config import AWSConfig, config
+from ..config import AWSConfig
 from .exceptions import StorageAlreadyExists, StorageInvalid
 from .interface import StorageAdaptor, StorageConfig, StorageData, UploadUrlData
 

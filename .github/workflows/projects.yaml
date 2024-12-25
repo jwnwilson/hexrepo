@@ -41,6 +41,7 @@ jobs:
     - name: Test Projects
       working-directory: ${{ matrix.project }}
       run: |
+        make lint
         make test
   plan_infra:
     needs: test_projects

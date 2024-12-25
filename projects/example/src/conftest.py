@@ -22,7 +22,7 @@ def uow() -> Generator[UOW, None, None]:
     """
     uow = SqlUOW(db_url=SQLALCHEMY_DATABASE_URL)
     # Create DB session
-    with uow.transaction() as session:
+    with uow.transaction():
         yield uow
 
 

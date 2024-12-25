@@ -1,7 +1,7 @@
 """DB migration
 
 Revision ID: 58d95491381f
-Revises: 
+Revises:
 Create Date: 2024-10-26 19:16:38.022304
 
 """
