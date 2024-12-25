@@ -22,7 +22,10 @@ build:
 
 # DB management
 db_migrate:
-	bash -c "source $(VENV_DIR)/bin/activate && alembic upgrade head"
+	bash -c "uv run alembic upgrade head"
+
+db_migrate_local:
+	bash -c "env $$(cat env/local.env|xargs) uv run alembic upgrade head"
 
 db_migrate_docker:
 	docker compose run api bash -c "alembic upgrade head"
@@ -33,10 +36,10 @@ db_delete_data: down
 db_upgrade: db_migrate down
 
 db_downgrade: down
-	bash -c "source $(VENV_DIR)/bin/activate && alembic downgrade -1"
+	bash -c "uv run alembic downgrade -1"
 
 db_create_migration: down
-	bash -c "source $(VENV_DIR)/bin/activate && alembic revision --autogenerate -m \"DB migration\""
+	bash -c "uv run alembic revision --autogenerate -m \"DB migration\""
 
 db:
 	docker compose run --service-ports -d postgres_db 
@@ -48,13 +51,11 @@ down:
 
 # Host API locally, loading local env file
 run: down db venv
-	source $(VENV_DIR)/bin/activate && \
-	PYTHONPATH=src uvicorn app.interactor.api.fastapi.main:app --reload --env-file env/local.env
+	PYTHONPATH=src uv run uvicorn app.interactor.api.fastapi.main:app --reload --env-file env/local.env
 
 # Host API locally, connect to cloud db. Still requires manual setting of DB_PASSWORD_SECRET_NAME in bastion.env
 run_bastion: bastion venv
-	source $(VENV_DIR)/bin/activate && \
-	PYTHONPATH=src uvicorn app.interactor.api.fastapi.main:app --reload --env-file env/local.env
+	PYTHONPATH=src uv run uvicorn app.interactor.api.fastapi.main:app --reload --env-file env/local.env
 
 # Host API locally and run in docker
 run_docker:
@@ -63,13 +64,11 @@ run_docker:
 # Testing commands
 test: venv
 	@echo "Running unit tests"
-	. $(VENV_DIR)/bin/activate; \
-	pytest
+	uv run pytest
 
 coverage:
 	@echo "Running unit tests"	
-	. $(VENV_DIR)/bin/activate; \
-	pytest --cov-report html	
+	uv run pytest --cov-report html	
 
 lint:
 	@TARGET_DIRS="src" bash ../../tools/bash_scripts/lint.sh 
