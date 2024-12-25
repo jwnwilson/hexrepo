@@ -45,12 +45,9 @@ AWS_SECRET_ACCESS_KEY
 - Setup backend
     - Setup test / lint build image
         - Setup UV
-            - Fix uv cache
-                - Use act to validate?
             - improve docker image:
                 https://github.com/astral-sh/uv/issues/8935
         - Setup ruff
-        - Look at https://github.com/nektos/act
     - Play with AI crawler project 
         - Setup async tasks
             - migrate hex lib into this repo
