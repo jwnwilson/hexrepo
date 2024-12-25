@@ -43,11 +43,6 @@ AWS_SECRET_ACCESS_KEY
 # To Do
 
 - Setup backend
-    - Setup test / lint build image
-        - Setup UV
-            - improve docker image:
-                https://github.com/astral-sh/uv/issues/8935
-        - Setup ruff
     - Play with AI crawler project 
         - Setup async tasks
             - migrate hex lib into this repo
@@ -64,6 +59,7 @@ AWS_SECRET_ACCESS_KEY
     - Setup command to run local against bastion db
     - Improve docker container builds
         - Reduce image size
+            https://github.com/astral-sh/uv/issues/8935
         - Setup base lib image to re-use for projects
     - Add user setup to infra as code
         - During project config setup define monorepo user with admin account
