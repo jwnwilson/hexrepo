@@ -1,12 +1,3 @@
 #! /bin/bash
-VENV_DIR=.venv
 
-if [[ -z "${GITHUB_ACTIONS}" ]]; then
-    echo "Running locally, activating venv."
-    . ${VENV_DIR}/bin/activate
-else
-    echo "Running on github skipping venv activation."
-    . ${VENV_DIR}/bin/activate
-fi
-
-pytest
+uv run pytest

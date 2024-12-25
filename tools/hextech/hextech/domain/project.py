@@ -118,7 +118,5 @@ def install_library_in_project(library: str, project: str):
 
     library_type = get_library_type(library)
     with chdir(f"projects/{project}"):
-        run_system_command(
-            f"uv add --editable ../../libs/{library_type}/{library}"
-        )
+        run_system_command(f"uv add --editable ../../libs/{library_type}/{library}")
     typer.echo(f"Library {library} installed in project {project}")
