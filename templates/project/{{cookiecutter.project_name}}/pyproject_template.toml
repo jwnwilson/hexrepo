@@ -30,11 +30,13 @@ dependencies = [
     {% endif %}
     {% if cookiecutter.use_api == 'y' %}
     "monorepo-api @ file:///${PROJECT_ROOT}/../../libs/interactor/api",
-    "mangum<1.0.0,>=0.19.0",
     {% endif %}
 ]
 
 [dependency-groups]
+aws = [
+    "mangum<1.0.0,>=0.19.0",
+]
 dev = [
     "pytest<9.0.0,>=8.3.3",
     "mypy<2.0.0,>=1.13.0",

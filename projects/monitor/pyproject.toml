@@ -16,10 +16,12 @@ dependencies = [
     "monorepo-db @ file:///${PROJECT_ROOT}/../../libs/adaptor/db",
     "monorepo-api @ file:///${PROJECT_ROOT}/../../libs/interactor/api",
     "boto3-stubs[essential]<2.0.0,>=1.35.86",
-    "mangum<1.0.0,>=0.19.0",
 ]
 
 [dependency-groups]
+aws = [
+    "mangum<1.0.0,>=0.19.0",
+]
 dev = [
     "pytest<9.0.0,>=8.3.3",
     "mypy<2.0.0,>=1.13.0",
