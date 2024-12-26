@@ -14,6 +14,10 @@ class RecordNotFound(RepositoryException):
     pass
 
 
+class DuplicateRecord(RepositoryException):
+    pass
+
+
 class IntegrityError(RepositoryException):
     pass
 

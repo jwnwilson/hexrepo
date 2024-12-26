@@ -15,33 +15,6 @@ from ...exception import RecordNotFound
 
 logger = logging.getLogger(__name__)
 
-
-class KeyType(Enum):
-    HASH = "HASH"
-    RANGE = "RANGE"
-
-
-class AttributeType(Enum):
-    string = "S"
-    number = "N"
-    binary = "B"
-
-
-class KeySchema(BaseModel):
-    name: str
-    type: KeyType
-
-
-class AttributeDefinitions(BaseModel):
-    name: str
-    type: AttributeType
-
-
-class TableDefinition(BaseModel):
-    key_schema: List[KeySchema]
-    attribute_definitions: List[AttributeDefinitions]
-
-
 QueryParams = Dict[str, Any]
 FilterParam = Dict[str, Any]
 
@@ -135,7 +108,8 @@ class DynamoRepository(Repository):
         except KeyError:
             raise RecordNotFound("Record not found: {record_id} in table: {table}")
 
-    def read_multi(self, 
+    def read_multi(
+            self, 
             filters: Optional[Dict[str, Any]] = None,
             page_size: int = 100,
             page_number: int = 1,
