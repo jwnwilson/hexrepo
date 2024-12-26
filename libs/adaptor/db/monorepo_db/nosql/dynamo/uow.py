@@ -1,5 +1,6 @@
 import contextlib
 from typing import Any, Dict, Generator, Optional
+
 import boto3
 from mypy_boto3_dynamodb.service_resource import DynamoDBServiceResource
 

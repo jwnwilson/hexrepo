@@ -1,6 +1,8 @@
 import contextlib
 from typing import Dict, Optional
+
 from pymongo import MongoClient
+
 from ...interface import UOW
 from .models.example import ExampleRepository
 

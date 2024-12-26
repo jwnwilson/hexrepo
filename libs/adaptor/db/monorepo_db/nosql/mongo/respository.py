@@ -7,8 +7,13 @@ from pymongo import MongoClient
 from pymongo.collection import Collection
 
 from ...exception import RecordNotFound
-from ...interface import PaginatedData, Repository, ModelDTOType, ModelDTO, UpdateModelDTO
-
+from ...interface import (
+    ModelDTO,
+    ModelDTOType,
+    PaginatedData,
+    Repository,
+    UpdateModelDTO,
+)
 
 logger = logging.getLogger(__name__)
 

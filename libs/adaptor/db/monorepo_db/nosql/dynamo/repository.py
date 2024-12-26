@@ -1,17 +1,22 @@
-from enum import Enum
-from functools import reduce
 import logging
+from functools import reduce
 from operator import and_
 from typing import Any, Dict, List, Optional
 from uuid import UUID
 
-from botocore.exceptions import ClientError
 from boto3.dynamodb.conditions import Attr
-from mypy_boto3_dynamodb.service_resource import Table, DynamoDBServiceResource
+from botocore.exceptions import ClientError
+from mypy_boto3_dynamodb.service_resource import DynamoDBServiceResource, Table
 from pydantic import BaseModel
 
-from ...interface import PaginatedData, Repository, ModelDTOType, ModelDTO, UpdateModelDTO
 from ...exception import RecordNotFound
+from ...interface import (
+    ModelDTO,
+    ModelDTOType,
+    PaginatedData,
+    Repository,
+    UpdateModelDTO,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -61,7 +66,7 @@ class DynamoRepository(Repository):
         try:
             if self.table:
                 return True
-        except ClientError as err:
+        except ClientError:
             pass
         return False
 

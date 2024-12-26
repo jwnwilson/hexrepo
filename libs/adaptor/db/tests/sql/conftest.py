@@ -3,8 +3,8 @@ from typing import Dict, Generator
 import pytest
 
 from monorepo_db import UOW
-from monorepo_db.sql import get_sql_db_url
-from monorepo_db.sql.models.example import ExampleCreateDTO, ExampleDTO, SqlUOW
+from monorepo_db.sql import SqlUOW, get_sql_db_url
+from monorepo_db.sql.models.example import ExampleCreateDTO, ExampleDTO
 
 
 @pytest.fixture
