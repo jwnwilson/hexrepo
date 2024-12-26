@@ -15,13 +15,10 @@ test: db venv
 
 # Setup docker db for tests
 db: db_down
-	docker compose run --service-ports -d postgres_db 
+	docker compose up -d
 
 db_down:
 	docker compose down
-
-db_delete_data: db_down
-	docker compose run postgres_db bash -c "rm -rf /var/lib/postgresql/data/*"
 
 coverage:
 	@echo "Running unit tests"	

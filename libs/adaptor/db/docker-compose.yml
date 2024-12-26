@@ -9,8 +9,6 @@ services:
     container_name: monorepo_db
     restart: unless-stopped
     image: postgres:15
-    volumes:
-      - postgres_db:/var/lib/postgresql/data
     environment:
       - POSTGRES_DB=monorepo_db
       - POSTGRES_USER=postgres
@@ -23,10 +21,11 @@ services:
     container_name: monorepo_dynamodb
     command: "-jar DynamoDBLocal.jar -sharedDb -dbPath ./data"
     image: "amazon/dynamodb-local:latest"
-    container_name: dynamodb-local
     ports:
       - "8000:8000"
     working_dir: /home/dynamodblocal
+    volumes:
+     - "./docker/dynamodb:/home/dynamodblocal/data"
   mongodb:
     container_name: monorepo_mongo
     image: mongo:6-jammy

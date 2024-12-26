@@ -15,7 +15,7 @@ def uow() -> Generator[UOW, None, None]:
         yield uow
 
 
-@pytest.fixture(scope="function", autouse=True)
+@pytest.fixture(scope="function")
 def create_tables(uow: UOW) -> None:
     uow.drop_all()
     uow.create_all()
