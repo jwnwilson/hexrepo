@@ -1,14 +1,13 @@
 import contextlib
 from typing import TYPE_CHECKING, Dict, Generator, Optional
+from sqlalchemy.orm import Session
 
 from ..interface import UOW
 from .session import DatabaseSessionManager
-
-if TYPE_CHECKING:
-    from sqlalchemy.orm import Session
+from .models.example import ExampleRepository
 
 
-class BaseSqlUOW(UOW):
+class SqlUOW(UOW):
     def __init__(self, db_url: str, required_filters: Optional[Dict[str, str]] = None):
         self._db_url: str = db_url
         self._required_filters: Optional[Dict[str, str]] = required_filters
@@ -35,3 +34,7 @@ class BaseSqlUOW(UOW):
         from .models.base_model import Base
 
         Base.metadata.drop_all(self.session.get_bind())
+    
+    @property
+    def example(self) -> ExampleRepository:
+        return ExampleRepository(self.session)

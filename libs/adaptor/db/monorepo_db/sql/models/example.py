@@ -5,8 +5,6 @@ from pydantic import BaseModel
 from sqlalchemy import String, Text
 from sqlalchemy.orm import Mapped, mapped_column
 
-from monorepo_db.sql.uow import BaseSqlUOW
-
 from ..repository import SQLRepository
 from .base_model import Base
 
@@ -42,9 +40,3 @@ class ExampleTable(Base):
 class ExampleRepository(SQLRepository):
     model = ExampleTable
     model_dto = ExampleDTO
-
-
-class SqlUOW(BaseSqlUOW):
-    @property
-    def example(self) -> ExampleRepository:
-        return ExampleRepository(self.session)

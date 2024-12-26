@@ -13,6 +13,7 @@ dependencies = [
     "psycopg2-binary<3.0.0,>=2.9.10",
     "sqlalchemy<3.0.0,>=2.0.36",
     "boto3<2.0.0,>=1.35.68",
+    "boto3-stubs[essential]<2.0.0,>=1.35.86",
     "alembic<2.0.0,>=1.14.0",
     "monorepo-cloud",
 ]
