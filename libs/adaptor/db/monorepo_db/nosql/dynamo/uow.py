@@ -9,10 +9,14 @@ from .models.example import ExampleRepository
 
 
 class DynamoUOW(UOW):
-    def __init__(self, required_filters: Optional[Dict[str, str]] = None):
+    def __init__(self, db_url: str, required_filters: Optional[Dict[str, str]] = None):
+        self._db_url: str = db_url
         self._required_filters: Optional[Dict[str, str]] = required_filters
         # Auth using env vars
-        self.resource: DynamoDBServiceResource = boto3.resource("dynamodb")
+        if db_url:
+            self.resource: DynamoDBServiceResource = boto3.resource("dynamodb", endpoint_url=db_url)
+        else:
+            self.resource: DynamoDBServiceResource = boto3.resource("dynamodb")
 
     @contextlib.contextmanager
     def transaction(self) -> Generator[Any, None, None]:

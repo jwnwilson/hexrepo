@@ -7,7 +7,7 @@ from ...interface import UOW
 from .models.example import ExampleRepository
 
 
-class DynamoUOW(UOW):
+class MongoUOW(UOW):
     def __init__(self, db_url: str, required_filters: Optional[Dict[str, str]] = None):
         self._required_filters: Optional[Dict[str, str]] = required_filters
         # Auth using env vars

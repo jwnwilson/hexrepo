@@ -13,7 +13,6 @@ dependencies = [
     "pydantic-settings<3.0.0,>=2.6.0",
     "gevent<25.0.0,>=24.10.3",
     "monorepo-cloud @ file:///${PROJECT_ROOT}/../../libs/adaptor/cloud",
-    "monorepo-db @ file:///${PROJECT_ROOT}/../../libs/adaptor/db",
     "monorepo-api @ file:///${PROJECT_ROOT}/../../libs/interactor/api",
     "boto3-stubs[essential]<2.0.0,>=1.35.86",
 ]

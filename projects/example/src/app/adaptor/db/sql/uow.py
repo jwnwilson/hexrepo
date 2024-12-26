@@ -1,9 +1,9 @@
-from monorepo_db.sql import BaseSqlUOW
+from monorepo_db.sql import SqlUOW
 
 from .models.example import ExampleRepository
 
 
-class SqlUOW(BaseSqlUOW):
+class SqlUOW(SqlUOW):
     @property
     def example(self) -> ExampleRepository:
         return ExampleRepository(self.session)

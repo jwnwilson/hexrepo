@@ -20,7 +20,7 @@ dependencies = [
     "boto3<2.0.0,>=1.35.66",
     "boto3-stubs[essential]<2.0.0,>=1.35.86",
     "monorepo-cloud @ file:///${PROJECT_ROOT}/../../libs/adaptor/cloud",
-    "monorepo-db @ file:///${PROJECT_ROOT}/../../libs/adaptor/db",
+    "monorepo-db[sql] @ file:///${PROJECT_ROOT}/../../libs/adaptor/db",
     "monorepo-api @ file:///${PROJECT_ROOT}/../../libs/interactor/api",
 ]
 
