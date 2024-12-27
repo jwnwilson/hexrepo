@@ -50,6 +50,7 @@ jobs:
         cors: '*'
     - name: Setup Test DBs
       if: matrix.library == 'libs/adaptor/db'
+      working-directory: ${{ matrix.library }}
       run: |
         docker compose up postgres_db mongodb -d
     - name: Test Library
