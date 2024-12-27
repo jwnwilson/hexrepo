@@ -46,6 +46,7 @@ jobs:
       working-directory: ${{ matrix.library }}
       run: |
         make lint
+        make db
         aws dynamodb list-tables --endpoint-url http://localhost:8000
         make test
   check_version_bump:
