@@ -49,6 +49,8 @@ jobs:
         make db
         docker ps
         docker compose logs dynamodb-local
+        aws dynamodb list-tables --endpoint-url http://127.0.0.1:8000
+        aws dynamodb list-tables --endpoint-url http://0.0.0.0:8000
         aws dynamodb list-tables --endpoint-url http://localhost:8000
         nc -z localhost 27017
         make test
