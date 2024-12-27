@@ -14,10 +14,10 @@ test: db venv
 	@../../../tools/bash_scripts/test.sh
 
 # Setup docker db for tests
-db: db_down
+db: down
 	docker compose up -d
 
-db_down:
+down:
 	docker compose down
 
 coverage:

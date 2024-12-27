@@ -35,7 +35,7 @@ class SqlUOW(UOW):
         from .models.base_model import Base
 
         Base.metadata.drop_all(self.session.get_bind())
-    
+
     @property
     def example(self) -> ExampleRepository:
         return ExampleRepository(self.session)

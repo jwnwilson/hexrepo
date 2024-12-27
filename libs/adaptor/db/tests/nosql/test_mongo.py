@@ -1,14 +1,7 @@
-import uuid
-from typing import Any, Dict, Optional
-
-import pytest
-
-from monorepo_db.exception import IntegrityError, RecordNotFound
-from monorepo_db.interface import UOW, PaginatedData
+from monorepo_db.interface import UOW
 from monorepo_db.sql.models.example import (
     ExampleCreateDTO,
     ExampleDTO,
-    ExampleUpdateDTO,
 )
 
 

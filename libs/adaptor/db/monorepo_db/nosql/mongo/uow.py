@@ -25,7 +25,9 @@ class MongoUOW(UOW):
 
     def drop_all(self) -> None:
         self.example.delete_table()
-    
+
     @property
     def example(self) -> ExampleRepository:
-        return ExampleRepository(self.client, table="example", required_filters=self._required_filters)
+        return ExampleRepository(
+            self.client, table="example", required_filters=self._required_filters
+        )

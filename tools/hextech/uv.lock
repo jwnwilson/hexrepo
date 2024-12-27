@@ -439,7 +439,7 @@ wheels = [
 
 [[package]]
 name = "monorepo-cloud"
-version = "0.3.6"
+version = "0.3.7"
 source = { editable = "../../libs/adaptor/cloud" }
 dependencies = [
     { name = "boto3-stubs", extra = ["essential"] },

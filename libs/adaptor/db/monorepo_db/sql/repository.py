@@ -23,7 +23,13 @@ logger = logging.getLogger()
 
 
 class DefaultQuery(Query):
-    def __init__(self, model: SQLModelType, model_dto: ModelDTOType, session: Session, default_filters: Optional[Dict[str, Any]] = None):
+    def __init__(
+        self,
+        model: SQLModelType,
+        model_dto: ModelDTOType,
+        session: Session,
+        default_filters: Optional[Dict[str, Any]] = None,
+    ):
         self.model: SQLModelType = model
         self.model_dto: ModelDTOType = model_dto
         self.session: Session = session
@@ -34,7 +40,7 @@ class DefaultQuery(Query):
             for key, value in self.default_filters.items():
                 query = query.where(getattr(self.model, key) == value)
         return query
-    
+
     def query_multi(self) -> Select[Any]:
         # Query to return list of entities
         default_query = select(self.model)

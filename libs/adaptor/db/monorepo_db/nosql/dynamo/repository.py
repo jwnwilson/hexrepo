@@ -1,13 +1,15 @@
 import logging
+from datetime import datetime
 from functools import reduce
 from operator import and_
 from typing import Any, Dict, List, Optional
-from uuid import UUID
+from uuid import UUID, uuid4
 
 from boto3.dynamodb.conditions import Attr
 from botocore.exceptions import ClientError
 from mypy_boto3_dynamodb.service_resource import DynamoDBServiceResource, Table
 from pydantic import BaseModel
+from pydantic.fields import FieldInfo
 
 from ...exception import RecordNotFound
 from ...interface import (
@@ -28,7 +30,10 @@ class DynamoRepository(Repository):
     model_dto: ModelDTOType = BaseModel
 
     def __init__(
-        self, dyn_resource: DynamoDBServiceResource, table: str, required_filters: Optional[FilterParam] = None,
+        self,
+        dyn_resource: DynamoDBServiceResource,
+        table: str,
+        required_filters: Optional[FilterParam] = None,
     ):
         self.dyn_resource: DynamoDBServiceResource = dyn_resource
         self.default_filters: Optional[FilterParam] = required_filters
@@ -55,13 +60,15 @@ class DynamoRepository(Repository):
                 logger.error(f"Table not found: {self.table_name}")
                 raise
             else:
-                logger.error(
-                    f"Error accessing table: {self.table_name}. Error: {err}"
-                )
+                logger.error(f"Error accessing table: {self.table_name}. Error: {err}")
                 raise
-                
+
         return self._table
-    
+
+    @table.setter
+    def table(self, table: Optional[Table]) -> None:
+        self._table = table
+
     def table_exists(self) -> bool:
         try:
             if self.table:
@@ -72,17 +79,23 @@ class DynamoRepository(Repository):
 
     def _apply_default_filters(self, query_params: QueryParams) -> QueryParams:
         if self.default_filters:
-            query_params["FilterExpression"] += self._add_expressions(self.default_filters)
+            query_params["FilterExpression"] += self._add_expressions(
+                self.default_filters
+            )
         return query_params
 
-    def _build_query_params(self, filters: Optional[FilterParam] = None, query_params: Optional[QueryParams] = None) -> Dict[str, Any]:
+    def _build_query_params(
+        self,
+        filters: Optional[FilterParam] = None,
+        query_params: Optional[QueryParams] = None,
+    ) -> Dict[str, Any]:
         query_params: QueryParams = query_params or {"FilterExpression": []}
         if filters:
             query_params["FilterExpression"] += self._add_expressions(filters)
         query_params = self._apply_default_filters(query_params)
 
         return query_params
-    
+
     def _list_to_dto(self, items: List[Dict[str, Any]]) -> List[ModelDTO]:
         return [self.model_dto(**item.__dict__) for item in items]
 
@@ -98,38 +111,43 @@ class DynamoRepository(Repository):
 
     def create(self, obj_in: ModelDTO) -> ModelDTO:
         record_data: Dict[str, Any] = obj_in.model_dump()
-        record_data["id"] = str(UUID())
-        table_data: Dict[str, Any] = self.table.put_item(Item=record_data)
-        return self.model_dto(**table_data)
-    
+        record_data["id"] = str(uuid4())
+        self.table.put_item(Item=record_data)
+        # table_data: Dict[str, Any] = self.table.get_item(
+        #     Key={"id": record_data["id"]}
+        # )
+        return self.model_dto(**record_data)
+
     def read(self, record_id: UUID) -> ModelDTO:
         try:
-            table_data: dict = self.table.get_item(
-                Key={
-                    "id": record_id
-                }
+            table_data: Dict[str, Any] = self.table.get_item(
+                Key={"id": str(record_id)}
             )["Item"]
             return self.model_dto(**table_data)
         except KeyError:
             raise RecordNotFound("Record not found: {record_id} in table: {table}")
 
     def read_multi(
-            self, 
-            filters: Optional[Dict[str, Any]] = None,
-            page_size: int = 100,
-            page_number: int = 1,
-            order_by: str = "-created_at"
-        ) -> PaginatedData[ModelDTO]:
-        
+        self,
+        filters: Optional[Dict[str, Any]] = None,
+        page_size: int = 100,
+        page_number: int = 1,
+        order_by: str = "-created_at",
+    ) -> PaginatedData[ModelDTO]:
         table_data: List[dict] = self.table.scan(
             **self._build_query_params(filters), Limit=page_size
         )
         results: List[ModelDTO] = self._list_to_dto(table_data)
         return PaginatedData(
-            results=results, total=len(results), page_size=page_size, page_number=page_number
+            results=results,
+            total=len(results),
+            page_size=page_size,
+            page_number=page_number,
         )
 
-    def update(self, record_id: UUID, obj_in: UpdateModelDTO, merge_objects: bool = False) -> ModelDTO:
+    def update(
+        self, record_id: UUID, obj_in: UpdateModelDTO, merge_objects: bool = False
+    ) -> ModelDTO:
         update_expression = "SET "
         expression_attr_values = {}
         expression_attr_names = {}
@@ -164,64 +182,65 @@ class DynamoRepository(Repository):
         try:
             self.table.delete_item(Key={"id": id})
         except ClientError as err:
-            logger.error(
-                f"Couldn't delete record {id}. Error: {err}"
-            )
+            logger.error(f"Couldn't delete record {id}. Error: {err}")
             raise
 
     def _generate_attribute_definitions(self) -> List[Dict[str, Any]]:
-        attribute_definitions = []
+        attribute_definitions: List[Dict[str, Any]] = []
+        field: str
 
-        for field in self.model_dto.model_fields():
-            if field.type_ == str:
+        for field in self.model_dto.model_fields:
+            field_type: FieldInfo = self.model_dto.model_fields[field]
+            if field_type.annotation in (UUID, str, datetime):
                 attribute_definitions.append(
-                    {"AttributeName": field.name, "AttributeType": "S"}
+                    {"AttributeName": field, "AttributeType": "S"}
                 )
-            if field.type_ == int:
+            if field_type.annotation in (int, float):
                 attribute_definitions.append(
-                    {"AttributeName": field.name, "AttributeType": "N"}
+                    {"AttributeName": field, "AttributeType": "N"}
                 )
         return attribute_definitions
 
-
     def create_table(self) -> None:
         if self.table_exists():
+            logger.info(f"Skipping Table {self.table_name} create as it does not exist")
             return
         try:
-            attr_defs: List[Dict[str, Any]] = self._generate_attribute_definitions()
+            # attr_defs: List[Dict[str, Any]] = []
+            # attr_defs += self._generate_attribute_definitions()
             self.table = self.dyn_resource.create_table(
                 TableName=self.table_name,
                 KeySchema=[
                     {"AttributeName": "id", "KeyType": "HASH"},  # Partition key
-                    # {"AttributeName": "company_id", "KeyType": "RANGE"},  # Sort key
+                    # {"AttributeName": "company_id", "KeyType": "HASH"},  # Partition key
+                    # {"AttributeName": "id", "KeyType": "HASH"},  # Sort key
                 ],
-                AttributeDefinitions=attr_defs,
-                # ProvisionedThroughput={
-                #     "ReadCapacityUnits": 10,
-                #     "WriteCapacityUnits": 10,
-                # },
+                AttributeDefinitions=[
+                    {"AttributeName": "id", "AttributeType": "S"},  # Partition key
+                    # {"AttributeName": "company_id", "AttributeType": "S"},  # Sort key
+                ],
+                ProvisionedThroughput={
+                    "ReadCapacityUnits": 10,
+                    "WriteCapacityUnits": 10,
+                },
             )
             self.table.wait_until_exists()
+            logger.info(f"Table {self.table_name} created successfully")
         except ClientError as err:
-            logger.error(
-                f"Couldn't create table {self.table_name}. Error: {err}"
-            )
+            logger.error(f"Couldn't create table {self.table_name}. Error: {err}")
             raise
 
-        # Wait until the table exists.
-        self.table.wait_until_exists() 
-    
     def delete_table(self):
         """
         Deletes the table.
         """
         if not self.table_exists():
+            logger.info(f"Skipping Table {self.table_name} delete as it does not exist")
             return
         try:
             self.table.delete()
             self.table = None
+            logger.info(f"Table {self.table_name} deleted successfully")
         except ClientError as err:
-            logger.error(
-                f"Couldn't delete table {self.table_name}. Error: {err}"
-            )
+            logger.error(f"Couldn't delete table {self.table_name}. Error: {err}")
             raise
