@@ -22,7 +22,7 @@ services:
     command: "-jar DynamoDBLocal.jar -sharedDb -dbPath ./data"
     image: "amazon/dynamodb-local:latest"
     ports:
-      - "8000:8000"
+      - "0.0.0.0:8000:8000"
     working_dir: /home/dynamodblocal
     volumes:
      - "./docker/dynamodb:/home/dynamodblocal/data"
@@ -30,7 +30,7 @@ services:
     container_name: monorepo_mongo
     image: mongo:latest
     ports:
-      - '27017:27017'
+      - '0.0.0.0:27017:27017'
     restart: always
     volumes:
       - ./tests/test_data/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
