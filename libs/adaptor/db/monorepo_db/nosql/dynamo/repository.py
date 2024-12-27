@@ -77,35 +77,34 @@ class DynamoRepository(Repository):
             pass
         return False
 
-    def _apply_default_filters(self, query_params: QueryParams) -> QueryParams:
-        if self.default_filters:
-            query_params["FilterExpression"] += self._add_expressions(
-                self.default_filters
-            )
-        return query_params
-
     def _build_query_params(
         self,
         filters: Optional[FilterParam] = None,
-        query_params: Optional[QueryParams] = None,
     ) -> Dict[str, Any]:
-        query_params: QueryParams = query_params or {"FilterExpression": []}
+        combined_filters: FilterParam = self.default_filters or {}
         if filters:
-            query_params["FilterExpression"] += self._add_expressions(filters)
-        query_params = self._apply_default_filters(query_params)
-
-        return query_params
+            combined_filters.update(**filters)
+        if combined_filters:
+            return {"FilterExpression": self._add_expressions(filters)}
+        else:
+            return {}
 
     def _list_to_dto(self, items: List[Dict[str, Any]]) -> List[ModelDTO]:
-        return [self.model_dto(**item.__dict__) for item in items]
+        return [self.model_dto(**item) for item in items]
 
     def _add_expressions(self, filters: Dict[str, Any]) -> List[Any]:
         if filters:
             conditions: List[Any] = []
             for key, value in filters.items():
+                if isinstance(value, (UUID, datetime)):
+                    value = str(value)
                 if isinstance(value, str):
                     conditions.append(Attr(key).eq(value))
-                if isinstance(value, list):
+                elif isinstance(value, list):
+                    value = [
+                        str(v) if isinstance(v, (UUID, datetime)) else v for v in value
+                    ]
+                    key = key.split("__")[0]
                     conditions.append(Attr(key).is_in([v for v in value]))
             return reduce(and_, conditions)
 
@@ -118,14 +117,14 @@ class DynamoRepository(Repository):
         # )
         return self.model_dto(**record_data)
 
-    def read(self, record_id: UUID) -> ModelDTO:
+    def read(self, id: UUID) -> ModelDTO:
         try:
-            table_data: Dict[str, Any] = self.table.get_item(
-                Key={"id": str(record_id)}
-            )["Item"]
+            table_data: Dict[str, Any] = self.table.get_item(Key={"id": str(id)})[
+                "Item"
+            ]
             return self.model_dto(**table_data)
         except KeyError:
-            raise RecordNotFound("Record not found: {record_id} in table: {table}")
+            raise RecordNotFound(f"Record not found: {id} in table: {self.table_name}")
 
     def read_multi(
         self,
@@ -134,10 +133,9 @@ class DynamoRepository(Repository):
         page_number: int = 1,
         order_by: str = "-created_at",
     ) -> PaginatedData[ModelDTO]:
-        table_data: List[dict] = self.table.scan(
-            **self._build_query_params(filters), Limit=page_size
-        )
-        results: List[ModelDTO] = self._list_to_dto(table_data)
+        query_params: QueryParams = self._build_query_params(filters)
+        table_data: Dict[str, Any] = self.table.scan(**query_params, Limit=page_size)
+        results: List[ModelDTO] = self._list_to_dto(table_data["Items"])
         return PaginatedData(
             results=results,
             total=len(results),
@@ -146,43 +144,57 @@ class DynamoRepository(Repository):
         )
 
     def update(
-        self, record_id: UUID, obj_in: UpdateModelDTO, merge_objects: bool = False
+        self, id: UUID, obj_in: UpdateModelDTO, merge_objects: bool = False
     ) -> ModelDTO:
         update_expression = "SET "
         expression_attr_values = {}
         expression_attr_names = {}
         update_expressions = []
 
-        for key in obj_in.model_dump().keys():
+        existing_obj: BaseModel = self.read(id)
+        update_obj: Dict[str, Any] = existing_obj.model_dump()
+        update_obj.update(**obj_in.model_dump(exclude_unset=True))
+        del update_obj["id"]
+
+        for key in update_obj.keys():
+            expression_value: Any = (
+                str(update_obj[key])
+                if isinstance(update_obj[key], (UUID, datetime))
+                else update_obj[key]
+            )
             update_expressions.append(f"#{key} = :{key}")
-            expression_attr_values[f":{key}"] = getattr(obj_in, key)
+            expression_attr_values[f":{key}"] = expression_value
             expression_attr_names[f"#{key}"] = key
 
         update_expression += ", ".join(update_expressions)
 
         try:
-            table_data: Dict[str, Any] = self.table.update_item(
-                Key={"id": record_id},
+            self.table.update_item(
+                Key={"id": str(id)},
                 UpdateExpression=update_expression,
                 ExpressionAttributeValues=expression_attr_values,
                 ExpressionAttributeNames=expression_attr_names,
             )
         except ClientError as err:
             logger.error(
-                f"Couldn't update record {record_id} in table {self.table_name}:Error: {err} ",
-                record_id,
+                f"Couldn't update record {id} in table {self.table_name}:Error: {err} ",
+                id,
                 self.table_name,
                 err.response["Error"]["Code"],
                 err.response["Error"]["Message"],
             )
             raise
-        return self.model_dto(**table_data.__dict__)
+
+        return self.read(id)
 
     def delete(self, id: UUID) -> None:
         try:
-            self.table.delete_item(Key={"id": id})
+            self.read(id)
+            self.table.delete_item(Key={"id": str(id)})
+            print("here")
         except ClientError as err:
-            logger.error(f"Couldn't delete record {id}. Error: {err}")
+            msg: str = f"Couldn't delete record {id}. Error: {err}"
+            logger.error(msg)
             raise
 
     def _generate_attribute_definitions(self) -> List[Dict[str, Any]]:

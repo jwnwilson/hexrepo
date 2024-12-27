@@ -50,15 +50,15 @@ class MongoRepository(Repository):
         mongo_data = {**obj_in.model_dump(), **{"_id": data_id}}
         try:
             self.collection.insert_one(mongo_data)
-            return self.read(record_id=data_id)
+            return self.read(id=data_id)
         except Exception as error:
             logger.info(f"Error creating record. Error: {error}")
             raise
 
-    def read(self, record_id: UUID) -> ModelDTO:
-        record: Optional[dict] = self.collection.find_one({"_id": str(record_id)})
+    def read(self, id: UUID) -> ModelDTO:
+        record: Optional[dict] = self.collection.find_one({"_id": str(id)})
         if not record:
-            raise RecordNotFound(f"Record not found id: '{record_id}'")
+            raise RecordNotFound(f"Record not found id: '{id}'")
         record["id"] = record.pop("_id")
         return self.model_dto(**record)
 
@@ -81,21 +81,21 @@ class MongoRepository(Repository):
         )
 
     def update(
-        self, record_id: UUID, obj_in: UpdateModelDTO, merge_objects: bool = False
+        self, id: UUID, obj_in: UpdateModelDTO, merge_objects: bool = False
     ) -> ModelDTO:
-        record: Optional[dict] = self.collection.find_one({"_id": str(record_id)})
+        record: Optional[Dict[str, Any]] = self.collection.find_one({"_id": str(id)})
         if not record:
-            raise RecordNotFound(f"Record not found id: '{record_id}'")
+            raise RecordNotFound(f"Record not found id: '{id}'")
 
         record.update(obj_in)
-        query = {"_id": str(record_id)}
+        query = {"_id": str(id)}
         updated_record: Dict[str, Any] = self.collection.replace_one(
             query, record, upsert=True
         ).raw_result
         return self.model_dto(**updated_record)
 
-    def delete(self, record_id: UUID):
-        self.collection.delete_one({"_id": str(record_id)})
+    def delete(self, id: UUID):
+        self.collection.delete_one({"_id": str(id)})
 
     def create_table(self):
         collection = self.client[self.db][self.table]
