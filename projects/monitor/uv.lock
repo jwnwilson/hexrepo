@@ -428,7 +428,7 @@ dev = [
 
 [[package]]
 name = "monorepo-api"
-version = "0.1.4"
+version = "0.1.5"
 source = { directory = "../../libs/interactor/api" }
 dependencies = [
     { name = "fastapi" },
@@ -460,7 +460,7 @@ dev = [
 
 [[package]]
 name = "monorepo-cloud"
-version = "0.3.7"
+version = "0.3.8"
 source = { editable = "../../libs/adaptor/cloud" }
 dependencies = [
     { name = "boto3-stubs", extra = ["essential"] },
@@ -490,7 +490,7 @@ dev = [
 
 [[package]]
 name = "monorepo-db"
-version = "0.1.4"
+version = "0.1.5"
 source = { editable = "../../libs/adaptor/db" }
 dependencies = [
     { name = "boto3" },
