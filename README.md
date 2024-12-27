@@ -43,9 +43,12 @@ AWS_SECRET_ACCESS_KEY
 # To Do
 
 - Setup backend
+    - fix db ci tests
+    - add no sql to project setup
     - Add ability to disable / destroy projects
     - Play with AI crawler project 
         - Setup no sql DB
+            - Add infra
         - Setup async tasks
             - migrate hex lib into this repo
                 https://github.com/jwnwilson/hex-lib/tree/main/src/hex_lib/adapter/out

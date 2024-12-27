@@ -23,6 +23,8 @@ services:
     image: "amazon/dynamodb-local:latest"
     ports:
       - "0.0.0.0:8000:8000"
+    expose:
+      - "8000"
     working_dir: /home/dynamodblocal
     volumes:
      - "./docker/dynamodb:/home/dynamodblocal/data"
@@ -31,6 +33,8 @@ services:
     image: mongo:latest
     ports:
       - '0.0.0.0:27017:27017'
+    expose:
+      - "27017"
     restart: always
     volumes:
       - ./tests/test_data/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
