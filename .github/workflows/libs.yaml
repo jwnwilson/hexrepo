@@ -46,6 +46,8 @@ jobs:
       working-directory: ${{ matrix.library }}
       run: |
         make lint
+        make db
+        docker ps
         make test
   check_version_bump:
     strategy:
