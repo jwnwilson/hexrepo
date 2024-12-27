@@ -43,7 +43,7 @@ class MongoRepository(Repository):
         return self._collection
 
     def _list_to_dto(self, items: List[Dict[str, Any]]) -> List[ModelDTO]:
-        return [self.model_dto(**item.__dict__) for item in items]
+        return [self.model_dto(**item) for item in items]
 
     def create(self, obj_in: ModelDTO) -> ModelDTO:
         data_id: str = str(uuid4())
@@ -62,6 +62,21 @@ class MongoRepository(Repository):
         record["id"] = record.pop("_id")
         return self.model_dto(**record)
 
+    def generate_filters(
+        self, filters: Optional[Dict[str, Any]] = None
+    ) -> Dict[str, Any]:
+        if filters is None:
+            return {}
+        new_filters: Dict[str, Any] = {}
+        for filter in filters:
+            if "__in" in filter:
+                new_filters[filter.replace("__in", "")] = {"$in": filters[filter]}
+            else:
+                new_filters[filter] = filters[filter]
+        if "id" in new_filters:
+            new_filters["_id"] = new_filters.pop("id")
+        return new_filters
+
     def read_multi(
         self,
         filters: Optional[Dict[str, Any]] = None,
@@ -69,10 +84,14 @@ class MongoRepository(Repository):
         page_number: int = 1,
         order_by: str = "-created_at",
     ) -> PaginatedData[ModelDTO]:
-        collection_data = self.collection.find(filters)
+        collection_data = self.collection.find(self.generate_filters(filters))
         if page_size:
             collection_data = collection_data.limit(page_size)
-        results: List[ModelDTO] = self._list_to_dto(collection_data)
+        record_data = []
+        for record in collection_data:
+            record["id"] = record.pop("_id")
+            record_data.append(record)
+        results: List[ModelDTO] = self._list_to_dto(record_data)
         return PaginatedData(
             results=results,
             total=len(results),
@@ -87,14 +106,14 @@ class MongoRepository(Repository):
         if not record:
             raise RecordNotFound(f"Record not found id: '{id}'")
 
-        record.update(obj_in)
+        record.update(obj_in.model_dump(exclude_unset=True))
         query = {"_id": str(id)}
-        updated_record: Dict[str, Any] = self.collection.replace_one(
-            query, record, upsert=True
-        ).raw_result
-        return self.model_dto(**updated_record)
+        self.collection.replace_one(query, record, upsert=True)
+        record["id"] = record.pop("_id")
+        return self.model_dto(**record)
 
     def delete(self, id: UUID):
+        self.read(id)
         self.collection.delete_one({"_id": str(id)})
 
     def create_table(self):
