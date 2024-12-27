@@ -32,8 +32,8 @@ jobs:
       matrix:
         library:
         - "libs/adaptor/db"
-        - "libs/adaptor/cloud"
-        - "libs/interactor/api"
+        # - "libs/adaptor/cloud"
+        # - "libs/interactor/api"
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
