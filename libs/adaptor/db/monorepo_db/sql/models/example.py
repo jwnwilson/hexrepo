@@ -44,7 +44,6 @@ class ExampleRepository(SQLRepository):
 
 
 class SqlUOW(BaseSqlUOW):
-    
     @property
     def example(self) -> ExampleRepository:
         return ExampleRepository(self.session)
