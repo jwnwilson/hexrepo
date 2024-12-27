@@ -42,14 +42,16 @@ jobs:
       uses: ./.github/actions/be_venv
       with:
         lock_file: "${{ matrix.library }}/uv.lock"
+    - name: Setup DynamoDB Local
+      uses: rrainn/dynamodb-action@v2.0.1
+      with:
+        port: 8000
+        cors: '*'
     - name: Test Library
       working-directory: ${{ matrix.library }}
       run: |
         make lint
-        make db
-        sleep 5
-        docker ps
-        aws dynamodb list-tables --endpoint-url http://localhost:8000
+        docker compose up postgres_db mongodb -d
         uv run pytest
   check_version_bump:
     strategy:
