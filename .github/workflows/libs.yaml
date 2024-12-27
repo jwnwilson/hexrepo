@@ -49,7 +49,9 @@ jobs:
         make db
         sleep 5
         docker ps
-        make test
+        docker compose logs dynamodb-local
+        aws dynamodb list-tables --endpoint-url http://localhost:8000
+        uv run pytest
   check_version_bump:
     strategy:
       matrix:
