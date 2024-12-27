@@ -47,6 +47,7 @@ jobs:
       run: |
         make lint
         make db
+        sleep 5
         docker ps
         docker compose logs dynamodb-local
         aws dynamodb list-tables --endpoint-url http://0.0.0.0:8000
