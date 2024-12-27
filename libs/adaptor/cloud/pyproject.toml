@@ -4,7 +4,7 @@ authors = [
 ]
 requires-python = "<4.0,>=3.12"
 name = "monorepo-cloud"
-version = "0.3.7"
+version = "0.3.8"
 description = ""
 readme = "README.md"
 dependencies = [

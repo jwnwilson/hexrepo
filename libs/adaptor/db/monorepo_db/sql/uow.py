@@ -1,11 +1,10 @@
 import contextlib
-from typing import TYPE_CHECKING, Dict, Generator, Optional
+from typing import Dict, Generator, Optional
+
+from sqlalchemy.orm import Session
 
 from ..interface import UOW
 from .session import DatabaseSessionManager
-
-if TYPE_CHECKING:
-    from sqlalchemy.orm import Session
 
 
 class BaseSqlUOW(UOW):
