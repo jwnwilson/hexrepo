@@ -9,7 +9,7 @@ from monorepo_db.sql.models.example import ExampleCreateDTO, ExampleDTO
 
 @pytest.fixture
 def uow_dynamo() -> Generator[UOW, None, None]:
-    db_url = "http://0.0.0.0:8000"
+    db_url = "http://localhost:8000"
     uow = DynamoUOW(db_url=db_url)
     # with uow.transaction():
     yield uow
@@ -17,7 +17,7 @@ def uow_dynamo() -> Generator[UOW, None, None]:
 
 @pytest.fixture
 def uow_mongo() -> Generator[UOW, None, None]:
-    db_url = "mongodb://0.0.0.0:27017/test_db"
+    db_url = "mongodb://localhost:27017/test_db"
     uow = MongoUOW(db_url=db_url)
     # with uow.transaction():
     yield uow
