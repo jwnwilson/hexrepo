@@ -29,30 +29,30 @@ def create_tables_dynamo(uow_dynamo: UOW) -> None:
     uow_dynamo.create_all()
 
 
-@pytest.fixture(scope="function", autouse=True)
-def create_tables_mongo(uow_mongo: UOW) -> None:
-    uow_mongo.drop_all()
-    uow_mongo.create_all()
+# @pytest.fixture(scope="function", autouse=True)
+# def create_tables_mongo(uow_mongo: UOW) -> None:
+#     uow_mongo.drop_all()
+#     uow_mongo.create_all()
 
 
-@pytest.fixture
-def example_records_dynamo(uow_dynamo: UOW) -> Dict[str, ExampleDTO]:
-    example_1: ExampleDTO = uow_dynamo.example.create(
-        ExampleCreateDTO(name="example1", url="example1.com")
-    )
-    example_2: ExampleDTO = uow_dynamo.example.create(
-        ExampleCreateDTO(name="example2", url="example2.com")
-    )
+# @pytest.fixture
+# def example_records_dynamo(uow_dynamo: UOW) -> Dict[str, ExampleDTO]:
+#     example_1: ExampleDTO = uow_dynamo.example.create(
+#         ExampleCreateDTO(name="example1", url="example1.com")
+#     )
+#     example_2: ExampleDTO = uow_dynamo.example.create(
+#         ExampleCreateDTO(name="example2", url="example2.com")
+#     )
 
-    return {"example_1": example_1, "example_2": example_2}
+#     return {"example_1": example_1, "example_2": example_2}
 
 
-@pytest.fixture
-def example_records_mongo(uow_mongo: UOW) -> Dict[str, ExampleDTO]:
-    example_1: ExampleDTO = uow_mongo.example.create(
-        ExampleCreateDTO(name="example1", url="example1.com")
-    )
-    example_2: ExampleDTO = uow_mongo.example.create(
-        ExampleCreateDTO(name="example2", url="example2.com")
-    )
-    return {"example_1": example_1, "example_2": example_2}
+# @pytest.fixture
+# def example_records_mongo(uow_mongo: UOW) -> Dict[str, ExampleDTO]:
+#     example_1: ExampleDTO = uow_mongo.example.create(
+#         ExampleCreateDTO(name="example1", url="example1.com")
+#     )
+#     example_2: ExampleDTO = uow_mongo.example.create(
+#         ExampleCreateDTO(name="example2", url="example2.com")
+#     )
+#     return {"example_1": example_1, "example_2": example_2}
