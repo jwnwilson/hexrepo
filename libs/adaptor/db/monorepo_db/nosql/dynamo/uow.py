@@ -31,4 +31,3 @@ class BaseDynamoUOW(UOW):
 
     def drop_all(self) -> None:
         raise NotImplementedError
-

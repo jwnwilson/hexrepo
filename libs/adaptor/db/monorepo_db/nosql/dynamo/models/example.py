@@ -2,8 +2,8 @@ from typing import Optional
 
 from pydantic import BaseModel
 
-from ..uow import BaseDynamoUOW
 from ..repository import DynamoRepository
+from ..uow import BaseDynamoUOW
 from .base_model import Base
 
 
@@ -26,7 +26,6 @@ class ExampleRepository(DynamoRepository):
 
 
 class DynamoUOW(BaseDynamoUOW):
-
     # Used for testing
     def create_all(self) -> None:
         self.example.create_table()
