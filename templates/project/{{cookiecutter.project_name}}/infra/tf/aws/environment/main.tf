@@ -11,6 +11,14 @@ terraform {
   }
 }
 
+data "aws_caller_identity" "current" {}
+data "aws_region" "current" {}
+
+locals {
+    account_id = data.aws_caller_identity.current.account_id
+    region = data.aws_region.current.name
+}
+
 {% if cookiecutter.use_db == "y" and cookiecutter.use_db_logic == "sql" %}
 locals {
   db_url = "postgresql+psycopg2://postgres:{password}@${module.{{cookiecutter.project_slug}}_postgres.db_instance_endpoint}/${var.project}"
@@ -61,7 +69,8 @@ module "{{cookiecutter.project_slug}}_api" {
   security_group_ids = [data.aws_security_group.default_sg.id]
   {% endif %}
   {% if cookiecutter.use_db == "y" and cookiecutter.use_db_logic == "nosql" %}
-  dynamodb_arn      = module.{{cookiecutter.project_slug}}_dynamodb.dynamodb_table_arn
+  # This should be modified to be restricted to all tables for this project with project_env prefix
+  dynamodb_arn      = "arn:aws:dynamodb:${locals.region}:${locals.account_id}:table/{{cookiecutter.project_slug}}_${terraform.workspace}*"
   {% endif %}
 
 

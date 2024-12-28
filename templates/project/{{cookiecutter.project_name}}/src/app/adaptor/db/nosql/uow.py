@@ -1,6 +1,7 @@
 from logging import config
 from monorepo_db.nosql import BaseDynamoUOW
 from .models.example import ExampleRepository
+from app.config import config
 
 
 class DynamoUOW(BaseDynamoUOW):
@@ -16,7 +17,7 @@ class DynamoUOW(BaseDynamoUOW):
         project: str = config.project
         table_name: str = "example"
         env: str = config.environment
-        full_table_name: str = f"{project}_{table_name}_{env}"
+        full_table_name = f"{project}_{env}_{table_name}"
         return ExampleRepository(
             self.resource, table=full_table_name, required_filters=self._required_filters
         )
