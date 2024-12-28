@@ -54,7 +54,8 @@ db:
 
 down:
 	docker compose down
-
+	bash -c "docker ps -aq | xargs docker stop | xargs docker rm"
+	
 # Local Development
 
 # Host API locally, loading local env file
@@ -71,7 +72,7 @@ run_docker:
 
 # Testing commands
 {% if cookiecutter.use_db == "y"%}
-test: venv db
+test: venv db down
 {% else %}
 test: venv
 {% endif %}
