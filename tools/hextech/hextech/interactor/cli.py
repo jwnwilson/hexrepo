@@ -36,8 +36,6 @@ from hextech.domain.prompts.common import (
     prompt_project,
 )
 from hextech.domain.prompts.infra import (
-    prompt_setup_lib_infra,
-    prompt_setup_project_infra,
     prompt_setup_shared_infra,
     prompt_setup_tf,
 )

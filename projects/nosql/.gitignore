@@ -1,0 +1,4 @@
+.coverage
+coverage.xml
+test.db
+db_data
