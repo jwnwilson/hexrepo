@@ -134,7 +134,9 @@ class DynamoRepository(Repository):
         order_by: str = "-created_at",
     ) -> PaginatedData[ModelDTO]:
         query_params: QueryParams = self._build_query_params(filters)
-        table_data: Dict[str, Any] = self.table.scan(**query_params, Limit=page_size)
+        if page_size < 0:
+            query_params["Limit"] = page_size
+        table_data: Dict[str, Any] = self.table.scan(**query_params)
         results: List[ModelDTO] = self._list_to_dto(table_data["Items"])
         return PaginatedData(
             results=results,

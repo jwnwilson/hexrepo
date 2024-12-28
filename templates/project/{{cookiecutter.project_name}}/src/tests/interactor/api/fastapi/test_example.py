@@ -29,6 +29,7 @@ def test_example_read(client: TestClient, created_example):
     assert response.json()["url"] == created_example.url
 
 
+{% if cookiecutter.use_db == "y" and cookiecutter.use_db_logic == "sql" %}
 def test_example_read_filter_name(client: TestClient, created_example):
     response = client.get(
         f'/api/v1/example/?filters=%7B"name"%3A"{created_example.name}"%7D'
@@ -37,7 +38,6 @@ def test_example_read_filter_name(client: TestClient, created_example):
     assert response.json()["total"] == 1
 
 
-{% if cookiecutter.use_db == "y" %}
 def test_example_read_filter_none(client: TestClient, created_example):
     response = client.get(f'/api/v1/example/?filters=%7B"name"%3A"doesntexist"%7D')
     assert response.status_code == 200

@@ -21,6 +21,7 @@ build:
 	docker compose build
 
 # DB management
+{% if cookiecutter.use_db == "y" and cookiecutter.use_db_logic == "sql" %}
 db_migrate:
 	bash -c "uv run alembic upgrade head"
 
@@ -31,7 +32,7 @@ db_migrate_docker:
 	docker compose run api bash -c "alembic upgrade head"
 
 db_delete_data: down
-	docker compose run postgres_db bash -c "rm -rf /var/lib/postgresql/data/*"
+	docker compose run db bash -c "rm -rf /var/lib/postgresql/data/*"
 
 db_upgrade: db_migrate down
 
@@ -40,13 +41,21 @@ db_downgrade: down
 
 db_create_migration: down
 	bash -c "uv run alembic revision --autogenerate -m \"DB migration\""
+{% elif cookiecutter.use_db == "y" and cookiecutter.use_db_logic == "nosql" %}
+db_setup:
+	bash -c "DB_URL=http://localhost:8888 uv run python -m app.interactor.cli.create_dynamo_tables"
+
+db_delete_data: down
+	docker compose run db bash -c "rm -rf /home/dynamodblocal/data/*"
+{% endif %}
 
 db:
-	docker compose run --service-ports -d postgres_db 
+	docker compose run --service-ports -d db 
 
 down:
 	docker compose down
-
+	bash -c "docker ps -aq | xargs docker stop | xargs docker rm"
+	
 # Local Development
 
 # Host API locally, loading local env file
@@ -62,7 +71,11 @@ run_docker:
 	docker compose up
 
 # Testing commands
+{% if cookiecutter.use_db == "y"%}
+test: venv db down
+{% else %}
 test: venv
+{% endif %}
 	@echo "Running unit tests"
 	uv run pytest
 

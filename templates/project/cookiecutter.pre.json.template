@@ -21,7 +21,7 @@
         "use_db_logic": {
             "__prompt__": "Select the db storage method",
             "sql": "Add Sqlalchemy to project",
-            "nosql": "Add NoSQL wrapper to project"
+            "nosql": "Add NoSQL DB to project"
         },
         "api_domain": "Enter domain for project"
     }

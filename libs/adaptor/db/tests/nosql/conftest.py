@@ -3,7 +3,8 @@ from typing import Dict, Generator
 import pytest
 
 from monorepo_db import UOW
-from monorepo_db.nosql import DynamoUOW, MongoUOW
+from monorepo_db.nosql import MongoUOW
+from monorepo_db.nosql.dynamo.models.example import DynamoUOW
 from monorepo_db.sql.models.example import ExampleCreateDTO, ExampleDTO
 
 

@@ -51,6 +51,7 @@ db:
 
 down:
 	docker compose down
+	bash -c "docker ps -aq | xargs docker stop | xargs docker rm"
 
 # Host API locally, connect to cloud db. Still requires manual setting of DB_PASSWORD_SECRET_NAME in bastion.env
 run_bastion: bastion venv
