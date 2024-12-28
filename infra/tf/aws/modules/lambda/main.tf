@@ -145,7 +145,7 @@ resource "aws_iam_policy" "sqs-secret-lambda-policy" {
       ],
       "Effect": "Allow",
       "Resource": "arn:aws:s3:::${var.bucket}/*"
-    },
+    }
   ]
 }
 EOF
