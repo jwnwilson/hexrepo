@@ -72,6 +72,9 @@ module "{{cookiecutter.project_slug}}_api" {
   # This should be modified to be restricted to all tables for this project with project_env prefix
   dynamodb_arn      = "arn:aws:dynamodb:${local.region}:${local.account_id}:table/{{cookiecutter.project_slug}}_${terraform.workspace}*"
   {% endif %}
+  {% if cookiecutter.use_storage == "y" %}
+  bucket            = module.{{cookiecutter.project_slug}}_bucket.bucket_name
+  {% endif %}
 
   environment_variables = {
     ENVIRONMENT                 = terraform.workspace

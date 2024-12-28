@@ -44,7 +44,6 @@ AWS_SECRET_ACCESS_KEY
 
 - Setup backend
     - Play with AI crawler project 
-        - Add file storage
         - Setup async tasks
             - migrate hex lib into this repo
                 https://github.com/jwnwilson/hex-lib/tree/main/src/hex_lib/adapter/out
