@@ -15,6 +15,7 @@ class Config(BaseSettings):
     with environment variables.
     """
     # Current environment
+    project: str = os.environ.get("PROJECT", "{{cookiecutter.project_slug}}")
     CLOUD_PROVIDER: str = os.environ.get("CLOUD_PROVIDER", "local")
     environment: str = os.environ.get("ENVIRONMENT", "dev") 
 

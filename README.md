@@ -43,8 +43,8 @@ AWS_SECRET_ACCESS_KEY
 # To Do
 
 - Setup backend
+    - Improve dynamodb
     - Play with AI crawler project 
-        - Setup no sql DB infra
         - Add file storage
         - Setup async tasks
             - migrate hex lib into this repo

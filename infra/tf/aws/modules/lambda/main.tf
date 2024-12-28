@@ -111,8 +111,8 @@ resource "aws_lambda_permission" "allow_cloudwatch" {
 }
 
 resource "aws_iam_policy" "sqs-secret-lambda-policy" {
-  name        = "sqs-secret-lambda-policy-${var.project}-${var.environment}"
-  description = "allow lambda access to sqs policy & secret manager"
+  name        = "${var.project}-${var.environment}-lambda-policy"
+  description = "allow lambda access necessary resources"
 
   policy = <<EOF
 {
@@ -131,6 +131,13 @@ resource "aws_iam_policy" "sqs-secret-lambda-policy" {
       ],
       "Effect": "Allow",
       "Resource": "*"
+    },
+    {
+      "Action": [
+        "dynamodb:*"
+      ],
+      "Effect": "Allow",
+      "Resource": "${var.dynamodb_arn}"
     }
   ]
 }

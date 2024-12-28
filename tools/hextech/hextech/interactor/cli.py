@@ -36,8 +36,6 @@ from hextech.domain.prompts.common import (
     prompt_project,
 )
 from hextech.domain.prompts.infra import (
-    prompt_setup_lib_infra,
-    prompt_setup_project_infra,
     prompt_setup_shared_infra,
     prompt_setup_tf,
 )
@@ -81,13 +79,6 @@ def create_library():
     with chdir(f"libs/{library_type}"):
         # Run cookie cutter command to copy template
         cookiecutter("../../templates/library")
-        # Setup infra for libray
-        if prompt_setup_lib_infra():
-            typer.echo("Setting up library infrastructure...")
-            run_system_command("make tf_init")
-            run_system_command("make tf_plan")
-            run_system_command("make tf_apply")
-            typer.echo("Shared infrastructure setup complete.")
 
 
 @app.command()
@@ -96,13 +87,6 @@ def create_project():
     with chdir("projects"):
         # Run cookie cutter command to copy template
         cookiecutter("../templates/project")
-        # Setup infra for service
-        if prompt_setup_project_infra():
-            typer.echo("Setting up project infrastructure...")
-            run_system_command("make tf_init")
-            run_system_command("make tf_plan")
-            run_system_command("make tf_apply")
-            typer.echo("Shared infrastructure setup complete.")
 
 
 @app.command()
