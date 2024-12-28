@@ -70,7 +70,11 @@ run_docker:
 	docker compose up
 
 # Testing commands
+{% if cookiecutter.use_db == "y"%}
+test: venv db
+{% else %}
 test: venv
+{% endif %}
 	@echo "Running unit tests"
 	uv run pytest
 
