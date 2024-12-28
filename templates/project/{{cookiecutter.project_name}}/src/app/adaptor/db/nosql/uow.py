@@ -14,9 +14,9 @@ class DynamoUOW(BaseDynamoUOW):
 
     @property
     def example(self) -> ExampleRepository:
-        project: str = config.project
+        project: str = config.PROJECT
         table_name: str = "example"
-        env: str = config.environment
+        env: str = config.ENVIRONMENT
         full_table_name = f"{project}_{env}_{table_name}"
         return ExampleRepository(
             self.resource, table=full_table_name, required_filters=self._required_filters

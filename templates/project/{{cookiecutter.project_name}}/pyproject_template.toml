@@ -22,7 +22,7 @@ dependencies = [
     {% elif cookiecutter.use_db == 'y' and cookiecutter.use_db_logic == 'nosql' %}
     "pymongo>=4.10.1",
     {% endif %}
-    {% if cookiecutter.use_cloud == 'y' %}
+    {% if cookiecutter.use_storage == 'y' %}
     "boto3<2.0.0,>=1.35.66",
     "boto3-stubs[essential]<2.0.0,>=1.35.86",
     "monorepo-cloud @ file:///${PROJECT_ROOT}/../../libs/adaptor/cloud",

@@ -4,7 +4,7 @@
     ],
     "use_api": "y",
     "use_db": "y",
-    "use_cloud": "y",
+    "use_storage": "y",
     "api_domain": "{{ domain }}",
     "use_db_logic": [
         "sql",
@@ -17,7 +17,7 @@
     "__prompts__": {
         "use_api": "Do you want fastapi?",
         "use_db": "Do you want a database?",
-        "use_cloud": "Do you want to install cloud libraries?",
+        "use_storage": "Do you want to store files?",
         "use_db_logic": {
             "__prompt__": "Select the db storage method",
             "sql": "Add Sqlalchemy to project",

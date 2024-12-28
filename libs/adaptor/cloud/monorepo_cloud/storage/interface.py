@@ -15,7 +15,7 @@ class UploadUrlData(BaseModel):
 
 class StorageConfig(BaseModel):
     aws_bucket: str
-    aws_upload_prefix: Optional[str] = None
+    aws_region: str
     public_url_timeout: Optional[int] = None
 
 
