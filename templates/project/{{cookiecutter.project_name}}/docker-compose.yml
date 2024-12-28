@@ -62,12 +62,12 @@ services:
     command: "-jar DynamoDBLocal.jar -sharedDb -dbPath ./data -port 8888"
     image: "amazon/dynamodb-local:latest"
     ports:
-      - "0.0.0.0:8000:8000"
+      - "0.0.0.0:8888:8888"
     expose:
-      - "8000"
+      - "8888"
     working_dir: /home/dynamodblocal
     volumes:
-     - dynamo_db:/home/dynamodblocal/data
+     - ./db_data:/home/dynamodblocal/data
 {% endif %}
 
 

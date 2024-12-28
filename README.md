@@ -43,10 +43,8 @@ AWS_SECRET_ACCESS_KEY
 # To Do
 
 - Setup backend
-    - Add no sql to project setup
     - Play with AI crawler project 
-        - Setup no sql DB
-            - Add infra
+        - Setup no sql DB infra
         - Add file storage
         - Setup async tasks
             - migrate hex lib into this repo

@@ -21,6 +21,7 @@ build:
 	docker compose build
 
 # DB management
+{% if cookiecutter.use_db == "y" and cookiecutter.use_db_logic == "sql" %}
 db_migrate:
 	bash -c "uv run alembic upgrade head"
 
@@ -31,11 +32,7 @@ db_migrate_docker:
 	docker compose run api bash -c "alembic upgrade head"
 
 db_delete_data: down
-	{% if cookiecutter.use_db == "y" and cookiecutter.use_db_logic == "nosql" %}
-		docker compose run db bash -c "rm -rf /home/dynamodblocal/data/*"
-	{% elif cookiecutter.use_db == "y" and cookiecutter.use_db_logic == "sql" %}
-		docker compose run db bash -c "rm -rf /var/lib/postgresql/data/*"
-	{% endif %}
+	docker compose run db bash -c "rm -rf /var/lib/postgresql/data/*"
 
 db_upgrade: db_migrate down
 
@@ -44,6 +41,13 @@ db_downgrade: down
 
 db_create_migration: down
 	bash -c "uv run alembic revision --autogenerate -m \"DB migration\""
+{% elif cookiecutter.use_db == "y" and cookiecutter.use_db_logic == "nosql" %}
+db_setup:
+	bash -c "DB_URL=http://localhost:8888 uv run python -m app.interactor.cli.create_dynamo_tables"
+
+db_delete_data: down
+	docker compose run db bash -c "rm -rf /home/dynamodblocal/data/*"
+{% endif %}
 
 db:
 	docker compose run --service-ports -d db 
