@@ -38,4 +38,5 @@ variable "dynamodb_arn" {
 
 variable "bucket" {
   type = string
+  default = "*"
 }
