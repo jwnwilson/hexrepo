@@ -8,7 +8,7 @@ features:
     resources:
       - src/app/adaptor/db/nosql
   - name: storage
-    enabled: {{cookiecutter.use_cloud}}
+    enabled: {{cookiecutter.use_storage}}
     resources:
       - src/app/adaptor/storage
   - name: api
