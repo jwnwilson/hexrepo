@@ -29,3 +29,9 @@ variable "security_group_ids" {
 variable "lambda_schedule_expression" {
   default = null
 }
+
+variable "dynamodb_arn" {
+  default = "*"
+  type = string
+  
+}

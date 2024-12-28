@@ -131,6 +131,13 @@ resource "aws_iam_policy" "sqs-secret-lambda-policy" {
       ],
       "Effect": "Allow",
       "Resource": "*"
+    },
+    {
+      "Action": [
+        "dynamodb:*"
+      ],
+      "Effect": "Allow",
+      "Resource": "${var.dynamodb_arn}"
     }
   ]
 }

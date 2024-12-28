@@ -11,7 +11,7 @@ terraform {
   }
 }
 
-{% if cookiecutter.use_db == "y" %}
+{% if cookiecutter.use_db == "y" and cookiecutter.use_db_logic == "sql" %}
 locals {
   db_url = "postgresql+psycopg2://postgres:{password}@${module.{{cookiecutter.project_slug}}_postgres.db_instance_endpoint}/${var.project}"
 }
@@ -32,7 +32,7 @@ data "aws_ecr_repository" "ecr_repo" {
   name                 = "monorepo-${var.project}"
 }
 
-{% if cookiecutter.use_db == "n" %}
+{% if cookiecutter.use_db == "n" or (cookiecutter.use_db == "y" and cookiecutter.use_db_logic == "nosql") %}
 data "aws_security_group" "default_sg" {
   tags = {
     Name = "monorepo-vpc-${terraform.workspace}-default"
@@ -55,10 +55,13 @@ module "{{cookiecutter.project_slug}}_api" {
   {% else %}
   lambda_command    = ["uvicorn", "app.interactor.api.fastapi.main:app", "--host", "0.0.0.0", "--port", "8000"]
   {% endif %}
-  {% if cookiecutter.use_db == "y" %}
+  {% if cookiecutter.use_db == "y" and cookiecutter.use_db_logic == "sql" %}
   security_group_ids = [module.{{cookiecutter.project_slug}}_postgres.db_security_group_id]
   {% else %}
   security_group_ids = [data.aws_security_group.default_sg.id]
+  {% endif %}
+  {% if cookiecutter.use_db == "y" and cookiecutter.use_db_logic == "nosql" %}
+  dynamodb_arn      = module.{{cookiecutter.project_slug}}_dynamodb.dynamodb_table_arn
   {% endif %}
 
 
@@ -66,9 +69,12 @@ module "{{cookiecutter.project_slug}}_api" {
   environment_variables = {
     ENVIRONMENT                 = terraform.workspace
     CLOUD_PROVIDER              = "{{ cookiecutter.cloud_provider|upper }}"
-    {% if cookiecutter.use_db == "y" %}
+    {% if cookiecutter.use_db == "y" and cookiecutter.use_db_logic == "sql" %}
     DB_URL                      = local.db_url
     DB_PASSWORD_SECRET_NAME     = data.aws_secretsmanager_secret.db_secret.name
+    {% endif %}
+    {% if cookiecutter.use_db == "y" and cookiecutter.use_db_logic == "nosql" %}
+    DB_URL                      = ""
     {% endif %}
   }
 }
@@ -84,7 +90,7 @@ module "{{cookiecutter.project_slug}}_api_gateway" {
   project           = "{{cookiecutter.project_slug}}"
 }
 
-{% if cookiecutter.use_db == "y" %}
+{% if cookiecutter.use_db == "y" and cookiecutter.use_db_logic == "sql" %}
 module "{{cookiecutter.project_slug}}_postgres" {
   source = "../../../../../../infra/tf/aws/modules/rds"
 
@@ -96,5 +102,12 @@ module "{{cookiecutter.project_slug}}_postgres" {
 
 data "aws_secretsmanager_secret" "db_secret" {
   arn = module.{{cookiecutter.project_slug}}_postgres.db_password_secret_arn
+}
+{% elif cookiecutter.use_db == "y" and cookiecutter.use_db_logic == "nosql" %}
+module "nosql_dynamodb" {
+  source = "../../../../../../infra/tf/aws/modules/dynamodb"
+
+  environment = terraform.workspace
+  project     = "nosql"
 }
 {% endif %}
