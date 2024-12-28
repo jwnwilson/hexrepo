@@ -104,10 +104,11 @@ data "aws_secretsmanager_secret" "db_secret" {
   arn = module.{{cookiecutter.project_slug}}_postgres.db_password_secret_arn
 }
 {% elif cookiecutter.use_db == "y" and cookiecutter.use_db_logic == "nosql" %}
-module "nosql_dynamodb" {
+module "{{cookiecutter.project_slug}}_dynamodb" {
   source = "../../../../../../infra/tf/aws/modules/dynamodb"
 
-  environment = terraform.workspace
-  project     = "nosql"
+  environment   = terraform.workspace
+  table_name    = "example" 
+  project       = "{{cookiecutter.project_slug}}"
 }
 {% endif %}
