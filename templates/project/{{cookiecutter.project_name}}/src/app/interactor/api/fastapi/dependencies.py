@@ -10,7 +10,7 @@ from monorepo_db import UOW
 {% if cookiecutter.use_db_logic == "sql" %}
 from monorepo_db.sql import get_sql_db_url
 from app.adaptor.db.sql import SqlUOW
-{% elif cookiecutter.use_db == "y" and cookiecutter.use_db_logic == "sql" %}
+{% elif cookiecutter.use_db == "y" and cookiecutter.use_db_logic == "nosql" %}
 from app.adaptor.db.nosql import DynamoUOW
 {% else %}
 from monorepo_db import UOW, Repository
