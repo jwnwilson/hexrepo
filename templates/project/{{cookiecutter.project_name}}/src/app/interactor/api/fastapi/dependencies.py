@@ -2,11 +2,16 @@ import logging
 import uuid
 from collections.abc import Generator
 from pydantic import BaseModel
+
+from app.config import config
 {% if cookiecutter.use_db == "y" %}
 from monorepo_db import UOW
+{% endif %}
+{% if cookiecutter.use_db_logic == "sql" %}
 from monorepo_db.sql import get_sql_db_url
-
 from app.adaptor.db.sql import SqlUOW
+{% elif cookiecutter.use_db == "y" and cookiecutter.use_db_logic == "sql" %}
+from app.adaptor.db.nosql import DynamoUOW
 {% else %}
 from monorepo_db import UOW, Repository
 from monorepo_db.sql.stub import StubbedRepository
@@ -17,11 +22,16 @@ from app.domain.example import ExampleDTO
 logger = logging.getLogger(__name__)
 
 
-{% if cookiecutter.use_db == "y" %}
+{% if cookiecutter.use_db == "y" and cookiecutter.use_db_logic == "sql" %}
 def get_uow() -> Generator[UOW, None, None]:
     uow = SqlUOW(db_url=get_sql_db_url())
     with uow.transaction():
         yield uow
+{% elif cookiecutter.use_db == "y" and cookiecutter.use_db_logic == "nosql" %}
+def get_uow() -> Generator[UOW, None, None]:
+    # Leave empty string to use aws env vars
+    uow = DynamoUOW(db_url=config.DB_URL)
+    yield uow
 {% else %}
 class StubbedExampleRepository(StubbedRepository):
     model_dto: ExampleDTO = ExampleDTO
