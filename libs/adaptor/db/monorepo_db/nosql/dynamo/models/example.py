@@ -2,6 +2,7 @@ from typing import Optional
 
 from pydantic import BaseModel
 
+from ..uow import BaseDynamoUOW
 from ..repository import DynamoRepository
 from .base_model import Base
 
@@ -22,3 +23,19 @@ class ExampleUpdateDTO(BaseModel):
 
 class ExampleRepository(DynamoRepository):
     model_dto = ExampleDTO
+
+
+class DynamoUOW(BaseDynamoUOW):
+
+    # Used for testing
+    def create_all(self) -> None:
+        self.example.create_table()
+
+    def drop_all(self) -> None:
+        self.example.delete_table()
+
+    @property
+    def example(self) -> ExampleRepository:
+        return ExampleRepository(
+            self.resource, table="example", required_filters=self._required_filters
+        )

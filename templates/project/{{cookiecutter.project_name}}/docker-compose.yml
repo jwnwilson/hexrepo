@@ -36,7 +36,7 @@ services:
     command: "uvicorn app.adapter.into.fastapi.main:app --host 0.0.0.0 --port 80 --reload --debug"
     {% endif %}
 
-{% if cookiecutter.use_db == "y" %}
+{% if cookiecutter.use_db == "y" and cookiecutter.use_db_logic == 'sql' %}
   postgres_db:
     container_name: {{cookiecutter.project_slug}}_db
     restart: unless-stopped
@@ -55,7 +55,26 @@ services:
       - "0.0.0.0:5432:5432"
     expose:
       - "5432"
+{% endif %}
+{% if cookiecutter.use_db == "y" and cookiecutter.use_db_logic == 'nosql' %}
+  dynamodb-local:
+    container_name: monorepo_dynamodb
+    command: "-jar DynamoDBLocal.jar -sharedDb -dbPath ./data"
+    image: "amazon/dynamodb-local:latest"
+    ports:
+      - "0.0.0.0:8000:8000"
+    expose:
+      - "8000"
+    working_dir: /home/dynamodblocal
+    volumes:
+     - dynamo_db:/home/dynamodblocal/data
+{% endif %}
+
 
 volumes:
+  {% if cookiecutter.use_db == "y" and cookiecutter.use_db_logic == 'sql' %}
   postgres_db:
-{% endif %}
+  {% endif %}
+  {% if cookiecutter.use_db == "y" and cookiecutter.use_db_logic == 'nosql' %}
+  dynamo_db:
+  {% endif %}

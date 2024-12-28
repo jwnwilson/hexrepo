@@ -5,10 +5,9 @@ import boto3
 from mypy_boto3_dynamodb.service_resource import DynamoDBServiceResource
 
 from ...interface import UOW
-from .models.example import ExampleRepository
 
 
-class DynamoUOW(UOW):
+class BaseDynamoUOW(UOW):
     def __init__(self, db_url: str, required_filters: Optional[Dict[str, str]] = None):
         self._db_url: str = db_url
         self._required_filters: Optional[Dict[str, str]] = required_filters
@@ -28,13 +27,8 @@ class DynamoUOW(UOW):
 
     # Used for testing
     def create_all(self) -> None:
-        self.example.create_table()
+        raise NotImplementedError
 
     def drop_all(self) -> None:
-        self.example.delete_table()
+        raise NotImplementedError
 
-    @property
-    def example(self) -> ExampleRepository:
-        return ExampleRepository(
-            self.resource, table="example", required_filters=self._required_filters
-        )
