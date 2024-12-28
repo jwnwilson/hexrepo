@@ -43,11 +43,11 @@ AWS_SECRET_ACCESS_KEY
 # To Do
 
 - Setup backend
-    - add no sql to project setup
-    - Add ability to disable / destroy projects
+    - Add no sql to project setup
     - Play with AI crawler project 
         - Setup no sql DB
             - Add infra
+        - Add file storage
         - Setup async tasks
             - migrate hex lib into this repo
                 https://github.com/jwnwilson/hex-lib/tree/main/src/hex_lib/adapter/out
@@ -56,6 +56,7 @@ AWS_SECRET_ACCESS_KEY
         - Setup crawl spider
         - Store data in graph format and visualise it
         - Categorise web pages
+    - Add ability to disable / destroy projects
     - Setup auth / cross project auth / authorisation
     - Implement template -> project update:
         - Look at cruft again

@@ -24,14 +24,38 @@ def test_bake_then_run_project_tests(cookies, update_path_project, monkey_patch_
     exit_code:int = os.system(f"cd {result.project_path} && make test")
     assert exit_code == 0, "Error running: make test in new cookiecutter project"
 
-    
-def test_project_nosql():
-    raise
+
+def test_project_nosql(cookies, update_path_project, monkey_patch_cookiecutter_hooks):
+    """Test for 'cookiecutter-template'."""
+    result = cookies.bake(template="../../templates/project", extra_context={"project_name": "test_project", "use_db": "y", "use_db_logic": "nosql"})
+
+    assert result.exit_code == 0
+    assert result.exception is None
+
+    os.system(f"cp -r ../../tools {result.project_path.parent.parent}")
+    os.system(f"cp -r ../../libs {result.project_path.parent.parent}")
+    exit_code:int = os.system(f"cd {result.project_path} && make test")
+    assert exit_code == 0, "Error running: make test in new cookiecutter project"
 
 
-def test_project_no_db():
-    raise
+
+def test_project_no_db(cookies, update_path_project, monkey_patch_cookiecutter_hooks):
+    """Test for 'cookiecutter-template'."""
+    result = cookies.bake(template="../../templates/project", extra_context={"project_name": "test_project", "use_db": "n"})
+
+    assert result.exit_code == 0
+    assert result.exception is None
+
+    os.system(f"cp -r ../../tools {result.project_path.parent.parent}")
+    os.system(f"cp -r ../../libs {result.project_path.parent.parent}")
+    exit_code:int = os.system(f"cd {result.project_path} && make test")
+    assert exit_code == 0, "Error running: make test in new cookiecutter project"
 
 
-def test_project_no_api():
-    raise
+
+def test_project_no_api(cookies, update_path_project, monkey_patch_cookiecutter_hooks):
+    """Test for 'cookiecutter-template'."""
+    result = cookies.bake(template="../../templates/project", extra_context={"project_name": "test_project", "use_api": "n"})
+
+    assert result.exit_code == 0
+    assert result.exception is None
