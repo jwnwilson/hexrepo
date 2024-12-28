@@ -16,9 +16,11 @@ dependencies = [
     "requests<3.0.0,>=2.32.3",
     "python-dotenv<2.0.0,>=1.0.1",
     "pydantic-settings<3.0.0,>=2.6.0",
-    {% if cookiecutter.use_db == 'y' %}
+    {% if cookiecutter.use_db == 'y' and cookiecutter.use_db_logic == 'sql' %}
     "alembic<2.0.0,>=1.13.3",
     "psycopg2-binary<3.0.0,>=2.9.10",
+    {% elif cookiecutter.use_db == 'y' and cookiecutter.use_db_logic == 'nosql' %}
+    "pymongo>=4.10.1",
     {% endif %}
     {% if cookiecutter.use_cloud == 'y' %}
     "boto3<2.0.0,>=1.35.66",

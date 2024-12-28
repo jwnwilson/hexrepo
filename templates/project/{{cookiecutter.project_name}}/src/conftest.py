@@ -9,7 +9,11 @@ from fastapi.testclient import TestClient
 
 {% if cookiecutter.use_db == "y" %}
 from monorepo_db.interface import UOW
+{% endif %}
+{% if cookiecutter.use_db == "y" and cookiecutter.use_db_logic == "sql" %}
 from app.adaptor.db.sql.uow import SqlUOW
+{% elif cookiecutter.use_db == "y" and cookiecutter.use_db_logic == "nosql" %}
+from app.adaptor.db.nosql import DynamoUOW
 {% else %}
 from app.interactor.api.fastapi.dependencies import StubbedUOW
 {% endif %}
@@ -17,7 +21,7 @@ from monorepo_db import UOW
 
 from app.domain.example import ExampleDTO
 
-{% if cookiecutter.use_db == "y" %}
+{% if cookiecutter.use_db == "y" and cookiecutter.use_db_logic == "sql" %}
 # Silence SQLALchemy deprecation warning until we can upgrade
 os.environ["SQLALCHEMY_SILENCE_UBER_WARNING"] = "1"
 
@@ -33,13 +37,27 @@ def uow() -> Generator[UOW, None, None]:
     # Create DB session
     with uow.transaction() as session:
         yield uow
+{% elif cookiecutter.use_db == "y" and cookiecutter.use_db_logic == "nosql" %}
+@pytest.fixture
+def uow() -> Generator[UOW, None, None]:
+    """
+    Return db adaptor with initialised DB & DB session.
+    """
+    uow = DynamoUOW(db_url="http://localhost:8000")
+    # Create DB session
+    yield uow
+{% endif %}
 
 
+{% if cookiecutter.use_db == "y" and cookiecutter.use_db == "y" %}
 @pytest.fixture(scope="function", autouse=True)
 def create_tables(uow: UOW):
     uow.drop_all()
     uow.create_all()
-{% elif cookiecutter.use_api == 'y' %}
+{% endif %}
+
+
+{% if cookiecutter.use_api == 'y' and cookiecutter.use_db == 'n' %}
 @pytest.fixture
 def uow() -> Generator[UOW, None, None]:
     yield StubbedUOW(db_url="test")

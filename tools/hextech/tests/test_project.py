@@ -23,4 +23,15 @@ def test_bake_then_run_project_tests(cookies, update_path_project, monkey_patch_
     os.system(f"cp -r ../../libs {result.project_path.parent.parent}")
     exit_code:int = os.system(f"cd {result.project_path} && make test")
     assert exit_code == 0, "Error running: make test in new cookiecutter project"
+
     
+def test_project_nosql():
+    raise
+
+
+def test_project_no_db():
+    raise
+
+
+def test_project_no_api():
+    raise

@@ -1,10 +1,10 @@
 features:
   - name: sql
-    enabled: {{cookiecutter.use_db_logic == 'sql'}}
+    enabled: {{cookiecutter.use_db == 'y' and cookiecutter.use_db_logic == 'sql'}}
     resources:
       - src/app/adaptor/db/sql
   - name: nosql
-    enabled: {{cookiecutter.use_db_logic == 'nosql'}}
+    enabled: {{cookiecutter.use_db == 'y' and cookiecutter.use_db_logic == 'nosql'}}
     resources:
       - src/app/adaptor/db/nosql
   - name: storage
