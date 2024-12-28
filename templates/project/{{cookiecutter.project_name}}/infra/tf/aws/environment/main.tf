@@ -119,3 +119,13 @@ module "{{cookiecutter.project_slug}}_dynamodb" {
   project       = "{{cookiecutter.project_slug}}"
 }
 {% endif %}
+
+{% if cookiecutter.use_storage == "y" %}
+module "{{cookiecutter.project_slug}}_bucket" {
+  source = "../../../../../../infra/tf/aws/modules/s3"
+
+  environment = terraform.workspace
+  project     = "{{cookiecutter.project_slug}}"
+  name        = "example"
+}
+{% endif %}

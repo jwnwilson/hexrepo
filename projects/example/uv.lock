@@ -516,7 +516,7 @@ wheels = [
 
 [[package]]
 name = "monorepo-api"
-version = "0.1.5"
+version = "0.1.6"
 source = { directory = "../../libs/interactor/api" }
 dependencies = [
     { name = "fastapi" },
@@ -578,7 +578,7 @@ dev = [
 
 [[package]]
 name = "monorepo-db"
-version = "0.1.6"
+version = "0.1.7"
 source = { editable = "../../libs/adaptor/db" }
 dependencies = [
     { name = "boto3" },

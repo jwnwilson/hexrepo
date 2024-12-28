@@ -43,7 +43,6 @@ AWS_SECRET_ACCESS_KEY
 # To Do
 
 - Setup backend
-    - Improve dynamodb
     - Play with AI crawler project 
         - Add file storage
         - Setup async tasks

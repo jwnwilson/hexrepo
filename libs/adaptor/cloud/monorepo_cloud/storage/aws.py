@@ -13,21 +13,16 @@ logger = logging.getLogger(__name__)
 
 
 class S3Adaptor(StorageAdaptor):
-    def __init__(self, storage_config: StorageConfig, config: AWSConfig) -> None:
-        self.aws_config: AWSConfig = config
+    def __init__(self, storage_config: StorageConfig) -> None:
         self.bucket_name = storage_config.aws_bucket
         self.s3 = boto3.resource("s3")
         self.client: S3Client = boto3.client("s3")
         self.bucket = self.s3.Bucket(self.bucket_name)
-        self.upload_prefix = storage_config.aws_upload_prefix
         self.public_url_timeout: Optional[int] = storage_config.public_url_timeout
         self._upload_client: Optional[S3Client] = None
 
-        if not self.upload_prefix:
-            raise RuntimeError("Upload prefix is not set")
-
         self.url_prefix: str = (
-            f"https://{self.bucket_name}.s3-{config.AWS_REGION}.amazonaws.com/"
+            f"https://{self.bucket_name}.s3-{storage_config.aws_region}.amazonaws.com/"
         )
 
     @property

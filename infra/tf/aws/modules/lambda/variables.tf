@@ -35,3 +35,7 @@ variable "dynamodb_arn" {
   type = string
   
 }
+
+variable "bucket" {
+  type = string
+}
