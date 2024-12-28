@@ -31,9 +31,9 @@ db_migrate_docker:
 	docker compose run api bash -c "alembic upgrade head"
 
 db_delete_data: down
-	{% if cookiecutter.db_use_logic == "nosql" %}
+	{% if cookiecutter.use_db == "y" and cookiecutter.use_db_logic == "nosql" %}
 		docker compose run db bash -c "rm -rf /home/dynamodblocal/data/*"
-	{% elif cookiecutter.db_use_logic == "sql" %}
+	{% elif cookiecutter.use_db == "y" and cookiecutter.use_db_logic == "sql" %}
 		docker compose run db bash -c "rm -rf /var/lib/postgresql/data/*"
 	{% endif %}
 
