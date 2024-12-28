@@ -70,11 +70,9 @@ module "{{cookiecutter.project_slug}}_api" {
   {% endif %}
   {% if cookiecutter.use_db == "y" and cookiecutter.use_db_logic == "nosql" %}
   # This should be modified to be restricted to all tables for this project with project_env prefix
-  dynamodb_arn      = "arn:aws:dynamodb:${locals.region}:${locals.account_id}:table/{{cookiecutter.project_slug}}_${terraform.workspace}*"
+  dynamodb_arn      = "arn:aws:dynamodb:${local.region}:${local.account_id}:table/{{cookiecutter.project_slug}}_${terraform.workspace}*"
   {% endif %}
 
-
-  
   environment_variables = {
     ENVIRONMENT                 = terraform.workspace
     CLOUD_PROVIDER              = "{{ cookiecutter.cloud_provider|upper }}"
