@@ -59,7 +59,7 @@ services:
 {% if cookiecutter.use_db == "y" and cookiecutter.use_db_logic == 'nosql' %}
   db:
     container_name: monorepo_dynamodb
-    command: "-jar DynamoDBLocal.jar -sharedDb -dbPath ./data"
+    command: "-jar DynamoDBLocal.jar -sharedDb -dbPath ./data -port 8888"
     image: "amazon/dynamodb-local:latest"
     ports:
       - "0.0.0.0:8000:8000"
