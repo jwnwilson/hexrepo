@@ -28,7 +28,7 @@ services:
       - 0.0.0.0:8000:8000
     {% if cookiecutter.use_db == "y" %}
     depends_on:
-      - postgres_db
+      - db
     {% endif %}
     {% if cookiecutter.cloud_provider == "aws" %}
     # Override lambda entry point to revert to default docker behaviour
@@ -37,7 +37,7 @@ services:
     {% endif %}
 
 {% if cookiecutter.use_db == "y" and cookiecutter.use_db_logic == 'sql' %}
-  postgres_db:
+  db:
     container_name: {{cookiecutter.project_slug}}_db
     restart: unless-stopped
     image: postgres:15
@@ -57,7 +57,7 @@ services:
       - "5432"
 {% endif %}
 {% if cookiecutter.use_db == "y" and cookiecutter.use_db_logic == 'nosql' %}
-  dynamodb-local:
+  db:
     container_name: monorepo_dynamodb
     command: "-jar DynamoDBLocal.jar -sharedDb -dbPath ./data"
     image: "amazon/dynamodb-local:latest"

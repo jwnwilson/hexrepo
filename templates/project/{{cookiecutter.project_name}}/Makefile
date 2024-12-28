@@ -31,7 +31,11 @@ db_migrate_docker:
 	docker compose run api bash -c "alembic upgrade head"
 
 db_delete_data: down
-	docker compose run postgres_db bash -c "rm -rf /var/lib/postgresql/data/*"
+	{% if cookiecutter.db_use_logic == "nosql" %}
+		docker compose run db bash -c "rm -rf /home/dynamodblocal/data/*"
+	{% elif cookiecutter.db_use_logic == "sql" %}
+		docker compose run db bash -c "rm -rf /var/lib/postgresql/data/*"
+	{% endif %}
 
 db_upgrade: db_migrate down
 
@@ -42,7 +46,7 @@ db_create_migration: down
 	bash -c "uv run alembic revision --autogenerate -m \"DB migration\""
 
 db:
-	docker compose run --service-ports -d postgres_db 
+	docker compose run --service-ports -d db 
 
 down:
 	docker compose down
