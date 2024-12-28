@@ -145,7 +145,7 @@ def create_env_infra(config: MonorepoConfig, env: str, no_input: bool = False) -
         except:  # noqa
             pass
         if no_input:
-            run_system_command("make tf_env_appl_no_input")
+            run_system_command("make tf_env_apply_no_input")
         else:
             run_system_command("make tf_env_apply")
     typer.echo("Shared infrastructure apply complete.")
