@@ -1,4 +1,3 @@
-# AWS Lambda wrapper - delete if not needed.
 import logging
 
 from mangum import Mangum
@@ -7,7 +6,7 @@ from mangum import Mangum
 logging.basicConfig(level=logging.INFO)
 logging.getLogger().setLevel(logging.INFO)
 
-from .main import app
+from ..api.fastapi.main import app  # noqa
 
 # To plug into lambda
 handler = Mangum(app)
