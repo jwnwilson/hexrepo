@@ -4,7 +4,7 @@ from uuid import UUID, uuid4
 from pydantic import BaseModel
 import logging
 
-from libs.adaptor.task.hexrepo_task.interface import TaskAdapter
+from .interface import TaskAdapter
 
 logger = logging.getLogger(__name__)
 
@@ -101,7 +101,7 @@ class TaskApp():
         
         return register_task
     
-    def get_task(self, event: TaskEvent) -> Task:
+    def _get_task(self, event: TaskEvent) -> Task:
         """Get task by name"""
         task = Task(event)
         
@@ -116,15 +116,15 @@ class TaskApp():
         task_instance.queue()
         return task_instance
     
-    def parse_event(self, event: Dict[Any]) -> TaskEvent:
+    def _parse_event(self, event: Dict[Any]) -> TaskEvent:
         """Parse event data"""
         return TaskEvent(**event)
 
     def handle(self, event: Dict[Any]):
         """Handle event and run task"""
-        event: TaskEvent = self.parse_event(event)
+        event: TaskEvent = self._parse_event(event)
         # parse event + create task instnace
-        task: Task = self.get_task(event)
+        task: Task = self._get_task(event)
         # Execute task
         try:
             task.execute()
