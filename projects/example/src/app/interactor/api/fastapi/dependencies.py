@@ -1,7 +1,7 @@
 from collections.abc import Generator
 
-from monorepo_db import UOW
-from monorepo_db.sql import get_sql_db_url
+from hexrepo_db import UOW
+from hexrepo_db.sql import get_sql_db_url
 
 from app.adaptor.db.sql import SqlUOW
 

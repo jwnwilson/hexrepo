@@ -3,7 +3,7 @@ from logging.config import fileConfig
 from alembic import context
 from sqlalchemy import Connection, engine_from_config, pool
 
-from monorepo_db.sql.models.base_model import Base
+from hexrepo_db.sql.models.base_model import Base
 
 from ..config import get_sql_db_url
 

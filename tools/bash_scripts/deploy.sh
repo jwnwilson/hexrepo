@@ -9,7 +9,7 @@ docker compose build
 
 region="eu-west-1"
 aws_ecr="675468650888.dkr.ecr.eu-west-1.amazonaws.com"
-ecr_repo_name="monorepo-${PROJECT}"
+ecr_repo_name="hexrepo-${PROJECT}"
 # Use last commit datetime as git tag
 docker_tag=$(git log -n1 --pretty='format:%cd' --date=format:'%Y%m%d%H%M%S')
 latest_image=`docker images -q ${PROJECT}`

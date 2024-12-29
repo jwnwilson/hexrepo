@@ -1,8 +1,8 @@
 terraform {
   backend "s3" {
     region = "eu-west-1"
-    bucket = "monorepo-jwn"
-    key = "monorepo-shared.tfstate"
+    bucket = "hexrepo-jwn"
+    key = "hexrepo-shared.tfstate"
   }
   required_providers {
     aws = {
@@ -15,13 +15,13 @@ provider "aws" {
   region  = var.aws_region
 }
 
-module "monorepo_code_artifact" {
+module "hexrepo_code_artifact" {
   source = "../modules/codeartifact"
-  project = "monorepo"
-  domain = "monorepo"
+  project = "hexrepo"
+  domain = "hexrepo"
 }
 
-# module "monorepo_route_53_zone" {
+# module "hexrepo_route_53_zone" {
 #   source = "../modules/route53"
 #   domain = "jwnwilson.co.uk"
 # }

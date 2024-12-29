@@ -14,11 +14,11 @@ dependencies = [
     "boto3<2.0.0,>=1.35.58",
     "pydantic-settings<3.0.0,>=2.6.1",
     "boto3-stubs[essential]<2.0.0,>=1.35.86",
-    "monorepo-cloud",
+    "hexrepo-cloud",
 ]
 
 [tool.uv.sources]
-monorepo-cloud = { path = "../../libs/adaptor/cloud", editable = true }
+hexrepo-cloud = { path = "../../libs/adaptor/cloud", editable = true }
 
 [project.scripts]
 hextech = "hextech.interactor.cli:app"

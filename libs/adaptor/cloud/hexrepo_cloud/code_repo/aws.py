@@ -3,7 +3,7 @@ import boto3
 from ..config import AWSConfig
 
 
-def authenticate_code_artiface(config: AWSConfig, domain: str = "monorepo") -> str:
+def authenticate_code_artiface(config: AWSConfig, domain: str = "hexrepo") -> str:
     aws_account: str = config.AWS_ACCOUNT
 
     client = boto3.client("codeartifact")

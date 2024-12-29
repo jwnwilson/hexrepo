@@ -1,7 +1,7 @@
 terraform {
   backend "s3" {
     region = "eu-west-1"
-    bucket = "monorepo-jwn"
+    bucket = "hexrepo-jwn"
     key = "{{cookiecutter.project_slug}}-shared.tfstate"
   }
   required_providers {
@@ -17,7 +17,7 @@ provider "aws" {
 
 module "example_ecr" {
   source = "../../../../../../infra/tf/aws/modules/ecr"
-  project           = "monorepo-${var.project}"
+  project           = "hexrepo-${var.project}"
 }
 
 # Add url domain infra here 

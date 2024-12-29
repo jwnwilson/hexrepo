@@ -25,13 +25,13 @@ dependencies = [
     {% if cookiecutter.use_storage == 'y' %}
     "boto3<2.0.0,>=1.35.66",
     "boto3-stubs[essential]<2.0.0,>=1.35.86",
-    "monorepo-cloud @ file:///${PROJECT_ROOT}/../../libs/adaptor/cloud",
+    "hexrepo-cloud @ file:///${PROJECT_ROOT}/../../libs/adaptor/cloud",
     {% endif %}
     {% if cookiecutter.use_db == 'y' %}
-    "monorepo-db @ file:///${PROJECT_ROOT}/../../libs/adaptor/db",
+    "hexrepo-db @ file:///${PROJECT_ROOT}/../../libs/adaptor/db",
     {% endif %}
     {% if cookiecutter.use_api == 'y' %}
-    "monorepo-api @ file:///${PROJECT_ROOT}/../../libs/interactor/api",
+    "hexrepo-api @ file:///${PROJECT_ROOT}/../../libs/interactor/api",
     {% endif %}
 ]
 

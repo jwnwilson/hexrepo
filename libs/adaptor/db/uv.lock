@@ -369,7 +369,7 @@ wheels = [
 ]
 
 [[package]]
-name = "monorepo-cloud"
+name = "hexrepo-cloud"
 version = "0.3.8"
 source = { editable = "../cloud" }
 dependencies = [
@@ -399,13 +399,13 @@ dev = [
 ]
 
 [[package]]
-name = "monorepo-db"
+name = "hexrepo-db"
 version = "0.1.7"
 source = { editable = "." }
 dependencies = [
     { name = "boto3" },
     { name = "boto3-stubs", extra = ["essential"] },
-    { name = "monorepo-cloud" },
+    { name = "hexrepo-cloud" },
     { name = "pydantic" },
     { name = "pydantic-settings" },
 ]
@@ -434,7 +434,7 @@ sql = [
 requires-dist = [
     { name = "boto3", specifier = ">=1.35.68,<2.0.0" },
     { name = "boto3-stubs", extras = ["essential"], specifier = ">=1.35.86,<2.0.0" },
-    { name = "monorepo-cloud", editable = "../cloud" },
+    { name = "hexrepo-cloud", editable = "../cloud" },
     { name = "pydantic", specifier = ">=2.9.2,<3.0.0" },
     { name = "pydantic-settings", specifier = ">=2.6.1,<3.0.0" },
 ]

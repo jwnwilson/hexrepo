@@ -3,9 +3,9 @@ from typing import Any, Dict, Optional
 
 import pytest
 
-from monorepo_db.exception import RecordNotFound
-from monorepo_db.interface import UOW, PaginatedData
-from monorepo_db.sql.models.example import (
+from hexrepo_db.exception import RecordNotFound
+from hexrepo_db.interface import UOW, PaginatedData
+from hexrepo_db.sql.models.example import (
     ExampleCreateDTO,
     ExampleDTO,
     ExampleUpdateDTO,

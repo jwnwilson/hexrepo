@@ -8,7 +8,7 @@ from fastapi.testclient import TestClient
 {% endif %}
 
 {% if cookiecutter.use_db == "y" %}
-from monorepo_db.interface import UOW
+from hexrepo_db.interface import UOW
 {% endif %}
 {% if cookiecutter.use_db == "y" and cookiecutter.use_db_logic == "sql" %}
 from app.adaptor.db.sql.uow import SqlUOW
@@ -17,7 +17,7 @@ from app.adaptor.db.nosql import DynamoUOW
 {% else %}
 from app.interactor.api.fastapi.dependencies import StubbedUOW
 {% endif %}
-from monorepo_db import UOW
+from hexrepo_db import UOW
 
 from app.domain.example import ExampleDTO
 

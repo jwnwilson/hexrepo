@@ -6,7 +6,7 @@ from sqlalchemy import create_engine, event
 from sqlalchemy.engine.base import Connection, Engine
 from sqlalchemy.orm import Session, sessionmaker
 
-from monorepo_db.config import config
+from hexrepo_db.config import config
 
 
 class DatabaseSessionManager:

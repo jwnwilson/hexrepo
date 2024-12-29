@@ -6,12 +6,12 @@ from uuid import UUID
 import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
-from monorepo_db.exception import RecordNotFound
-from monorepo_db.interface import UOW, PaginatedData, Repository
+from hexrepo_db.exception import RecordNotFound
+from hexrepo_db.interface import UOW, PaginatedData, Repository
 from polyfactory.factories.pydantic_factory import ModelFactory
 from pydantic import BaseModel
 
-from monorepo_api.crud import CrudRouter
+from hexrepo_api.crud import CrudRouter
 
 
 class MockCreateSchema(BaseModel):

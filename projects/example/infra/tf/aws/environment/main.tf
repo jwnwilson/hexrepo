@@ -1,7 +1,7 @@
 terraform {
   backend "s3" {
     region = "eu-west-1"
-    bucket = "monorepo-jwn"
+    bucket = "hexrepo-jwn"
     key    = "example-environment.tfstate"
   }
   required_providers {
@@ -19,15 +19,15 @@ provider "aws" {
   region = var.aws_region
 }
 
-data "aws_vpc" "monorepo" {
+data "aws_vpc" "hexrepo" {
   filter {
     name   = "tag:Name"
-    values = ["monorepo-vpc-${terraform.workspace}"]
+    values = ["hexrepo-vpc-${terraform.workspace}"]
   }
 }
 
 data "aws_ecr_repository" "ecr_repo" {
-  name = "monorepo-${var.project}"
+  name = "hexrepo-${var.project}"
 }
 
 data "aws_secretsmanager_secret" "db_secret" {
@@ -41,7 +41,7 @@ module "example_api" {
   project            = "example"
   ecr_url            = data.aws_ecr_repository.ecr_repo.repository_url
   docker_tag         = var.docker_tag
-  vpc_id             = data.aws_vpc.monorepo.id
+  vpc_id             = data.aws_vpc.hexrepo.id
   lambda_command     = ["src.app.interactor.aws.lambda_api.handler"]
   security_group_ids = [module.example_postgres.db_security_group_id]
 
@@ -69,7 +69,7 @@ module "example_postgres" {
 
   environment = terraform.workspace
   project     = "example"
-  vpc_id      = data.aws_vpc.monorepo.id
+  vpc_id      = data.aws_vpc.hexrepo.id
   username    = "postgres"
   start_time  = "09:00:00"
   stop_time   = "17:00:00"  

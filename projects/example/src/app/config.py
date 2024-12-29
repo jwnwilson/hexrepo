@@ -1,7 +1,7 @@
 import logging
 import os
 
-from monorepo_db.sql.config import get_sql_db_url
+from hexrepo_db.sql.config import get_sql_db_url
 from pydantic_settings import BaseSettings
 
 logger = logging.getLogger()

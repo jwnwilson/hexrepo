@@ -5,7 +5,7 @@ import boto3
 from mypy_boto3_ec2.client import EC2Client
 from mypy_boto3_ec2.type_defs import InstanceTypeDef
 
-from monorepo_cloud.config import AWSConfig
+from hexrepo_cloud.config import AWSConfig
 
 logger = logging.getLogger()
 

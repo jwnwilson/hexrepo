@@ -1,5 +1,5 @@
 from logging import config
-from monorepo_db.nosql import BaseDynamoUOW
+from hexrepo_db.nosql import BaseDynamoUOW
 from .models.example import ExampleRepository
 from app.config import config
 

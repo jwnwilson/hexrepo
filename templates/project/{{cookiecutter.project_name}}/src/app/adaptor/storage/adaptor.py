@@ -1,4 +1,4 @@
-from monorepo_cloud.storage import S3Adaptor, StorageConfig
+from hexrepo_cloud.storage import S3Adaptor, StorageConfig
 from app.config import config
 
 

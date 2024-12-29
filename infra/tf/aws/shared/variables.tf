@@ -9,5 +9,5 @@ variable "aws_secret_key" {
 }
 
 variable "project" {
-  default = "monorepo"
+  default = "hexrepo"
 }

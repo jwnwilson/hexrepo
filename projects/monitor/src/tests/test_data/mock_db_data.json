@@ -29,7 +29,7 @@
             "DBSecurityGroups": [],
             "DBSubnetGroup": {
                 "DBSubnetGroupDescription": "Managed by Terraform",
-                "DBSubnetGroupName": "monorepo-default",
+                "DBSubnetGroupName": "hexrepo-default",
                 "SubnetGroupStatus": "Complete",
                 "Subnets": [
                     {

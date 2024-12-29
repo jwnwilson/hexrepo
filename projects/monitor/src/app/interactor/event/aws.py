@@ -2,9 +2,9 @@ import datetime
 import logging
 from typing import Any, Dict, List, Tuple
 
-from monorepo_cloud.compute import AWSComputeManager
-from monorepo_cloud.config import AWSConfig, load_aws_config
-from monorepo_cloud.db import AWSRDSManager
+from hexrepo_cloud.compute import AWSComputeManager
+from hexrepo_cloud.config import AWSConfig, load_aws_config
+from hexrepo_cloud.db import AWSRDSManager
 
 logging.basicConfig(level=logging.INFO)
 logging.getLogger().setLevel(logging.INFO)

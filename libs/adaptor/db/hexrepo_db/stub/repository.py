@@ -4,8 +4,8 @@ from typing import Any, Dict, Optional, Type
 
 from pydantic import BaseModel
 
-from monorepo_db import Repository
-from monorepo_db.interface import PaginatedData
+from hexrepo_db import Repository
+from hexrepo_db.interface import PaginatedData
 
 logger = logging.getLogger(__name__)
 

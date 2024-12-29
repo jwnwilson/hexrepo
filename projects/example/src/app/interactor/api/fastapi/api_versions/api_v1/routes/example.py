@@ -1,6 +1,6 @@
 from typing import Optional
 
-from monorepo_api import CrudRouter
+from hexrepo_api import CrudRouter
 from pydantic import BaseModel
 
 from app.adaptor.db.sql.models.example import ExampleDTO

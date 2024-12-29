@@ -1,7 +1,7 @@
 terraform {
   backend "s3" {
     region = "eu-west-1"
-    bucket = "monorepo-jwn"
+    bucket = "hexrepo-jwn"
     key = "{{cookiecutter.project_slug}}-environment.tfstate"
   }
   required_providers {
@@ -29,21 +29,21 @@ provider "aws" {
   region  = var.aws_region
 }
 
-data "aws_vpc" "monorepo" {
+data "aws_vpc" "hexrepo" {
   filter {
     name   = "tag:Name"
-    values = ["monorepo-vpc-${terraform.workspace}"]
+    values = ["hexrepo-vpc-${terraform.workspace}"]
   }
 }
 
 data "aws_ecr_repository" "ecr_repo" {
-  name                 = "monorepo-${var.project}"
+  name                 = "hexrepo-${var.project}"
 }
 
 {% if cookiecutter.use_db == "n" or (cookiecutter.use_db == "y" and cookiecutter.use_db_logic == "nosql") %}
 data "aws_security_group" "default_sg" {
   tags = {
-    Name = "monorepo-vpc-${terraform.workspace}-default"
+    Name = "hexrepo-vpc-${terraform.workspace}-default"
   }
 }
 {% endif %}
@@ -55,7 +55,7 @@ module "{{cookiecutter.project_slug}}_api" {
   project           = "{{cookiecutter.project_slug}}"
   ecr_url           = data.aws_ecr_repository.ecr_repo.repository_url
   docker_tag        = var.docker_tag
-  vpc_id            = data.aws_vpc.monorepo.id
+  vpc_id            = data.aws_vpc.hexrepo.id
   {% if (cookiecutter.cloud_provider == "aws" and cookiecutter.use_api == "y") %}
   lambda_command    = ["src.app.interactor.aws.lambda_api.handler"]
   {% elif cookiecutter.cloud_provider == "aws" %}
@@ -106,7 +106,7 @@ module "{{cookiecutter.project_slug}}_postgres" {
 
   environment       = terraform.workspace
   project           = "{{cookiecutter.project_slug}}"
-  vpc_id            = data.aws_vpc.monorepo.id
+  vpc_id            = data.aws_vpc.hexrepo.id
   username          = "postgres"
 }
 

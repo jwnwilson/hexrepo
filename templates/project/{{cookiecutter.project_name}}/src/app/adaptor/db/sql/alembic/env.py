@@ -4,8 +4,8 @@ from alembic import context
 from app.config import config as app_config
 from sqlalchemy import Connection, engine_from_config, pool
 
-from monorepo_db.sql import get_sql_db_url
-from monorepo_db.sql.models.base_model import Base
+from hexrepo_db.sql import get_sql_db_url
+from hexrepo_db.sql.models.base_model import Base
 
 
 def get_db_url_alembic():

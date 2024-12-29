@@ -6,7 +6,7 @@ from typing import Dict, List, Optional
 
 import typer
 
-from hextech.config import MonorepoConfig
+from hextech.config import HexrepoConfig
 from hextech.domain.infra.bastion import db_exists, managed_bastion_ssh
 from hextech.domain.infra.code_repo import authenticate_lib_repo
 from hextech.domain.project import (
@@ -20,8 +20,8 @@ from hextech.domain.project import (
 from hextech.domain.system import run_system_command, run_system_command_with_output
 
 
-def create_shared_infra(config: MonorepoConfig) -> None:
-    typer.echo("Creating initial monorepo infrastructure...")
+def create_shared_infra(config: HexrepoConfig) -> None:
+    typer.echo("Creating initial hexrepo infrastructure...")
     # Placeholder for library infra setup
     with chdir("infra"):
         run_system_command("make tf_shared_init")
@@ -30,18 +30,18 @@ def create_shared_infra(config: MonorepoConfig) -> None:
         code_repo_url = json.loads(code_repo_data)[
             "aws_codeartifact_repository_endpoint"
         ]["value"]
-    config.set_config_var("monorepo_lib_repo_url", code_repo_url, set_env=True)
+    config.set_config_var("hexrepo_lib_repo_url", code_repo_url, set_env=True)
     typer.echo("Infrastructure setup complete.")
 
 
 def publish_libs(
-    config: MonorepoConfig,
+    config: HexrepoConfig,
     libraries: Optional[List[str]] = None,
     check_modified: bool = False,
 ) -> None:
     typer.echo("Publishing libraries to repo...")
     # Get code repo token
-    assert os.environ.get("MONOREPO_LIB_REPO_URL"), "Library repo url not found."
+    assert os.environ.get("HEXREPO_LIB_REPO_URL"), "Library repo url not found."
     authenticate_lib_repo(config)
     # Publish all libraries if none specified
     libraries = libraries if libraries else get_libraries()
@@ -63,7 +63,7 @@ def publish_libs(
 
 def deploy_projects(
     env: str,
-    config: MonorepoConfig,
+    config: HexrepoConfig,
     projects: Optional[List[str]],
     check_modified: bool = False,
     no_input: bool = False,
@@ -90,7 +90,7 @@ def deploy_projects(
     typer.echo("Projects deployed successfully.")
 
 
-def create_per_env_infra(config: MonorepoConfig) -> None:
+def create_per_env_infra(config: HexrepoConfig) -> None:
     typer.echo("Setting up per env infrastructure...")
     # Placeholder for shared infra setup
     with chdir("infra"):
@@ -105,7 +105,7 @@ def create_per_env_infra(config: MonorepoConfig) -> None:
     typer.echo("Shared infrastructure setup complete.")
 
 
-def shared_infra_plan_command(config: MonorepoConfig) -> None:
+def shared_infra_plan_command(config: HexrepoConfig) -> None:
     typer.echo("Planning shared infrastructure...")
     with chdir("infra"):
         run_system_command("make tf_shared_init")
@@ -113,7 +113,7 @@ def shared_infra_plan_command(config: MonorepoConfig) -> None:
     typer.echo("Shared infrastructure plan complete.")
 
 
-def shared_infra_apply_command(config: MonorepoConfig, no_input: bool = False) -> None:
+def shared_infra_apply_command(config: HexrepoConfig, no_input: bool = False) -> None:
     typer.echo("Applying shared infrastructure...")
     with chdir("infra"):
         run_system_command("make tf_shared_init")
@@ -124,7 +124,7 @@ def shared_infra_apply_command(config: MonorepoConfig, no_input: bool = False) -
     typer.echo("Shared infrastructure apply complete.")
 
 
-def plan_env_infra_command(config: MonorepoConfig, env: str) -> None:
+def plan_env_infra_command(config: HexrepoConfig, env: str) -> None:
     typer.echo("Planning shared infrastructure...")
     with chdir("infra"):
         run_system_command("make tf_env_init")
@@ -136,7 +136,7 @@ def plan_env_infra_command(config: MonorepoConfig, env: str) -> None:
     typer.echo("Shared infrastructure plan complete.")
 
 
-def create_env_infra(config: MonorepoConfig, env: str, no_input: bool = False) -> None:
+def create_env_infra(config: HexrepoConfig, env: str, no_input: bool = False) -> None:
     typer.echo("Applying shared infrastructure...")
     with chdir("infra"):
         run_system_command("make tf_env_init")
@@ -165,7 +165,7 @@ def get_terrform_output(env: str, project: str) -> str:
         raise typer.Abort(f"Error parsing terraform output: {err}")
 
 
-def migrate_db(config: MonorepoConfig, env: str, project: str):
+def migrate_db(config: HexrepoConfig, env: str, project: str):
     if config.cloud_provider == "aws" and env != "local":
         if not db_exists(config, project, env):
             typer.echo(

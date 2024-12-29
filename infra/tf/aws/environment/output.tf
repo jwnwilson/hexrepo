@@ -1,3 +1,3 @@
 output "aws_vpc_id" {
-  value = module.monorepo_vpc.vpc_id
+  value = module.hexrepo_vpc.vpc_id
 }

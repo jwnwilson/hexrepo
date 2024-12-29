@@ -19,10 +19,10 @@ coverage:
 	pytest --cov-report html	
 
 lint: venv
-	@TARGET_DIRS="monorepo_{{cookiecutter.project_slug}} tests" bash ../../../tools/bash_scripts/lint.sh 
+	@TARGET_DIRS="hexrepo_{{cookiecutter.project_slug}} tests" bash ../../../tools/bash_scripts/lint.sh 
 
 lint_check: venv
-	@TARGET_DIRS="monorepo_{{cookiecutter.project_slug}} tests" bash ../../../tools/bash_scripts/lint.sh --check
+	@TARGET_DIRS="hexrepo_{{cookiecutter.project_slug}} tests" bash ../../../tools/bash_scripts/lint.sh --check
 
 clean:
 	@find . -type f -name '*.py[co]' -delete -o -type d -name __pycache__ -delete

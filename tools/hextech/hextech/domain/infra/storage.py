@@ -1,10 +1,10 @@
 import typer
-from monorepo_cloud.storage import S3Adaptor
+from hexrepo_cloud.storage import S3Adaptor
 
-from hextech.config import MonorepoConfig
+from hextech.config import HexrepoConfig
 
 
-def create_bucket(bucket_name: str, config: MonorepoConfig) -> None:
+def create_bucket(bucket_name: str, config: HexrepoConfig) -> None:
     if config.cloud_provider == "aws":
         try:
             S3Adaptor.create_bucket(bucket_name, config.cloud_provider_config)
@@ -12,7 +12,7 @@ def create_bucket(bucket_name: str, config: MonorepoConfig) -> None:
             typer.echo(f"Error creating bucket: {err}")
 
 
-def create_tf_state(config: MonorepoConfig) -> None:
+def create_tf_state(config: HexrepoConfig) -> None:
     # Prompt for bucket name
     bucket_name: str = config.cloud_provider_config.AWS_TF_STATE_BUCKET
     # Attempt to create bucket

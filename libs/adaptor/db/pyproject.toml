@@ -3,7 +3,7 @@ authors = [
     {name = "Noel Wilson", email = "jwnwilson@hotmail.co.uk"},
 ]
 requires-python = "<4.0,>=3.12"
-name = "monorepo_db"
+name = "hexrepo_db"
 version = "0.1.8"
 description = "A short description of the project"
 readme = "README.md"
@@ -12,11 +12,11 @@ dependencies = [
     "pydantic-settings<3.0.0,>=2.6.1",
     "boto3<2.0.0,>=1.35.68",
     "boto3-stubs[essential]<2.0.0,>=1.35.86",
-    "monorepo-cloud",
+    "hexrepo-cloud",
 ]
 
 [tool.uv.sources]
-monorepo-cloud = { path = "../cloud", editable = true }
+hexrepo-cloud = { path = "../cloud", editable = true }
 
 [dependency-groups]
 sql = [
@@ -53,7 +53,7 @@ env_files = ["env/local.env"]
 [tool.coverage.run]
 concurrency = ["gevent"]
 omit = ["tests/*"]
-source = ["monorepo_db"]
+source = ["hexrepo_db"]
 
 [tool.mypy]
 python_version = "3.12"

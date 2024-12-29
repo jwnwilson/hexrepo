@@ -2,15 +2,15 @@ import logging
 from typing import List
 
 import typer
-from monorepo_cloud.compute import AWSComputeManager
-from monorepo_cloud.db import AWSRDSManager
+from hexrepo_cloud.compute import AWSComputeManager
+from hexrepo_cloud.db import AWSRDSManager
 
-from hextech.config import MonorepoConfig
+from hextech.config import HexrepoConfig
 
 logger = logging.getLogger()
 
 
-def start_infra_command(config: MonorepoConfig):
+def start_infra_command(config: HexrepoConfig):
     if config.cloud_provider == "aws":
         aws_compute_manager = AWSComputeManager(config.cloud_provider_config)
         aws_rds_manager = AWSRDSManager(config.cloud_provider_config)
@@ -29,7 +29,7 @@ def start_infra_command(config: MonorepoConfig):
         typer.echo(f"Started dbs: {started_dbs}")
 
 
-def stop_infra_command(config: MonorepoConfig):
+def stop_infra_command(config: HexrepoConfig):
     if config.cloud_provider == "aws":
         aws_compute_manager = AWSComputeManager(config.cloud_provider_config)
         aws_rds_manager = AWSRDSManager(config.cloud_provider_config)

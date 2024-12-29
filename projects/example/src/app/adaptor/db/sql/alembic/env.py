@@ -2,8 +2,8 @@ from logging.config import fileConfig
 from typing import Union
 
 from alembic import context
-from monorepo_db.sql import get_sql_db_url
-from monorepo_db.sql.models.base_model import Base
+from hexrepo_db.sql import get_sql_db_url
+from hexrepo_db.sql.models.base_model import Base
 from sqlalchemy import Connection, engine_from_config, pool
 
 

@@ -1,8 +1,8 @@
 terraform {
   backend "s3" {
     region = "eu-west-1"
-    bucket = "monorepo-jwn"
-    key    = "monorepo-env.tfstate"
+    bucket = "hexrepo-jwn"
+    key    = "hexrepo-env.tfstate"
   }
   required_providers {
     aws = {
@@ -15,11 +15,11 @@ provider "aws" {
   region = var.aws_region
 }
 
-module "monorepo_vpc" {
+module "hexrepo_vpc" {
   source = "../modules/vpc"
 
   environment    = terraform.workspace
-  project        = "monorepo"
+  project        = "hexrepo"
   # Cheaper 3rd party alternative to NAT Gateway
   fck_nat_gateway = true
   nat_gateway     = false
@@ -30,11 +30,11 @@ module "monorepo_vpc" {
 module "bastion_ec2" {
   source = "../modules/bastionhost"
 
-  project                         = "monorepo"
-  vpc_id                          = module.monorepo_vpc.vpc_id
-  subnet_id                       = module.monorepo_vpc.private_subnet_ids[0]
+  project                         = "hexrepo"
+  vpc_id                          = module.hexrepo_vpc.vpc_id
+  subnet_id                       = module.hexrepo_vpc.private_subnet_ids[0]
   instance_type                   = "t2.nano"
-  bastion_host_security_group_ids = module.monorepo_vpc.security_group_ids
+  bastion_host_security_group_ids = module.hexrepo_vpc.security_group_ids
   tag_application                 = "bastion"
   start_time                      = "08:00:00"
   stop_time                       = "20:00:00"

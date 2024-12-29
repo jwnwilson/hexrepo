@@ -6,8 +6,8 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Response
 from fastapi.types import DecoratedCallable
-from monorepo_db.exception import IntegrityError, InvalidArgument, RecordNotFound
-from monorepo_db.interface import UOW, PaginatedData, Repository
+from hexrepo_db.exception import IntegrityError, InvalidArgument, RecordNotFound
+from hexrepo_db.interface import UOW, PaginatedData, Repository
 from pydantic import BaseModel
 
 logger = getLogger()

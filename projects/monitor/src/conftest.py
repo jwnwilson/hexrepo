@@ -16,8 +16,8 @@ def mock_current_time():
 
 @pytest.fixture
 def compute_manager():
-    from monorepo_cloud.compute import AWSComputeManager
-    from monorepo_cloud.config import AWSConfig, load_aws_config
+    from hexrepo_cloud.compute import AWSComputeManager
+    from hexrepo_cloud.config import AWSConfig, load_aws_config
 
     aws_config: AWSConfig = load_aws_config()
 
@@ -37,8 +37,8 @@ def compute_manager():
 
 @pytest.fixture
 def db_manager():
-    from monorepo_cloud.config import AWSConfig, load_aws_config
-    from monorepo_cloud.db import AWSRDSManager
+    from hexrepo_cloud.config import AWSConfig, load_aws_config
+    from hexrepo_cloud.db import AWSRDSManager
 
     aws_config: AWSConfig = load_aws_config()
 

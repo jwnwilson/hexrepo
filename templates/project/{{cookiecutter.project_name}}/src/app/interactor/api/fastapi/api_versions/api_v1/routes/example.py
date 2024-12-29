@@ -2,7 +2,7 @@ from typing import Optional
 from pydantic import BaseModel
 from app.domain.example import ExampleDTO
 
-from monorepo_api import CrudRouter
+from hexrepo_api import CrudRouter
 from ....dependencies import get_uow
 
 

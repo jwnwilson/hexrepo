@@ -1,6 +1,6 @@
 import logging
 
-from monorepo_db.sql.alembic import update_db
+from hexrepo_db.sql.alembic import update_db
 
 # Initialize you log configuration using the base class
 logging.basicConfig(level=logging.INFO)

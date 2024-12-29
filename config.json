@@ -1,16 +1,16 @@
 {
-    "project_name": "monorepo",
+    "project_name": "hexrepo",
     "shell_file": "~/.zshrc",
     "cloud_provider": "aws",
     "cloud_provider_config": {
         "AWS_ACCOUNT": "675468650888",
         "AWS_REGION": "eu-west-1",
-        "AWS_TF_STATE_BUCKET": "monorepo-jwn"
+        "AWS_TF_STATE_BUCKET": "hexrepo-jwn"
     },
     "environments": [
         "default"
     ],
-    "monorepo_lib_repo_url": "https://monorepo-675468650888.d.codeartifact.eu-west-1.amazonaws.com/pypi/monorepo/",
-    "monorepo_lib_repo_username": "aws",
+    "hexrepo_lib_repo_url": "https://hexrepo-675468650888.d.codeartifact.eu-west-1.amazonaws.com/pypi/hexrepo/",
+    "hexrepo_lib_repo_username": "aws",
     "domain": "jwnwilson.co.uk"
 }

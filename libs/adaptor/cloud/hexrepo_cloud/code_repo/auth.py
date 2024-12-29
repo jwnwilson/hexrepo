@@ -1,5 +1,5 @@
-from monorepo_cloud.code_repo.aws import authenticate_code_artiface
-from monorepo_cloud.config import AWSConfig
+from hexrepo_cloud.code_repo.aws import authenticate_code_artiface
+from hexrepo_cloud.config import AWSConfig
 
 
 def authenticate_repo(config: AWSConfig) -> str:

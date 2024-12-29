@@ -5,16 +5,16 @@ from pydantic import BaseModel
 
 from app.config import config
 {% if cookiecutter.use_db == "y" %}
-from monorepo_db import UOW
+from hexrepo_db import UOW
 {% endif %}
 {% if cookiecutter.use_db_logic == "sql" %}
-from monorepo_db.sql import get_sql_db_url
+from hexrepo_db.sql import get_sql_db_url
 from app.adaptor.db.sql import SqlUOW
 {% elif cookiecutter.use_db == "y" and cookiecutter.use_db_logic == "nosql" %}
 from app.adaptor.db.nosql import DynamoUOW
 {% else %}
-from monorepo_db import UOW, Repository
-from monorepo_db.sql.stub import StubbedRepository
+from hexrepo_db import UOW, Repository
+from hexrepo_db.sql.stub import StubbedRepository
 
 from app.domain.example import ExampleDTO
 {% endif %}

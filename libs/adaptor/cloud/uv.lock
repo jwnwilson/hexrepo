@@ -296,7 +296,7 @@ wheels = [
 ]
 
 [[package]]
-name = "monorepo-cloud"
+name = "hexrepo-cloud"
 version = "0.3.8"
 source = { editable = "." }
 dependencies = [

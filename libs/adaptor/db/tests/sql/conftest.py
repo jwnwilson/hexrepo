@@ -2,9 +2,9 @@ from typing import Dict, Generator
 
 import pytest
 
-from monorepo_db import UOW
-from monorepo_db.sql import get_sql_db_url
-from monorepo_db.sql.models.example import ExampleCreateDTO, ExampleDTO, SqlUOW
+from hexrepo_db import UOW
+from hexrepo_db.sql import get_sql_db_url
+from hexrepo_db.sql.models.example import ExampleCreateDTO, ExampleDTO, SqlUOW
 
 
 @pytest.fixture

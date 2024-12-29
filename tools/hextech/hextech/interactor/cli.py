@@ -7,7 +7,7 @@ import typer
 from cookiecutter.main import cookiecutter
 from typing_extensions import Annotated
 
-from hextech.config import MonorepoConfig, get_or_create_config
+from hextech.config import HexrepoConfig, get_or_create_config
 from hextech.domain.infra.bastion import bastion_ssh_tunnel
 from hextech.domain.infra.deployment import (
     create_env_infra,
@@ -36,6 +36,8 @@ from hextech.domain.prompts.common import (
     prompt_project,
 )
 from hextech.domain.prompts.infra import (
+    prompt_setup_lib_infra,
+    prompt_setup_project_infra,
     prompt_setup_shared_infra,
     prompt_setup_tf,
 )
@@ -51,7 +53,7 @@ app = typer.Typer()
 @app.command()
 def setup():
     # project config setup
-    config: MonorepoConfig
+    config: HexrepoConfig
     created_config: bool
     config, created_config = get_or_create_config()
 
@@ -79,6 +81,13 @@ def create_library():
     with chdir(f"libs/{library_type}"):
         # Run cookie cutter command to copy template
         cookiecutter("../../templates/library")
+        # Setup infra for libray
+        if prompt_setup_lib_infra():
+            typer.echo("Setting up library infrastructure...")
+            run_system_command("make tf_init")
+            run_system_command("make tf_plan")
+            run_system_command("make tf_apply")
+            typer.echo("Shared infrastructure setup complete.")
 
 
 @app.command()
@@ -87,6 +96,13 @@ def create_project():
     with chdir("projects"):
         # Run cookie cutter command to copy template
         cookiecutter("../templates/project")
+        # Setup infra for service
+        if prompt_setup_project_infra():
+            typer.echo("Setting up project infrastructure...")
+            run_system_command("make tf_init")
+            run_system_command("make tf_plan")
+            run_system_command("make tf_apply")
+            typer.echo("Shared infrastructure setup complete.")
 
 
 @app.command()
@@ -99,28 +115,28 @@ def add_library():
 
 @app.command()
 def shared_infra_plan():
-    config: MonorepoConfig
+    config: HexrepoConfig
     config, _ = get_or_create_config(no_input=True)
     shared_infra_plan_command(config)
 
 
 @app.command()
 def shared_infra_apply():
-    config: MonorepoConfig
+    config: HexrepoConfig
     config, _ = get_or_create_config(no_input=True)
     shared_infra_apply_command(config, no_input=True)
 
 
 @app.command()
 def env_infra_plan(env: str):
-    config: MonorepoConfig
+    config: HexrepoConfig
     config, _ = get_or_create_config(no_input=True)
     plan_env_infra_command(config, env)
 
 
 @app.command()
 def env_infra_apply(env: str):
-    config: MonorepoConfig
+    config: HexrepoConfig
     config, _ = get_or_create_config(no_input=True)
     create_env_infra(config, env, no_input=True)
 
@@ -209,7 +225,7 @@ def deploy_libs(
     check_modified: bool = False,
     no_input: bool = False,
 ):
-    config: MonorepoConfig
+    config: HexrepoConfig
     config, _ = get_or_create_config(no_input=no_input)
     if libraries and "" in libraries:
         libraries = libraries.remove("")
@@ -224,7 +240,7 @@ def deploy_projects(
     check_modified: bool = False,
     no_input: bool = False,
 ):
-    config: MonorepoConfig
+    config: HexrepoConfig
     config, _ = get_or_create_config(no_input=no_input)
     if projects and "" in projects:
         projects = projects.remove("")
@@ -236,14 +252,14 @@ def deploy_projects(
 
 @app.command()
 def start_infra():
-    config: MonorepoConfig
+    config: HexrepoConfig
     config, _ = get_or_create_config(no_input=True)
     start_infra_command(config)
 
 
 @app.command()
 def stop_infra():
-    config: MonorepoConfig
+    config: HexrepoConfig
     config, _ = get_or_create_config(no_input=True)
     stop_infra_command(config)
 
@@ -253,7 +269,7 @@ def bastion(
     env: Annotated[Optional[str], typer.Argument()] = None,
     project: Annotated[Optional[str], typer.Argument()] = None,
 ):
-    config: MonorepoConfig
+    config: HexrepoConfig
     config, _ = get_or_create_config(no_input=True)
     env: str = env or prompt_environment()
     project: str = project or prompt_project()
@@ -265,7 +281,7 @@ def migrate_db(
     env: Annotated[Optional[str], typer.Argument()] = None,
     project: Annotated[Optional[str], typer.Argument()] = None,
 ):
-    config: MonorepoConfig
+    config: HexrepoConfig
     config, _ = get_or_create_config(no_input=True)
     env: str = env or prompt_environment()
     project: str = project or prompt_project()
