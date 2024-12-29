@@ -89,7 +89,8 @@ class Task:
 
 # Logic to run tasks from any queue provider
 class TaskApp():
-    def __init__(self, uow: UOW):
+    def __init__(self, task_adapter: TaskAdapter, uow: UOW):
+        self.task_adapter = task_adapter
         self.uow = uow
     
     def task(self):
@@ -110,7 +111,8 @@ class TaskApp():
         """Call task by name"""
         if isinstance(task, callable):
             task = task.__name__
-        task_instance: Task = Task(event, uow=self.uow)
+        event: TaskEvent = TaskEvent(task_name=task, event=args)
+        task_instance: Task = Task(event, task_adapter=self.task_adapter, uow=self.uow)
         task_instance.queue()
         return task_instance
     
