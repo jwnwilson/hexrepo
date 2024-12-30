@@ -34,7 +34,6 @@ class TaskUpdateDTO(BaseModel):
 class TaskEvent(BaseModel):
     task_name: str
     task_id: Optional[UUID] = None
-    event: Optional[Dict[Any]] = None
     args: Optional[Dict[Any]] = None
     
 
@@ -70,12 +69,12 @@ class Task:
         self.state = self.uow.task.create(TaskCreateDTO(
             status="pending",
             name=self.event.task_name,
-            event=self.event.event,
+            event=self.event.args,
             created_at=datetime.now(),
             updated_at=datetime.now()
         ))
-        queue_instance = self.task_adapter.queue(self.state.id, self.state.name, self.state.args)
-        self.update(queue_id=queue_instance.id)
+        taskEvent = TaskEvent(task_id=self.state.id, task_name=self.state.name, args=self.event.args)
+        self.task_adapter.queue(taskEvent)
 
     def execute(self):
         # Create task instance + state
@@ -112,11 +111,11 @@ class TaskApp():
         
         return task
     
-    def queue_task(self, task: str | Callable, args: Dict[Any]) -> Task:
+    def queue(self, task: str | Callable, args: Dict[Any]) -> Task:
         """Call task by name"""
         if isinstance(task, callable):
             task = task.__name__
-        event: TaskEvent = TaskEvent(task_name=task, event=args)
+        event: TaskEvent = TaskEvent(task_name=task, args=args)
         task_instance: Task = Task(event, task_adapter=self.task_adapter, uow=self.uow)
         task_instance.queue()
         return task_instance
@@ -144,5 +143,5 @@ if __name__ == "__main__":
     @app.task
     def task_example(event: TaskEvent):
         print(event)
-
+    
     app.queue("task_example", {"name": "example", "status": "running"})

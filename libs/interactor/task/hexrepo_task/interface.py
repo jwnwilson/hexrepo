@@ -1,6 +1,7 @@
 from abc import ABC
 from uuid import UUID
 
+from libs.interactor.task.hexrepo_task.app import TaskEvent
 from pydantic import BaseModel
 
 
@@ -24,7 +25,7 @@ class TaskAdapter(ABC):
     def __init__(self, config: TaskConfig):
         raise NotImplementedError
 
-    def add_task(self, task_args: TaskArgs) -> TaskData:
+    def queue(self, task_event: TaskEvent) -> TaskData:
         raise NotImplementedError
 
     def get_task(self, task_id: UUID) -> TaskData:
