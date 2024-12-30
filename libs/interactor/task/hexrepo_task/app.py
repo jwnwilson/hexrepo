@@ -141,7 +141,43 @@ if __name__ == "__main__":
     app = TaskApp()
 
     @app.task
-    def task_example(event: TaskEvent):
+    def task_A(event: TaskEvent):
         print(event)
+
+    @app.task
+    def task_B(event: TaskEvent):
+        print(event)
+
+    # queue task
+    task_queue_insyance = task_A.queue()
+
+    # run task directly
+    task_result = task_A(name="example", status="running")
+
+    # Using generator will require server instead of being serverless
+    # need to do this but keep it serverless
+    # Might need to have a long running async lambda process to manage these tasks
+    @app.flow
+    async def workflow_a(*args, **kwargs):
+        try:
+            queue = task_A.queue(*args, **kwargs)
+            results = queue.wait()
+
+            concurrent = []
+            for res in results:
+                concurrent.append(task_B.queue(res))
+                concurrent.append(task_C.queue(res))
+            
+            all(c.wait() for c in concurrent)
+        except:
+            error_task()
+        
+    # this will work with serverless also force serialisation of data
+    # this is hsrd to dynamically fan out
+    # workflow_a = Workflow("workflow_a", task_A | [task_B, task_C] )
+
+    # app.trigger("workflow_a", {"name": "example", "status": "running"})
+
+    workflow_a.trigger()
+
     
-    app.queue("task_example", {"name": "example", "status": "running"})
