@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import Any, Callable, Dict, List, Optional
 from uuid import UUID, uuid4
+from hexrepo_db.interface import UOW
 from pydantic import BaseModel
 import logging
 
@@ -34,6 +35,7 @@ class TaskEvent(BaseModel):
     task_name: str
     task_id: Optional[UUID] = None
     event: Optional[Dict[Any]] = None
+    args: Optional[Dict[Any]] = None
     
 
 class Task:
@@ -43,6 +45,7 @@ class Task:
         self.func: Callable = self.task_registry[event.task_name]
         self.event: TaskEvent = event
         self.uow: UOW = uow
+        self.task_adapter: TaskAdapter = task_adapter
         self.state: Optional[TaskDTO] = None
         if event.task_id:
             self.get_task_data()
@@ -71,6 +74,8 @@ class Task:
             created_at=datetime.now(),
             updated_at=datetime.now()
         ))
+        queue_instance = self.task_adapter.queue(self.state.id, self.state.name, self.state.args)
+        self.update(queue_id=queue_instance.id)
 
     def execute(self):
         # Create task instance + state
@@ -133,10 +138,11 @@ class TaskApp():
             raise
     
 
-app = TaskApp()
+if __name__ == "__main__":
+    app = TaskApp()
 
-@app.task
-def task_example(event):
-    print(event)
+    @app.task
+    def task_example(event: TaskEvent):
+        print(event)
 
-app.queue("task_example", {"name": "example", "status": "running"})
+    app.queue("task_example", {"name": "example", "status": "running"})
