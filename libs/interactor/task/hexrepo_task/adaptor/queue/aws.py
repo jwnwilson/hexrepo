@@ -10,9 +10,12 @@ logger = logging.getLogger(__name__)
 
 
 class SqsQueueAdapter(QueueAdapter):
-    def __init__(self, config):
+    def __init__(self, config, queue_url=None):
         # Create SQS client
-        self.sqs = boto3.client("sqs")
+        if queue_url:
+            self.sqs = boto3.client("sqs", queue_url=queue_url)
+        else:
+            self.sqs = boto3.client("sqs")
         self.queue_url = config["queue"]
 
     def add_task(self, task_event: TaskDTO) -> TaskDTO:
@@ -37,3 +40,13 @@ class SqsQueueAdapter(QueueAdapter):
             WaitTimeSeconds=0,
         )
         return TaskDTO(**json.loads(sqs_resp["Messages"][0]["Body"]))
+
+    def create_queue(self, queue_name: str):
+        # Create a new SQS queue
+        self.sqs.create_queue(QueueName=queue_name)
+        logger.info(f"Created queue: {queue_name}")
+
+    def delete_queue(self, queue_name: str):
+        # Delete a SQS queue
+        self.sqs.delete_queue(QueueUrl=queue_name)
+        logger.info(f"Deleted queue: {queue_name}")

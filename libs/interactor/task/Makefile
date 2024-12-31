@@ -9,9 +9,13 @@ VENV_DIR = $(MKFILE_DIR)$(VENV)
 venv:
 	@../../../tools/bash_scripts/setup_env.sh
 
-test: venv
+test: venv db
 	@echo "Running tests..."
 	@../../../tools/bash_scripts/test.sh
+
+db:
+	@echo "Starting db..."
+	@docker compose up -d 
 
 coverage:
 	@echo "Running unit tests"	

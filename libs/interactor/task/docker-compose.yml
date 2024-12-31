@@ -5,18 +5,18 @@
 #
 version: '3'
 services:
-  db:
-    container_name: hexorepo_task_dynamodb
-    command: "-jar DynamoDBLocal.jar -sharedDb -dbPath ./data -port 8888"
-    image: "amazon/dynamodb-local:latest"
+  localstack:
+    container_name: "${LOCALSTACK_DOCKER_NAME:-localstack-main}"
+    image: localstack/localstack
     ports:
-      - "0.0.0.0:8888:8888"
-    expose:
-      - "8888"
-    working_dir: /home/dynamodblocal
+      - "127.0.0.1:4566:4566"            # LocalStack Gateway
+      - "127.0.0.1:4510-4559:4510-4559"  # external services port range
+    environment:
+      # LocalStack configuration: https://docs.localstack.cloud/references/configuration/
+      - DEBUG=${DEBUG:-0}
     volumes:
-     - ./db_data:/home/dynamodblocal/data
-
+      - localstack:/var/lib/localstack
+      - "/var/run/docker.sock:/var/run/docker.sock"
 
 volumes:
-  dynamo_db:
+  localstack:
