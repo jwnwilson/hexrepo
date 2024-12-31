@@ -1,8 +1,8 @@
 from abc import ABC
 from uuid import UUID
-
-from libs.interactor.task.hexrepo_task.app import TaskEvent
 from pydantic import BaseModel
+
+from .app import TaskEvent
 
 
 class TaskArgs(BaseModel):
@@ -17,15 +17,15 @@ class TaskData(BaseModel):
     status: str
 
 
-class TaskConfig(BaseModel):
+class QueueConfig(BaseModel):
     queue: str
 
 
-class TaskAdapter(ABC):
-    def __init__(self, config: TaskConfig):
+class QueueAdapter(ABC):
+    def __init__(self, config: QueueConfig,):
         raise NotImplementedError
 
-    def queue(self, task_event: TaskEvent) -> TaskData:
+    def add_task(self, task_event: TaskEvent) -> TaskData:
         raise NotImplementedError
 
     def get_task(self, task_id: UUID) -> TaskData:

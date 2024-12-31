@@ -5,7 +5,7 @@ from hexrepo_db.interface import UOW
 from pydantic import BaseModel
 import logging
 
-from .interface import TaskAdapter
+from .interface import QueueAdapter, TaskAdapter
 
 logger = logging.getLogger(__name__)
 
@@ -40,11 +40,11 @@ class TaskEvent(BaseModel):
 class Task:
     task_registry = {}
 
-    def __init__(self, event: TaskEvent, task_adapter: TaskAdapter, uow: UOW):
+    def __init__(self, event: TaskEvent, queue_adaptor: QueueAdapter, uow: UOW):
         self.func: Callable = self.task_registry[event.task_name]
         self.event: TaskEvent = event
         self.uow: UOW = uow
-        self.task_adapter: TaskAdapter = task_adapter
+        self.queue_adaptor: QueueAdapter = queue_adaptor
         self.state: Optional[TaskDTO] = None
         if event.task_id:
             self.get_task_data()
@@ -52,7 +52,7 @@ class Task:
     @classmethod
     def add_task_func(cls, func: Callable):
         func_name = func.__name__
-        if cls.task_registry.get(func_name) and cls.tasks_registry.get(func_name) is not func:
+        if cls.task_registry.get(func_name) and cls.task_registry.get(func_name) is not func:
             raise RuntimeError(f"Duplicate functions with name: {func_name} please rename: {func}")
         cls.task_registry[func_name] = func
 
@@ -74,7 +74,9 @@ class Task:
             updated_at=datetime.now()
         ))
         taskEvent = TaskEvent(task_id=self.state.id, task_name=self.state.name, args=self.event.args)
-        self.task_adapter.queue(taskEvent)
+        queue_instance = self.queue_adaptor.add_task(taskEvent)
+        if queue_instance:
+            self.state = self.update(status="queued")
 
     def execute(self):
         # Create task instance + state
@@ -91,19 +93,33 @@ class Task:
         self.state = self.update(self.state.id, status="completed")
 
 
+class TaskFunc(object):
+    def __init__(self, func: Callable, queue_adaptor: QueueAdapter, uow: UOW, args: Dict[Any], kwargs: Dict[Any]):
+        self.func: Callable = func
+        self.queue_adaptor: QueueAdapter = queue_adaptor
+        self.uow: UOW = uow
+        self.args: Dict[Any] = args
+        self.kwargs: Dict[Any] = kwargs
+    
+    def queue(self, **kwargs) -> Task:
+        event = TaskEvent(task_name=self.func.__name__, args=kwargs)
+        return Task(event, self.queue_adaptor, self.uow).queue()
+
+    def __call__(self, *args, **kwargs):
+        self.func(*args, **kwargs)
+    
+
 # Logic to run tasks from any queue provider
 class TaskApp():
-    def __init__(self, task_adapter: TaskAdapter, uow: UOW):
-        self.task_adapter = task_adapter
+    def __init__(self, queue: QueueAdapter, uow: UOW):
+        self.queue = queue
         self.uow = uow
     
-    def task(self):
+    def task(self, func: Callable, *args, **kwargs) -> TaskFunc:
         """Task decorator to register task functions"""
-        def register_task(func: TaskHandlerFuncType) -> TaskHandlerFuncType:
-            Task.add_task_func(func)
-            return func
+        Task.add_task_func(func)
         
-        return register_task
+        return TaskFunc(func, self.queue, self.uow, *args, **kwargs)
     
     def _get_task(self, event: TaskEvent) -> Task:
         """Get task by name"""
@@ -133,12 +149,12 @@ class TaskApp():
         try:
             task.execute()
         except Exception as e:
-            logger.error(f"Error running task: {task.name}, id: {task.id}, error: {e}")
+            logger.error(f"Error running task: {task.state.name}, id: {task.state.id}, error: {e}")
             raise
     
 
 if __name__ == "__main__":
-    app = TaskApp()
+    app = TaskApp(uow=UOW(), queue=QueueAdapter())
 
     @app.task
     def task_A(event: TaskEvent):
@@ -148,11 +164,11 @@ if __name__ == "__main__":
     def task_B(event: TaskEvent):
         print(event)
 
-    # queue task
-    task_queue_insyance = task_A.queue()
-
     # run task directly
     task_result = task_A(name="example", status="running")
+
+    # queue task
+    task_queue_instance = task_A.queue()
 
     # Using generator will require server instead of being serverless
     # need to do this but keep it serverless
@@ -170,13 +186,7 @@ if __name__ == "__main__":
             
             all(c.wait() for c in concurrent)
         except:
-            error_task()
-        
-    # this will work with serverless also force serialisation of data
-    # this is hsrd to dynamically fan out
-    # workflow_a = Workflow("workflow_a", task_A | [task_B, task_C] )
-
-    # app.trigger("workflow_a", {"name": "example", "status": "running"})
+            error_logic()
 
     workflow_a.trigger()
 
