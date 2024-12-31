@@ -1,3 +1,4 @@
+from asyncio import sleep
 from datetime import datetime
 from typing import Any, Callable, Dict, Optional
 from uuid import UUID
@@ -15,8 +16,6 @@ logger = logging.getLogger(__name__)
 TaskHandlerFuncType = Callable[..., Any]
 
 
-    
-
 # Logic to run tasks from any queue provider
 class TaskApp():
     def __init__(self, queue: QueueAdapter, uow: UOW):
@@ -28,15 +27,6 @@ class TaskApp():
         Task.add_task_func(func)
         
         return TaskFunc(func, self, *args, **kwargs)
-    
-    # def queue(self, task: str | Callable, args: Dict[Any]) -> Task:
-    #     """Call task by name"""
-    #     if isinstance(task, callable):
-    #         task = task.__name__
-    #     event: TaskDTO = TaskDTO(task_name=task, args=args)
-    #     task_instance: Task = Task(event, task_adapter=self.task_adapter, uow=self.uow)
-    #     task_instance.queue()
-    #     return task_instance
     
     def handle(self, event: Dict[Any]):
         """Handle event and run task"""
@@ -88,7 +78,7 @@ class Task:
         task_param: TaskUpdateDTO = TaskUpdateDTO(**kwargs)
         return self.app.uow.task.update(self.state.id, task_param)
 
-    def queue(self):
+    def queue(self) -> "TaskPromise":
         # Send task to queue
         self.state = self.app.uow.task.create(TaskCreateDTO(
             status="pending",
@@ -100,6 +90,7 @@ class Task:
         task_event = self.app.queue.add_task(self.state)
         if task_event.task_id:
             self.state = self.update(status="queued")
+        return TaskPromise(self)
 
     def execute(self):
         # Create task instance + state
@@ -116,6 +107,24 @@ class Task:
         self.state = self.update(self.state.id, status="completed")
 
 
+class TaskPromise:
+    def __init__(self, task: "Task", timeout: int = 30):
+        self.task: Task = task
+        self.timeout: int = timeout
+    
+    def wait(self):
+        """Wait for task to complete"""
+        timer: int = 0
+        self.task.refresh_task_data()
+        while self.task.state.status not in ["completed", "error"]:
+            if timer >= self.timeout:
+                raise TimeoutError(f"Task took too long to complete: {self.task.state.name}, id: {self.task.state.id}")
+            sleep(1)
+            timer += 1
+            self.task.refresh_task_data()
+        return self.task.state
+
+
 class TaskFunc(object):
     
     def __init__(self, func: Callable, task_app: TaskApp, args: Dict[Any], kwargs: Dict[Any]):
@@ -126,7 +135,7 @@ class TaskFunc(object):
         self.args: Dict[Any] = args
         self.kwargs: Dict[Any] = kwargs
     
-    def queue(self, **kwargs) -> Task:
+    def queue(self, **kwargs) -> TaskPromise:
         event = TaskDTO(task_name=self.func.__name__, args=kwargs)
         return Task(event, self.app).queue()
 
@@ -149,7 +158,7 @@ if __name__ == "__main__":
     task_result = task_A(name="example", status="running")
 
     # queue task
-    task_queue_instance = task_A.queue()
+    task_queue_instance: TaskPromise = task_A.queue()
 
     # Using generator will require server instead of being serverless
     # need to do this but keep it serverless
@@ -157,7 +166,7 @@ if __name__ == "__main__":
     @app.flow
     async def workflow_a(*args, **kwargs):
         try:
-            queue = task_A.queue(*args, **kwargs)
+            queue: TaskPromise = task_A.queue(*args, **kwargs)
             results = queue.wait()
 
             concurrent = []
