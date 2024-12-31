@@ -59,13 +59,15 @@ class UOW(ABC):
     def transaction(self) -> Generator[Any, None, None]:
         raise NotImplementedError
 
-    @property
-    def example(self) -> Repository:
-        raise NotImplementedError
-
     # Used for testing
     def create_all(self) -> None:
         raise NotImplementedError
 
     def drop_all(self) -> None:
+        raise NotImplementedError
+    
+
+class ExampleUOW(UOW):
+    @property
+    def example(self) -> Repository:
         raise NotImplementedError
