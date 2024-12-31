@@ -2,7 +2,7 @@ from collections.abc import Generator
 
 import pytest
 
-from hexrepo_task.interface import TaskUOW as UOW, QueueAdapter
+from hexrepo_task.interface import QueueConfig, TaskUOW as UOW, QueueAdapter
 from hexrepo_task.adaptor.db.nosql import DynamoUOW
 from hexrepo_task.adaptor.queue.aws import SqsQueueAdapter
 
@@ -12,7 +12,6 @@ def uow() -> Generator[UOW, None, None]:
     """
     Return db adaptor with initialised DB & DB session.
     """
-    breakpoint()
     uow = DynamoUOW(db_url="http://localhost.localstack.cloud:4566")
     # Create DB session
     yield uow
@@ -29,8 +28,14 @@ def queue() -> Generator[QueueAdapter, None, None]:
     """
     Return db adaptor with initialised DB & DB session.
     """
-    breakpoint()
-    queue = SqsQueueAdapter(queue_url="http://localhost.localstack.cloud:4566")
-    queue.delete_queue("test-queue")
+    config: QueueConfig = QueueConfig(
+        queue="test-queue",
+        queue_url="http://localhost.localstack.cloud:4566"
+    )
+    queue = SqsQueueAdapter(config)
+    try:
+        queue.delete_queue("test-queue")
+    except Exception:
+        pass
     queue.create_queue("test-queue")
     yield queue

@@ -9,11 +9,11 @@ from pydantic import BaseModel
 class TaskCreateDTO(BaseModel):
     task_id: Optional[UUID] = None
     name: str
-    params: Dict[Any]
+    params: Dict
     created_at: datetime
     updated_at: datetime
     status: str
-    error: Optional[Dict[Any]]
+    error: Optional[Dict]
 
 
 class TaskDTO(TaskCreateDTO):
@@ -21,24 +21,25 @@ class TaskDTO(TaskCreateDTO):
 
 
 class TaskUpdateDTO(BaseModel):
-    params: Optional[Dict[Any]] = None
+    params: Optional[Dict] = None
     status: Optional[str] = None
-    error: Optional[Dict[Any]] = None
+    error: Optional[Dict] = None
 
 
 # class TaskEvent(BaseModel):
 #     id: Optional[UUID] = None
 #     task_id: Optional[UUID] = None
 #     task_name: str
-#     params: Optional[Dict[Any]] = None
+#     params: Optional[Dict] = None
 
 class TaskArgs(BaseModel):
     task_name: str
-    params: Dict[Any]
+    params: Dict
 
 
 class QueueConfig(BaseModel):
     queue: str
+    queue_url: Optional[str] = None
 
 
 class QueueAdapter(ABC):

@@ -4,19 +4,19 @@ import uuid
 
 import boto3
 
-from hexrepo_task.interface import QueueAdapter, TaskArgs, TaskDTO
+from hexrepo_task.interface import QueueAdapter, QueueConfig, TaskDTO
 
 logger = logging.getLogger(__name__)
 
 
 class SqsQueueAdapter(QueueAdapter):
-    def __init__(self, config, queue_url=None):
+    def __init__(self, config: QueueConfig, queue_url=None):
         # Create SQS client
         if queue_url:
             self.sqs = boto3.client("sqs", queue_url=queue_url)
         else:
             self.sqs = boto3.client("sqs")
-        self.queue_url = config["queue"]
+        self.queue_url: str = config.queue_url
 
     def add_task(self, task_event: TaskDTO) -> TaskDTO:
         # Send message to SQS queue

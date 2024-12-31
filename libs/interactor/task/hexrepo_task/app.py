@@ -28,7 +28,7 @@ class TaskApp():
         
         return TaskFunc(func, self, *args, **kwargs)
     
-    def handle(self, event: Dict[Any]):
+    def handle(self, event: Dict):
         """Handle event and run task"""
         event: TaskDTO = self._parse_event(event)
         # parse event + create task instnace
@@ -46,7 +46,7 @@ class TaskApp():
         
         return task
     
-    def _parse_event(self, event: Dict[Any]) -> TaskDTO:
+    def _parse_event(self, event: Dict) -> TaskDTO:
         """Parse event data"""
         return TaskDTO(**event)
     
@@ -127,13 +127,13 @@ class TaskPromise:
 
 class TaskFunc(object):
     
-    def __init__(self, func: Callable, task_app: TaskApp, args: Dict[Any], kwargs: Dict[Any]):
+    def __init__(self, func: Callable, task_app: TaskApp, args: Dict, kwargs: Dict):
         Task.add_task_func(func)
 
         self.func: Callable = func
         self.app: TaskApp = task_app
-        self.args: Dict[Any] = args
-        self.kwargs: Dict[Any] = kwargs
+        self.args: Dict = args
+        self.kwargs: Dict = kwargs
     
     def queue(self, **kwargs) -> TaskPromise:
         event = TaskDTO(task_name=self.func.__name__, args=kwargs)
