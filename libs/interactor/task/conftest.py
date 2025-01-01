@@ -3,7 +3,7 @@ from collections.abc import Generator
 import pytest
 
 from hexrepo_task.interface import QueueConfig, TaskUOW as UOW, QueueAdapter
-from hexrepo_task.adaptor.db.nosql import DynamoUOW
+from hexrepo_task.adaptor.db import QueueUOW
 from hexrepo_task.adaptor.queue.aws import SqsQueueAdapter
 from hexrepo_task.app import Task
 
@@ -13,7 +13,7 @@ def uow() -> Generator[UOW, None, None]:
     """
     Return db adaptor with initialised DB & DB session.
     """
-    uow = DynamoUOW(db_url="http://localhost.localstack.cloud:4566")
+    uow = QueueUOW(db_url="http://localhost.localstack.cloud:4566")
     # Create DB session
     yield uow
 

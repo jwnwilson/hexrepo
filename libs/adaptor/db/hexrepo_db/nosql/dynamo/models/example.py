@@ -25,7 +25,7 @@ class ExampleRepository(DynamoRepository):
     model_dto = ExampleDTO
 
 
-class DynamoUOW(BaseDynamoUOW):
+class ExampleUOW(BaseDynamoUOW):
     # Used for testing
     def create_all(self) -> None:
         self.example.create_table()

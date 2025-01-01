@@ -5,7 +5,7 @@ from hexrepo_task.config import config
 from .models.task import TaskRepository
 
 
-class DynamoUOW(BaseDynamoUOW):
+class QueueUOW(BaseDynamoUOW):
     # Used for testing
     def create_all(self) -> None:
         self.task.create_table()

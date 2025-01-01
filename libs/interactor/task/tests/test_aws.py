@@ -1,7 +1,7 @@
 from uuid import uuid4
 
 import pytest
-from hexrepo_db.nosql.dynamo.models.example import DynamoUOW
+from hexrepo_db.nosql.dynamo.models.example import ExampleUOW
 
 from hexrepo_task.adaptor.queue.aws import SqsQueueAdapter
 from hexrepo_task.app import Dependency, TaskApp, TaskFuncWrapper, TaskPromise
@@ -10,7 +10,7 @@ from hexrepo_task.interface import TaskDTO
 
 
 @pytest.fixture
-def create_task_app(uow: DynamoUOW, queue: SqsQueueAdapter):
+def create_task_app(uow: ExampleUOW, queue: SqsQueueAdapter):
     def get_uow():
         return uow
 

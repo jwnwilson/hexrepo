@@ -4,14 +4,14 @@ import pytest
 
 from hexrepo_db import UOW
 from hexrepo_db.nosql import MongoUOW
-from hexrepo_db.nosql.dynamo.models.example import DynamoUOW
+from hexrepo_db.nosql.dynamo.models.example import ExampleUOW
 from hexrepo_db.sql.models.example import ExampleCreateDTO, ExampleDTO
 
 
 @pytest.fixture
 def uow_dynamo() -> Generator[UOW, None, None]:
     db_url = "http://localhost.localstack.cloud:4566"
-    uow = DynamoUOW(db_url=db_url)
+    uow = ExampleUOW(db_url=db_url)
     # with uow.transaction():
     yield uow
 

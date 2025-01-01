@@ -1,1 +1,1 @@
-from .uow import DynamoUOW as DynamoUOW  # noqa
+from .uow import QueueUOW as QueueUOW  # noqa

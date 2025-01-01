@@ -3,13 +3,13 @@ from collections.abc import Generator
 from hexrepo_db import UOW
 from hexrepo_db.sql.config import get_sql_db_url
 from hexrepo_task import QueueAdapter, SqsQueueAdapter
-from hexrepo_task.adaptor.db import DynamoUOW
+from hexrepo_task.adaptor.db import QueueUOW
 
 from app.adaptor.db.sql import SqlUOW
 
 
 def get_queue_uow() -> Generator[UOW, None, None]:
-    uow: UOW = DynamoUOW()
+    uow: UOW = QueueUOW()
     yield uow
 
 
