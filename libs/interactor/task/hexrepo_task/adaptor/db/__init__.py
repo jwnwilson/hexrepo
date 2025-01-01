@@ -1,1 +1,1 @@
-from .nosql import DynamoUOW
+from .nosql import DynamoUOW as DynamoUOW # noqa
