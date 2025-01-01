@@ -73,7 +73,7 @@ class TaskApp:
 
 class Task:
     """
-    Contain task data and logic to run task
+    Contain task data and manage metadata for a task function call
     """
     task_registry = {}
 
