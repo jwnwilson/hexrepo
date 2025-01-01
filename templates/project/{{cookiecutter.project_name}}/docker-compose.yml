@@ -74,8 +74,8 @@ services:
 
 volumes:
   {% if cookiecutter.use_db == "y" and cookiecutter.use_db_logic == 'sql' %}
-  localstack:
+  postgres_db:
   {% endif %}
   {% if cookiecutter.use_db == "y" and cookiecutter.use_db_logic == 'nosql' %}
-  dynamo_db:
+  localstack:
   {% endif %}
