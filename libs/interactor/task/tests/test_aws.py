@@ -11,7 +11,12 @@ from hexrepo_task.interface import TaskDTO
 
 @pytest.fixture
 def create_task_app(uow: DynamoUOW, queue: SqsQueueAdapter):
-    app = TaskApp(uow=uow, queue=queue)
+    def get_uow():
+        return uow
+    def get_queue():
+        return queue
+    
+    app = TaskApp(get_uow=get_uow, quget_queueeue=get_queue)
 
     @app.task
     def task_A(event: TaskDTO):

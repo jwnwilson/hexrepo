@@ -45,14 +45,13 @@ AWS_SECRET_ACCESS_KEY
 - Destroy all infra on main branch then re-deploy using this branch before mering!
 - Setup backend
     - Setup serverless orchestration
-        - test with local stack
-        - use localstack across project
-        - 1 task table per hexrepo
+        - setup task option in project setup
     - Play with AI crawler project 
         - Setup crawl spider
         - Store data in graph format and visualise it
         - Categorise web pages
     - Create serverless orchestrator project 
+        - 1 task table per hexrepo
         - Setup ECS for long running async orchestrator on fargate
         - Setup workflow orchestration
         - Setup Idempotent re-run

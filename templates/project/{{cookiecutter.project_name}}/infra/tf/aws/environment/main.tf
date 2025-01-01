@@ -57,9 +57,9 @@ module "{{cookiecutter.project_slug}}_api" {
   docker_tag        = var.docker_tag
   vpc_id            = data.aws_vpc.hexrepo.id
   {% if (cookiecutter.cloud_provider == "aws" and cookiecutter.use_api == "y") %}
-  lambda_command    = ["src.app.interactor.aws.lambda_api.handler"]
+  lambda_command    = ["src.app.interactor.aws.lambda_handler"]
   {% elif cookiecutter.cloud_provider == "aws" %}
-  lambda_command    = ["src.app.interactor.event.aws.handler"]
+  lambda_command    = ["src.app.interactor.event.lambda_handler"]
   {% else %}
   lambda_command    = ["uvicorn", "app.interactor.api.fastapi.main:app", "--host", "0.0.0.0", "--port", "8000"]
   {% endif %}

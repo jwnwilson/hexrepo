@@ -1,11 +1,12 @@
 import logging
 
-from hexrepo_db.sql.alembic import update_db
+from mangum import Mangum
 
 # Initialize you log configuration using the base class
 logging.basicConfig(level=logging.INFO)
 logging.getLogger().setLevel(logging.INFO)
 
+from .main import app  # noqa
 
-def handler(event, context):
-    update_db()
+# To plug into lambda
+handler = Mangum(app)

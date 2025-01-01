@@ -17,4 +17,4 @@ COPY ./projects/${PROJECT}/src ./src
 COPY ./projects/${PROJECT}/alembic.ini ./
 
 ENV PYTHONPATH ${LAMBDA_TASK_ROOT}/src
-CMD ["src.app.interactor.aws.lambda_api.handler"]
+CMD ["src.app.interactor.api.lambda_handler"]

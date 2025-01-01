@@ -14,13 +14,28 @@ logger = logging.getLogger(__name__)
 
 
 TaskFunc = Callable[[TaskDTO], Any]
-
+GetQueue = Callable[[], QueueAdapter]
+GetUOW = Callable[[], UOW]
 
 # Logic to run tasks from any queue provider
 class TaskApp:
-    def __init__(self, queue: QueueAdapter, uow: UOW):
-        self.queue: QueueAdapter = queue
-        self.uow: UOW = uow
+    def __init__(self, get_queue: GetQueue, get_uow: GetUOW):
+        self.get_queue: GetQueue = get_queue
+        self._queue: Optional[QueueAdapter] = None
+        self.get_uow: GetUOW = get_uow
+        self._uow: Optional[UOW] = None
+
+    @property
+    def queue(self) -> QueueAdapter:
+        if self._queue is None:
+            self._queue = self.get_queue()
+        return self._queue
+    
+    @property
+    def uow(self) -> UOW:
+        if self._uow is None:
+            self._uow = self.get_uow()
+        return self._uow
 
     def task(self, func: TaskFunc, **config) -> "TaskFunc":
         """Task decorator to register task functions"""
@@ -164,7 +179,13 @@ class TaskFunc(object):
 
 
 # if __name__ == "__main__":
-#     app = TaskApp(uow=DynamoUOW(), queue=SqsQueueAdapter())
+
+#     def get_queue() -> QueueAdapter:
+#         return SqsQueueAdapter(queue="hexrepo-tasks")
+#     def get_uow() -> UOW:
+#         return DynamoUOW()
+    
+#     app = TaskApp(uow=get_uow(), queue=get_queue())
 
 #     @app.task
 #     def task_A(event: TaskDTO):
