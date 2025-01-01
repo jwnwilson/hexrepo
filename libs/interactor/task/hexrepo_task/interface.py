@@ -57,15 +57,16 @@ class QueueAdapter(ABC):
     @contextmanager
     def get_task(self) -> Generator[TaskDTO | None, None, None]:
         raise NotImplementedError
-    
+
     def create_queue(self, queue_name: str):
         raise NotImplementedError
 
     def delete_queue(self, queue_name: str):
         raise NotImplementedError
-    
+
     def purge_queue(self, queue_name: str):
         raise NotImplementedError
+
 
 class TaskUOW(UOW):
     @property
