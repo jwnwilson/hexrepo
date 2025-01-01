@@ -3,7 +3,7 @@ from pydantic import BaseModel
 from app.domain.example import ExampleDTO
 
 from hexrepo_api import CrudRouter
-from ....dependencies import get_uow
+from ......dependencies import get_uow
 
 
 class CreateExampleDTO(BaseModel):

@@ -4,6 +4,10 @@ from collections.abc import Generator
 from pydantic import BaseModel
 
 from app.config import config
+{% if cookiecutter.use_task == "y" %}
+from hexrepo_task import QueueAdapter, SqsQueueAdapter
+from hexrepo_task.adaptor.db import DynamoUOW
+{% endif %}
 {% if cookiecutter.use_db == "y" %}
 from hexrepo_db import UOW
 {% endif %}
@@ -53,4 +57,15 @@ class StubbedUOW(UOW):
 
 def get_uow() -> Generator[UOW, None, None]:
     yield StubbedUOW(db_url="test")
+{% endif %}
+
+{% if cookiecutter.use_task == "y" %}
+def get_queue_uow() -> Generator[UOW, None, None]:
+    uow: UOW = DynamoUOW()
+    yield uow
+
+
+def get_task_queue() -> Generator[QueueAdapter, None, None]:
+    queue = SqsQueueAdapter(queue="hexrepo-tasks")
+    yield queue
 {% endif %}
