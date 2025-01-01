@@ -17,13 +17,13 @@ class TaskDTO(BaseModel):
     created_at: datetime = datetime.now()
     updated_at: datetime = datetime.now()
     status: str = "pending"
-    error: Optional[Dict] = None
+    error: Optional[str] = None
 
 
 class TaskUpdateDTO(BaseModel):
     params: Optional[Dict] = None
     status: Optional[str] = None
-    error: Optional[Dict] = None
+    error: Optional[str] = None
 
 
 # class TaskEvent(BaseModel):

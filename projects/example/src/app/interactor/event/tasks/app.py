@@ -1,5 +1,6 @@
-from hexrepo_task.app import TaskApp, TaskDTO
-from .dependencies import get_queue_uow, get_task_queue
+from hexrepo_task.app import TaskApp, TaskDTO, Dependency
+from .dependencies import get_queue_uow, get_task_queue, get_uow
+from app.adaptor.db.sql import SqlUOW
 
 
 app = TaskApp(
@@ -9,5 +10,5 @@ app = TaskApp(
 
 
 @app.task
-def example_task(event: TaskDTO):
-    pass
+def create_example_task(task: TaskDTO, uow: SqlUOW = Dependency(get_uow)):
+    uow.example.create(event.params)

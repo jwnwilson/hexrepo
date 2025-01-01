@@ -16,7 +16,7 @@ def create_task_app(uow: DynamoUOW, queue: SqsQueueAdapter):
     def get_queue():
         return queue
     
-    app = TaskApp(get_uow=get_uow, quget_queueeue=get_queue)
+    app = TaskApp(get_uow=get_uow, get_queue=get_queue)
 
     @app.task
     def task_A(event: TaskDTO):
@@ -99,3 +99,27 @@ def test_aws_queue_multiple_task(create_task_app, queue: SqsQueueAdapter):
         assert task_02.id in task_ids
     with queue.get_task() as no_task:
         assert no_task is None
+
+
+def test_aws_task_error_handled(create_task_app, queue: SqsQueueAdapter):
+    app: TaskApp
+    task_A: TaskFunc
+    app, task_A = create_task_app
+
+    @app.task
+    def task_A_error(event: TaskDTO):
+        raise Exception("error")
+
+    # queue task
+    task_queue_instance: TaskPromise = task_A_error.queue(
+        params=dict(name="example", status="running")
+    )
+    # get task
+    with queue.get_task() as event:
+        # handle task
+        with pytest.raises(Exception):
+            app.handle(event)
+
+    # Assert task updated
+    task_queue_instance.wait()
+    assert task_queue_instance.task.state.status == "error"

@@ -42,7 +42,7 @@ class TaskApp:
         Task.add_task_func(func)
 
         task_config: TaskConfig = TaskConfig(**config)
-        return TaskFunc(func, self, config=task_config)
+        return TaskFuncWrapper(func, self, config=task_config)
 
     def handle(self, event: Dict | TaskDTO) -> Any:
         """Handle event and run task"""
@@ -72,6 +72,9 @@ class TaskApp:
 
 
 class Task:
+    """
+    Contain task data and logic to run task
+    """
     task_registry = {}
 
     def __init__(
@@ -127,12 +130,14 @@ class Task:
 
         try:
             logger.info(f"Running task: {self.state.name}, id: {self.state.id}")
-            result: Any = self.func(self.state)
+            task_wrapper: TaskFuncWrapper = TaskFuncWrapper(self.func, self.app, self.config) 
+            result: Any = task_wrapper(self.state)
         except Exception as e:
             logger.error(
                 f"Error running task: {self.state.name}, id: {self.state.id}, error: {e}"
             )
-            self.state = self.update(status="error", error=e)
+            self.state = self.update(status="error", error=str(e))
+            raise
 
         # Update Task status
         self.state = self.update(status="completed")
@@ -158,9 +163,20 @@ class TaskPromise:
             timer += 1
             self.task.refresh_task_data()
         return self.task.state
+    
+
+class Dependency:
+    def __init__(self, get_dependency: Callable):
+        self.get_dependency = get_dependency
+
+    def __get__(self, obj, objtype):
+        return self.get_dependency()
 
 
-class TaskFunc(object):
+class TaskFuncWrapper:
+    """
+    Call task function and handle dependencies
+    """
     def __init__(
         self, func: TaskFunc, task_app: TaskApp, config: Optional[TaskConfig] = None
     ):
@@ -170,12 +186,22 @@ class TaskFunc(object):
         self.app: TaskApp = task_app
         self.config: Optional[TaskConfig] = config or default_config
 
+    def _get_dependencies(self, func: TaskFunc) -> Dict:
+        dependencies = {}
+        for name, param in func.__annotations__.items():
+            name: str
+            param: Any
+            if isinstance(param, Dependency):
+                dependencies[name] = param.get_dependency()
+        return dependencies
+
     def queue(self, params: Optional[Dict] = None) -> TaskPromise:
         task = TaskDTO(name=self.func.__name__, params=params)
         return Task(task, self.app).queue()
 
-    def __call__(self, event: TaskDTO):
-        return self.func(event)
+    def __call__(self, task: TaskDTO):
+        dependencies = self._get_dependencies(self.func)
+        return self.func(task, **dependencies)
 
 
 # if __name__ == "__main__":
