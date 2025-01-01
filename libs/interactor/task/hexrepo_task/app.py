@@ -1,3 +1,4 @@
+import inspect
 import logging
 from asyncio import sleep
 from datetime import datetime
@@ -17,6 +18,7 @@ TaskFunc = Callable[[TaskDTO], Any]
 GetQueue = Callable[[], QueueAdapter]
 GetUOW = Callable[[], UOW]
 
+
 # Logic to run tasks from any queue provider
 class TaskApp:
     def __init__(self, get_queue: GetQueue, get_uow: GetUOW):
@@ -30,14 +32,14 @@ class TaskApp:
         if self._queue is None:
             self._queue = self.get_queue()
         return self._queue
-    
+
     @property
     def uow(self) -> UOW:
         if self._uow is None:
             self._uow = self.get_uow()
         return self._uow
 
-    def task(self, func: TaskFunc, **config) -> "TaskFunc":
+    def task(self, func: TaskFunc, **config) -> "TaskFuncWrapper":
         """Task decorator to register task functions"""
         Task.add_task_func(func)
 
@@ -75,6 +77,7 @@ class Task:
     """
     Contain task data and manage metadata for a task function call
     """
+
     task_registry = {}
 
     def __init__(
@@ -130,7 +133,9 @@ class Task:
 
         try:
             logger.info(f"Running task: {self.state.name}, id: {self.state.id}")
-            task_wrapper: TaskFuncWrapper = TaskFuncWrapper(self.func, self.app, self.config) 
+            task_wrapper: TaskFuncWrapper = TaskFuncWrapper(
+                self.func, self.app, self.config
+            )
             result: Any = task_wrapper(self.state)
         except Exception as e:
             logger.error(
@@ -163,20 +168,21 @@ class TaskPromise:
             timer += 1
             self.task.refresh_task_data()
         return self.task.state
-    
+
 
 class Dependency:
     def __init__(self, get_dependency: Callable):
-        self.get_dependency = get_dependency
+        self._get_dependency = get_dependency
 
-    def __get__(self, obj, objtype):
-        return self.get_dependency()
+    def get_dependency(self):
+        return self._get_dependency()
 
 
 class TaskFuncWrapper:
     """
     Call task function and handle dependencies
     """
+
     def __init__(
         self, func: TaskFunc, task_app: TaskApp, config: Optional[TaskConfig] = None
     ):
@@ -188,11 +194,11 @@ class TaskFuncWrapper:
 
     def _get_dependencies(self, func: TaskFunc) -> Dict:
         dependencies = {}
-        for name, param in func.__annotations__.items():
+        for name, param in inspect.signature(func).parameters.items():
             name: str
-            param: Any
-            if isinstance(param, Dependency):
-                dependencies[name] = param.get_dependency()
+            param: inspect.Parameter
+            if isinstance(param.default, Dependency):
+                dependencies[name] = param.default.get_dependency()
         return dependencies
 
     def queue(self, params: Optional[Dict] = None) -> TaskPromise:
@@ -210,7 +216,7 @@ class TaskFuncWrapper:
 #         return SqsQueueAdapter(queue="hexrepo-tasks")
 #     def get_uow() -> UOW:
 #         return DynamoUOW()
-    
+
 #     app = TaskApp(uow=get_uow(), queue=get_queue())
 
 #     @app.task
