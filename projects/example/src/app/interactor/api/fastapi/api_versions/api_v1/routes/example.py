@@ -1,11 +1,12 @@
 from typing import Optional
+from uuid import UUID
 
 from hexrepo_api import CrudRouter
 from pydantic import BaseModel
 
 from app.adaptor.db.sql.models.example import ExampleDTO
-
-from ....dependencies import get_uow
+from app.interactor.event.tasks.app import create_example_task
+from ......dependencies import get_uow
 
 
 class CreateExampleDTO(BaseModel):
@@ -28,3 +29,12 @@ router_v1 = CrudRouter(
     create_schema=CreateExampleDTO,
     update_schema=UpdateExampleDTO,
 )
+
+
+@router_v1.router.post("/task")
+def start_task():
+    params: ExampleDTO = ExampleDTO(name="example", url="example.com", location="example")
+    create_example_task.queue(params=params.model_dump())
+
+@router_v1.router.get("/task")
+def get_task(id: UUID):
