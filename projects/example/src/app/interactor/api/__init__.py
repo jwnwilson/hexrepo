@@ -1,1 +1,1 @@
-from .fastapi.lambda_wrapper import handler as lambda_handler
+from .fastapi.lambda_wrapper import handler as lambda_handler # noqa
