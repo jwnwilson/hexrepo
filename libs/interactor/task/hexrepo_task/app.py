@@ -1,14 +1,14 @@
+import logging
 from asyncio import sleep
 from datetime import datetime
 from typing import Any, Callable, Dict, Optional, cast
-import logging
 
 from hexrepo_task.exception import DuplicateTaskName
 
-from .interface import QueueAdapter, TaskDTO, TaskUOW as UOW, TaskUpdateDTO
-from .config import TaskConfig, config as default_config
-from .adaptor.db.nosql import DynamoUOW
-from .adaptor.queue import SqsQueueAdapter
+from .config import TaskConfig
+from .config import config as default_config
+from .interface import QueueAdapter, TaskDTO, TaskUpdateDTO
+from .interface import TaskUOW as UOW
 
 logger = logging.getLogger(__name__)
 
@@ -17,18 +17,18 @@ TaskFunc = Callable[[TaskDTO], Any]
 
 
 # Logic to run tasks from any queue provider
-class TaskApp():
+class TaskApp:
     def __init__(self, queue: QueueAdapter, uow: UOW):
         self.queue: QueueAdapter = queue
         self.uow: UOW = uow
-    
+
     def task(self, func: TaskFunc, **config) -> "TaskFunc":
         """Task decorator to register task functions"""
         Task.add_task_func(func)
-        
+
         task_config: TaskConfig = TaskConfig(**config)
         return TaskFunc(func, self, config=task_config)
-    
+
     def handle(self, event: Dict | TaskDTO) -> Any:
         """Handle event and run task"""
         if isinstance(event, dict):
@@ -40,24 +40,28 @@ class TaskApp():
         try:
             return task.execute()
         except Exception as e:
-            logger.error(f"Error running task: {task.state.name}, id: {task.state.id}, error: {e}")
+            logger.error(
+                f"Error running task: {task.state.name}, id: {task.state.id}, error: {e}"
+            )
             raise
-    
+
     def _get_task(self, event: TaskDTO) -> "Task":
         """Get task by name"""
         task = Task(event, task_app=self)
-        
+
         return task
-    
+
     def _parse_event(self, event: Dict) -> TaskDTO:
         """Parse event data"""
         return TaskDTO(**event)
-    
+
 
 class Task:
     task_registry = {}
 
-    def __init__(self, task: TaskDTO, task_app: TaskApp, config: Optional[TaskConfig] = None):
+    def __init__(
+        self, task: TaskDTO, task_app: TaskApp, config: Optional[TaskConfig] = None
+    ):
         self.func: TaskFunc = self.task_registry[task.name]
         # self.event: TaskDTO = event
         self.app: TaskApp = task_app
@@ -65,12 +69,17 @@ class Task:
         self.config: TaskConfig = config or default_config
         if task.id:
             self.refresh_task_data()
-    
+
     @classmethod
     def add_task_func(cls, func: TaskFunc):
         func_name = func.__name__
-        if cls.task_registry.get(func_name) and cls.task_registry.get(func_name) is not func:
-            raise DuplicateTaskName(f"Duplicate functions with name: {func_name} please rename: {func}")
+        if (
+            cls.task_registry.get(func_name)
+            and cls.task_registry.get(func_name) is not func
+        ):
+            raise DuplicateTaskName(
+                f"Duplicate functions with name: {func_name} please rename: {func}"
+            )
         cls.task_registry[func_name] = func
 
     def refresh_task_data(self):
@@ -83,13 +92,15 @@ class Task:
 
     def queue(self) -> "TaskPromise":
         # Send task to queue
-        self.state = self.app.uow.task.create(TaskDTO(
-            status="pending",
-            name=self.state.name,
-            params=self.state.params,
-            created_at=datetime.now(),
-            updated_at=datetime.now()
-        ))
+        self.state = self.app.uow.task.create(
+            TaskDTO(
+                status="pending",
+                name=self.state.name,
+                params=self.state.params,
+                created_at=datetime.now(),
+                updated_at=datetime.now(),
+            )
+        )
         task_event = self.app.queue.add_task(self.state)
         if task_event.task_id:
             self.state = self.update(status="queued")
@@ -103,27 +114,31 @@ class Task:
             logger.info(f"Running task: {self.state.name}, id: {self.state.id}")
             result: Any = self.func(self.state)
         except Exception as e:
-            logger.error(f"Error running task: {self.state.name}, id: {self.state.id}, error: {e}")
+            logger.error(
+                f"Error running task: {self.state.name}, id: {self.state.id}, error: {e}"
+            )
             self.state = self.update(status="error", error=e)
 
         # Update Task status
         self.state = self.update(status="completed")
 
-        return result 
+        return result
 
 
 class TaskPromise:
     def __init__(self, task: "Task", timeout: int = 30):
         self.task: Task = task
         self.timeout: int = timeout
-    
+
     def wait(self):
         """Wait for task to complete"""
         timer: int = 0
         self.task.refresh_task_data()
         while self.task.state.status not in ["completed", "error"]:
             if timer >= self.timeout:
-                raise TimeoutError(f"Task took too long to complete: {self.task.state.name}, id: {self.task.state.id}")
+                raise TimeoutError(
+                    f"Task took too long to complete: {self.task.state.name}, id: {self.task.state.id}"
+                )
             sleep(1)
             timer += 1
             self.task.refresh_task_data()
@@ -131,57 +146,56 @@ class TaskPromise:
 
 
 class TaskFunc(object):
-    
-    def __init__(self, func: TaskFunc, task_app: TaskApp, config: Optional[TaskConfig] = None):
+    def __init__(
+        self, func: TaskFunc, task_app: TaskApp, config: Optional[TaskConfig] = None
+    ):
         Task.add_task_func(func)
 
         self.func: TaskFunc = func
         self.app: TaskApp = task_app
         self.config: Optional[TaskConfig] = config or default_config
-    
+
     def queue(self, params: Optional[Dict] = None) -> TaskPromise:
         task = TaskDTO(name=self.func.__name__, params=params)
         return Task(task, self.app).queue()
 
     def __call__(self, event: TaskDTO):
         return self.func(event)
-    
 
-if __name__ == "__main__":
-    app = TaskApp(uow=DynamoUOW(), queue=SqsQueueAdapter())
 
-    @app.task
-    def task_A(event: TaskDTO):
-        print(event)
+# if __name__ == "__main__":
+#     app = TaskApp(uow=DynamoUOW(), queue=SqsQueueAdapter())
 
-    @app.task
-    def task_B(event: TaskDTO):
-        print(event)
+#     @app.task
+#     def task_A(event: TaskDTO):
+#         print(event)
 
-    # run task directly
-    task_result = task_A(params=dict(name="example", status="running"))
+#     @app.task
+#     def task_B(event: TaskDTO):
+#         print(event)
 
-    # queue task
-    task_queue_instance: TaskPromise = task_A.queue()
+#     # run task directly
+#     task_result = task_A(params=dict(name="example", status="running"))
 
-    # Using generator will require server instead of being serverless
-    # need to do this but keep it serverless
-    # Might need to have a long running async lambda process to manage these tasks
-    @app.flow
-    async def workflow_a(*args, **kwargs):
-        try:
-            queue: TaskPromise = task_A.queue(*args, **kwargs)
-            results = queue.wait()
+#     # queue task
+#     task_queue_instance: TaskPromise = task_A.queue()
 
-            concurrent = []
-            for res in results:
-                concurrent.append(task_B.queue(res))
-                concurrent.append(task_C.queue(res))
-            
-            all(c.wait() for c in concurrent)
-        except:
-            error_logic()
+#     # Using generator will require server instead of being serverless
+#     # need to do this but keep it serverless
+#     # Might need to have a long running async lambda process to manage these tasks
+#     @app.flow
+#     async def workflow_a(*args, **kwargs):
+#         try:
+#             queue: TaskPromise = task_A.queue(*args, **kwargs)
+#             results = queue.wait()
 
-    workflow_a.trigger()
+#             concurrent = []
+#             for res in results:
+#                 concurrent.append(task_B.queue(res))
+#                 concurrent.append(task_C.queue(res))
 
-    
+#             all(c.wait() for c in concurrent)
+#         except:
+#             error_logic()
+
+#     workflow_a.trigger()

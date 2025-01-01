@@ -1,8 +1,8 @@
-from datetime import datetime
 import json
 import logging
-from typing import Any, Dict
 import uuid
+from datetime import datetime
+from typing import Any, Dict
 
 import boto3
 
@@ -32,10 +32,10 @@ class SqsQueueAdapter(QueueAdapter):
             if isinstance(record_data[key], (uuid.UUID, datetime)):
                 record_data[key] = str(record_data[key])
         return record_data
-    
+
     def get_queue_url(self) -> str:
         try:
-             return self.sqs.get_queue_url(QueueName=self.queue)["QueueUrl"]
+            return self.sqs.get_queue_url(QueueName=self.queue)["QueueUrl"]
         except self.sqs.exceptions.QueueDoesNotExist:
             raise ValueError(f"Queue does not exist: {self.queue}")
         except Exception as e:
@@ -49,7 +49,9 @@ class SqsQueueAdapter(QueueAdapter):
             QueueUrl=self.queue_url, MessageBody=(json.dumps(task_data))
         )
         task_event.task_id = sqs_resp["MessageId"]
-        logger.info(f"Created task: {task_event.task_id} SQS event with id: {task_event.task_id}")
+        logger.info(
+            f"Created task: {task_event.task_id} SQS event with id: {task_event.task_id}"
+        )
 
         return task_event
 

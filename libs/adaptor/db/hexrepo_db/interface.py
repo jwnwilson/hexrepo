@@ -65,7 +65,7 @@ class UOW(ABC):
 
     def drop_all(self) -> None:
         raise NotImplementedError
-    
+
 
 class ExampleUOW(UOW):
     @property

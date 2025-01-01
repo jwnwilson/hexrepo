@@ -1,6 +1,7 @@
-from logging import config
 from hexrepo_db.nosql import BaseDynamoUOW
+
 from hexrepo_task.config import config
+
 from .models.task import TaskRepository
 
 
@@ -19,5 +20,7 @@ class DynamoUOW(BaseDynamoUOW):
         env: str = config.ENVIRONMENT
         full_table_name = f"{project}_{env}_{table_name}"
         return TaskRepository(
-            self.resource, table=full_table_name, required_filters=self._required_filters
+            self.resource,
+            table=full_table_name,
+            required_filters=self._required_filters,
         )

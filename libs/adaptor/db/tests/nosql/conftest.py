@@ -10,7 +10,7 @@ from hexrepo_db.sql.models.example import ExampleCreateDTO, ExampleDTO
 
 @pytest.fixture
 def uow_dynamo() -> Generator[UOW, None, None]:
-    db_url = "http://localhost:8000"
+    db_url = "http://localhost.localstack.cloud:4566"
     uow = DynamoUOW(db_url=db_url)
     # with uow.transaction():
     yield uow

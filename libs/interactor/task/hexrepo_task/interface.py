@@ -1,7 +1,8 @@
 from abc import ABC
 from datetime import datetime
-from typing import Any, Dict, Optional
+from typing import Dict, Optional
 from uuid import UUID
+
 from hexrepo_db.interface import UOW, Repository
 from pydantic import BaseModel
 
@@ -14,7 +15,7 @@ class TaskDTO(BaseModel):
     created_at: datetime = datetime.now()
     updated_at: datetime = datetime.now()
     status: str = "pending"
-    error: Optional[Dict] = None    
+    error: Optional[Dict] = None
 
 
 class TaskUpdateDTO(BaseModel):
@@ -29,6 +30,7 @@ class TaskUpdateDTO(BaseModel):
 #     task_name: str
 #     params: Optional[Dict] = None
 
+
 class TaskArgs(BaseModel):
     task_name: str
     params: Dict
@@ -41,7 +43,10 @@ class QueueConfig(BaseModel):
 
 
 class QueueAdapter(ABC):
-    def __init__(self, config: QueueConfig,):
+    def __init__(
+        self,
+        config: QueueConfig,
+    ):
         raise NotImplementedError
 
     def add_task(self, task_event: TaskDTO) -> TaskDTO:

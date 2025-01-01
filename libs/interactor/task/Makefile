@@ -23,10 +23,10 @@ coverage:
 	pytest --cov-report html	
 
 lint: venv
-	@TARGET_DIRS="hexrepo_api tests" bash ../../../tools/bash_scripts/lint.sh 
+	@TARGET_DIRS="hexrepo_task tests" bash ../../../tools/bash_scripts/lint.sh 
 
 lint_check: venv
-	@TARGET_DIRS="hexrepo_api tests" bash ../../../tools/bash_scripts/lint.sh --check
+	@TARGET_DIRS="hexrepo_task tests" bash ../../../tools/bash_scripts/lint.sh --check
 
 clean:
 	@find . -type f -name '*.py[co]' -delete -o -type d -name __pycache__ -delete

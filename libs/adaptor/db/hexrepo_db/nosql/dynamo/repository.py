@@ -113,7 +113,7 @@ class DynamoRepository(Repository):
             if isinstance(record_data[key], (UUID, datetime)):
                 record_data[key] = str(record_data[key])
         return record_data
-    
+
     def create(self, obj_in: ModelDTO) -> ModelDTO:
         record_data: Dict[str, Any] = obj_in.model_dump()
         record_data["id"] = str(uuid4())
