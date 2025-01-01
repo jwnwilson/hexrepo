@@ -35,7 +35,7 @@ def create_tables(uow: UOW):
 @pytest.fixture
 def client(uow):
     from app.interactor.api.fastapi import app
-    from app.interactor.api.fastapi.dependencies import get_uow
+    from app.interactor.dependencies import get_uow
 
     def get_uow_override():
         yield uow

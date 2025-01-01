@@ -45,7 +45,7 @@ AWS_SECRET_ACCESS_KEY
 - Destroy all infra on main branch then re-deploy using this branch before mering!
 - Setup backend
     - Setup serverless orchestration
-        - setup task option in project setup
+        - deploy and validate task logic in project
     - Play with AI crawler project 
         - Setup crawl spider
         - Store data in graph format and visualise it

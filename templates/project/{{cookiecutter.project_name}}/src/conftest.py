@@ -15,7 +15,7 @@ from app.adaptor.db.sql.uow import SqlUOW
 {% elif cookiecutter.use_db == "y" and cookiecutter.use_db_logic == "nosql" %}
 from app.adaptor.db.nosql import DynamoUOW
 {% else %}
-from app.interactor.api.fastapi.dependencies import StubbedUOW
+from app.interactor.dependencies import StubbedUOW
 {% endif %}
 from hexrepo_db import UOW
 
@@ -67,7 +67,7 @@ def uow() -> Generator[UOW, None, None]:
 @pytest.fixture
 def client(uow):
     from app.interactor.api.fastapi import app
-    from app.interactor.api.fastapi.dependencies import get_uow
+    from app.interactor.dependencies import get_uow
 
     def get_uow_override():
         yield uow
