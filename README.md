@@ -44,12 +44,13 @@ AWS_SECRET_ACCESS_KEY
 
 - Destroy all infra on main branch then re-deploy using this branch before mering!
 - Setup backend
-    - Setup serverless orchestration
+    - Setup serverless async tasks
         - deploy and validate task logic in project
     - Play with AI crawler project 
-        - Setup crawl spider
+        - Setup crawl spider for PLP pages
         - Store data in graph format and visualise it
-        - Categorise web pages
+        - Categorise PLP pages
+        - Fan out and crawl web page PDP page contents
     - Create serverless orchestrator project 
         - 1 task table per hexrepo
         - Setup ECS for long running async orchestrator on fargate
@@ -64,9 +65,6 @@ AWS_SECRET_ACCESS_KEY
         - Reduce image size
             https://github.com/astral-sh/uv/issues/8935
         - Setup base lib image to re-use for projects
-    - Add user setup to infra as code
-        - During project config setup define hexrepo user with admin account
-        - login with mono repo user and store credentials to work specifically with hexrepo
     - Enforce architecture rules:
         - https://roman.pt/posts/python-architecture-linter/
         - [deply](https://github.com/Vashkatsi/deply)
@@ -78,6 +76,9 @@ AWS_SECRET_ACCESS_KEY
         - Create Diff with changes
         - Add CI job to detect template changes and add a new PR with applied patch to projects
     - Add another cloud provider - GCP
+    - Add user setup to infra as code
+        - During project config setup define hexrepo user with admin account
+        - login with mono repo user and store credentials to work specifically with hexrepo
 
 - Full hexrepo setup with hextech cli command like turbo repo
 - Investigate setting up company services
