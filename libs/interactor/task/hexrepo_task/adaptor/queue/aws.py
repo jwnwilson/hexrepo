@@ -1,8 +1,10 @@
 import json
 import logging
 import uuid
+from collections.abc import Generator
+from contextlib import contextmanager
 from datetime import datetime
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 import boto3
 
@@ -55,20 +57,24 @@ class SqsQueueAdapter(QueueAdapter):
 
         return task_event
 
-    # Turn into conext manager to handle message deletion
-    def get_task(self) -> TaskDTO | None:
+    @contextmanager
+    def get_task(self) -> Generator[TaskDTO | None, None, None]:
         # Get a message from sqs queue
-        sqs_resp = self.sqs.receive_message(
+        sqs_resp: Optional[Dict] = self.sqs.receive_message(
             QueueUrl=self.queue_url,
             MaxNumberOfMessages=1,
             MessageAttributeNames=["All"],
             VisibilityTimeout=0,
             WaitTimeSeconds=0,
         )
-        if sqs_resp["Messages"]:
-            return TaskDTO(**json.loads(sqs_resp["Messages"][0]["Body"]))
+        if "Messages" in sqs_resp:
+            yield TaskDTO(**json.loads(sqs_resp["Messages"][0]["Body"]))
+            self.sqs.delete_message(
+                QueueUrl=self.queue_url,
+                ReceiptHandle=sqs_resp["Messages"][0]["ReceiptHandle"],
+            )
         else:
-            return None
+            yield None
 
     def create_queue(self, queue_name: str):
         # Create a new SQS queue

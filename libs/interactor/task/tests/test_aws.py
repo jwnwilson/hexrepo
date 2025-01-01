@@ -47,8 +47,8 @@ def test_aws_queue_task(create_task_app, queue: SqsQueueAdapter):
     task_queue_instance: TaskPromise = task_A.queue()
     assert task_queue_instance.task.state.status == "queued"
     # get task
-    event: TaskDTO = queue.get_task()
-    assert event.id == task_queue_instance.task.state.id
+    with queue.get_task() as event:
+        assert event.id == task_queue_instance.task.state.id
 
 
 def test_aws_handle_task(create_task_app, queue: SqsQueueAdapter):
@@ -61,10 +61,11 @@ def test_aws_handle_task(create_task_app, queue: SqsQueueAdapter):
         params=dict(name="example", status="running")
     )
     # get task
-    event: TaskDTO = queue.get_task()
-    # handle task
-    result = app.handle(event)
-    assert result == "example"
+    with queue.get_task() as event:
+        # handle task
+        result = app.handle(event)
+        assert result == "example"
+
     # Assert task updated
     task_queue_instance.wait()
     assert task_queue_instance.task.state.status == "completed"
@@ -87,10 +88,9 @@ def test_aws_queue_multiple_task(create_task_app, queue: SqsQueueAdapter):
         task_queue_instance_02.task.state.id,
     ]
     # get task
-    task_01: TaskDTO | None = queue.get_task()
-    task_02: TaskDTO | None = queue.get_task()
-    no_task: TaskDTO = queue.get_task()
-    breakpoint()
-    assert task_01.id in task_ids
-    assert task_02.id in task_ids
-    assert no_task is None
+    with queue.get_task() as task_01:
+        assert task_01.id in task_ids
+    with queue.get_task() as task_02:
+        assert task_02.id in task_ids
+    with queue.get_task() as no_task:
+        assert no_task is None

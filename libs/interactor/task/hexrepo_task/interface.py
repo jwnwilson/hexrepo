@@ -1,4 +1,6 @@
 from abc import ABC
+from collections.abc import Generator
+from contextlib import contextmanager
 from datetime import datetime
 from typing import Dict, Optional
 from uuid import UUID
@@ -52,7 +54,8 @@ class QueueAdapter(ABC):
     def add_task(self, task_event: TaskDTO) -> TaskDTO:
         raise NotImplementedError
 
-    def get_task(self, task_id: UUID) -> TaskDTO:
+    @contextmanager
+    def get_task(self) -> Generator[TaskDTO | None, None, None]:
         raise NotImplementedError
 
 
