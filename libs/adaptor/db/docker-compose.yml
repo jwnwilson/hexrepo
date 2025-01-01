@@ -18,16 +18,17 @@ services:
     expose:
       - "5432"
   dynamodb-local:
-    container_name: hexrepo_dynamodb
-    command: "-jar DynamoDBLocal.jar -sharedDb -dbPath ./data"
-    image: "amazon/dynamodb-local:latest"
+    container_name: "hexrepo-db-localstack"
+    image: localstack/localstack
     ports:
-      - "0.0.0.0:8000:8000"
-    expose:
-      - "8000"
-    working_dir: /home/dynamodblocal
+      - "127.0.0.1:4566:4566"            # LocalStack Gateway
+      - "127.0.0.1:4510-4559:4510-4559"  # external services port range
+    environment:
+      # LocalStack configuration: https://docs.localstack.cloud/references/configuration/
+      - DEBUG=${DEBUG:-0}
     volumes:
-     - "./docker/dynamodb:/home/dynamodblocal/data"
+      - localstack:/var/lib/localstack
+      - "/var/run/docker.sock:/var/run/docker.sock"
   mongodb:
     container_name: hexrepo_mongo
     image: mongo:latest
@@ -38,3 +39,6 @@ services:
     restart: unless-stopped
     volumes:
       - ./tests/test_data/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+
+volumes:
+  localstack:

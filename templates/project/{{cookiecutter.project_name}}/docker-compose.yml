@@ -58,22 +58,23 @@ services:
 {% endif %}
 {% if cookiecutter.use_db == "y" and cookiecutter.use_db_logic == 'nosql' %}
   db:
-    container_name: hexrepo_dynamodb
-    command: "-jar DynamoDBLocal.jar -sharedDb -dbPath ./data -port 8888"
-    image: "amazon/dynamodb-local:latest"
+    container_name: "{{cookiecutter.project_slug}}-localstack"
+    image: localstack/localstack
     ports:
-      - "0.0.0.0:8888:8888"
-    expose:
-      - "8888"
-    working_dir: /home/dynamodblocal
+      - "127.0.0.1:4566:4566"            # LocalStack Gateway
+      - "127.0.0.1:4510-4559:4510-4559"  # external services port range
+    environment:
+      # LocalStack configuration: https://docs.localstack.cloud/references/configuration/
+      - DEBUG=${DEBUG:-0}
     volumes:
-     - ./db_data:/home/dynamodblocal/data
+      - localstack:/var/lib/localstack
+      - "/var/run/docker.sock:/var/run/docker.sock"
 {% endif %}
 
 
 volumes:
   {% if cookiecutter.use_db == "y" and cookiecutter.use_db_logic == 'sql' %}
-  postgres_db:
+  localstack:
   {% endif %}
   {% if cookiecutter.use_db == "y" and cookiecutter.use_db_logic == 'nosql' %}
   dynamo_db:

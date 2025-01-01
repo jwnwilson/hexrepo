@@ -1,11 +1,11 @@
 from asyncio import sleep
 from datetime import datetime
-from typing import Any, Callable, Dict, Optional
-from uuid import UUID
-from pydantic import BaseModel
+from typing import Any, Callable, Dict, Optional, cast
 import logging
 
-from .interface import QueueAdapter, TaskCreateDTO, TaskDTO, TaskUOW as UOW, TaskUpdateDTO
+from hexrepo_task.exception import DuplicateTaskName
+
+from .interface import QueueAdapter, TaskDTO, TaskUOW as UOW, TaskUpdateDTO
 from .config import TaskConfig, config as default_config
 from .adaptor.db.nosql import DynamoUOW
 from .adaptor.queue import SqsQueueAdapter
@@ -13,7 +13,7 @@ from .adaptor.queue import SqsQueueAdapter
 logger = logging.getLogger(__name__)
 
 
-TaskHandlerFuncType = Callable[..., Any]
+TaskFunc = Callable[[TaskDTO], Any]
 
 
 # Logic to run tasks from any queue provider
@@ -22,20 +22,23 @@ class TaskApp():
         self.queue: QueueAdapter = queue
         self.uow: UOW = uow
     
-    def task(self, func: Callable, *args, **kwargs) -> "TaskFunc":
+    def task(self, func: TaskFunc, **config) -> "TaskFunc":
         """Task decorator to register task functions"""
         Task.add_task_func(func)
         
-        return TaskFunc(func, self, *args, **kwargs)
+        task_config: TaskConfig = TaskConfig(**config)
+        return TaskFunc(func, self, config=task_config)
     
-    def handle(self, event: Dict):
+    def handle(self, event: Dict | TaskDTO) -> Any:
         """Handle event and run task"""
-        event: TaskDTO = self._parse_event(event)
+        if isinstance(event, dict):
+            event = self._parse_event(event)
+        event = cast(TaskDTO, event)
         # parse event + create task instnace
         task: Task = self._get_task(event)
         # Execute task
         try:
-            task.execute()
+            return task.execute()
         except Exception as e:
             logger.error(f"Error running task: {task.state.name}, id: {task.state.id}, error: {e}")
             raise
@@ -54,20 +57,20 @@ class TaskApp():
 class Task:
     task_registry = {}
 
-    def __init__(self, event: TaskDTO, task_app: TaskApp, config: Optional[TaskConfig] = None):
-        self.func: Callable = self.task_registry[event.name]
-        self.event: TaskDTO = event
+    def __init__(self, task: TaskDTO, task_app: TaskApp, config: Optional[TaskConfig] = None):
+        self.func: TaskFunc = self.task_registry[task.name]
+        # self.event: TaskDTO = event
         self.app: TaskApp = task_app
-        self.state: Optional[TaskDTO] = None
-        self.config: Optional[TaskConfig] = config or default_config
-        if event.task_id:
+        self.state: TaskDTO = task
+        self.config: TaskConfig = config or default_config
+        if task.id:
             self.refresh_task_data()
     
     @classmethod
-    def add_task_func(cls, func: Callable):
+    def add_task_func(cls, func: TaskFunc):
         func_name = func.__name__
         if cls.task_registry.get(func_name) and cls.task_registry.get(func_name) is not func:
-            raise RuntimeError(f"Duplicate functions with name: {func_name} please rename: {func}")
+            raise DuplicateTaskName(f"Duplicate functions with name: {func_name} please rename: {func}")
         cls.task_registry[func_name] = func
 
     def refresh_task_data(self):
@@ -80,10 +83,10 @@ class Task:
 
     def queue(self) -> "TaskPromise":
         # Send task to queue
-        self.state = self.app.uow.task.create(TaskCreateDTO(
+        self.state = self.app.uow.task.create(TaskDTO(
             status="pending",
-            name=self.event.name,
-            params=self.event.params,
+            name=self.state.name,
+            params=self.state.params,
             created_at=datetime.now(),
             updated_at=datetime.now()
         ))
@@ -92,19 +95,21 @@ class Task:
             self.state = self.update(status="queued")
         return TaskPromise(self)
 
-    def execute(self):
+    def execute(self) -> Any:
         # Create task instance + state
-        self.state = self.update(self.state.id, status="running")
+        self.state = self.update(status="running")
 
         try:
             logger.info(f"Running task: {self.state.name}, id: {self.state.id}")
-            self.func(self.state.event)
+            result: Any = self.func(self.state)
         except Exception as e:
             logger.error(f"Error running task: {self.state.name}, id: {self.state.id}, error: {e}")
-            self.state = self.update(self.state.id, status="error", error=e)
+            self.state = self.update(status="error", error=e)
 
         # Update Task status
-        self.state = self.update(self.state.id, status="completed")
+        self.state = self.update(status="completed")
+
+        return result 
 
 
 class TaskPromise:
@@ -127,20 +132,19 @@ class TaskPromise:
 
 class TaskFunc(object):
     
-    def __init__(self, func: Callable, task_app: TaskApp, args: Dict, kwargs: Dict):
+    def __init__(self, func: TaskFunc, task_app: TaskApp, config: Optional[TaskConfig] = None):
         Task.add_task_func(func)
 
-        self.func: Callable = func
+        self.func: TaskFunc = func
         self.app: TaskApp = task_app
-        self.args: Dict = args
-        self.kwargs: Dict = kwargs
+        self.config: Optional[TaskConfig] = config or default_config
     
-    def queue(self, **kwargs) -> TaskPromise:
-        event = TaskDTO(task_name=self.func.__name__, args=kwargs)
-        return Task(event, self.app).queue()
+    def queue(self, params: Optional[Dict] = None) -> TaskPromise:
+        task = TaskDTO(name=self.func.__name__, params=params)
+        return Task(task, self.app).queue()
 
-    def __call__(self, *args, **kwargs):
-        self.func(*args, **kwargs)
+    def __call__(self, event: TaskDTO):
+        return self.func(event)
     
 
 if __name__ == "__main__":
@@ -155,7 +159,7 @@ if __name__ == "__main__":
         print(event)
 
     # run task directly
-    task_result = task_A(name="example", status="running")
+    task_result = task_A(params=dict(name="example", status="running"))
 
     # queue task
     task_queue_instance: TaskPromise = task_A.queue()

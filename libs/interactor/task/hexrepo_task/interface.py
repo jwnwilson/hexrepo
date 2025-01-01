@@ -6,18 +6,15 @@ from hexrepo_db.interface import UOW, Repository
 from pydantic import BaseModel
 
 
-class TaskCreateDTO(BaseModel):
+class TaskDTO(BaseModel):
+    id: Optional[UUID] = None
     task_id: Optional[UUID] = None
     name: str
-    params: Dict
-    created_at: datetime
-    updated_at: datetime
-    status: str
-    error: Optional[Dict]
-
-
-class TaskDTO(TaskCreateDTO):
-    id: UUID
+    params: Optional[Dict] = None
+    created_at: datetime = datetime.now()
+    updated_at: datetime = datetime.now()
+    status: str = "pending"
+    error: Optional[Dict] = None    
 
 
 class TaskUpdateDTO(BaseModel):
@@ -39,6 +36,7 @@ class TaskArgs(BaseModel):
 
 class QueueConfig(BaseModel):
     queue: str
+    endpoint_url: Optional[str] = None
     queue_url: Optional[str] = None
 
 

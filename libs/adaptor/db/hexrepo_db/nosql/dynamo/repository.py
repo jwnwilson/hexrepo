@@ -108,13 +108,18 @@ class DynamoRepository(Repository):
                     conditions.append(Attr(key).is_in([v for v in value]))
             return reduce(and_, conditions)
 
+    def _convert_fields_to_str(self, record_data: Dict[str, Any]) -> Dict[str, Any]:
+        for key in record_data.keys():
+            if isinstance(record_data[key], (UUID, datetime)):
+                record_data[key] = str(record_data[key])
+        return record_data
+    
     def create(self, obj_in: ModelDTO) -> ModelDTO:
         record_data: Dict[str, Any] = obj_in.model_dump()
         record_data["id"] = str(uuid4())
+        # Handle datetime and uuid fields
+        record_data = self._convert_fields_to_str(record_data)
         self.table.put_item(Item=record_data)
-        # table_data: Dict[str, Any] = self.table.get_item(
-        #     Key={"id": record_data["id"]}
-        # )
         return self.model_dto(**record_data)
 
     def read(self, id: UUID) -> ModelDTO:

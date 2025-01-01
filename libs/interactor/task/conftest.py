@@ -5,6 +5,7 @@ import pytest
 from hexrepo_task.interface import QueueConfig, TaskUOW as UOW, QueueAdapter
 from hexrepo_task.adaptor.db.nosql import DynamoUOW
 from hexrepo_task.adaptor.queue.aws import SqsQueueAdapter
+from hexrepo_task.app import Task
 
 
 @pytest.fixture
@@ -23,6 +24,11 @@ def create_tables(uow: UOW):
     uow.create_all()
 
 
+@pytest.fixture(scope="function", autouse=True)
+def clear_task_registry():
+    Task.task_registry = {}
+
+
 @pytest.fixture
 def queue() -> Generator[QueueAdapter, None, None]:
     """
@@ -30,7 +36,7 @@ def queue() -> Generator[QueueAdapter, None, None]:
     """
     config: QueueConfig = QueueConfig(
         queue="test-queue",
-        queue_url="http://localhost.localstack.cloud:4566"
+        endpoint_url="http://localhost.localstack.cloud:4566"
     )
     queue = SqsQueueAdapter(config)
     try:

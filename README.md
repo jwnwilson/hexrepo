@@ -47,12 +47,13 @@ AWS_SECRET_ACCESS_KEY
     - Setup serverless orchestration
         - test with local stack
         - use localstack across project
-        - SQS + lambda
+        - 1 task table per hexrepo
     - Play with AI crawler project 
         - Setup crawl spider
         - Store data in graph format and visualise it
         - Categorise web pages
     - Create serverless orchestrator project 
+        - Setup ECS for long running async orchestrator on fargate
         - Setup workflow orchestration
         - Setup Idempotent re-run
         - Dectorator based workflow setup e.g.:
