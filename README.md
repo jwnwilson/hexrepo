@@ -8,7 +8,7 @@ Features include:
 
 - CLI commands to setup projects
 - CLI to create libraries and add them to project
-- Auto update projects when a library is updated
+- Auto update projects when a library is updated 
 - Auto update infra as code when shared infra as code is modified
 - Local debugging of library code while developing
 - Automatic deployment of libraries and projects 
@@ -45,7 +45,8 @@ AWS_SECRET_ACCESS_KEY
 - Destroy all infra on main branch then re-deploy using this branch before mering!
 - Setup backend
     - Setup serverless async tasks
-        - deploy and validate task logic in project
+        - Add tests to example to validate event logic
+        - deploy and validate task logic in aws
     - Play with AI crawler project 
         - Setup crawl spider for PLP pages
         - Store data in graph format and visualise it
@@ -84,6 +85,7 @@ AWS_SECRET_ACCESS_KEY
 - Investigate setting up company services
     - Create generic hexrepo setup cli tool to setup projects like turborepo
     - Feature Flagging / A / B testing
+    - Good stack tracing / logging
     - Switching calculation verisons
     - Analytics
     - JIRA / Confluence
