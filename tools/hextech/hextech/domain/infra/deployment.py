@@ -158,7 +158,7 @@ def create_env_infra(config: MonorepoConfig, env: str, no_input: bool = False) -
     typer.echo("Shared infrastructure apply complete.")
 
 
-def destroy_env_infra(config: MonorepoConfig, env: str, no_input: bool = False) -> None:
+def destroy_env_infra(config: MonorepoConfig, env: str) -> None:
     typer.echo("Destroying shared infrastructure...")
     with chdir("infra"):
         run_system_command("make tf_env_init")

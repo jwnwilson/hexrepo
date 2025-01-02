@@ -81,12 +81,9 @@ def destroy():
     if prompt_destroy():
         for project in get_projects():
             run_system_command(f"cd projects/{project} && make tf_destroy")
-        for lib in get_libraries():
-            lib_type = get_library_type(lib)
-            run_system_command(f"cd libs/{lib_type}/{lib} && make tf_destroy")
         for env in config.environments:
-            destroy_env_infra(config, env, destroy=True)
-        destroy_shared_infra(config, destroy=True)
+            destroy_env_infra(config, env)
+        destroy_shared_infra(config)
 
 
 @app.command()
