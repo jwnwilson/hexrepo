@@ -34,6 +34,13 @@ def create_shared_infra(config: MonorepoConfig) -> None:
     typer.echo("Infrastructure setup complete.")
 
 
+def destroy_shared_infra(config: MonorepoConfig, no_input: bool = False) -> None:
+    typer.echo("Destroying shared infrastructure...")
+    with chdir("infra"):
+        run_system_command("make tf_shared_destroy")
+    typer.echo("Shared infrastructure destroyed.")
+    
+
 def publish_libs(
     config: MonorepoConfig,
     libraries: Optional[List[str]] = None,
@@ -149,6 +156,18 @@ def create_env_infra(config: MonorepoConfig, env: str, no_input: bool = False) -
         else:
             run_system_command("make tf_env_apply")
     typer.echo("Shared infrastructure apply complete.")
+
+
+def destroy_env_infra(config: MonorepoConfig, env: str, no_input: bool = False) -> None:
+    typer.echo("Destroying shared infrastructure...")
+    with chdir("infra"):
+        run_system_command("make tf_env_init")
+        try:
+            run_system_command(f"ENVIRONMENT={env} make tf_workspace")
+        except:  # noqa
+            pass
+        run_system_command("make tf_env_destroy")
+    typer.echo("Shared infrastructure destroyed.")
 
 
 def get_terrform_output(env: str, project: str) -> str:

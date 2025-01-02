@@ -92,6 +92,10 @@ start_infra: hextech
 	@echo "Starting infra..."
 	hextech start-infra
 
+destroy_infra: hextech
+	@echo "Destroying infra..."
+	hextech destroy
+
 bastion: hextech
 	@echo "Starting bastion..."
 	hextech bastion
