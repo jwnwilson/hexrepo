@@ -62,3 +62,10 @@ def test_example_delete(client: TestClient, created_example):
     # Verify the delete
     response = client.get(f"/api/v1/example/{company_id}")
     assert response.status_code == 404
+
+
+def test_example_create_task(client: TestClient):
+    response = client.post("/api/v1/example/task")
+    
+    assert queue.get_task() is not None
+    assert response.status_code == 204
