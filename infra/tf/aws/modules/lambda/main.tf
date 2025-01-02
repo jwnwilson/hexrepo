@@ -110,7 +110,7 @@ resource "aws_lambda_permission" "allow_cloudwatch" {
   source_arn    = aws_cloudwatch_event_rule.schedule_lambda[count.index].arn
 }
 
-resource "aws_iam_policy" "sqs-secret-lambda-policy" {
+resource "aws_iam_policy" "lambda-policy" {
   name        = "${var.project}-${var.environment}-lambda-policy"
   description = "allow lambda access necessary resources"
 
@@ -151,8 +151,8 @@ resource "aws_iam_policy" "sqs-secret-lambda-policy" {
 EOF
 }
 
-resource "aws_iam_role_policy_attachment" "sqs-attach" {
+resource "aws_iam_role_policy_attachment" "permissions-attach" {
   role       = module.lambda.lambda_role_name
-  policy_arn = aws_iam_policy.sqs-secret-lambda-policy.arn
+  policy_arn = aws_iam_policy.lambda-policy.arn
 }
 

@@ -5,7 +5,6 @@
     "use_api": "y",
     "use_db": "y",
     "use_storage": "y",
-    "use_task": "y",
     "api_domain": "jwnwilson.co.uk",
     "use_db_logic": [
         "sql",
