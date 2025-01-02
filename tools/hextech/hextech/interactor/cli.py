@@ -12,6 +12,8 @@ from hextech.domain.infra.bastion import bastion_ssh_tunnel
 from hextech.domain.infra.deployment import (
     create_env_infra,
     create_shared_infra,
+    destroy_env_infra,
+    destroy_shared_infra,
     plan_env_infra_command,
     publish_libs,
     shared_infra_apply_command,
@@ -38,6 +40,7 @@ from hextech.domain.prompts.common import (
 from hextech.domain.prompts.infra import (
     prompt_setup_lib_infra,
     prompt_setup_project_infra,
+    prompt_destroy,
     prompt_setup_shared_infra,
     prompt_setup_tf,
 )
@@ -72,6 +75,17 @@ def setup():
         create_shared_infra(config)
         for env in config.environments:
             create_env_infra(config, env)
+
+@app.command()
+def destroy():
+    config: MonorepoConfig
+    config, _ = get_or_create_config(no_input=True)
+    if prompt_destroy():
+        for project in get_projects():
+            run_system_command(f"cd projects/{project} && make tf_destroy")
+        for env in config.environments:
+            destroy_env_infra(config, env)
+        destroy_shared_infra(config)
 
 
 @app.command()
