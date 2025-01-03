@@ -106,6 +106,8 @@ def create_library():
 
 @app.command()
 def create_project():
+    # rm template .venv folder to speed up cookectter
+    os.system("rm -r templates/project/.venv 2> /dev/null || echo > /dev/null")        
     # CD to projects folder
     with chdir("projects"):
         # Run cookie cutter command to copy template
