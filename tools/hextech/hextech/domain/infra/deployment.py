@@ -34,7 +34,7 @@ def create_shared_infra(config: HexrepoConfig) -> None:
     typer.echo("Infrastructure setup complete.")
 
 
-def destroy_shared_infra(config: MonorepoConfig, no_input: bool = False) -> None:
+def destroy_shared_infra(config: HexrepoConfig, no_input: bool = False) -> None:
     typer.echo("Destroying shared infrastructure...")
     with chdir("infra"):
         run_system_command("make tf_shared_destroy")
@@ -158,7 +158,7 @@ def create_env_infra(config: HexrepoConfig, env: str, no_input: bool = False) ->
     typer.echo("Shared infrastructure apply complete.")
 
 
-def destroy_env_infra(config: MonorepoConfig, env: str) -> None:
+def destroy_env_infra(config: HexrepoConfig, env: str) -> None:
     typer.echo("Destroying shared infrastructure...")
     with chdir("infra"):
         run_system_command("make tf_env_init")

@@ -78,7 +78,7 @@ def setup():
 
 @app.command()
 def destroy():
-    config: MonorepoConfig
+    config: HexrepoConfig
     config, _ = get_or_create_config(no_input=True)
     if prompt_destroy():
         for project in get_projects():
