@@ -13,7 +13,7 @@ dependencies = [
     "boto3<2.0.0,>=1.35.58",
     "pydantic-settings<3.0.0,>=2.6.1",
     "boto3-stubs[essential]<2.0.0,>=1.35.86",
-    "monorepo-cloud",
+    "hexrepo-cloud",
     "typer-slim>=0.15.1",
 ]
 
