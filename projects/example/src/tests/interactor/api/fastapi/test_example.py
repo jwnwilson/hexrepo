@@ -1,6 +1,8 @@
 import pytest
 from fastapi.testclient import TestClient
 
+from hexrepo_task.interface import QueueAdapter
+
 
 @pytest.fixture
 def example_data_missing_url():
@@ -64,7 +66,7 @@ def test_example_delete(client: TestClient, created_example):
     assert response.status_code == 404
 
 
-def test_example_create_task(client: TestClient):
+def test_example_create_task(client: TestClient, queue: QueueAdapter):
     response = client.post("/api/v1/example/task")
     
     assert queue.get_task() is not None

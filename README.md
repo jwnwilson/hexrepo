@@ -42,10 +42,10 @@ AWS_SECRET_ACCESS_KEY
 
 # To Do
 
-- Destroy all infra on main branch then re-deploy using this branch before mering!
 - Setup backend
     - Setup serverless async tasks
         - Add tests to example to validate event logic
+            - Add logic to handle generator dependency wrapping task & queue. Might need to create queue dependency to queue tasks
         - deploy and validate task logic in aws
     - Play with AI crawler project 
         - Setup crawl spider for PLP pages

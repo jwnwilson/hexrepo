@@ -36,6 +36,7 @@ class TaskApp:
     @property
     def uow(self) -> UOW:
         if self._uow is None:
+            breakpoint()
             self._uow = self.get_uow()
         return self._uow
 
