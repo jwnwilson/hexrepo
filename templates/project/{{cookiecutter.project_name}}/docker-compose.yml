@@ -76,6 +76,6 @@ volumes:
   {% if cookiecutter.use_db == "y" and cookiecutter.use_db_logic == 'sql' %}
   postgres_db:
   {% endif %}
-  {% if cookiecutter.use_db == "y" and cookiecutter.use_db_logic == 'nosql' %}
+  {% if cookiecutter.use_db == "y" and cookiecutter.use_db_logic == 'nosql' or cookiecutter.use_task %}
   localstack:
   {% endif %}
