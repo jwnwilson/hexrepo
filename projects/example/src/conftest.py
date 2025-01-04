@@ -4,6 +4,7 @@ from collections.abc import Generator
 import pytest
 from fastapi.testclient import TestClient
 from hexrepo_db.interface import UOW
+from hexrepo_task.adaptor.db.nosql.uow import QueueUOW
 from hexrepo_task.interface import QueueAdaptor, QueueConfig
 from hexrepo_task.adaptor.queue import SqsQueueAdaptor
 
@@ -67,4 +68,22 @@ def queue() -> Generator[QueueAdaptor, None, None]:
     Return a queue object.
     """
     config: QueueConfig = QueueConfig(queue="sqs", endpoint_url="http://localhost.localstack.cloud:4566")
-    return SqsQueueAdaptor(config=config)
+    queue_adapater: SqsQueueAdaptor = SqsQueueAdaptor(config=config)
+    queue_adapater.create_queue("hexrepo-tasks")
+    return queue_adapater 
+
+
+@pytest.fixture
+def queue_uow() -> Generator[UOW, None, None]:
+    """
+    Return db adaptor with initialised DB & DB session.
+    """
+    uow = QueueUOW(db_url="http://localhost.localstack.cloud:4566")
+    # Create DB session
+    yield uow
+
+
+@pytest.fixture(scope="function", autouse=True)
+def create_tables_queue_uow(queue_uow: UOW):
+    queue_uow.drop_all()
+    queue_uow.create_all()

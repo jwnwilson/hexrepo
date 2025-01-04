@@ -47,7 +47,7 @@ run: down db venv
 	PYTHONPATH=src uv run uvicorn app.interactor.api.fastapi.main:app --reload --env-file env/local.env
 
 db:
-	docker compose run --service-ports -d postgres_db 
+	docker compose up -d postgres_db localstack
 
 down:
 	docker compose down
