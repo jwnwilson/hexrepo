@@ -1,1 +1,1 @@
-from .aws import SqsQueueAdapter as SqsQueueAdapter
+from .aws import SqsQueueAdaptor as SqsQueueAdaptor

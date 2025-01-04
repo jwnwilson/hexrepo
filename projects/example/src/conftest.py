@@ -4,8 +4,8 @@ from collections.abc import Generator
 import pytest
 from fastapi.testclient import TestClient
 from hexrepo_db.interface import UOW
-from hexrepo_task.interface import QueueAdapter, QueueConfig
-from hexrepo_task.adaptor.queue import SqsQueueAdapter
+from hexrepo_task.interface import QueueAdaptor, QueueConfig
+from hexrepo_task.adaptor.queue import SqsQueueAdaptor
 
 from app.adaptor.db.sql.uow import SqlUOW
 from app.domain.example import ExampleDTO
@@ -62,9 +62,9 @@ def created_example(client: TestClient, example_data) -> ExampleDTO:
 
 
 @pytest.fixture
-def queue() -> Generator[QueueAdapter, None, None]:
+def queue() -> Generator[QueueAdaptor, None, None]:
     """
     Return a queue object.
     """
     config: QueueConfig = QueueConfig(queue="sqs", endpoint_url="http://localhost.localstack.cloud:4566")
-    return SqsQueueAdapter(config=config)
+    return SqsQueueAdaptor(config=config)

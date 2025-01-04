@@ -3,14 +3,14 @@ from uuid import uuid4
 import pytest
 from hexrepo_db.nosql.dynamo.models.example import ExampleUOW
 
-from hexrepo_task.adaptor.queue.aws import SqsQueueAdapter
+from hexrepo_task.adaptor.queue.aws import SqsQueueAdaptor
 from hexrepo_task.app import Dependency, TaskApp, TaskFuncWrapper, TaskPromise
 from hexrepo_task.exception import DuplicateTaskName
 from hexrepo_task.interface import TaskDTO
 
 
 @pytest.fixture
-def create_task_app(uow: ExampleUOW, queue: SqsQueueAdapter):
+def create_task_app(uow: ExampleUOW, queue: SqsQueueAdaptor):
     def get_uow():
         return uow
 
@@ -38,7 +38,7 @@ def test_duplicate_task(create_task_app):
             return event.params["name"]
 
 
-def test_aws_queue_task(create_task_app, queue: SqsQueueAdapter):
+def test_aws_queue_task(create_task_app, queue: SqsQueueAdaptor):
     app: TaskApp
     task_A: TaskFuncWrapper
     app, task_A = create_task_app
@@ -57,7 +57,7 @@ def test_aws_queue_task(create_task_app, queue: SqsQueueAdapter):
         assert event.id == task_queue_instance.task.state.id
 
 
-def test_aws_handle_task(create_task_app, queue: SqsQueueAdapter):
+def test_aws_handle_task(create_task_app, queue: SqsQueueAdaptor):
     app: TaskApp
     task_A: TaskFuncWrapper
     app, task_A = create_task_app
@@ -77,7 +77,7 @@ def test_aws_handle_task(create_task_app, queue: SqsQueueAdapter):
     assert task_queue_instance.task.state.status == "completed"
 
 
-def test_aws_queue_multiple_task(create_task_app, queue: SqsQueueAdapter):
+def test_aws_queue_multiple_task(create_task_app, queue: SqsQueueAdaptor):
     app: TaskApp
     task_A: TaskFuncWrapper
     app, task_A = create_task_app
@@ -102,7 +102,7 @@ def test_aws_queue_multiple_task(create_task_app, queue: SqsQueueAdapter):
         assert no_task is None
 
 
-def test_aws_task_error_handled(create_task_app, queue: SqsQueueAdapter):
+def test_aws_task_error_handled(create_task_app, queue: SqsQueueAdaptor):
     app: TaskApp
     task_A: TaskFuncWrapper
     app, task_A = create_task_app
@@ -126,7 +126,7 @@ def test_aws_task_error_handled(create_task_app, queue: SqsQueueAdapter):
     assert task_queue_instance.task.state.status == "error"
 
 
-def test_aws_task_dependency(create_task_app, queue: SqsQueueAdapter):
+def test_aws_task_dependency(create_task_app, queue: SqsQueueAdaptor):
     app: TaskApp
     task_A: TaskFuncWrapper
     app, task_A = create_task_app

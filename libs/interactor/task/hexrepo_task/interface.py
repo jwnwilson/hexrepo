@@ -49,7 +49,7 @@ class QueueConfig(BaseModel):
     queue_url: Optional[str] = None
 
 
-class QueueAdapter(ABC):
+class QueueAdaptor(ABC):
     def __init__(
         self,
         config: QueueConfig,

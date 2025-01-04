@@ -8,12 +8,12 @@ from typing import Any, Dict, Optional
 
 import boto3
 
-from hexrepo_task.interface import QueueAdapter, QueueConfig, TaskDTO
+from hexrepo_task.interface import QueueAdaptor, QueueConfig, TaskDTO
 
 logger = logging.getLogger(__name__)
 
 
-class SqsQueueAdapter(QueueAdapter):
+class SqsQueueAdaptor(QueueAdaptor):
     def __init__(self, config: QueueConfig):
         # Create SQS client
         if config.endpoint_url:

@@ -2,9 +2,9 @@ from collections.abc import Generator
 
 import pytest
 
-from hexrepo_task.interface import QueueConfig, TaskUOW as UOW, QueueAdapter
+from hexrepo_task.interface import QueueConfig, TaskUOW as UOW, QueueAdaptor
 from hexrepo_task.adaptor.db import QueueUOW
-from hexrepo_task.adaptor.queue.aws import SqsQueueAdapter
+from hexrepo_task.adaptor.queue.aws import SqsQueueAdaptor
 from hexrepo_task.app import Task
 
 
@@ -30,7 +30,7 @@ def clear_task_registry():
 
 
 @pytest.fixture
-def queue() -> Generator[QueueAdapter, None, None]:
+def queue() -> Generator[QueueAdaptor, None, None]:
     """
     Return db adaptor with initialised DB & DB session.
     """
@@ -38,7 +38,7 @@ def queue() -> Generator[QueueAdapter, None, None]:
         queue="test-queue",
         endpoint_url="http://localhost.localstack.cloud:4566"
     )
-    queue = SqsQueueAdapter(config)
+    queue = SqsQueueAdaptor(config)
     try:
         queue.delete_queue("test-queue")
     except Exception:

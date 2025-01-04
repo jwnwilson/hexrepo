@@ -5,7 +5,7 @@ from pydantic import BaseModel
 
 from app.config import config
 {% if cookiecutter.use_task == "y" %}
-from hexrepo_task import QueueAdapter, SqsQueueAdapter
+from hexrepo_task import QueueAdaptor, SqsQueueAdaptor
 from hexrepo_task.adaptor.db import QueueUOW
 {% endif %}
 {% if cookiecutter.use_db == "y" %}
@@ -65,7 +65,7 @@ def get_queue_uow() -> Generator[UOW, None, None]:
     yield uow
 
 
-def get_task_queue() -> Generator[QueueAdapter, None, None]:
-    queue = SqsQueueAdapter(queue="hexrepo-tasks")
+def get_task_queue() -> Generator[QueueAdaptor, None, None]:
+    queue = SqsQueueAdaptor(queue="hexrepo-tasks")
     yield queue
 {% endif %}

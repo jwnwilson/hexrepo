@@ -6,18 +6,18 @@ from datetime import datetime
 from typing import Any, Callable, Dict, Generator, Optional, cast
 from uuid import UUID
 
-from hexrepo_task.exception import DuplicateTaskName
+from hexrepo_task.exception import DuplicateTaskName, TaskNotFound
 
 from .config import TaskConfig
 from .config import config as default_config
-from .interface import QueueAdapter, TaskCreateDTO, TaskDTO, TaskUpdateDTO
+from .interface import QueueAdaptor, TaskCreateDTO, TaskDTO, TaskUpdateDTO
 from .interface import TaskUOW as UOW
 
 logger = logging.getLogger(__name__)
 
 
 TaskFunc = Callable[[TaskDTO], Any]
-GetQueue = Callable[[], QueueAdapter]
+GetQueue = Callable[[], QueueAdaptor]
 GetUOW = Callable[[], UOW]
 
 
@@ -30,7 +30,7 @@ class TaskApp:
         self._get_uow: GetUOW = get_uow
 
     @contextmanager
-    def get_queue(self) -> Generator[QueueAdapter, None, None]:
+    def get_queue(self) -> Generator[QueueAdaptor, None, None]:
         queue = self._get_queue()
         if isinstance(queue, Generator):
             yield queue
@@ -61,9 +61,7 @@ class TaskApp:
     def task(self, func: TaskFunc, **config) -> "TaskFuncWrapper":
         """Task decorator to register task functions"""
         self.add_task_func(func)
-
-        task_config: TaskConfig = TaskConfig(**config)
-        return TaskFuncWrapper(func, self, config=task_config)
+        return TaskFuncWrapper(func)
 
     def handle(self, event: Dict | TaskDTO) -> Any:
         """Handle event and run task"""
@@ -74,7 +72,7 @@ class TaskApp:
         with self.get_queue() as queue, self.get_uow() as uow:
             # Execute task
             try:
-                task_adaptor: TaskAdapter = self._get_task_adaptor(uow, queue)
+                task_adaptor: TaskAdaptor = self._get_task_adaptor(uow, queue)
                 return task_adaptor.execute(task)
             except Exception as e:
                 logger.error(
@@ -95,29 +93,33 @@ class TaskApp:
                 )
                 raise
 
-    def _get_task_adaptor(self, uow: UOW, queue: QueueAdapter) -> "Task":
+    def _get_task_adaptor(self, uow: UOW, queue: QueueAdaptor) -> "Task":
         """Get task by name"""
-        return TaskAdapter(task_app=self, uow=uow, queue=queue, config=self.config)
+        return TaskAdaptor(task_app=self, uow=uow, queue=queue, config=self.config)
 
     def _parse_event(self, event: Dict) -> TaskDTO:
         """Parse event data"""
         return TaskDTO(**event)
 
 
-class TaskAdapter:
+class TaskAdaptor:
     """
     Task Adaptor to handle task data and queue operations
     """
     def __init__(
-        self, app: TaskApp, uow:UOW, queue: QueueAdapter, config: Optional[TaskConfig] = None
+        self, app: TaskApp, uow:UOW, queue: QueueAdaptor, config: Optional[TaskConfig] = None
     ):
         self._app: TaskApp = app
         self._uow: UOW = uow
-        self._queue: QueueAdapter = queue
+        self._queue: QueueAdaptor = queue
         self._config: TaskConfig = config or default_config
 
-    def read(self, task: TaskDTO) -> TaskDTO:
-        self.state = self._uow.task.read(self.state.id)
+    def _validate_task(self, task: TaskDTO | TaskCreateDTO):
+        if not task.name in self._app.task_registry:
+            raise TaskNotFound(f"Task not found: {task.name}")
+
+    def read(self, id: UUID) -> TaskDTO:
+        return self._uow.task.read(id)
 
     def update(self, id: UUID, task: TaskUpdateDTO) -> TaskDTO:
         # validate kwargs
@@ -125,6 +127,7 @@ class TaskAdapter:
 
     def queue(self, task_data: TaskCreateDTO) -> "TaskPromise":
         # Send task to queue
+        self._validate_task(task_data)
         task: TaskDTO = self._uow.task.create(task_data)
         try:
             logger.info(f"Queueing task: {task.name}, id: {task.id}")
@@ -142,6 +145,7 @@ class TaskAdapter:
 
     def execute(self, task: TaskDTO) -> Any:
         # Create task instance + state
+        self._validate_task(task)
         task = self.update(task.id, TaskUpdateDTO(status="running"))
         func: TaskFunc = self._app.task_registry[task.name]
         try:
@@ -164,9 +168,9 @@ class TaskAdapter:
 
 
 class TaskPromise:
-    def __init__(self, task: TaskDTO, task_adaptor: TaskAdapter, timeout: int = 30):
+    def __init__(self, task: TaskDTO, task_adaptor: TaskAdaptor, timeout: int = 30):
         self.task: TaskDTO = task
-        self.task_adaptor: TaskAdapter = task_adaptor
+        self.task_adaptor: TaskAdaptor = task_adaptor
         self.timeout: int = timeout
 
     def wait(self) -> None:
@@ -196,7 +200,6 @@ class TaskFuncWrapper:
     """
     Call task function and handle dependencies
     """
-
     def __init__(self, func: TaskFunc):
         self.func: TaskFunc = func
 
@@ -231,8 +234,8 @@ class TaskFuncWrapper:
 
 # if __name__ == "__main__":
 
-#     def get_queue() -> QueueAdapter:
-#         return SqsQueueAdapter(queue="hexrepo-tasks")
+#     def get_queue() -> QueueAdaptor:
+#         return SqsQueueAdaptor(queue="hexrepo-tasks")
 #     def get_uow() -> UOW:
 #         return DynamoUOW()
 
