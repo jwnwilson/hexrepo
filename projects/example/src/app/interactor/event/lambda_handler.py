@@ -1,5 +1,5 @@
-from .tasks.app import app
+from .tasks import task_app
 
 
 def handler(event, context):
-    return app.handle(event)
+    return task_app.handle(event)

@@ -6,7 +6,7 @@ from fastapi.testclient import TestClient
 from hexrepo_db.interface import UOW
 from hexrepo_task.adaptor.db.nosql.uow import QueueUOW
 from hexrepo_task.adaptor.queue import SqsQueueAdaptor
-from hexrepo_task.app import TaskAdaptor
+from hexrepo_task.app import TaskAdaptor, TaskApp
 from hexrepo_task.interface import QueueAdaptor, QueueConfig
 
 from app.adaptor.db.sql.uow import SqlUOW
@@ -53,6 +53,18 @@ def client(uow, task_adaptor) -> TestClient:
 
 
 @pytest.fixture
+def task_client(queue_uow, queue) -> TestClient:
+    def get_uow_override():
+        yield queue_uow
+
+    def get_queue_override():
+        yield queue
+
+    app: TaskApp = TaskApp(get_uow=get_uow_override, get_queue=get_queue_override) 
+    return app
+
+
+@pytest.fixture
 def example_data():
     return {
         "name": "test",
@@ -77,6 +89,10 @@ def queue() -> Generator[QueueAdaptor, None, None]:
         endpoint_url="http://localhost.localstack.cloud:4566",
     )
     queue_adapater: SqsQueueAdaptor = SqsQueueAdaptor(config=config)
+    try:
+        queue_adapater.delete_queue("hexrepo-tasks")
+    except:
+        pass
     queue_adapater.create_queue("hexrepo-tasks")
     return queue_adapater
 

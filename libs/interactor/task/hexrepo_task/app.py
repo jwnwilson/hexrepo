@@ -25,27 +25,28 @@ class TaskApp:
     # Initialise task app to configure how tasks are run
     task_registry: Dict[str, Callable] = {}
 
-    def __init__(self, get_queue: GetQueue, get_uow: GetUOW):
+    def __init__(self, get_queue: GetQueue, get_uow: GetUOW, config: Optional[TaskConfig] = None):
         self._get_queue: GetQueue = get_queue
         self._get_uow: GetUOW = get_uow
+        self.config: TaskConfig = config or default_config
 
     @contextmanager
     def get_queue(self) -> Generator[QueueAdaptor, None, None]:
         queue = self._get_queue()
         if isinstance(queue, Generator):
-            yield queue
-            next(queue)
+            for _ in queue:
+                yield _
         else:
-            return queue
+            yield queue
         
     @contextmanager
     def get_uow(self) -> Generator[UOW, None, None]:
         uow = self._get_uow()
         if isinstance(uow, Generator):
-            yield uow
-            next(uow)
+            for _ in uow:
+                yield _
         else:
-            return uow
+            yield uow
     
     def add_task_func(self, func: TaskFunc):
         func_name = func.__name__
@@ -80,24 +81,23 @@ class TaskApp:
                 )
                 raise
 
-    def queue_task(self, func: str | TaskFunc, param: Dict) -> "TaskPromise":
+    def queue_task(self, func: str | TaskFunc, params: Dict) -> "TaskPromise":
         """Queue task from app initialising deodependencies"""
         # Check name is right even with wrapper
         func_name = func if isinstance(func, str) else func.__name__
-        event: TaskCreateDTO = TaskCreateDTO(name=func_name, param=param)
         with self.get_queue() as queue, self.get_uow() as uow:
             try:
-                task_adaptor: TaskAdaptor = self._get_task_adaptor(event, uow, queue)
-                return task_adaptor.queue(event)
+                task_adaptor: TaskAdaptor = self._get_task_adaptor(uow, queue)
+                return task_adaptor.queue(func, params)
             except Exception as e:
                 logger.error(
-                    f"Error queueing task: {func_name}, param: {param}, error: {e}"
+                    f"Error queueing task: {func_name}, param: {params}, error: {e}"
                 )
                 raise
 
     def _get_task_adaptor(self, uow: UOW, queue: QueueAdaptor) -> "TaskAdaptor":
         """Get task by name"""
-        return TaskAdaptor(task_app=self, uow=uow, queue=queue, config=self.config)
+        return TaskAdaptor(app=self, uow=uow, queue=queue, config=self.config)
 
     def _parse_event(self, event: Dict) -> TaskDTO:
         """Parse event data"""
@@ -127,10 +127,10 @@ class TaskAdaptor:
         # validate kwargs
         return self._uow.task.update(id, task)
 
-    def queue(self, func: str | TaskFunc, param: Dict) -> "TaskPromise":
+    def queue(self, func: str | TaskFunc, params: Dict) -> "TaskPromise":
         # Send task to queue
         func_name: str = func if isinstance(func, str) else func.__name__
-        task_data: TaskCreateDTO = TaskCreateDTO(name=func_name, param=param)
+        task_data: TaskCreateDTO = TaskCreateDTO(name=func_name, params=params)
         self._validate_task(task_data)
         # Validate task param and error if invalid types
         task: TaskDTO = self._uow.task.create(task_data)
@@ -156,9 +156,9 @@ class TaskAdaptor:
         try:
             logger.info(f"Running task: {task.name}, id: {task.id}")
             task_wrapper: TaskFuncWrapper = TaskFuncWrapper(
-                func, self._app, self._config
+                func
             )
-            result: Any = task_wrapper(self.state)
+            result: Any = task_wrapper(task)
         except Exception as e:
             logger.error(
                 f"Error running task: {task.name}, id: {task.id}, error: {e}"
@@ -226,7 +226,7 @@ class TaskFuncWrapper:
                 dep_return = param.default.get_dependency()
                 if isinstance(dep_return, Generator):
                     dependency_generators[name] = dep_return
-                    dependencies[name] = yield dependency_generators[name]
+                    dependencies[name] = next(dependency_generators[name])
                 else:
                     dependencies[name] = dep_return
             else:
@@ -235,11 +235,16 @@ class TaskFuncWrapper:
 
         # Clean up dependence generators
         for dep in dependency_generators:
-            next(dependency_generators[dep])
+            try:
+                next(dependency_generators[dep])
+            except StopIteration:
+                pass
 
     def __call__(self, task: TaskDTO, **kwargs) -> Any:
-        with self._get_dependencies(self.func, kwargs) as dependencies:
-            return self.func(task, **dependencies)
+        task_kwargs: Dict = kwargs.copy()
+        task_kwargs["task"] = task
+        with self._get_dependencies(self.func, task_kwargs) as dependencies:
+            return self.func(**dependencies)
 
 
 # if __name__ == "__main__":
