@@ -20,14 +20,15 @@ class SqsQueueAdaptor(QueueAdaptor):
             self.sqs = boto3.client("sqs", endpoint_url=config.endpoint_url)
         else:
             self.sqs = boto3.client("sqs")
-        self.queue: str = config.queue
-        self._queue_url: str = config.queue_url
+        self.default_queue: str = config.default_queue
+        self._queue_urls: Dict[str, str] = {}
 
     @property
-    def queue_url(self) -> str:
-        if not self._queue_url:
-            self._queue_url = self.get_queue_url()
-        return self._queue_url
+    def queue_url(self, queue_name: Optional[str] = None) -> str:
+        queue_name = queue_name or self.default_queue
+        if not self._queue_urls.get(queue_name):
+            self._queue_urls[queue_name] = self.get_queue_url()
+        return self._queue_urls[queue_name]
 
     def _convert_fields_to_str(self, record_data: Dict[str, Any]) -> Dict[str, Any]:
         for key in record_data.keys():
@@ -35,16 +36,18 @@ class SqsQueueAdaptor(QueueAdaptor):
                 record_data[key] = str(record_data[key])
         return record_data
 
-    def get_queue_url(self) -> str:
+    def get_queue_url(self, queue_name: Optional[str] = None) -> str:
         try:
-            return self.sqs.get_queue_url(QueueName=self.queue)["QueueUrl"]
+            queue_name = queue_name or self.default_queue
+            return self.sqs.get_queue_url(QueueName=queue_name)["QueueUrl"]
         except self.sqs.exceptions.QueueDoesNotExist:
-            raise ValueError(f"Queue does not exist: {self.queue}")
+            raise ValueError(f"Queue does not exist: {queue_name}")
         except Exception as e:
             raise ValueError(f"Error getting queue url: {e}")
 
-    def add_task(self, task_event: TaskDTO) -> TaskDTO:
+    def add_task(self, task_event: TaskDTO, queue_name: Optional[str] = None) -> TaskDTO:
         # Send message to SQS queue
+        queue_name = queue_name or self.default_queue
         logger.info(f"Creating task: {task_event.id}")
         task_data: Dict = self._convert_fields_to_str(task_event.model_dump())
         sqs_resp = self.sqs.send_message(

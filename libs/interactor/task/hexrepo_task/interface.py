@@ -24,6 +24,7 @@ class TaskUpdateDTO(BaseModel):
     params: Optional[Dict] = None
     status: Optional[str] = None
     error: Optional[str] = None
+    task_id: Optional[UUID] = None
 
 
 class TaskCreateDTO(BaseModel):
@@ -44,7 +45,7 @@ class TaskArgs(BaseModel):
 
 
 class QueueConfig(BaseModel):
-    queue: str
+    default_queue: str
     endpoint_url: Optional[str] = None
     queue_url: Optional[str] = None
 
@@ -56,7 +57,7 @@ class QueueAdaptor(ABC):
     ):
         raise NotImplementedError
 
-    def add_task(self, task_event: TaskDTO) -> TaskDTO:
+    def add_task(self, task_event: TaskDTO, queue_name: Optional[str] = None) -> TaskDTO:
         raise NotImplementedError
 
     @contextmanager

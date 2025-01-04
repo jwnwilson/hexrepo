@@ -21,18 +21,19 @@ router_v1 = CrudRouter(
 
 
 @router_v1.router.post("/task")
-def start_task(task_adaptor: TaskAdaptor = Depends(get_task_adaptor)) -> int:
+def start_task(task_adaptor: TaskAdaptor = Depends(get_task_adaptor)) -> TaskDTO:
     params: CreateExampleDTO = CreateExampleDTO(
         name="example", url="example.com", location="example"
     )
     task_data: TaskCreateDTO = TaskCreateDTO(
-        name="create_example_task", 
-        params=params.model_dump()
+        name="create_example_task", params=params.model_dump()
     )
-    task_adaptor.queue(task_data)
-    return 204
+    task_data: TaskDTO = task_adaptor.queue(task_data).task
+    return task_data
 
 
-@router_v1.router.get("/task")
-def get_task(id: UUID, task_adaptor: TaskAdaptor = Depends(get_task_adaptor)) -> TaskDTO:
+@router_v1.router.get("/task/{id}")
+def get_task(
+    id: UUID, task_adaptor: TaskAdaptor = Depends(get_task_adaptor)
+) -> TaskDTO:
     return task_adaptor.read(id)

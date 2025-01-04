@@ -1,9 +1,9 @@
 import logging
 
-from app.domain.example import CreateExampleDTO
 from hexrepo_task.app import Dependency, TaskApp, TaskDTO
 
 from app.adaptor.db.sql import SqlUOW
+from app.domain.example import CreateExampleDTO
 
 from ...dependencies import get_queue_uow, get_task_queue, get_uow
 

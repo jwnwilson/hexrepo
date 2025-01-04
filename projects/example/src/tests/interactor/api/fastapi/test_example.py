@@ -1,6 +1,7 @@
+from typing import Dict
+
 import pytest
 from fastapi.testclient import TestClient
-
 from hexrepo_task.interface import QueueAdaptor
 
 
@@ -68,6 +69,22 @@ def test_example_delete(client: TestClient, created_example):
 
 def test_example_create_task(client: TestClient, queue: QueueAdaptor):
     response = client.post("/api/v1/example/task")
-    
+    response_data: Dict = response.json()
+
     assert queue.get_task() is not None
-    assert response.status_code == 204
+    assert response.status_code == 200
+    assert response_data["status"] == "queued"
+    assert response_data["name"] == "create_example_task"
+    assert response_data["task_id"]
+    assert response_data["id"]
+
+
+def test_example_get_task(client: TestClient, created_example):
+    response = client.post("/api/v1/example/task")
+    response_data: Dict = response.json()
+
+    response = client.get(f"/api/v1/example/task/{response_data["id"]}")
+    assert response.status_code == 200
+    assert response_data["status"] == "queued"
+    assert response.json()["name"] == "create_example_task"
+    assert response.json()["task_id"]

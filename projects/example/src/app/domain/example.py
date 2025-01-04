@@ -21,4 +21,3 @@ class UpdateExampleDTO(BaseModel):
     name: Optional[str] = None
     url: Optional[str] = None
     location: Optional[str] = None
-

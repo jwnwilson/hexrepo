@@ -140,7 +140,7 @@ class TaskAdaptor:
             )
             self.update(task.id, TaskUpdateDTO(status="error", error=str(e)))
             raise
-        task = self.update(task.id, TaskUpdateDTO(status="queued"))
+        task = self.update(task.id, TaskUpdateDTO(status="queued", task_id=task.task_id))
         return TaskPromise(task, task_adaptor=self)
 
     def execute(self, task: TaskDTO) -> Any:

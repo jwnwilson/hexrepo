@@ -5,8 +5,9 @@ import pytest
 from fastapi.testclient import TestClient
 from hexrepo_db.interface import UOW
 from hexrepo_task.adaptor.db.nosql.uow import QueueUOW
-from hexrepo_task.interface import QueueAdaptor, QueueConfig
 from hexrepo_task.adaptor.queue import SqsQueueAdaptor
+from hexrepo_task.app import TaskAdaptor
+from hexrepo_task.interface import QueueAdaptor, QueueConfig
 
 from app.adaptor.db.sql.uow import SqlUOW
 from app.domain.example import ExampleDTO
@@ -36,14 +37,18 @@ def create_tables(uow: UOW):
 
 
 @pytest.fixture
-def client(uow):
+def client(uow, task_adaptor) -> TestClient:
     from app.interactor.api.fastapi import app
-    from app.interactor.dependencies import get_uow
+    from app.interactor.dependencies import get_task_adaptor, get_uow
 
     def get_uow_override():
         yield uow
 
+    def get_task_adaptor_override():
+        yield task_adaptor
+
     app.dependency_overrides[get_uow] = get_uow_override
+    app.dependency_overrides[get_task_adaptor] = get_task_adaptor_override
     return TestClient(app)
 
 
@@ -67,10 +72,13 @@ def queue() -> Generator[QueueAdaptor, None, None]:
     """
     Return a queue object.
     """
-    config: QueueConfig = QueueConfig(queue="sqs", endpoint_url="http://localhost.localstack.cloud:4566")
+    config: QueueConfig = QueueConfig(
+        default_queue="hexrepo-tasks",
+        endpoint_url="http://localhost.localstack.cloud:4566",
+    )
     queue_adapater: SqsQueueAdaptor = SqsQueueAdaptor(config=config)
     queue_adapater.create_queue("hexrepo-tasks")
-    return queue_adapater 
+    return queue_adapater
 
 
 @pytest.fixture
@@ -81,6 +89,16 @@ def queue_uow() -> Generator[UOW, None, None]:
     uow = QueueUOW(db_url="http://localhost.localstack.cloud:4566")
     # Create DB session
     yield uow
+
+
+@pytest.fixture()
+def task_adaptor(
+    queue: QueueAdaptor, queue_uow: UOW
+) -> Generator[QueueAdaptor, None, None]:
+    from app.interactor.event.tasks.app import app
+
+    task_adaptor = TaskAdaptor(app, uow=queue_uow, queue=queue)
+    yield task_adaptor
 
 
 @pytest.fixture(scope="function", autouse=True)
