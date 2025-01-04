@@ -1,8 +1,9 @@
+from contextlib import contextmanager
 import inspect
 import logging
 from asyncio import sleep
 from datetime import datetime
-from typing import Any, Callable, Dict, Optional, cast
+from typing import Any, Callable, Dict, Generator, Optional, cast
 
 from hexrepo_task.exception import DuplicateTaskName
 
@@ -19,30 +20,46 @@ GetQueue = Callable[[], QueueAdapter]
 GetUOW = Callable[[], UOW]
 
 
-# Logic to run tasks from any queue provider
 class TaskApp:
+    # Initialise task app to configure how tasks are run
+    task_registry: Dict[str, Callable] = {}
+
     def __init__(self, get_queue: GetQueue, get_uow: GetUOW):
-        self.get_queue: GetQueue = get_queue
-        self._queue: Optional[QueueAdapter] = None
-        self.get_uow: GetUOW = get_uow
-        self._uow: Optional[UOW] = None
+        self._get_queue: GetQueue = get_queue
+        self._get_uow: GetUOW = get_uow
 
-    @property
-    def queue(self) -> QueueAdapter:
-        if self._queue is None:
-            self._queue = self.get_queue()
-        return self._queue
-
-    @property
-    def uow(self) -> UOW:
-        if self._uow is None:
-            breakpoint()
-            self._uow = self.get_uow()
-        return self._uow
+    @contextmanager
+    def get_queue(self) -> Generator[QueueAdapter, None, None]:
+        queue = self._get_queue()
+        if isinstance(queue, Generator):
+            yield queue
+            next(queue)
+        else:
+            return queue
+        
+    @contextmanager
+    def get_uow(self) -> Generator[UOW, None, None]:
+        uow = self._get_uow()
+        if isinstance(uow, Generator):
+            yield uow
+            next(uow)
+        else:
+            return uow
+    
+    def add_task_func(self, func: TaskFunc):
+        func_name = func.__name__
+        if (
+            self.task_registry.get(func_name)
+            and self.task_registry.get(func_name) is not func
+        ):
+            raise DuplicateTaskName(
+                f"Duplicate functions with name: {func_name} please rename: {func}"
+            )
+        self.task_registry[func_name] = func
 
     def task(self, func: TaskFunc, **config) -> "TaskFuncWrapper":
         """Task decorator to register task functions"""
-        Task.add_task_func(func)
+        self.add_task_func(func)
 
         task_config: TaskConfig = TaskConfig(**config)
         return TaskFuncWrapper(func, self, config=task_config)
@@ -52,20 +69,34 @@ class TaskApp:
         if isinstance(event, dict):
             event = self._parse_event(event)
         event = cast(TaskDTO, event)
-        # parse event + create task instnace
-        task: Task = self._get_task(event)
-        # Execute task
-        try:
-            return task.execute()
-        except Exception as e:
-            logger.error(
-                f"Error running task: {task.state.name}, id: {task.state.id}, error: {e}"
-            )
-            raise
+        # parse event + create task instance
+        with self.get_queue() as queue, self.get_uow() as uow:
+            # Execute task
+            try:
+                task: Task = self._get_task(event, uow, queue)
+                return task.execute()
+            except Exception as e:
+                logger.error(
+                    f"Error running task: {task.state.name}, id: {task.state.id}, error: {e}"
+                )
+                raise
 
-    def _get_task(self, event: TaskDTO) -> "Task":
+    def queue_task(self, func: TaskFunc, param: Dict) -> "TaskPromise":
+        """Queue task"""
+        event: TaskDTO = TaskDTO(name=func.__name__, params=param)
+        with self.get_queue() as queue, self.get_uow() as uow:
+            try:
+                task: Task = self._get_task(event, uow, queue)
+                return task.queue_task()
+            except Exception as e:
+                logger.error(
+                    f"Error queueing task: {task.state.name}, id: {task.state.id}, error: {e}"
+                )
+                raise
+
+    def _get_task(self, event: TaskDTO, uow: UOW, queue: QueueAdapter) -> "Task":
         """Get task by name"""
-        task = Task(event, task_app=self)
+        task = Task(event, task_app=self, uow=uow, queue=queue)
 
         return task
 
@@ -76,45 +107,31 @@ class TaskApp:
 
 class Task:
     """
-    Contain task data and manage metadata for a task function call
+    Task instance to run task
     """
-
-    task_registry = {}
-
     def __init__(
-        self, task: TaskDTO, task_app: TaskApp, config: Optional[TaskConfig] = None
+        self, task: TaskDTO, app: TaskApp, uow:UOW, queue: QueueAdapter, config: Optional[TaskConfig] = None
     ):
-        self.func: TaskFunc = self.task_registry[task.name]
-        # self.event: TaskDTO = event
-        self.app: TaskApp = task_app
+        self.func: TaskFunc = app.task_registry[task.name]
+        self.app: TaskApp = app
+        self.uow: UOW = uow
+        self.queue: QueueAdapter = queue
         self.state: TaskDTO = task
         self.config: TaskConfig = config or default_config
         if task.id:
             self.refresh_task_data()
 
-    @classmethod
-    def add_task_func(cls, func: TaskFunc):
-        func_name = func.__name__
-        if (
-            cls.task_registry.get(func_name)
-            and cls.task_registry.get(func_name) is not func
-        ):
-            raise DuplicateTaskName(
-                f"Duplicate functions with name: {func_name} please rename: {func}"
-            )
-        cls.task_registry[func_name] = func
-
     def refresh_task_data(self):
-        self.state = self.app.uow.task.read(self.state.id)
+        self.state = self.uow.task.read(self.state.id)
 
     def update(self, **kwargs) -> TaskDTO:
         # validate kwargs
         task_param: TaskUpdateDTO = TaskUpdateDTO(**kwargs)
-        return self.app.uow.task.update(self.state.id, task_param)
+        return self.uow.task.update(self.state.id, task_param)
 
-    def queue(self) -> "TaskPromise":
+    def queue_task(self) -> "TaskPromise":
         # Send task to queue
-        self.state = self.app.uow.task.create(
+        self.state = self.uow.task.create(
             TaskDTO(
                 status="pending",
                 name=self.state.name,
@@ -123,7 +140,7 @@ class Task:
                 updated_at=datetime.now(),
             )
         )
-        task_event = self.app.queue.add_task(self.state)
+        task_event = self.queue.add_task(self.state)
         if task_event.task_id:
             self.state = self.update(status="queued")
         return TaskPromise(self)
@@ -175,7 +192,7 @@ class Dependency:
     def __init__(self, get_dependency: Callable):
         self._get_dependency = get_dependency
 
-    def get_dependency(self):
+    def get_dependency(self) -> Generator:
         return self._get_dependency()
 
 
@@ -184,31 +201,36 @@ class TaskFuncWrapper:
     Call task function and handle dependencies
     """
 
-    def __init__(
-        self, func: TaskFunc, task_app: TaskApp, config: Optional[TaskConfig] = None
-    ):
-        Task.add_task_func(func)
-
+    def __init__(self, func: TaskFunc):
         self.func: TaskFunc = func
-        self.app: TaskApp = task_app
-        self.config: Optional[TaskConfig] = config or default_config
 
-    def _get_dependencies(self, func: TaskFunc) -> Dict:
+    @contextmanager
+    def _get_dependencies(self, func: TaskFunc, kwargs: Dict) -> Generator[Dict, None, None]:
         dependencies = {}
+        dependency_generators = {}
         for name, param in inspect.signature(func).parameters.items():
             name: str
             param: inspect.Parameter
-            if isinstance(param.default, Dependency):
-                dependencies[name] = param.default.get_dependency()
-        return dependencies
+            if name in kwargs:
+                dependencies[name] = kwargs[name]
+            elif isinstance(param.default, Dependency):
+                dep_return = param.default.get_dependency()
+                if isinstance(dep_return, Generator):
+                    dependency_generators[name] = dep_return
+                    dependencies[name] = yield dependency_generators[name]
+                else:
+                    dependencies[name] = dep_return
+            else:
+                dependencies[name] = param.default
+        yield dependencies
 
-    def queue(self, params: Optional[Dict] = None) -> TaskPromise:
-        task = TaskDTO(name=self.func.__name__, params=params)
-        return Task(task, self.app).queue()
+        # Clean up dependence generators
+        for dep in dependency_generators:
+            next(dependency_generators[dep])
 
-    def __call__(self, task: TaskDTO):
-        dependencies = self._get_dependencies(self.func)
-        return self.func(task, **dependencies)
+    def __call__(self, task: TaskDTO, **kwargs) -> Any:
+        with self._get_dependencies(self.func, kwargs) as dependencies:
+            return self.func(task, **dependencies)
 
 
 # if __name__ == "__main__":

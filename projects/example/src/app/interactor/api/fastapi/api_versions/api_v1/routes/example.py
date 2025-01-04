@@ -5,6 +5,7 @@ from app.domain.example import CreateExampleDTO, UpdateExampleDTO
 from fastapi import Depends
 from hexrepo_api import CrudRouter
 from hexrepo_task.adaptor.db import QueueUOW
+from hexrepo_task.app import TaskApp
 from hexrepo_task.interface import TaskDTO
 from pydantic import BaseModel
 
@@ -24,14 +25,14 @@ router_v1 = CrudRouter(
 
 
 @router_v1.router.post("/task")
-def start_task():
+def start_task(task_app: TaskApp = Depends(get_tasks)) -> int:
     params: CreateExampleDTO = CreateExampleDTO(
         name="example", url="example.com", location="example"
     )
-    create_example_task.queue(params=params.model_dump())
+    task_app.queue(create_example_task, params=params.model_dump())
     return 204
 
 
 @router_v1.router.get("/task")
-def get_task(id: UUID, task_db: QueueUOW = Depends(get_queue_uow)) -> TaskDTO:
-    return task_db.task.read(id)
+def get_task(id: UUID, task_app: TaskApp = Depends(get_tasks)) -> TaskDTO:
+    return task_app.get_task(id)
