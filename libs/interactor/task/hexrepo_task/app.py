@@ -76,24 +76,26 @@ class TaskApp:
                 return task_adaptor.execute(task)
             except Exception as e:
                 logger.error(
-                    f"Error running task: {task.state.name}, id: {task.state.id}, error: {e}"
+                    f"Error running task: {event.name}, id: {event.id}, error: {e}"
                 )
                 raise
 
-    def queue_task(self, func: TaskFunc, param: Dict) -> "TaskPromise":
+    def queue_task(self, func: str | TaskFunc, param: Dict) -> "TaskPromise":
         """Queue task from app initialising deodependencies"""
-        event: TaskDTO = TaskDTO(name=func.__name__, params=param)
+        # Check name is right even with wrapper
+        func_name = func if isinstance(func, str) else func.__name__
+        event: TaskCreateDTO = TaskCreateDTO(name=func_name, param=param)
         with self.get_queue() as queue, self.get_uow() as uow:
             try:
-                task: Task = self._get_task_adaptor(event, uow, queue)
-                return task.queue_task()
+                task_adaptor: TaskAdaptor = self._get_task_adaptor(event, uow, queue)
+                return task_adaptor.queue(event)
             except Exception as e:
                 logger.error(
-                    f"Error queueing task: {task.state.name}, id: {task.state.id}, error: {e}"
+                    f"Error queueing task: {func_name}, param: {param}, error: {e}"
                 )
                 raise
 
-    def _get_task_adaptor(self, uow: UOW, queue: QueueAdaptor) -> "Task":
+    def _get_task_adaptor(self, uow: UOW, queue: QueueAdaptor) -> "TaskAdaptor":
         """Get task by name"""
         return TaskAdaptor(task_app=self, uow=uow, queue=queue, config=self.config)
 
@@ -125,9 +127,12 @@ class TaskAdaptor:
         # validate kwargs
         return self._uow.task.update(id, task)
 
-    def queue(self, task_data: TaskCreateDTO) -> "TaskPromise":
+    def queue(self, func: str | TaskFunc, param: Dict) -> "TaskPromise":
         # Send task to queue
+        func_name: str = func if isinstance(func, str) else func.__name__
+        task_data: TaskCreateDTO = TaskCreateDTO(name=func_name, param=param)
         self._validate_task(task_data)
+        # Validate task param and error if invalid types
         task: TaskDTO = self._uow.task.create(task_data)
         try:
             logger.info(f"Queueing task: {task.name}, id: {task.id}")
@@ -201,7 +206,12 @@ class TaskFuncWrapper:
     Call task function and handle dependencies
     """
     def __init__(self, func: TaskFunc):
+        # validate func is compatible with task app error if invalid args
         self.func: TaskFunc = func
+
+    @property
+    def __name__(self) -> str:
+        return self.func.__name__
 
     @contextmanager
     def _get_dependencies(self, func: TaskFunc, kwargs: Dict) -> Generator[Dict, None, None]:
@@ -250,7 +260,7 @@ class TaskFuncWrapper:
 #         print(event)
 
 #     # run task directly
-#     task_result = task_A(params=dict(name="example", status="running"))
+#     task_result = task_A(param=dict(name="example", status="running"))
 
 #     # queue task
 #     task_queue_instance: TaskPromise = task_A.queue()

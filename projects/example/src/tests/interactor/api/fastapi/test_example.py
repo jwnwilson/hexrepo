@@ -71,7 +71,8 @@ def test_example_create_task(client: TestClient, queue: QueueAdaptor):
     response = client.post("/api/v1/example/task")
     response_data: Dict = response.json()
 
-    assert queue.get_task() is not None
+    with queue.get_task() as task:
+        assert task is not None
     assert response.status_code == 200
     assert response_data["status"] == "queued"
     assert response_data["name"] == "create_example_task"

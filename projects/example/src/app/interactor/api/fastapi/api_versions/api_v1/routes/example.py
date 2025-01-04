@@ -1,5 +1,6 @@
 from uuid import UUID
 
+from app.interactor.event.tasks.app import create_example_task
 from fastapi import Depends
 from hexrepo_api import CrudRouter
 from hexrepo_task import TaskAdaptor
@@ -22,13 +23,12 @@ router_v1 = CrudRouter(
 
 @router_v1.router.post("/task")
 def start_task(task_adaptor: TaskAdaptor = Depends(get_task_adaptor)) -> TaskDTO:
-    params: CreateExampleDTO = CreateExampleDTO(
+    param: CreateExampleDTO = CreateExampleDTO(
         name="example", url="example.com", location="example"
     )
-    task_data: TaskCreateDTO = TaskCreateDTO(
-        name="create_example_task", params=params.model_dump()
-    )
-    task_data: TaskDTO = task_adaptor.queue(task_data).task
+    task_data: TaskDTO = task_adaptor.queue(
+        create_example_task, param=param.model_dump()
+    ).task
     return task_data
 
 
