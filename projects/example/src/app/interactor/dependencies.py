@@ -21,6 +21,7 @@ def get_task_queue() -> Generator[QueueAdaptor, None, None]:
     yield queue
 
 
+# Not sure hot to get this work for fastapi and also tasks
 def get_task_adaptor(
     uow: UOW = Dependency(get_queue_uow),
     queue: QueueAdaptor= Dependency(get_queue_uow)

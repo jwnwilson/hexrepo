@@ -49,6 +49,7 @@ AWS_SECRET_ACCESS_KEY
         - deploy and validate task logic in aws
     - Play with AI crawler project 
         - Setup crawl spider for PLP pages
+        - Cache all page data to avoid recrawls
         - Store data in graph format and visualise it
         - Categorise PLP pages
         - Fan out and crawl web page PDP page contents
