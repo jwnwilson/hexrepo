@@ -26,6 +26,11 @@ class TaskUpdateDTO(BaseModel):
     error: Optional[str] = None
 
 
+class TaskCreateDTO(BaseModel):
+    name: str
+    params: Optional[Dict] = None
+
+
 # class TaskEvent(BaseModel):
 #     id: Optional[UUID] = None
 #     task_id: Optional[UUID] = None

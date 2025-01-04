@@ -4,12 +4,13 @@ import logging
 from asyncio import sleep
 from datetime import datetime
 from typing import Any, Callable, Dict, Generator, Optional, cast
+from uuid import UUID
 
 from hexrepo_task.exception import DuplicateTaskName
 
 from .config import TaskConfig
 from .config import config as default_config
-from .interface import QueueAdapter, TaskDTO, TaskUpdateDTO
+from .interface import QueueAdapter, TaskCreateDTO, TaskDTO, TaskUpdateDTO
 from .interface import TaskUOW as UOW
 
 logger = logging.getLogger(__name__)
@@ -68,13 +69,13 @@ class TaskApp:
         """Handle event and run task"""
         if isinstance(event, dict):
             event = self._parse_event(event)
-        event = cast(TaskDTO, event)
+        task: TaskDTO = cast(TaskDTO, event)
         # parse event + create task instance
         with self.get_queue() as queue, self.get_uow() as uow:
             # Execute task
             try:
-                task: Task = self._get_task(event, uow, queue)
-                return task.execute()
+                task_adaptor: TaskAdapter = self._get_task_adaptor(uow, queue)
+                return task_adaptor.execute(task)
             except Exception as e:
                 logger.error(
                     f"Error running task: {task.state.name}, id: {task.state.id}, error: {e}"
@@ -82,11 +83,11 @@ class TaskApp:
                 raise
 
     def queue_task(self, func: TaskFunc, param: Dict) -> "TaskPromise":
-        """Queue task"""
+        """Queue task from app initialising deodependencies"""
         event: TaskDTO = TaskDTO(name=func.__name__, params=param)
         with self.get_queue() as queue, self.get_uow() as uow:
             try:
-                task: Task = self._get_task(event, uow, queue)
+                task: Task = self._get_task_adaptor(event, uow, queue)
                 return task.queue_task()
             except Exception as e:
                 logger.error(
@@ -94,98 +95,93 @@ class TaskApp:
                 )
                 raise
 
-    def _get_task(self, event: TaskDTO, uow: UOW, queue: QueueAdapter) -> "Task":
+    def _get_task_adaptor(self, uow: UOW, queue: QueueAdapter) -> "Task":
         """Get task by name"""
-        task = Task(event, task_app=self, uow=uow, queue=queue)
-
-        return task
+        return TaskAdapter(task_app=self, uow=uow, queue=queue, config=self.config)
 
     def _parse_event(self, event: Dict) -> TaskDTO:
         """Parse event data"""
         return TaskDTO(**event)
 
 
-class Task:
+class TaskAdapter:
     """
-    Task instance to run task
+    Task Adaptor to handle task data and queue operations
     """
     def __init__(
-        self, task: TaskDTO, app: TaskApp, uow:UOW, queue: QueueAdapter, config: Optional[TaskConfig] = None
+        self, app: TaskApp, uow:UOW, queue: QueueAdapter, config: Optional[TaskConfig] = None
     ):
-        self.func: TaskFunc = app.task_registry[task.name]
-        self.app: TaskApp = app
-        self.uow: UOW = uow
-        self.queue: QueueAdapter = queue
-        self.state: TaskDTO = task
-        self.config: TaskConfig = config or default_config
-        if task.id:
-            self.refresh_task_data()
+        self._app: TaskApp = app
+        self._uow: UOW = uow
+        self._queue: QueueAdapter = queue
+        self._config: TaskConfig = config or default_config
 
-    def refresh_task_data(self):
-        self.state = self.uow.task.read(self.state.id)
+    def read(self, task: TaskDTO) -> TaskDTO:
+        self.state = self._uow.task.read(self.state.id)
 
-    def update(self, **kwargs) -> TaskDTO:
+    def update(self, id: UUID, task: TaskUpdateDTO) -> TaskDTO:
         # validate kwargs
-        task_param: TaskUpdateDTO = TaskUpdateDTO(**kwargs)
-        return self.uow.task.update(self.state.id, task_param)
+        return self._uow.task.update(id, task)
 
-    def queue_task(self) -> "TaskPromise":
+    def queue(self, task_data: TaskCreateDTO) -> "TaskPromise":
         # Send task to queue
-        self.state = self.uow.task.create(
-            TaskDTO(
-                status="pending",
-                name=self.state.name,
-                params=self.state.params,
-                created_at=datetime.now(),
-                updated_at=datetime.now(),
-            )
-        )
-        task_event = self.queue.add_task(self.state)
-        if task_event.task_id:
-            self.state = self.update(status="queued")
-        return TaskPromise(self)
-
-    def execute(self) -> Any:
-        # Create task instance + state
-        self.state = self.update(status="running")
-
+        task: TaskDTO = self._uow.task.create(task_data)
         try:
-            logger.info(f"Running task: {self.state.name}, id: {self.state.id}")
+            logger.info(f"Queueing task: {task.name}, id: {task.id}")
+            task = self._queue.add_task(task)
+            if not task.task_id:
+                raise Exception(f"Task not queued, missing task_id for task: {task}")
+        except Exception as e:
+            logger.error(
+                f"Error queueing task: {task.name}, id: {task.id}, error: {e}"
+            )
+            self.update(task.id, TaskUpdateDTO(status="error", error=str(e)))
+            raise
+        task = self.update(task.id, TaskUpdateDTO(status="queued"))
+        return TaskPromise(task, task_adaptor=self)
+
+    def execute(self, task: TaskDTO) -> Any:
+        # Create task instance + state
+        task = self.update(task.id, TaskUpdateDTO(status="running"))
+        func: TaskFunc = self._app.task_registry[task.name]
+        try:
+            logger.info(f"Running task: {task.name}, id: {task.id}")
             task_wrapper: TaskFuncWrapper = TaskFuncWrapper(
-                self.func, self.app, self.config
+                func, self._app, self._config
             )
             result: Any = task_wrapper(self.state)
         except Exception as e:
             logger.error(
-                f"Error running task: {self.state.name}, id: {self.state.id}, error: {e}"
+                f"Error running task: {task.name}, id: {task.id}, error: {e}"
             )
-            self.state = self.update(status="error", error=str(e))
+            self.update(task.id, TaskUpdateDTO(status="error", error=str(e)))
             raise
 
         # Update Task status
-        self.state = self.update(status="completed")
+        self.state = self.update(task.id,TaskUpdateDTO(status="completed"))
 
         return result
 
 
 class TaskPromise:
-    def __init__(self, task: "Task", timeout: int = 30):
-        self.task: Task = task
+    def __init__(self, task: TaskDTO, task_adaptor: TaskAdapter, timeout: int = 30):
+        self.task: TaskDTO = task
+        self.task_adaptor: TaskAdapter = task_adaptor
         self.timeout: int = timeout
 
-    def wait(self):
+    def wait(self) -> None:
         """Wait for task to complete"""
         timer: int = 0
-        self.task.refresh_task_data()
-        while self.task.state.status not in ["completed", "error"]:
+        self.task = self.task_adaptor.read(self.task.id)
+        while self.task.status not in ["completed", "error"]:
             if timer >= self.timeout:
                 raise TimeoutError(
                     f"Task took too long to complete: {self.task.state.name}, id: {self.task.state.id}"
                 )
             sleep(1)
             timer += 1
-            self.task.refresh_task_data()
-        return self.task.state
+            self.task_adaptor.read(self.task.id)
+        return
 
 
 class Dependency:
