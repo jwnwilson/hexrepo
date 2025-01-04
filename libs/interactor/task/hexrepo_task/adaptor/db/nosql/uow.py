@@ -15,9 +15,9 @@ class QueueUOW(BaseDynamoUOW):
 
     @property
     def task(self) -> TaskRepository:
-        project: str = config.PROJECT
+        project: str = config.project
         table_name: str = "tasks"
-        env: str = config.ENVIRONMENT
+        env: str = config.environment
         full_table_name = f"{project}_{env}_{table_name}"
         return TaskRepository(
             self.resource,

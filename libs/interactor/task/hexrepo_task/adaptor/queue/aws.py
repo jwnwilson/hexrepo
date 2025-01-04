@@ -1,4 +1,5 @@
 import json
+import base64
 import logging
 import uuid
 from collections.abc import Generator
@@ -61,7 +62,7 @@ class SqsQueueAdaptor(QueueAdaptor):
         return task_event
 
     @contextmanager
-    def get_task(self) -> Generator[TaskDTO | None, None, None]:
+    def get_task(self) -> Generator[Dict | None, None, None]:
         # Get a message from sqs queue
         sqs_resp: Optional[Dict] = self.sqs.receive_message(
             QueueUrl=self.queue_url,
@@ -71,7 +72,12 @@ class SqsQueueAdaptor(QueueAdaptor):
             WaitTimeSeconds=0,
         )
         if "Messages" in sqs_resp:
-            yield TaskDTO(**json.loads(sqs_resp["Messages"][0]["Body"]))
+            event_data = sqs_resp["Messages"][0]["Body"]
+            try:
+                event_data = base64.b64decode(event_data).decode("utf-8")
+            except Exception:
+                pass
+            yield json.loads(event_data)
             self.sqs.delete_message(
                 QueueUrl=self.queue_url,
                 ReceiptHandle=sqs_resp["Messages"][0]["ReceiptHandle"],

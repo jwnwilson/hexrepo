@@ -72,6 +72,9 @@ class QueueAdaptor(ABC):
 
     def purge_queue(self, queue_name: str):
         raise NotImplementedError
+    
+    def get_queue_url(self, queue_name: Optional[str] = None) -> str:
+        raise NotImplementedError
 
 
 class TaskUOW(UOW):

@@ -44,11 +44,9 @@ AWS_SECRET_ACCESS_KEY
 
 - Setup backend
     - Setup serverless async tasks
-        - Add tests to example to validate event logic
-            - Add logic to handle generator dependency wrapping task & queue. Might need to create queue dependency to queue tasks
-            - Make dependency handling fastapi compatible
-            - pydantic task param
-        - Am I overthinking this? Could I just write a celery adapter to call celery task in lambda?
+        - Task lib celery wrapper, zappa / chalice wrapper
+            https://github.com/alanjds/celery-serverless/blob/master/celery_serverless/worker_management.py#L83
+            https://github.com/zappa/Zappa?tab=readme-ov-file#asynchronous-task-execution
         - deploy and validate task logic in aws
     - Play with AI crawler project 
         - Setup crawl spider for PLP pages

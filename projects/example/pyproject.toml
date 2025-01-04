@@ -23,6 +23,7 @@ dependencies = [
     "hexrepo-db[sql]",
     "hexrepo-api",
     "hexrepo-task",
+    "celery>=5.4.0",
 ]
 
 [dependency-groups]
