@@ -39,11 +39,11 @@ jobs:
       with:
         lock_file: "${{ matrix.project }}/uv.lock"
     - name: Start Test DB
+      if: matrix.project == 'projects/example'
       working-directory: ${{ matrix.project }}
       run: |
         make db
     - name: Test Projects
-      if: matrix.library == 'projects/example'
       working-directory: ${{ matrix.project }}
       run: |
         make lint
