@@ -27,9 +27,9 @@ def get_task_queue() -> Generator[QueueAdaptor, None, None]:
 def get_task_adaptor(
     uow: UOW = Depends(get_queue_uow), queue: QueueAdaptor = Depends(get_task_queue)
 ) -> Generator[TaskAdaptor, None, None]:
-    from app.interactor.event.tasks.app import app
+    from app.interactor.event.tasks.app import task_app
 
-    task_adaptor = TaskAdaptor(app, uow=uow, queue=queue)
+    task_adaptor = TaskAdaptor(task_app, uow=uow, queue=queue)
     yield task_adaptor
 
 
