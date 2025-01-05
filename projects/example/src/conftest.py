@@ -85,7 +85,7 @@ def queue() -> Generator[QueueAdaptor, None, None]:
 
 
 @pytest.fixture
-def queue_uow() -> Generator[UOW, None, None]:
+def queue_uow() -> Generator[QueueUOW, None, None]:
     """
     Return db adaptor with initialised DB & DB session.
     """
@@ -95,7 +95,7 @@ def queue_uow() -> Generator[UOW, None, None]:
 
 
 @pytest.fixture
-def task_client(queue_uow, queue, uow) -> TestClient:
+def task_app(queue_uow: QueueUOW, queue: QueueAdaptor, uow: UOW) -> TaskApp:
     from app.interactor.dependencies import get_uow
 
     def get_queue_uow_override():

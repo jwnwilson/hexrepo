@@ -2,7 +2,7 @@ from contextlib import contextmanager
 import inspect
 import logging
 from asyncio import sleep
-from datetime import datetime
+from inspect import signature
 from typing import Any, Callable, Dict, Generator, Optional, cast
 from uuid import UUID
 
@@ -219,8 +219,18 @@ class TaskFuncWrapper:
     """
     def __init__(self, func: TaskFunc, dependency_overrides: Optional[Dict] = None):
         # validate func is compatible with task app error if invalid args
+        self._validate_func(func)
         self.func: TaskFunc = func
         self.dependency_overrides: Dict = dependency_overrides or {}
+
+    def _validate_func(self, func: TaskFunc):
+        func_signature = signature(func)
+        try:
+            first_arg = list(func_signature.parameters.keys())[0]
+        except IndexError:
+            raise ValueError(f"Task function: {func} must have first parameter as TaskDTO")
+        if func_signature.parameters[first_arg].name != "task" or not func_signature.parameters[first_arg].annotation is TaskDTO :
+            raise ValueError(f"Task function: {func} must have first parameter as TaskDTO")
 
     @property
     def __name__(self) -> str:

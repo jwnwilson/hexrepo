@@ -24,6 +24,19 @@ def create_tables(uow: UOW):
     uow.create_all()
 
 
+@pytest.fixture
+def task_app(uow: UOW, queue: QueueAdaptor) -> TaskApp:
+    def get_queue_uow_override():
+        yield uow
+
+    def get_queue_override():
+        yield queue
+    
+    # Make dependencies generic
+    app: TaskApp = TaskApp(get_uow=get_queue_uow_override, get_queue=get_queue_override) 
+    return app
+
+
 @pytest.fixture(scope="function", autouse=True)
 def clear_task_registry():
     TaskApp.task_registry = {}

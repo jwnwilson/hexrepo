@@ -1,3 +1,4 @@
+from typing import Tuple
 from uuid import uuid4
 
 import pytest
@@ -8,28 +9,30 @@ from hexrepo_task.app import Dependency, TaskApp, TaskFuncWrapper, TaskPromise
 from hexrepo_task.exception import DuplicateTaskName
 from hexrepo_task.interface import TaskDTO
 
+TaskAppValues = Tuple[TaskApp, TaskFuncWrapper]
+
 
 @pytest.fixture
-def create_task_app(uow: ExampleUOW, queue: SqsQueueAdaptor):
-    def get_uow():
-        return uow
+def task_A(task_app: TaskApp) -> TaskAppValues:
 
-    def get_queue():
-        return queue
+    @task_app.task
+    def task_A(task: TaskDTO):
+        return task.params["name"]
 
-    app = TaskApp(get_uow=get_uow, get_queue=get_queue)
-
-    @app.task
-    def task_A(event: TaskDTO):
-        return event.params["name"]
-
-    return app, task_A
+    return task_app, task_A
 
 
-def test_duplicate_task(create_task_app):
+def test_invalid_task_name(task_app: TaskApp):
+
+    with pytest.raises(ValueError):
+        @task_app.task
+        def task_A_invalid(event: TaskDTO):
+            return event.params["name"]
+
+def test_duplicate_task(task_A: TaskAppValues):
     app: TaskApp
     task_A: TaskFuncWrapper
-    app, task_A = create_task_app
+    app, task_A = task_A
 
     with pytest.raises(DuplicateTaskName):
         # Duplicate task
@@ -38,10 +41,10 @@ def test_duplicate_task(create_task_app):
             return event.params["name"]
 
 
-def test_aws_queue_task(create_task_app, queue: SqsQueueAdaptor):
+def test_aws_queue_task(task_A: TaskAppValues, queue: SqsQueueAdaptor):
     app: TaskApp
     task_A: TaskFuncWrapper
-    app, task_A = create_task_app
+    app, task_A = task_A
 
     test_event = TaskDTO(
         name="task_A", params=dict(name="example", status="running"), id=uuid4()
@@ -50,22 +53,20 @@ def test_aws_queue_task(create_task_app, queue: SqsQueueAdaptor):
     task_result = task_A(test_event)
     assert task_result == "example"
     # queue task
-    task_queue_instance: TaskPromise = task_A.queue()
-    assert task_queue_instance.task.state.status == "queued"
+    task_queue_instance: TaskPromise = app.queue_task(task_A, params=dict(name="example", status="running"))
+    assert task_queue_instance.task.status == "queued"
     # get task
     with queue.get_task() as event:
-        assert event.id == task_queue_instance.task.state.id
+        assert event.id == task_queue_instance.task.id
 
 
-def test_aws_handle_task(create_task_app, queue: SqsQueueAdaptor):
+def test_aws_handle_task(task_A: TaskAppValues, queue: SqsQueueAdaptor):
     app: TaskApp
     task_A: TaskFuncWrapper
-    app, task_A = create_task_app
+    app, task_A = task_A
 
     # queue task
-    task_queue_instance: TaskPromise = task_A.queue(
-        params=dict(name="example", status="running")
-    )
+    task_queue_instance: TaskPromise = app.queue_task(task_A, params=dict(name="example", status="running"))
     # get task
     with queue.get_task() as event:
         # handle task
@@ -74,7 +75,7 @@ def test_aws_handle_task(create_task_app, queue: SqsQueueAdaptor):
 
     # Assert task updated
     task_queue_instance.wait()
-    assert task_queue_instance.task.state.status == "completed"
+    assert task_queue_instance.task.status == "completed"
 
 
 def test_aws_queue_multiple_task(create_task_app, queue: SqsQueueAdaptor):
