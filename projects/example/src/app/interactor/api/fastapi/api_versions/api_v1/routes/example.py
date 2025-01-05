@@ -1,24 +1,15 @@
-from typing import Optional
+from uuid import UUID
 
-from monorepo_api import CrudRouter
-from pydantic import BaseModel
+from fastapi import Depends
+from hexrepo_api import CrudRouter
+from hexrepo_task import TaskAdaptor
+from hexrepo_task.interface import TaskDTO
 
 from app.adaptor.db.sql.models.example import ExampleDTO
+from app.domain.example import CreateExampleDTO, UpdateExampleDTO
+from app.interactor.event.tasks.app import create_example_task
 
-from ....dependencies import get_uow
-
-
-class CreateExampleDTO(BaseModel):
-    name: str
-    url: str
-    location: str
-
-
-class UpdateExampleDTO(BaseModel):
-    name: Optional[str] = None
-    url: Optional[str] = None
-    location: Optional[str] = None
-
+from ......dependencies import get_task_adaptor, get_uow
 
 router_v1 = CrudRouter(
     db_dependency=get_uow,
@@ -28,3 +19,21 @@ router_v1 = CrudRouter(
     create_schema=CreateExampleDTO,
     update_schema=UpdateExampleDTO,
 )
+
+
+@router_v1.router.post("/task")
+def start_task(task_adaptor: TaskAdaptor = Depends(get_task_adaptor)) -> TaskDTO:
+    param: CreateExampleDTO = CreateExampleDTO(
+        name="example", url="example.com", location="example"
+    )
+    task_data: TaskDTO = task_adaptor.queue(
+        create_example_task, params=param.model_dump()
+    ).task
+    return task_data
+
+
+@router_v1.router.get("/task/{id}")
+def get_task(
+    id: UUID, task_adaptor: TaskAdaptor = Depends(get_task_adaptor)
+) -> TaskDTO:
+    return task_adaptor.read(id)

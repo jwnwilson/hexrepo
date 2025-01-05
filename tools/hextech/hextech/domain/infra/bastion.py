@@ -5,16 +5,16 @@ from contextlib import contextmanager
 from typing import Any, List, Optional
 
 import typer
-from monorepo_cloud.compute import AWSComputeManager
-from monorepo_cloud.db import AWSRDSManager
+from hexrepo_cloud.compute import AWSComputeManager
+from hexrepo_cloud.db import AWSRDSManager
 
-from hextech.config import MonorepoConfig
+from hextech.config import HexrepoConfig
 
 from ..system import run_system_command
 
 
 def bastion_ssh_tunnel(
-    config: MonorepoConfig, env: str, project: str, background_task: bool = False
+    config: HexrepoConfig, env: str, project: str, background_task: bool = False
 ) -> Optional[Any]:
     if config.cloud_provider == "aws":
         compute_manager: AWSComputeManager = AWSComputeManager(
@@ -46,7 +46,7 @@ def bastion_ssh_tunnel(
 
 
 @contextmanager
-def managed_bastion_ssh(config: MonorepoConfig, env: str, project: str):
+def managed_bastion_ssh(config: HexrepoConfig, env: str, project: str):
     typer.echo("Starting ssh tunnel to bastion")
     bastion_process = bastion_ssh_tunnel(config, env, project, background_task=True)
     try:
@@ -58,7 +58,7 @@ def managed_bastion_ssh(config: MonorepoConfig, env: str, project: str):
 
 
 def db_exists(
-    config: MonorepoConfig,
+    config: HexrepoConfig,
     project: str,
     env: str,
 ) -> bool:

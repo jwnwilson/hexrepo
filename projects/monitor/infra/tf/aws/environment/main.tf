@@ -1,7 +1,7 @@
 terraform {
   backend "s3" {
     region = "eu-west-1"
-    bucket = "monorepo-jwn"
+    bucket = "hexrepo-jwn"
     key    = "monitor-environment.tfstate"
   }
   required_providers {
@@ -15,21 +15,21 @@ provider "aws" {
   region = var.aws_region
 }
 
-data "aws_vpc" "monorepo" {
+data "aws_vpc" "hexrepo" {
   filter {
     name   = "tag:Name"
-    values = ["monorepo-vpc-${terraform.workspace}"]
+    values = ["hexrepo-vpc-${terraform.workspace}"]
   }
 }
 
 data "aws_security_group" "default_sg" {
   tags = {
-    Name = "monorepo-vpc-${terraform.workspace}-default"
+    Name = "hexrepo-vpc-${terraform.workspace}-default"
   }
 }
 
 data "aws_ecr_repository" "ecr_repo" {
-  name = "monorepo-${var.project}"
+  name = "hexrepo-${var.project}"
 }
 
 resource "aws_iam_policy" "manage_ec2_rds" {
@@ -71,7 +71,7 @@ module "monitor_lambda" {
   project                    = "monitor"
   ecr_url                    = data.aws_ecr_repository.ecr_repo.repository_url
   docker_tag                 = var.docker_tag
-  vpc_id                     = data.aws_vpc.monorepo.id
+  vpc_id                     = data.aws_vpc.hexrepo.id
   lambda_command             = ["src.app.interactor.event.aws.handler"]
   security_group_ids         = [data.aws_security_group.default_sg.id]
   lambda_schedule_expression = "cron(5 * * * ? *)"
@@ -80,6 +80,6 @@ module "monitor_lambda" {
     ENVIRONMENT         = terraform.workspace
     CLOUD_PROVIDER      = "AWS"
     AWS_ACCOUNT         = "675468650888"
-    AWS_TF_STATE_BUCKET = "monorepo-jwn"
+    AWS_TF_STATE_BUCKET = "hexrepo-jwn"
   }
 }

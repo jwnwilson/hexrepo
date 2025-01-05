@@ -25,13 +25,16 @@ dependencies = [
     {% if cookiecutter.use_storage == 'y' %}
     "boto3<2.0.0,>=1.35.66",
     "boto3-stubs[essential]<2.0.0,>=1.35.86",
-    "monorepo-cloud @ file:///${PROJECT_ROOT}/../../libs/adaptor/cloud",
+    "hexrepo-cloud",
     {% endif %}
     {% if cookiecutter.use_db == 'y' %}
-    "monorepo-db @ file:///${PROJECT_ROOT}/../../libs/adaptor/db",
+    "hexrepo-db",
     {% endif %}
     {% if cookiecutter.use_api == 'y' %}
-    "monorepo-api @ file:///${PROJECT_ROOT}/../../libs/interactor/api",
+    "hexrepo-api",
+    {% endif %}
+    {% if cookiecutter.use_task == 'y' %}
+    "hexrepo-task",
     {% endif %}
 ]
 
@@ -72,3 +75,17 @@ source = ["app"]
 [tool.mypy]
 python_version = "3.12"
 strict = true
+
+[tool.uv.sources]
+{% if cookiecutter.use_api == 'y' %}
+hexrepo-api = { path = "../../libs/interactor/api", editable = true }
+{% endif %}
+{% if cookiecutter.use_db == 'y' %}
+hexrepo-db = { path = "../../libs/adaptor/db", editable = true }
+{% endif %}
+{% if cookiecutter.use_storage == 'y' %}
+hexrepo-cloud = { path = "../../libs/adaptor/cloud", editable = true }
+{% endif %}
+{% if cookiecutter.use_task == 'y' %}
+hexrepo-task = { path = "../../libs/interactor/task", editable = true }
+{% endif %}

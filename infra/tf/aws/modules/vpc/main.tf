@@ -43,17 +43,17 @@ module "vpc" {
 
 # Cheaper 3rd party alternative to NAT Gateway
 data "aws_subnet" "private" {
-  for_each = toset(module.vpc.private_subnets)
+  for_each = {for i, val in module.vpc.private_subnets: i => val}
   id       = each.value
 }
 
 data "aws_subnet" "public" {
-  for_each = toset(module.vpc.public_subnets)
+  for_each = {for i, val in module.vpc.private_subnets: i => val}
   id       = each.value
 }
 
 data "aws_route_table" "private_route_tables" {
-  for_each = toset(module.vpc.private_subnets)
+  for_each = {for i, val in module.vpc.private_subnets: i => val}
   subnet_id = each.value
 }
 
@@ -102,25 +102,6 @@ module "fck-nat" {
     StartTime = var.nat_start_time
     StopTime = var.nat_stop_time
   }
+  
+  depends_on = [ module.vpc ]
 }
-
-# module "fck-nat" {
-#   source = "RaJiska/fck-nat/aws"
-
-#   for_each = toset(module.vpc.azs)
-
-#   name          = "${var.project}-nat-${each.key}"
-#   vpc_id        = module.vpc.vpc_id
-#   subnet_id     = local.public_subnet_ids_az_map[each.key]
-#   ha_mode       = false
-#   instance_type = "t4g.nano"
-
-#   update_route_tables = true
-#   route_tables_ids = {
-#     "${var.project}-private-${each.key}" = local.private_route_table_subnet_map[local.private_subnet_ids_az_map[each.key]]
-#   }
-
-#   tags = {
-#     Name = "${var.project}-fck-nat-${each.key}"
-#   }
-# }

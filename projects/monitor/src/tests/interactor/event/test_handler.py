@@ -1,8 +1,8 @@
 from datetime import datetime
 from typing import Any, Dict
 
-from monorepo_cloud.compute.aws import AWSComputeManager
-from monorepo_cloud.db.aws import AWSRDSManager
+from hexrepo_cloud.compute.aws import AWSComputeManager
+from hexrepo_cloud.db.aws import AWSRDSManager
 
 from app.interactor.event.aws import handler
 

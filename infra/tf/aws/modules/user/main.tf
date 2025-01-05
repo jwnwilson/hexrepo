@@ -2,7 +2,7 @@
 terraform {
   backend "s3" {
     region = "eu-west-1"
-    bucket = "monorepo-jwn"
+    bucket = "hexrepo-jwn"
     key = "{{cookiecutter.project_slug}}-libs.tfstate"
   }
   required_providers {
@@ -31,9 +31,9 @@ module "iam_user1" {
 module "iam_policy" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
 
-  name        = "monorepo-policy"
+  name        = "hexrepo-policy"
   path        = "/"
-  description = "Permissions to build monorepo"
+  description = "Permissions to build hexrepo"
 
   policy = <<EOF
 {

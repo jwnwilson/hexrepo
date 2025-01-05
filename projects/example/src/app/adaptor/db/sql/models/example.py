@@ -1,5 +1,5 @@
-from monorepo_db.sql.models.base_model import Base
-from monorepo_db.sql.repository import SQLRepository
+from hexrepo_db.sql.models.base_model import Base
+from hexrepo_db.sql.repository import SQLRepository
 from sqlalchemy import String, Text
 from sqlalchemy.orm import Mapped, mapped_column
 

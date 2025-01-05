@@ -92,7 +92,7 @@ def get_projects_usings_libraries(libraries: List[str]) -> List[str]:
         with chdir(f"projects/{proj}"):
             for lib in libraries:
                 with open("pyproject.toml") as f:
-                    if f"monorepo_{lib}" in f.read():
+                    if f"hexrepo_{lib}" in f.read():
                         projects_using_libs.add(proj)
     return list(projects_using_libs)
 

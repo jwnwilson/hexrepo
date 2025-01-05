@@ -91,11 +91,11 @@ data "aws_secretsmanager_secret_version" "db_password" {
 }
 
 resource "aws_db_subnet_group" "default" {
-  name       = "monorepo-${var.environment}"
+  name       = "hexrepo-${var.environment}"
   subnet_ids = data.aws_subnets.private_subnet_ids.ids
 
   tags = {
-    Name = "monorepo-${var.environment}"
+    Name = "hexrepo-${var.environment}"
   }
 }
 

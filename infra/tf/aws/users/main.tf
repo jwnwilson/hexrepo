@@ -1,7 +1,7 @@
 terraform {
   backend "s3" {
     region = "eu-west-1"
-    bucket = "monorepo-jwn"
+    bucket = "hexrepo-jwn"
     key = "{{cookiecutter.project_slug}}-users.tfstate"
   }
   required_providers {
@@ -18,7 +18,7 @@ provider "aws" {
 module "iam_user1" {
   source = "terraform-aws-modules/iam/aws/modules/iam-user"
 
-  name = "monorepo"
+  name = "hexrepo"
 
   create_iam_user_login_profile = false
   create_iam_access_key         = true
@@ -27,11 +27,11 @@ module "iam_user1" {
 #####################################################################################
 # IAM group for users with custom access
 #####################################################################################
-module "iam_group_with_monorepo_policies" {
+module "iam_group_with_hexrepo_policies" {
   source = "terraform-aws-modules/iam/aws/modules/iam-group-with-policies"
 
-  name = "monorepo"
-  path = "/monorepo/"
+  name = "hexrepo"
+  path = "/hexrepo/"
 
   group_users = [
     module.iam_user1.iam_user_name,
@@ -42,8 +42,8 @@ module "iam_group_with_monorepo_policies" {
 
   custom_group_policies = [
     {
-      name   = "AllowMonorepoWrite"
-      policy = data.aws_iam_policy_document.monorepo.json
+      name   = "AllowHexrepoWrite"
+      policy = data.aws_iam_policy_document.hexrepo.json
     },
   ]
 }
@@ -51,7 +51,7 @@ module "iam_group_with_monorepo_policies" {
 ######################
 # IAM policy
 ######################
-data "aws_iam_policy_document" "monorepo" {
+data "aws_iam_policy_document" "hexrepo" {
   statement {
     actions = [
       "s3:ListBuckets",

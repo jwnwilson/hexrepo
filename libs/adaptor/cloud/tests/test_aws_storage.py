@@ -2,13 +2,13 @@ import os
 
 import pytest
 
-from monorepo_cloud.storage import S3Adaptor, StorageConfig
+from hexrepo_cloud.storage import S3Adaptor, StorageConfig
 
 
 @pytest.fixture
 def storage_config() -> StorageConfig:
     return StorageConfig(
-        aws_bucket="monorepo-jwn",
+        aws_bucket="hexrepo-jwn",
         aws_region="eu-west-1",
         aws_upload_prefix="test-upload-prefix",
     )

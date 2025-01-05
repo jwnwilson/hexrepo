@@ -154,7 +154,7 @@
                     },
                     {
                         "Key": "Name",
-                        "Value": "monorepo-default-bastion-host"
+                        "Value": "hexrepo-default-bastion-host"
                     },
                     {
                         "Key": "StartTime",

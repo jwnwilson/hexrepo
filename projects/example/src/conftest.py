@@ -3,7 +3,11 @@ from collections.abc import Generator
 
 import pytest
 from fastapi.testclient import TestClient
-from monorepo_db.interface import UOW
+from hexrepo_db.interface import UOW
+from hexrepo_task.adaptor.db.nosql.uow import QueueUOW
+from hexrepo_task.adaptor.queue import SqsQueueAdaptor
+from hexrepo_task.interactor.event.app import TaskAdaptor, TaskApp
+from hexrepo_task.interface import QueueAdaptor, QueueConfig
 
 from app.adaptor.db.sql.uow import SqlUOW
 from app.domain.example import ExampleDTO
@@ -33,14 +37,18 @@ def create_tables(uow: UOW):
 
 
 @pytest.fixture
-def client(uow):
+def client(uow, task_adaptor) -> TestClient:
     from app.interactor.api.fastapi import app
-    from app.interactor.api.fastapi.dependencies import get_uow
+    from app.interactor.dependencies import get_task_adaptor, get_uow
 
     def get_uow_override():
         yield uow
 
+    def get_task_adaptor_override():
+        yield task_adaptor
+
     app.dependency_overrides[get_uow] = get_uow_override
+    app.dependency_overrides[get_task_adaptor] = get_task_adaptor_override
     return TestClient(app)
 
 
@@ -57,3 +65,64 @@ def example_data():
 def created_example(client: TestClient, example_data) -> ExampleDTO:
     response = client.post("/api/v1/example/", json=example_data)
     return ExampleDTO(**response.json())
+
+
+@pytest.fixture
+def queue() -> Generator[QueueAdaptor, None, None]:
+    """
+    Return a queue object.
+    """
+    config: QueueConfig = QueueConfig(
+        default_queue="hexrepo-tasks",
+        endpoint_url="http://localhost.localstack.cloud:4566",
+    )
+    queue_adapater: SqsQueueAdaptor = SqsQueueAdaptor(config=config)
+    try:
+        queue_adapater.delete_queue("hexrepo-tasks")
+    except:  # noqa
+        pass
+    queue_adapater.create_queue("hexrepo-tasks")
+    return queue_adapater
+
+
+@pytest.fixture
+def queue_uow() -> Generator[QueueUOW, None, None]:
+    """
+    Return db adaptor with initialised DB & DB session.
+    """
+    uow = QueueUOW(db_url="http://localhost.localstack.cloud:4566")
+    # Create DB session
+    yield uow
+
+
+@pytest.fixture
+def task_app(queue_uow: QueueUOW, queue: QueueAdaptor, uow: UOW) -> TaskApp:
+    from app.interactor.dependencies import get_uow
+
+    def get_queue_uow_override():
+        yield queue_uow
+
+    def get_queue_override():
+        yield queue
+
+    def get_uow_override():
+        yield uow
+
+    # Make dependencies generic
+    app: TaskApp = TaskApp(get_uow=get_queue_uow_override, get_queue=get_queue_override)
+    app.dependency_overrides[get_uow] = get_uow_override
+    return app
+
+
+@pytest.fixture()
+def task_adaptor(
+    task_app: TaskApp, queue: QueueAdaptor, queue_uow: UOW, uow: UOW
+) -> Generator[QueueAdaptor, None, None]:
+    task_adaptor = TaskAdaptor(task_app, uow=queue_uow, queue=queue)
+    yield task_adaptor
+
+
+@pytest.fixture(scope="function", autouse=True)
+def create_tables_queue_uow(queue_uow: UOW):
+    queue_uow.drop_all()
+    queue_uow.create_all()

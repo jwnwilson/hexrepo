@@ -4,8 +4,8 @@ from pydantic import UUID4
 from sqlalchemy import UUID, Column, Integer, String, Text, Table, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship, joinedload
 
-from monorepo_db.sql.models.base_model import Base
-from monorepo_db.sql.repository import SQLRepository
+from hexrepo_db.sql.models.base_model import Base
+from hexrepo_db.sql.repository import SQLRepository
 from app.domain.example import ExampleDTO
 
 

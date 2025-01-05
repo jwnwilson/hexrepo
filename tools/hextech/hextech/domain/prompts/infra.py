@@ -14,12 +14,15 @@ def prompt_setup_shared_infra() -> bool:
         "Would you like to setup shared infrastructure for environments?"
     )
 
+
 def prompt_destroy() -> bool:
-    return typer.confirm("Would you like to destroy infrastructure? (This is irreversible)")
+    return typer.confirm(
+        "Would you like to destroy infrastructure? (This is irreversible)"
+    )
 
 
 def prompt_setup_project_infra() -> bool:
-    return typer.confirm("Would you like to setup infrastructure for the project?")
+    return typer.confirm("Would you like to initial infra / docker repo to enable CI/CD?")
 
 
 def prompt_deploy_libs() -> bool:

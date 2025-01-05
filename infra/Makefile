@@ -40,9 +40,11 @@ tf_env_plan:
 	@cd tf/aws/environment  && terraform plan -out tfapply
 
 tf_env_apply:
+	@cd tf/aws/environment  && terraform apply -target=module.hexrepo_vpc.module.vpc
 	@cd tf/aws/environment  && terraform apply
 
 tf_env_apply_no_input:
+	@cd tf/aws/environment  && terraform apply -target=module.hexrepo_vpc.module.vpc -auto-approve
 	@cd tf/aws/environment  && terraform apply -auto-approve
 
 tf_env_destroy:

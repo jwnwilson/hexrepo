@@ -2,7 +2,7 @@ import json
 from typing import List, Optional, Tuple, Union
 
 import typer
-from monorepo_cloud.config import AWSConfig
+from hexrepo_cloud.config import AWSConfig
 from pydantic_settings import BaseSettings
 
 from hextech.domain.prompts.common import prompt_cloud_provider, prompt_shell_file
@@ -10,14 +10,14 @@ from hextech.domain.prompts.config import prompt_config_setup, prompt_environmen
 from hextech.domain.system import set_env_var
 
 
-class MonorepoConfig(BaseSettings):
-    project_name: str = "monorepo"
+class HexrepoConfig(BaseSettings):
+    project_name: str = "hexrepo"
     shell_file: str = "~/.zshrc"
     cloud_provider: str = "aws"
     cloud_provider_config: Optional[Union[AWSConfig]] = None
     environments: List[str] = ["dev", "prd"]
-    monorepo_lib_repo_url: str = ""
-    monorepo_lib_repo_username: str = ""
+    hexrepo_lib_repo_url: str = ""
+    hexrepo_lib_repo_username: str = ""
     domain: str = ""
 
     def set_config_var(self, key: str, value: str, set_env: bool = False):
@@ -34,30 +34,30 @@ class MonorepoConfig(BaseSettings):
         set_env_var(self.shell_file, key, value)
 
     @classmethod
-    def load_config(cls) -> Optional["MonorepoConfig"]:
+    def load_config(cls) -> Optional["HexrepoConfig"]:
         try:
             with open("config.json", "r") as f:
                 config = json.loads(f.read())
-            return MonorepoConfig(**config)
+            return HexrepoConfig(**config)
         except Exception:
             print("Unable to load config file.")
             return None
 
 
-def aws_config(config: MonorepoConfig) -> MonorepoConfig:
+def aws_config(config: HexrepoConfig) -> HexrepoConfig:
     aws_config: AWSConfig = AWSConfig(
         AWS_ACCOUNT=typer.prompt("Please enter your AWS account ID"),
         AWS_REGION=typer.prompt("Please enter your AWS region", default="eu-west-1"),
         AWS_TF_STATE_BUCKET=typer.prompt(
-            "Please enter your AWS Terraform state bucket name", default="monorepo"
+            "Please enter your AWS Terraform state bucket name", default="hexrepo"
         ),
     )
 
     access_key_id: str = typer.prompt(
-        "Please enter your AWS monorepo user access key id"
+        "Please enter your AWS hexrepo user access key id"
     )
     access_secret_key: str = typer.prompt(
-        "Please enter your AWS monorepo user secret access key"
+        "Please enter your AWS hexrepo user secret access key"
     )
 
     set_env_var(config.shell_file, "AWS_ACCESS_KEY_ID", access_key_id)
@@ -70,13 +70,13 @@ def aws_config(config: MonorepoConfig) -> MonorepoConfig:
     return config
 
 
-def setup_project_config() -> MonorepoConfig:
+def setup_project_config() -> HexrepoConfig:
     shell_file = prompt_shell_file()
     cloud_provider = prompt_cloud_provider()
     environments = prompt_environments()
     domain = typer.prompt("Please enter your registered domain name")
 
-    config: MonorepoConfig = MonorepoConfig(
+    config: HexrepoConfig = HexrepoConfig(
         shell_file=shell_file,
         cloud_provider=cloud_provider,
         environments=environments,
@@ -84,7 +84,7 @@ def setup_project_config() -> MonorepoConfig:
     )
 
     if cloud_provider == "aws":
-        config: MonorepoConfig = aws_config(config)
+        config: HexrepoConfig = aws_config(config)
 
     with open("config.json", "w") as f:
         f.write(config.model_dump_json())
@@ -92,11 +92,11 @@ def setup_project_config() -> MonorepoConfig:
     return config
 
 
-def get_or_create_config(no_input: bool = False) -> Tuple[MonorepoConfig, bool]:
+def get_or_create_config(no_input: bool = False) -> Tuple[HexrepoConfig, bool]:
     created_config: bool = False
-    config: Optional[MonorepoConfig] = MonorepoConfig.load_config()
+    config: Optional[HexrepoConfig] = HexrepoConfig.load_config()
     if not config or (not no_input and prompt_config_setup()):
-        config: MonorepoConfig = setup_project_config()
+        config: HexrepoConfig = setup_project_config()
         created_config = True
     if not config:
         typer.echo("Unable to load config file, aborting.")

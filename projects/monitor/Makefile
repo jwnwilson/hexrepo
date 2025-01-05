@@ -81,21 +81,18 @@ clean:
 	@find . -type f -name '*.py[co]' -delete -o -type d -name __pycache__ -delete
 
 tf_workspace:
-	@-cd infra/tf/aws/environment  && \
-	terraform workspace new $(ENVIRONMENT)
 	@cd infra/tf/aws/environment  && \
-	terraform workspace select $(ENVIRONMENT) 
+	terraform workspace select -or-create=true $(ENVIRONMENT) 
 
 tf_init:
 	@echo "Initializing Terraform infra"
 	cd infra/tf/aws/shared  && terraform init -input=false
 	cd infra/tf/aws/environment  && terraform init -input=false
 
-tf_setup:
-	@echo "Applying Terraform infra"
+tf_setup: tf_init
+	@echo "Applying Inital project Terraform infra"
+	cd infra/tf/aws/shared && terraform workspace select -or-create=true default
 	cd infra/tf/aws/shared && terraform apply
-	@echo "Deploying image to enable environment deployment"
-	make deploy
 
 tf_plan:
 	@echo "Planning Terraform infra"

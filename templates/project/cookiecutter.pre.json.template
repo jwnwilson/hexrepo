@@ -5,6 +5,7 @@
     "use_api": "y",
     "use_db": "y",
     "use_storage": "y",
+    "use_task": "Y",
     "api_domain": "{{ domain }}",
     "use_db_logic": [
         "sql",
@@ -18,6 +19,7 @@
         "use_api": "Do you want fastapi?",
         "use_db": "Do you want a database?",
         "use_storage": "Do you want to store files?",
+        "use_task": "Do you want to run async (background) tasks?",
         "use_db_logic": {
             "__prompt__": "Select the db storage method",
             "sql": "Add Sqlalchemy to project",

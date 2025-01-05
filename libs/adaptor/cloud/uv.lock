@@ -241,6 +241,53 @@ wheels = [
 ]
 
 [[package]]
+name = "hexrepo-cloud"
+version = "0.3.9"
+source = { editable = "." }
+dependencies = [
+    { name = "boto3-stubs", extra = ["essential"] },
+    { name = "pydantic" },
+    { name = "pydantic-settings" },
+]
+
+[package.optional-dependencies]
+aws = [
+    { name = "boto3" },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "gevent" },
+    { name = "httpx" },
+    { name = "mypy" },
+    { name = "pytest" },
+    { name = "pytest-cov" },
+    { name = "pytest-dotenv" },
+    { name = "pytest-xdist" },
+    { name = "ruff" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "boto3", marker = "extra == 'aws'", specifier = ">=1.35.54,<2.0.0" },
+    { name = "boto3-stubs", extras = ["essential"], specifier = ">=1.35.86,<2.0.0" },
+    { name = "pydantic", specifier = ">=2.9.2,<3.0.0" },
+    { name = "pydantic-settings", specifier = ">=2.6.1,<3.0.0" },
+]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "gevent", specifier = ">=24.10.3,<25.0.0" },
+    { name = "httpx", specifier = ">=0.27.2,<1.0.0" },
+    { name = "mypy", specifier = ">=1.13.0,<2.0.0" },
+    { name = "pytest", specifier = ">=8.3.3,<9.0.0" },
+    { name = "pytest-cov", specifier = ">=6.0.0,<7.0.0" },
+    { name = "pytest-dotenv", specifier = ">=0.5.2,<1.0.0" },
+    { name = "pytest-xdist", specifier = ">=3.6.1,<4.0.0" },
+    { name = "ruff", specifier = ">=0.8.4" },
+]
+
+[[package]]
 name = "httpcore"
 version = "1.0.7"
 source = { registry = "https://pypi.org/simple" }
@@ -293,53 +340,6 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/00/2a/e867e8531cf3e36b41201936b7fa7ba7b5702dbef42922193f05c8976cd6/jmespath-1.0.1.tar.gz", hash = "sha256:90261b206d6defd58fdd5e85f478bf633a2901798906be2ad389150c5c60edbe", size = 25843 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/31/b4/b9b800c45527aadd64d5b442f9b932b00648617eb5d63d2c7a6587b7cafc/jmespath-1.0.1-py3-none-any.whl", hash = "sha256:02e2e4cc71b5bcab88332eebf907519190dd9e6e82107fa7f83b1003a6252980", size = 20256 },
-]
-
-[[package]]
-name = "monorepo-cloud"
-version = "0.3.8"
-source = { editable = "." }
-dependencies = [
-    { name = "boto3-stubs", extra = ["essential"] },
-    { name = "pydantic" },
-    { name = "pydantic-settings" },
-]
-
-[package.optional-dependencies]
-aws = [
-    { name = "boto3" },
-]
-
-[package.dev-dependencies]
-dev = [
-    { name = "gevent" },
-    { name = "httpx" },
-    { name = "mypy" },
-    { name = "pytest" },
-    { name = "pytest-cov" },
-    { name = "pytest-dotenv" },
-    { name = "pytest-xdist" },
-    { name = "ruff" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "boto3", marker = "extra == 'aws'", specifier = ">=1.35.54,<2.0.0" },
-    { name = "boto3-stubs", extras = ["essential"], specifier = ">=1.35.86,<2.0.0" },
-    { name = "pydantic", specifier = ">=2.9.2,<3.0.0" },
-    { name = "pydantic-settings", specifier = ">=2.6.1,<3.0.0" },
-]
-
-[package.metadata.requires-dev]
-dev = [
-    { name = "gevent", specifier = ">=24.10.3,<25.0.0" },
-    { name = "httpx", specifier = ">=0.27.2,<1.0.0" },
-    { name = "mypy", specifier = ">=1.13.0,<2.0.0" },
-    { name = "pytest", specifier = ">=8.3.3,<9.0.0" },
-    { name = "pytest-cov", specifier = ">=6.0.0,<7.0.0" },
-    { name = "pytest-dotenv", specifier = ">=0.5.2,<1.0.0" },
-    { name = "pytest-xdist", specifier = ">=3.6.1,<4.0.0" },
-    { name = "ruff", specifier = ">=0.8.4" },
 ]
 
 [[package]]

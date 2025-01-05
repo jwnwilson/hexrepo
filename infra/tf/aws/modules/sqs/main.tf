@@ -6,8 +6,12 @@ terraform {
   }
 }
 
+locals {
+  queue_name = "${var.project}_${var.name}_queue_${var.environment}"
+}
+
 resource "aws_sqs_queue" "deadletter_queue" {
-  name                        = "${var.project}_queue_deadletter_${var.environment}"
+  name                        = "${local.queue_name}_deadletter"
   max_message_size            = 2048
   message_retention_seconds   = 86400
   receive_wait_time_seconds   = 10
@@ -18,7 +22,7 @@ resource "aws_sqs_queue" "deadletter_queue" {
 }
 
 resource "aws_sqs_queue" "queue" {
-  name                        = "${var.project}_queue_${var.environment}"
+  name                        = "${local.queue_name}"
   visibility_timeout_seconds  = 900
   max_message_size            = 2048
   message_retention_seconds   = 86400
@@ -31,8 +35,4 @@ resource "aws_sqs_queue" "queue" {
   tags = {
     Environment = var.environment
   }
-}
-
-output "queue_arn" {
-  value = aws_sqs_queue.queue.arn
 }

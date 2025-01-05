@@ -3,7 +3,7 @@ authors = [
     {name = "Noel Wilson", email = "jwnwilson@hotmail.co.uk"},
 ]
 requires-python = "<4.0,>=3.12"
-name = "monorepo_api"
+name = "hexrepo_api"
 version = "0.1.7"
 description = "A short description of the project"
 readme = "README.md"
@@ -11,11 +11,11 @@ dependencies = [
     "pydantic<3.0.0,>=2.9.2",
     "pydantic-settings<3.0.0,>=2.6.1",
     "fastapi<1.0.0,>=0.115.4",
-    "monorepo-db",
+    "hexrepo-db",
 ]
 
 [tool.uv.sources]
-monorepo-db = { path = "../../adaptor/db", editable = true }
+hexrepo-db = { path = "../../adaptor/db", editable = true }
 
 [dependency-groups]
 dev = [
@@ -45,7 +45,7 @@ env_files = ["env/local.env"]
 [tool.coverage.run]
 concurrency = ["gevent"]
 omit = ["tests/*"]
-source = ["monorepo_api"]
+source = ["hexrepo_api"]
 
 [tool.mypy]
 python_version = "3.12"

@@ -10,6 +10,6 @@ provider "aws" {
   region = "us-east-1"
 }
 
-resource "aws_route53_zone" "monorepo" {
+resource "aws_route53_zone" "hexrepo" {
   name = var.domain
 }

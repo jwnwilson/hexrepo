@@ -3,10 +3,10 @@ from typing import TYPE_CHECKING
 import jinja2
 
 if TYPE_CHECKING:
-    from hextech.domain.config import MonorepoConfig
+    from hextech.domain.config import HexrepoConfig
 
 
-def generate_libs_makefile(config: "MonorepoConfig"):
+def generate_libs_makefile(config: "HexrepoConfig"):
     environment = jinja2.Environment(
         trim_blocks=True,
         lstrip_blocks=True,
@@ -20,7 +20,7 @@ def generate_libs_makefile(config: "MonorepoConfig"):
         f.write(libs_makefile_content)
 
 
-def generate_project_makefile(config: "MonorepoConfig"):
+def generate_project_makefile(config: "HexrepoConfig"):
     environment = jinja2.Environment(
         trim_blocks=True,
         lstrip_blocks=True,

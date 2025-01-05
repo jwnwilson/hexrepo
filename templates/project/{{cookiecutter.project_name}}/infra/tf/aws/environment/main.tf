@@ -1,7 +1,7 @@
 terraform {
   backend "s3" {
     region = "eu-west-1"
-    bucket = "monorepo-jwn"
+    bucket = "hexrepo-jwn"
     key = "{{cookiecutter.project_slug}}-environment.tfstate"
   }
   required_providers {
@@ -29,21 +29,21 @@ provider "aws" {
   region  = var.aws_region
 }
 
-data "aws_vpc" "monorepo" {
+data "aws_vpc" "hexrepo" {
   filter {
     name   = "tag:Name"
-    values = ["monorepo-vpc-${terraform.workspace}"]
+    values = ["hexrepo-vpc-${terraform.workspace}"]
   }
 }
 
 data "aws_ecr_repository" "ecr_repo" {
-  name                 = "monorepo-${var.project}"
+  name                 = "hexrepo-${var.project}"
 }
 
 {% if cookiecutter.use_db == "n" or (cookiecutter.use_db == "y" and cookiecutter.use_db_logic == "nosql") %}
 data "aws_security_group" "default_sg" {
   tags = {
-    Name = "monorepo-vpc-${terraform.workspace}-default"
+    Name = "hexrepo-vpc-${terraform.workspace}-default"
   }
 }
 {% endif %}
@@ -55,11 +55,11 @@ module "{{cookiecutter.project_slug}}_api" {
   project           = "{{cookiecutter.project_slug}}"
   ecr_url           = data.aws_ecr_repository.ecr_repo.repository_url
   docker_tag        = var.docker_tag
-  vpc_id            = data.aws_vpc.monorepo.id
+  vpc_id            = data.aws_vpc.hexrepo.id
   {% if (cookiecutter.cloud_provider == "aws" and cookiecutter.use_api == "y") %}
-  lambda_command    = ["src.app.interactor.aws.lambda_api.handler"]
+  lambda_command    = ["src.app.interactor.aws.lambda_handler"]
   {% elif cookiecutter.cloud_provider == "aws" %}
-  lambda_command    = ["src.app.interactor.event.aws.handler"]
+  lambda_command    = ["src.app.interactor.event.lambda_handler"]
   {% else %}
   lambda_command    = ["uvicorn", "app.interactor.api.fastapi.main:app", "--host", "0.0.0.0", "--port", "8000"]
   {% endif %}
@@ -89,6 +89,40 @@ module "{{cookiecutter.project_slug}}_api" {
   }
 }
 
+{% if cookiecutter.use_task == "y" %}
+module "queue" {
+  source = "../../../../../../infra/tf/aws/modules/sqs"
+
+  project     = var.project
+  name        = "${var.project}-${terraform.workspace}"
+  environment = terraform.workspace
+}
+
+resource "aws_lambda_event_source_mapping" "queue_lambda_mapping" {
+  event_source_arn = module.queue.queue_arn
+  function_name    = module.example_tasks.lambda_function_name
+}
+
+module "example_tasks" {
+  source = "../../../../../../infra/tf/aws/modules/lambda"
+
+  environment        = terraform.workspace
+  project            = var.project
+  ecr_url            = data.aws_ecr_repository.ecr_repo.repository_url
+  docker_tag         = var.docker_tag
+  vpc_id             = data.aws_vpc.hexrepo.id
+  lambda_command     = ["src.app.interactor.event.lambda_handler"]
+  security_group_ids = [module.example_postgres.db_security_group_id]
+
+  environment_variables = {
+    ENVIRONMENT             = terraform.workspace
+    CLOUD_PROVIDER          = "AWS"
+    DB_URL                  = local.db_url
+    DB_PASSWORD_SECRET_NAME = data.aws_secretsmanager_secret.db_secret.name
+  }
+}
+{% endif %}
+
 module "{{cookiecutter.project_slug}}_api_gateway" {
   source = "../../../../../../infra/tf/aws/modules/apigateway"
 
@@ -106,7 +140,7 @@ module "{{cookiecutter.project_slug}}_postgres" {
 
   environment       = terraform.workspace
   project           = "{{cookiecutter.project_slug}}"
-  vpc_id            = data.aws_vpc.monorepo.id
+  vpc_id            = data.aws_vpc.hexrepo.id
   username          = "postgres"
 }
 

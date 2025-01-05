@@ -10,6 +10,7 @@ api_router_v1.include_router(
     tags=["Healthcheck"],
     prefix="/healthcheck",
 )
+
 api_router_v1.include_router(
     example_router,
     tags=["Example"],

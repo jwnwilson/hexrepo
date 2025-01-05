@@ -5,22 +5,22 @@ terraform {
     }
   }
 }
-resource "aws_kms_key" "monorepo" {
+resource "aws_kms_key" "hexrepo" {
   description = "domain key"
 }
 
-resource "aws_codeartifact_domain" "monorepo" {
+resource "aws_codeartifact_domain" "hexrepo" {
   domain         = var.domain
-  encryption_key = aws_kms_key.monorepo.arn
+  encryption_key = aws_kms_key.hexrepo.arn
 }
 
-resource "aws_codeartifact_repository" "monorepo" {
+resource "aws_codeartifact_repository" "hexrepo" {
   repository = var.project
-  domain     = aws_codeartifact_domain.monorepo.domain
+  domain     = aws_codeartifact_domain.hexrepo.domain
 }
 
-data "aws_codeartifact_repository_endpoint" "monorepo" {
-  domain     = aws_codeartifact_domain.monorepo.domain
-  repository = aws_codeartifact_repository.monorepo.repository
+data "aws_codeartifact_repository_endpoint" "hexrepo" {
+  domain     = aws_codeartifact_domain.hexrepo.domain
+  repository = aws_codeartifact_repository.hexrepo.repository
   format     = "pypi"
 }
