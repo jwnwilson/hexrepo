@@ -14,7 +14,7 @@ test: venv db
 	@../../../tools/bash_scripts/test.sh
 
 docker_stop:
-	@bash -c "docker ps -aq | xargs docker stop | xargs docker rm"
+	@-bash -c "docker ps -aq | xargs docker stop | xargs docker rm"
 
 db: docker_stop
 	@echo "Starting db..."

@@ -47,7 +47,7 @@ run: down db venv
 	PYTHONPATH=src uv run uvicorn app.interactor.api.fastapi.main:app --reload --env-file env/local.env
 
 docker_stop:
-	@bash -c "docker ps -aq | xargs docker stop | xargs docker rm"
+	@-bash -c "docker ps -aq | xargs docker stop | xargs docker rm"
 
 db: docker_stop
 	docker compose up -d postgres_db localstack

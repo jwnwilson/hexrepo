@@ -50,7 +50,7 @@ db_delete_data: down
 {% endif %}
 
 docker_stop:
-	@bash -c "docker ps -aq | xargs docker stop | xargs docker rm"
+	@-bash -c "docker ps -aq | xargs docker stop | xargs docker rm"
 
 db: docker_stop
 	docker compose run --service-ports -d db 
