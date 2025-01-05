@@ -5,7 +5,7 @@ import pytest
 from hexrepo_task.interface import QueueConfig, TaskUOW as UOW, QueueAdaptor
 from hexrepo_task.adaptor.db import QueueUOW
 from hexrepo_task.adaptor.queue.aws import SqsQueueAdaptor
-from hexrepo_task.app import TaskApp
+from hexrepo_task.interactor.event.app import TaskApp
 
 
 @pytest.fixture

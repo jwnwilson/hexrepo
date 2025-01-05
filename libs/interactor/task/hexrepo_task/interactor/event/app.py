@@ -8,10 +8,10 @@ from uuid import UUID
 
 from hexrepo_task.exception import DuplicateTaskName, TaskNotFound
 
-from .config import TaskConfig
-from .config import config as default_config
-from .interface import QueueAdaptor, TaskCreateDTO, TaskDTO, TaskUpdateDTO
-from .interface import TaskUOW as UOW
+from ...config import TaskConfig
+from ...config import config as default_config
+from ...interface import QueueAdaptor, TaskCreateDTO, TaskDTO, TaskUpdateDTO
+from ...interface import TaskUOW as UOW
 
 logger = logging.getLogger(__name__)
 

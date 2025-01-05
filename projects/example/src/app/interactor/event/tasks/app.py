@@ -1,6 +1,6 @@
 import logging
 
-from hexrepo_task.app import Dependency, TaskApp, TaskDTO
+from hexrepo_task.interactor.event.app import Dependency, TaskApp, TaskDTO
 
 from app.adaptor.db.sql import SqlUOW
 from app.domain.example import CreateExampleDTO

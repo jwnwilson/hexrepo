@@ -1,4 +1,4 @@
-from hexrepo_task.app import TaskApp, TaskPromise
+from hexrepo_task.interactor.event.app import TaskApp, TaskPromise
 from hexrepo_task.interface import QueueAdaptor
 
 from app.adaptor.db.sql import SqlUOW

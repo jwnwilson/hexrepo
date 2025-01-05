@@ -27,7 +27,7 @@ def start_task(task_adaptor: TaskAdaptor = Depends(get_task_adaptor)) -> TaskDTO
         name="example", url="example.com", location="example"
     )
     task_data: TaskDTO = task_adaptor.queue(
-        create_example_task, param=param.model_dump()
+        create_example_task, params=param.model_dump()
     ).task
     return task_data
 

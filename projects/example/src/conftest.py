@@ -6,7 +6,7 @@ from fastapi.testclient import TestClient
 from hexrepo_db.interface import UOW
 from hexrepo_task.adaptor.db.nosql.uow import QueueUOW
 from hexrepo_task.adaptor.queue import SqsQueueAdaptor
-from hexrepo_task.app import TaskAdaptor, TaskApp
+from hexrepo_task.interactor.event.app import TaskAdaptor, TaskApp
 from hexrepo_task.interface import QueueAdaptor, QueueConfig
 
 from app.adaptor.db.sql.uow import SqlUOW
@@ -116,9 +116,9 @@ def task_app(queue_uow: QueueUOW, queue: QueueAdaptor, uow: UOW) -> TaskApp:
 
 @pytest.fixture()
 def task_adaptor(
-    task_client: TaskApp, queue: QueueAdaptor, queue_uow: UOW, uow: UOW
+    task_app: TaskApp, queue: QueueAdaptor, queue_uow: UOW, uow: UOW
 ) -> Generator[QueueAdaptor, None, None]:
-    task_adaptor = TaskAdaptor(task_client, uow=queue_uow, queue=queue)
+    task_adaptor = TaskAdaptor(task_app, uow=queue_uow, queue=queue)
     yield task_adaptor
 
 

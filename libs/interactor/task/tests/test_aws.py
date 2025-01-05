@@ -4,8 +4,13 @@ from uuid import uuid4
 import pytest
 
 from hexrepo_task.adaptor.queue.aws import SqsQueueAdaptor
-from hexrepo_task.app import Dependency, TaskApp, TaskFuncWrapper, TaskPromise
 from hexrepo_task.exception import DuplicateTaskName
+from hexrepo_task.interactor.event.app import (
+    Dependency,
+    TaskApp,
+    TaskFuncWrapper,
+    TaskPromise,
+)
 from hexrepo_task.interface import TaskDTO
 
 TaskAppValues = Tuple[TaskApp, TaskFuncWrapper]
