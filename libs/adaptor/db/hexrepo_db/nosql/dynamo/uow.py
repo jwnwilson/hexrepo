@@ -8,13 +8,13 @@ from ...interface import UOW
 
 
 class BaseDynamoUOW(UOW):
-    def __init__(self, db_url: str, required_filters: Optional[Dict[str, str]] = None):
+    def __init__(self, db_url: str, required_filters: Optional[Dict[str, str]] = None, config: Optional[Dict[str, Any]] = None):
         self._db_url: str = db_url
         self._required_filters: Optional[Dict[str, str]] = required_filters
         # Auth using env vars
         if db_url:
             self.resource: DynamoDBServiceResource = boto3.resource(
-                "dynamodb", endpoint_url=db_url
+                "dynamodb", endpoint_url=db_url, region_name=config.get("region", "eu-west-1")
             )
         else:
             self.resource: DynamoDBServiceResource = boto3.resource("dynamodb")

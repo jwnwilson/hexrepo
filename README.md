@@ -45,7 +45,6 @@ AWS_SECRET_ACCESS_KEY
 - Setup backend
     - Setup serverless async tasks
         - Add tests to example to validate event logic
-            - Add logic to handle generator dependency wrapping task & queue. Might need to create queue dependency to queue tasks
             - Make dependency handling fastapi compatible
             - pydantic task param
         - deploy and validate task logic in aws
