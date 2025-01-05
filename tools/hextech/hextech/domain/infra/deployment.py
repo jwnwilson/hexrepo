@@ -39,7 +39,7 @@ def destroy_shared_infra(config: HexrepoConfig, no_input: bool = False) -> None:
     with chdir("infra"):
         run_system_command("make tf_shared_destroy")
     typer.echo("Shared infrastructure destroyed.")
-    
+
 
 def publish_libs(
     config: HexrepoConfig,

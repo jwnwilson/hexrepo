@@ -2,7 +2,6 @@ from typing import Tuple
 from uuid import uuid4
 
 import pytest
-from hexrepo_db.nosql.dynamo.models.example import ExampleUOW
 
 from hexrepo_task.adaptor.queue.aws import SqsQueueAdaptor
 from hexrepo_task.app import Dependency, TaskApp, TaskFuncWrapper, TaskPromise
@@ -14,7 +13,6 @@ TaskAppValues = Tuple[TaskApp, TaskFuncWrapper]
 
 @pytest.fixture
 def task_A(task_app: TaskApp) -> TaskAppValues:
-
     @task_app.task
     def task_A(task: TaskDTO):
         return task.params["name"]
@@ -23,11 +21,12 @@ def task_A(task_app: TaskApp) -> TaskAppValues:
 
 
 def test_invalid_task_name(task_app: TaskApp):
-
     with pytest.raises(ValueError):
+
         @task_app.task
         def task_A_invalid(event: TaskDTO):
             return event.params["name"]
+
 
 def test_duplicate_task(task_A: TaskAppValues):
     app: TaskApp
@@ -53,7 +52,9 @@ def test_aws_queue_task(task_A: TaskAppValues, queue: SqsQueueAdaptor):
     task_result = task_A(test_event)
     assert task_result == "example"
     # queue task
-    task_queue_instance: TaskPromise = app.queue_task(task_A, params=dict(name="example", status="running"))
+    task_queue_instance: TaskPromise = app.queue_task(
+        task_A, params=dict(name="example", status="running")
+    )
     assert task_queue_instance.task.status == "queued"
     # get task
     with queue.get_task() as event:
@@ -66,7 +67,9 @@ def test_aws_handle_task(task_A: TaskAppValues, queue: SqsQueueAdaptor):
     app, task_A = task_A
 
     # queue task
-    task_queue_instance: TaskPromise = app.queue_task(task_A, params=dict(name="example", status="running"))
+    task_queue_instance: TaskPromise = app.queue_task(
+        task_A, params=dict(name="example", status="running")
+    )
     # get task
     with queue.get_task() as event:
         # handle task
@@ -78,21 +81,21 @@ def test_aws_handle_task(task_A: TaskAppValues, queue: SqsQueueAdaptor):
     assert task_queue_instance.task.status == "completed"
 
 
-def test_aws_queue_multiple_task(create_task_app, queue: SqsQueueAdaptor):
+def test_aws_queue_multiple_task(task_A: TaskAppValues, queue: SqsQueueAdaptor):
     app: TaskApp
     task_A: TaskFuncWrapper
-    app, task_A = create_task_app
+    app, task_A = task_A
 
     # queue task
-    task_queue_instance_01: TaskPromise = task_A.queue(
-        params=dict(name="example", status="running")
+    task_queue_instance_01: TaskPromise = app.queue_task(
+        task_A, params=dict(name="example", status="running")
     )
-    task_queue_instance_02: TaskPromise = task_A.queue(
-        params=dict(name="example", status="running")
+    task_queue_instance_02: TaskPromise = app.queue_task(
+        task_A, params=dict(name="example", status="running")
     )
     task_ids = [
-        task_queue_instance_01.task.state.id,
-        task_queue_instance_02.task.state.id,
+        task_queue_instance_01.task.id,
+        task_queue_instance_02.task.id,
     ]
     # get task
     with queue.get_task() as task_01:
@@ -103,18 +106,18 @@ def test_aws_queue_multiple_task(create_task_app, queue: SqsQueueAdaptor):
         assert no_task is None
 
 
-def test_aws_task_error_handled(create_task_app, queue: SqsQueueAdaptor):
+def test_aws_task_error_handled(task_A, queue: SqsQueueAdaptor):
     app: TaskApp
     task_A: TaskFuncWrapper
-    app, task_A = create_task_app
+    app, task_A = task_A
 
     @app.task
-    def task_A_error(event: TaskDTO):
+    def task_A_error(task: TaskDTO):
         raise Exception("error")
 
     # queue task
-    task_queue_instance: TaskPromise = task_A_error.queue(
-        params=dict(name="example", status="running")
+    task_queue_instance: TaskPromise = app.queue_task(
+        task_A_error, params=dict(name="example", status="running")
     )
     # get task
     with queue.get_task() as event:
@@ -124,23 +127,25 @@ def test_aws_task_error_handled(create_task_app, queue: SqsQueueAdaptor):
 
     # Assert task updated
     task_queue_instance.wait()
-    assert task_queue_instance.task.state.status == "error"
+    assert task_queue_instance.task.status == "error"
 
 
-def test_aws_task_dependency(create_task_app, queue: SqsQueueAdaptor):
+def test_aws_task_dependency(task_A, queue: SqsQueueAdaptor):
     app: TaskApp
     task_A: TaskFuncWrapper
-    app, task_A = create_task_app
+    app, task_A = task_A
 
     def get_test_str():
         return "dependency value"
 
     @app.task
-    def task_A_dependency(event: TaskDTO, test: str = Dependency(get_test_str)):
+    def task_A_dependency(task: TaskDTO, test: str = Dependency(get_test_str)):
         return test
 
     # queue task
-    task_queue_instance: TaskPromise = task_A_dependency.queue()
+    task_queue_instance: TaskPromise = app.queue_task(
+        task_A_dependency, params=dict(name="example", status="running")
+    )
     # get task
     with queue.get_task() as event:
         # handle task
@@ -149,4 +154,4 @@ def test_aws_task_dependency(create_task_app, queue: SqsQueueAdaptor):
 
     # Assert task updated
     task_queue_instance.wait()
-    assert task_queue_instance.task.state.status == "completed"
+    assert task_queue_instance.task.status == "completed"

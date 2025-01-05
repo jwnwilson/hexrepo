@@ -2,7 +2,6 @@ import contextlib
 from typing import Dict, Generator, Optional
 
 from sqlalchemy.orm import Session
-from sqlalchemy import MetaData
 
 from ..interface import UOW
 from .session import DatabaseSessionManager

@@ -1,13 +1,13 @@
 from uuid import UUID
 
-from app.interactor.event.tasks.app import create_example_task
 from fastapi import Depends
 from hexrepo_api import CrudRouter
 from hexrepo_task import TaskAdaptor
-from hexrepo_task.interface import TaskCreateDTO, TaskDTO
+from hexrepo_task.interface import TaskDTO
 
 from app.adaptor.db.sql.models.example import ExampleDTO
 from app.domain.example import CreateExampleDTO, UpdateExampleDTO
+from app.interactor.event.tasks.app import create_example_task
 
 from ......dependencies import get_task_adaptor, get_uow
 

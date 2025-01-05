@@ -1,7 +1,7 @@
-from contextlib import contextmanager
 import inspect
 import logging
 from asyncio import sleep
+from contextlib import contextmanager
 from inspect import signature
 from typing import Any, Callable, Dict, Generator, Optional, cast
 from uuid import UUID
@@ -26,7 +26,9 @@ class TaskApp:
     task_registry: Dict[str, Callable] = {}
     _dependency_overrides: Dict[Callable, Callable] = {}
 
-    def __init__(self, get_queue: GetQueue, get_uow: GetUOW, config: Optional[TaskConfig] = None):
+    def __init__(
+        self, get_queue: GetQueue, get_uow: GetUOW, config: Optional[TaskConfig] = None
+    ):
         self._get_queue: GetQueue = get_queue
         self._get_uow: GetUOW = get_uow
         self.config: TaskConfig = config or default_config
@@ -34,7 +36,7 @@ class TaskApp:
     @property
     def dependency_overrides(self) -> Dict[Callable, Callable]:
         return self.__class__._dependency_overrides
-    
+
     @dependency_overrides.setter
     def dependency_overrides(self, value: Dict[Callable, Callable]):
         self.__class__._dependency_overrides = value
@@ -47,7 +49,7 @@ class TaskApp:
                 yield _
         else:
             yield queue
-        
+
     @contextmanager
     def get_uow(self) -> Generator[UOW, None, None]:
         uow = self._get_uow()
@@ -56,7 +58,7 @@ class TaskApp:
                 yield _
         else:
             yield uow
-    
+
     def add_task_func(self, func: TaskFunc):
         func_name = func.__name__
         if (
@@ -117,8 +119,13 @@ class TaskAdaptor:
     """
     Task Adaptor to handle task data and queue operations
     """
+
     def __init__(
-        self, app: TaskApp, uow:UOW, queue: QueueAdaptor, config: Optional[TaskConfig] = None
+        self,
+        app: TaskApp,
+        uow: UOW,
+        queue: QueueAdaptor,
+        config: Optional[TaskConfig] = None,
     ):
         self._app: TaskApp = app
         self._uow: UOW = uow
@@ -126,7 +133,7 @@ class TaskAdaptor:
         self._config: TaskConfig = config or default_config
 
     def _validate_task(self, task: TaskDTO | TaskCreateDTO):
-        if not task.name in self._app.task_registry:
+        if task.name not in self._app.task_registry:
             raise TaskNotFound(f"Task not found: {task.name}")
 
     def read(self, id: UUID) -> TaskDTO:
@@ -149,12 +156,12 @@ class TaskAdaptor:
             if not task.task_id:
                 raise Exception(f"Task not queued, missing task_id for task: {task}")
         except Exception as e:
-            logger.error(
-                f"Error queueing task: {task.name}, id: {task.id}, error: {e}"
-            )
+            logger.error(f"Error queueing task: {task.name}, id: {task.id}, error: {e}")
             self.update(task.id, TaskUpdateDTO(status="error", error=str(e)))
             raise
-        task = self.update(task.id, TaskUpdateDTO(status="queued", task_id=task.task_id))
+        task = self.update(
+            task.id, TaskUpdateDTO(status="queued", task_id=task.task_id)
+        )
         return TaskPromise(task, task_adaptor=self)
 
     def execute(self, task: TaskDTO) -> Any:
@@ -169,14 +176,12 @@ class TaskAdaptor:
             )
             result: Any = task_wrapper(task)
         except Exception as e:
-            logger.error(
-                f"Error running task: {task.name}, id: {task.id}, error: {e}"
-            )
+            logger.error(f"Error running task: {task.name}, id: {task.id}, error: {e}")
             self.update(task.id, TaskUpdateDTO(status="error", error=str(e)))
             raise
 
         # Update Task status
-        self.state = self.update(task.id,TaskUpdateDTO(status="completed"))
+        self.state = self.update(task.id, TaskUpdateDTO(status="completed"))
 
         return result
 
@@ -217,6 +222,7 @@ class TaskFuncWrapper:
     """
     Call task function and handle dependencies
     """
+
     def __init__(self, func: TaskFunc, dependency_overrides: Optional[Dict] = None):
         # validate func is compatible with task app error if invalid args
         self._validate_func(func)
@@ -228,16 +234,25 @@ class TaskFuncWrapper:
         try:
             first_arg = list(func_signature.parameters.keys())[0]
         except IndexError:
-            raise ValueError(f"Task function: {func} must have first parameter as TaskDTO")
-        if func_signature.parameters[first_arg].name != "task" or not func_signature.parameters[first_arg].annotation is TaskDTO :
-            raise ValueError(f"Task function: {func} must have first parameter as TaskDTO")
+            raise ValueError(
+                f"Task function: {func} must have first parameter as TaskDTO"
+            )
+        if (
+            func_signature.parameters[first_arg].name != "task"
+            or func_signature.parameters[first_arg].annotation is not TaskDTO
+        ):
+            raise ValueError(
+                f"Task function: {func} must have first parameter as TaskDTO"
+            )
 
     @property
     def __name__(self) -> str:
         return self.func.__name__
 
     @contextmanager
-    def _get_dependencies(self, func: TaskFunc, kwargs: Dict) -> Generator[Dict, None, None]:
+    def _get_dependencies(
+        self, func: TaskFunc, kwargs: Dict
+    ) -> Generator[Dict, None, None]:
         dependencies = {}
         dependency_generators = {}
         for name, param in inspect.signature(func).parameters.items():
@@ -247,7 +262,7 @@ class TaskFuncWrapper:
                 dependencies[name] = kwargs[name]
             elif isinstance(param.default, Dependency):
                 dep_func: Generator = param.default.get_dependency()
-                dep_iter: Callable = param.default.get_dependency_iter() 
+                dep_iter: Callable = param.default.get_dependency_iter()
                 # For testing purposes
                 if dep_func in self.dependency_overrides:
                     dep_return = self.dependency_overrides[dep_func]()

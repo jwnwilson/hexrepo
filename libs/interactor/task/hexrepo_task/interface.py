@@ -57,7 +57,9 @@ class QueueAdaptor(ABC):
     ):
         raise NotImplementedError
 
-    def add_task(self, task_event: TaskDTO, queue_name: Optional[str] = None) -> TaskDTO:
+    def add_task(
+        self, task_event: TaskDTO, queue_name: Optional[str] = None
+    ) -> TaskDTO:
         raise NotImplementedError
 
     @contextmanager

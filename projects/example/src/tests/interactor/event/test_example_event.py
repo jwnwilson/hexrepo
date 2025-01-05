@@ -1,8 +1,8 @@
-from app.interactor.event.tasks.app import create_example_task
-from app.adaptor.db.sql import SqlUOW
-
 from hexrepo_task.app import TaskApp, TaskPromise
 from hexrepo_task.interface import QueueAdaptor
+
+from app.adaptor.db.sql import SqlUOW
+from app.interactor.event.tasks.app import create_example_task
 
 
 def test_example_event_create_example_task(
@@ -12,17 +12,17 @@ def test_example_event_create_example_task(
         create_example_task,
         # Can we use a DTO here?
         params={
-            "name": "test_01", 
+            "name": "test_01",
             "url": "https://test.com",
-            "location": "test location"
-        }
-    ) 
+            "location": "test location",
+        },
+    )
     assert uow.example.read_multi().total == 0
 
     with queue.get_task() as task_event:
         assert task_event is not None
         task_app.handle(task_event)
-    
+
     task_promise.wait()
     assert uow.example.read_multi().total == 1
     assert task_promise.task.status == "completed"

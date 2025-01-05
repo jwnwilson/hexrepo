@@ -38,9 +38,9 @@ from hextech.domain.prompts.common import (
     prompt_project,
 )
 from hextech.domain.prompts.infra import (
+    prompt_destroy,
     prompt_setup_lib_infra,
     prompt_setup_project_infra,
-    prompt_destroy,
     prompt_setup_shared_infra,
     prompt_setup_tf,
 )
@@ -76,6 +76,7 @@ def setup():
         for env in config.environments:
             create_env_infra(config, env)
 
+
 @app.command()
 def destroy():
     config: HexrepoConfig
@@ -107,7 +108,7 @@ def create_library():
 @app.command()
 def create_project():
     # rm template .venv folder to speed up cookectter
-    os.system("rm -r templates/project/.venv 2> /dev/null || echo > /dev/null")        
+    os.system("rm -r templates/project/.venv 2> /dev/null || echo > /dev/null")
     # CD to projects folder
     with chdir("projects"):
         # Run cookie cutter command to copy template

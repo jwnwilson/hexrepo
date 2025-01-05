@@ -51,6 +51,7 @@ def client(uow, task_adaptor) -> TestClient:
     app.dependency_overrides[get_task_adaptor] = get_task_adaptor_override
     return TestClient(app)
 
+
 @pytest.fixture
 def example_data():
     return {
@@ -78,7 +79,7 @@ def queue() -> Generator[QueueAdaptor, None, None]:
     queue_adapater: SqsQueueAdaptor = SqsQueueAdaptor(config=config)
     try:
         queue_adapater.delete_queue("hexrepo-tasks")
-    except:
+    except:  # noqa
         pass
     queue_adapater.create_queue("hexrepo-tasks")
     return queue_adapater
@@ -106,9 +107,9 @@ def task_app(queue_uow: QueueUOW, queue: QueueAdaptor, uow: UOW) -> TaskApp:
 
     def get_uow_override():
         yield uow
-    
+
     # Make dependencies generic
-    app: TaskApp = TaskApp(get_uow=get_queue_uow_override, get_queue=get_queue_override) 
+    app: TaskApp = TaskApp(get_uow=get_queue_uow_override, get_queue=get_queue_override)
     app.dependency_overrides[get_uow] = get_uow_override
     return app
 
@@ -117,7 +118,6 @@ def task_app(queue_uow: QueueUOW, queue: QueueAdaptor, uow: UOW) -> TaskApp:
 def task_adaptor(
     task_client: TaskApp, queue: QueueAdaptor, queue_uow: UOW, uow: UOW
 ) -> Generator[QueueAdaptor, None, None]:
-    
     task_adaptor = TaskAdaptor(task_client, uow=queue_uow, queue=queue)
     yield task_adaptor
 

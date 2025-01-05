@@ -45,7 +45,9 @@ class SqsQueueAdaptor(QueueAdaptor):
         except Exception as e:
             raise ValueError(f"Error getting queue url: {e}")
 
-    def add_task(self, task_event: TaskDTO, queue_name: Optional[str] = None) -> TaskDTO:
+    def add_task(
+        self, task_event: TaskDTO, queue_name: Optional[str] = None
+    ) -> TaskDTO:
         # Send message to SQS queue
         queue_name = queue_name or self.default_queue
         logger.info(f"Creating task: {task_event.id}")
