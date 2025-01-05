@@ -36,7 +36,3 @@ resource "aws_sqs_queue" "queue" {
     Environment = var.environment
   }
 }
-
-output "queue_arn" {
-  value = aws_sqs_queue.queue.arn
-}
