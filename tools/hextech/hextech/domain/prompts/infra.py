@@ -22,7 +22,7 @@ def prompt_destroy() -> bool:
 
 
 def prompt_setup_project_infra() -> bool:
-    return typer.confirm("Would you like to setup infrastructure for the project?")
+    return typer.confirm("Would you like to initial infra / docker repo to enable CI/CD?")
 
 
 def prompt_deploy_libs() -> bool:
