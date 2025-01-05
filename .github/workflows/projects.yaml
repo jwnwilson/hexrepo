@@ -38,7 +38,12 @@ jobs:
       uses: ./.github/actions/be_venv
       with:
         lock_file: "${{ matrix.project }}/uv.lock"
+    - name: Start Test DB
+      working-directory: ${{ matrix.project }}
+      run: |
+        make db
     - name: Test Projects
+      if: matrix.library == 'projects/example'
       working-directory: ${{ matrix.project }}
       run: |
         make lint
