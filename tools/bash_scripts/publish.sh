@@ -1,8 +1,10 @@
 #! /bin/bash
 
 rm -rf dist
-. ${VENV_DIR}/bin/activate
-uvx publish \
---username=${HEXREPO_LIB_REPO_USERNAME} \
---password=${HEXREPO_LIB_REPO_PASSWORD} \
---publish-url=${HEXREPO_LIB_REPO_URL}
+
+export UV_PUBLISH_URL="${HEXREPO_LIB_REPO_URL}"
+export UV_PUBLISH_USERNAME=aws
+export UV_PUBLISH_PASSWORD="${HEXREPO_LIB_REPO_PASSWORD}"
+
+uv build
+uv publish
