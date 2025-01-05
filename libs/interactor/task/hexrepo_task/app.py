@@ -24,11 +24,20 @@ GetUOW = Callable[[], UOW]
 class TaskApp:
     # Initialise task app to configure how tasks are run
     task_registry: Dict[str, Callable] = {}
+    _dependency_overrides: Dict[Callable, Callable] = {}
 
     def __init__(self, get_queue: GetQueue, get_uow: GetUOW, config: Optional[TaskConfig] = None):
         self._get_queue: GetQueue = get_queue
         self._get_uow: GetUOW = get_uow
         self.config: TaskConfig = config or default_config
+
+    @property
+    def dependency_overrides(self) -> Dict[Callable, Callable]:
+        return self.__class__._dependency_overrides
+    
+    @dependency_overrides.setter
+    def dependency_overrides(self, value: Dict[Callable, Callable]):
+        self.__class__._dependency_overrides = value
 
     @contextmanager
     def get_queue(self) -> Generator[QueueAdaptor, None, None]:
@@ -62,7 +71,7 @@ class TaskApp:
     def task(self, func: TaskFunc, **config) -> "TaskFuncWrapper":
         """Task decorator to register task functions"""
         self.add_task_func(func)
-        return TaskFuncWrapper(func)
+        return TaskFuncWrapper(func, dependency_overrides=self.dependency_overrides)
 
     def handle(self, event: Dict | TaskDTO) -> Any:
         """Handle event and run task"""
@@ -156,7 +165,7 @@ class TaskAdaptor:
         try:
             logger.info(f"Running task: {task.name}, id: {task.id}")
             task_wrapper: TaskFuncWrapper = TaskFuncWrapper(
-                func
+                func, dependency_overrides=self._app.dependency_overrides
             )
             result: Any = task_wrapper(task)
         except Exception as e:
@@ -197,7 +206,10 @@ class Dependency:
     def __init__(self, get_dependency: Callable):
         self._get_dependency = get_dependency
 
-    def get_dependency(self) -> Generator:
+    def get_dependency(self) -> Callable:
+        return self._get_dependency
+
+    def get_dependency_iter(self) -> Generator:
         return self._get_dependency()
 
 
@@ -205,9 +217,10 @@ class TaskFuncWrapper:
     """
     Call task function and handle dependencies
     """
-    def __init__(self, func: TaskFunc):
+    def __init__(self, func: TaskFunc, dependency_overrides: Optional[Dict] = None):
         # validate func is compatible with task app error if invalid args
         self.func: TaskFunc = func
+        self.dependency_overrides: Dict = dependency_overrides or {}
 
     @property
     def __name__(self) -> str:
@@ -223,7 +236,13 @@ class TaskFuncWrapper:
             if name in kwargs:
                 dependencies[name] = kwargs[name]
             elif isinstance(param.default, Dependency):
-                dep_return = param.default.get_dependency()
+                dep_func: Generator = param.default.get_dependency()
+                dep_iter: Callable = param.default.get_dependency_iter() 
+                # For testing purposes
+                if dep_func in self.dependency_overrides:
+                    dep_return = self.dependency_overrides[dep_func]()
+                else:
+                    dep_return = dep_iter
                 if isinstance(dep_return, Generator):
                     dependency_generators[name] = dep_return
                     dependencies[name] = next(dependency_generators[name])

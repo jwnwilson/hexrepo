@@ -49,7 +49,10 @@ db_delete_data: down
 	docker compose run db bash -c "rm -rf /home/dynamodblocal/data/*"
 {% endif %}
 
-db:
+docker_stop:
+	@bash -c "docker ps -aq | xargs docker stop | xargs docker rm"
+
+db: docker_stop
 	docker compose run --service-ports -d db 
 
 down:

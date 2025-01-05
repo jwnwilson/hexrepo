@@ -13,7 +13,10 @@ test: venv db
 	@echo "Running tests..."
 	@../../../tools/bash_scripts/test.sh
 
-db:
+docker_stop:
+	@bash -c "docker ps -aq | xargs docker stop | xargs docker rm"
+
+db: docker_stop
 	@echo "Starting db..."
 	@docker compose up -d 
 

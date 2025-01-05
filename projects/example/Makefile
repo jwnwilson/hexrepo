@@ -46,12 +46,14 @@ db_create_migration: down
 run: down db venv
 	PYTHONPATH=src uv run uvicorn app.interactor.api.fastapi.main:app --reload --env-file env/local.env
 
-db:
+docker_stop:
+	@bash -c "docker ps -aq | xargs docker stop | xargs docker rm"
+
+db: docker_stop
 	docker compose up -d postgres_db localstack
 
-down:
+down: docker_stop
 	docker compose down
-	bash -c "docker ps -aq | xargs docker stop | xargs docker rm"
 
 # Host API locally, connect to cloud db. Still requires manual setting of DB_PASSWORD_SECRET_NAME in bastion.env
 run_bastion: bastion venv

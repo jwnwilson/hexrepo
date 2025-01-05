@@ -48,7 +48,6 @@ AWS_SECRET_ACCESS_KEY
             - Add logic to handle generator dependency wrapping task & queue. Might need to create queue dependency to queue tasks
             - Make dependency handling fastapi compatible
             - pydantic task param
-        - Am I overthinking this? Could I just write a celery adapter to call celery task in lambda?
         - deploy and validate task logic in aws
     - Play with AI crawler project 
         - Setup crawl spider for PLP pages
@@ -59,6 +58,7 @@ AWS_SECRET_ACCESS_KEY
     - Create serverless orchestrator project 
         - 1 task table per hexrepo
         - Setup ECS for long running async orchestrator on fargate
+            - Could move to celery here as celery doesn't work well with lambda as need to start worker to manage tasks
         - Setup workflow orchestration
         - Setup Idempotent re-run
         - Dectorator based workflow setup e.g.:

@@ -51,19 +51,6 @@ def client(uow, task_adaptor) -> TestClient:
     app.dependency_overrides[get_task_adaptor] = get_task_adaptor_override
     return TestClient(app)
 
-
-@pytest.fixture
-def task_client(queue_uow, queue) -> TestClient:
-    def get_uow_override():
-        yield queue_uow
-
-    def get_queue_override():
-        yield queue
-
-    app: TaskApp = TaskApp(get_uow=get_uow_override, get_queue=get_queue_override) 
-    return app
-
-
 @pytest.fixture
 def example_data():
     return {
@@ -107,13 +94,31 @@ def queue_uow() -> Generator[UOW, None, None]:
     yield uow
 
 
+@pytest.fixture
+def task_client(queue_uow, queue, uow) -> TestClient:
+    from app.interactor.dependencies import get_uow
+
+    def get_queue_uow_override():
+        yield queue_uow
+
+    def get_queue_override():
+        yield queue
+
+    def get_uow_override():
+        yield uow
+    
+    # Make dependencies generic
+    app: TaskApp = TaskApp(get_uow=get_queue_uow_override, get_queue=get_queue_override) 
+    app.dependency_overrides[get_uow] = get_uow_override
+    return app
+
+
 @pytest.fixture()
 def task_adaptor(
-    queue: QueueAdaptor, queue_uow: UOW
+    task_client: TaskApp, queue: QueueAdaptor, queue_uow: UOW, uow: UOW
 ) -> Generator[QueueAdaptor, None, None]:
-    from app.interactor.event.tasks.app import app
-
-    task_adaptor = TaskAdaptor(app, uow=queue_uow, queue=queue)
+    
+    task_adaptor = TaskAdaptor(task_client, uow=queue_uow, queue=queue)
     yield task_adaptor
 
 
