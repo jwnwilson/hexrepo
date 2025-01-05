@@ -44,20 +44,20 @@ AWS_SECRET_ACCESS_KEY
 
 - Setup backend
     - Setup serverless async tasks
-        - Add tests to example to validate event logic
-            - Make dependency handling fastapi compatible
-            - pydantic task param
         - deploy and validate task logic in aws
+        - Make dependency handling fastapi compatible
+        - pydantic task param
     - Play with AI crawler project 
         - Setup crawl spider for PLP pages
         - Cache all page data to avoid recrawls
         - Store data in graph format and visualise it
         - Categorise PLP pages
         - Fan out and crawl web page PDP page contents
-    - Create serverless orchestrator project 
+    - Create orchestrator project 
         - 1 task table per hexrepo
         - Setup ECS for long running async orchestrator on fargate
             - Could move to celery here as celery doesn't work well with lambda as need to start worker to manage tasks
+            - Could wrap celery in task adapter to give it a better interface
         - Setup workflow orchestration
         - Setup Idempotent re-run
         - Dectorator based workflow setup e.g.:
