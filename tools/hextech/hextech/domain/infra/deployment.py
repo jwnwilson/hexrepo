@@ -48,7 +48,6 @@ def publish_libs(
 ) -> None:
     typer.echo("Publishing libraries to repo...")
     # Get code repo token
-    assert os.environ.get("HEXREPO_LIB_REPO_URL"), "Library repo url not found."
     authenticate_lib_repo(config)
     # Publish all libraries if none specified
     libraries = libraries if libraries else get_libraries()
