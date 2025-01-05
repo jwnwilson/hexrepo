@@ -17,7 +17,7 @@ class SqsQueueAdaptor(QueueAdaptor):
     def __init__(self, config: QueueConfig):
         # Create SQS client
         if config.endpoint_url:
-            self.sqs = boto3.client("sqs", endpoint_url=config.endpoint_url)
+            self.sqs = boto3.client("sqs", endpoint_url=config.endpoint_url, region_name="eu-west-1", aws_access_key_id="test", aws_secret_access_key="test")
         else:
             self.sqs = boto3.client("sqs")
         self.default_queue: str = config.default_queue
