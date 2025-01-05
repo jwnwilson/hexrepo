@@ -1,6 +1,6 @@
 variable "environment" {}
 
-variable "project" {}
+variable "name" {}
 
 variable "description" {
   default = ""

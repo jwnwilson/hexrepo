@@ -35,7 +35,7 @@ module "security_group" {
   source  = "terraform-aws-modules/security-group/aws"
   version = "~> 4"
 
-  name        = "${var.project}-sg-${var.environment}-internet-access"
+  name        = "${var.name}-sg-${var.environment}-internet-access"
   description = "Internet access for lambda"
   vpc_id      = var.vpc_id
 
@@ -53,7 +53,7 @@ module "security_group" {
 module "lambda" {
   source = "terraform-aws-modules/lambda/aws"
 
-  function_name = "${var.project}_${var.environment}"
+  function_name = "${var.name}_${var.environment}"
   description   = var.description
 
   create_package = false
@@ -89,7 +89,7 @@ module "lambda" {
 
 resource "aws_cloudwatch_event_rule" "schedule_lambda" {
   count               = var.lambda_schedule_expression != null ? 1 : 0
-  name                = "${var.project}_${var.environment}_schedule_lambda"
+  name                = "${var.name}_${var.environment}_schedule_lambda"
   description         = "Schedule perodic Lambda call"
   schedule_expression = var.lambda_schedule_expression
 }
@@ -111,7 +111,7 @@ resource "aws_lambda_permission" "allow_cloudwatch" {
 }
 
 resource "aws_iam_policy" "lambda-policy" {
-  name        = "${var.project}-${var.environment}-lambda-policy"
+  name        = "${var.name}-${var.environment}-lambda-policy"
   description = "allow lambda access necessary resources"
 
   policy = <<EOF

@@ -68,7 +68,7 @@ module "monitor_lambda" {
   source = "../../../../../../infra/tf/aws/modules/lambda"
 
   environment                = terraform.workspace
-  project                    = "monitor"
+  name                       = "monitor"
   ecr_url                    = data.aws_ecr_repository.ecr_repo.repository_url
   docker_tag                 = var.docker_tag
   vpc_id                     = data.aws_vpc.hexrepo.id

@@ -52,7 +52,7 @@ module "{{cookiecutter.project_slug}}_api" {
   source = "../../../../../../infra/tf/aws/modules/lambda"
 
   environment       = terraform.workspace
-  project           = "{{cookiecutter.project_slug}}"
+  name              = "${var.project}-api"
   ecr_url           = data.aws_ecr_repository.ecr_repo.repository_url
   docker_tag        = var.docker_tag
   vpc_id            = data.aws_vpc.hexrepo.id
@@ -107,7 +107,7 @@ module "example_tasks" {
   source = "../../../../../../infra/tf/aws/modules/lambda"
 
   environment        = terraform.workspace
-  project            = var.project
+  name               = "${var.project}-tasks"
   ecr_url            = data.aws_ecr_repository.ecr_repo.repository_url
   docker_tag         = var.docker_tag
   vpc_id             = data.aws_vpc.hexrepo.id
