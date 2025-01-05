@@ -18,9 +18,9 @@ class BaseDynamoUOW(UOW):
         self._required_filters: Optional[Dict[str, str]] = required_filters
         # Auth using env vars
         if db_url:
-            # for tesring
+            # for testing
             self.resource: DynamoDBServiceResource = boto3.resource(
-                "dynamodb", endpoint_url=db_url, region_name=""
+                "dynamodb", endpoint_url=db_url, region_name="", aws_access_key_id="", aws_secret_access_key=""
             )
         else:
             self.resource: DynamoDBServiceResource = boto3.resource("dynamodb")
