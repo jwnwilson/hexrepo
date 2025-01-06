@@ -85,6 +85,13 @@ module "example_tasks" {
   }
 }
 
+module "example_task_nosql" {
+  source = "../../../../../../infra/tf/aws/modules/dynamodb"
+  project = var.project
+  table_name = "hexrepo_${terraform.workspace}_tasks"
+  environment = terraform.workspace
+}
+
 module "example_api_gateway" {
   source = "../../../../../../infra/tf/aws/modules/apigateway"
 
