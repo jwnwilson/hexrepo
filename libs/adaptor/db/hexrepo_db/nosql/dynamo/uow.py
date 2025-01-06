@@ -20,7 +20,11 @@ class BaseDynamoUOW(UOW):
         if db_url:
             # for testing
             self.resource: DynamoDBServiceResource = boto3.resource(
-                "dynamodb", endpoint_url=db_url, region_name="eu-west-1", aws_access_key_id="test", aws_secret_access_key="test"
+                "dynamodb",
+                endpoint_url=db_url,
+                region_name="eu-west-1",
+                aws_access_key_id="test",
+                aws_secret_access_key="test",
             )
         else:
             self.resource: DynamoDBServiceResource = boto3.resource("dynamodb")

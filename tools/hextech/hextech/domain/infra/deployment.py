@@ -1,5 +1,4 @@
 import json
-import os
 import subprocess
 from contextlib import chdir
 from typing import Dict, List, Optional

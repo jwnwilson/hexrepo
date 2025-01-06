@@ -1,4 +1,5 @@
 import inspect
+import json
 import logging
 from asyncio import sleep
 from contextlib import contextmanager
@@ -112,8 +113,11 @@ class TaskApp:
 
     def _parse_event(self, event: Dict) -> TaskDTO:
         """Parse event data"""
-        print(f"Parsing event: {event}")
-        return TaskDTO(**event)
+        try:
+            return TaskDTO(**json.loads(event["Messages"][0]["Body"]))
+        except Exception as e:
+            logger.error(f"Error parsing event: {event}, error: {e}")
+            raise
 
 
 class TaskAdaptor:
