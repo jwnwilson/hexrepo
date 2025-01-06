@@ -114,7 +114,10 @@ class TaskApp:
     def _parse_event(self, event: Dict) -> TaskDTO:
         """Parse event data"""
         try:
-            return TaskDTO(**json.loads(event["Messages"][0]["Body"]))
+            assert (
+                len(event["Records"]) == 1
+            ), "Expected 1 event, multiple are not handled"
+            return TaskDTO(**json.loads(event["Records"][0]["body"]))
         except Exception as e:
             logger.error(f"Error parsing event: {event}, error: {e}")
             raise
