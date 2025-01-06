@@ -51,7 +51,7 @@ module "example_api" {
     DB_URL                  = local.db_url
     DB_PASSWORD_SECRET_NAME = data.aws_secretsmanager_secret.db_secret.name
     PROJECT                 = var.project
-
+    TASK_QUEUE              = "${var.project}_${terraform.workspace}_tasks"
   }
 }
 
@@ -59,7 +59,7 @@ module "queue" {
   source = "../../../../../../infra/tf/aws/modules/sqs"
 
   project     = var.project
-  name        = "${var.project}-${terraform.workspace}"
+  name        = "tasks"
   environment = terraform.workspace
 }
 
@@ -85,6 +85,7 @@ module "example_tasks" {
     DB_URL                  = local.db_url
     DB_PASSWORD_SECRET_NAME = data.aws_secretsmanager_secret.db_secret.name
     PROJECT                 = var.project
+    TASK_QUEUE              = "${var.project}_${terraform.workspace}_tasks"
   }
 }
 

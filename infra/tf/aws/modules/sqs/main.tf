@@ -7,7 +7,7 @@ terraform {
 }
 
 locals {
-  queue_name = "${var.project}_${var.name}_queue_${var.environment}"
+  queue_name = "${var.project}_${var.environment}_${var.name}"
 }
 
 resource "aws_sqs_queue" "deadletter_queue" {

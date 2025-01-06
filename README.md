@@ -48,6 +48,11 @@ AWS_SECRET_ACCESS_KEY
         - Make dependency handling fastapi compatible check for fastapi depends class
         - task param pydantic style
     - move values from .zshrc to .hexrepo file
+    bugs:
+        - stop killing terraform apply jobs
+        - only run test / deploy ci for single project / lib if needed. skip unchanged projects
+        - need terraform lock
+        - need error on db migrate
     - Play with AI crawler project 
         - Setup crawl spider for PLP pages
         - Cache all page data to avoid recrawls
