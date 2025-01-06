@@ -84,8 +84,14 @@ class SqsQueueAdaptor(QueueAdaptor):
                 QueueUrl=self.queue_url,
                 ReceiptHandle=sqs_resp["Records"][0]["receiptHandle"],
             )
+        elif "Messages" in sqs_resp:
+            yield TaskDTO(**json.loads(sqs_resp["Messages"][0]["Body"]))
+            self.sqs.delete_message(
+                QueueUrl=self.queue_url,
+                ReceiptHandle=sqs_resp["Messages"][0]["ReceiptHandle"],
+            )
         else:
-            yield None
+            raise ValueError("Unrecognized SQS response")
 
     def create_queue(self, queue_name: str):
         # Create a new SQS queue
