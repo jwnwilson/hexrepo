@@ -112,6 +112,7 @@ class TaskApp:
 
     def _parse_event(self, event: Dict) -> TaskDTO:
         """Parse event data"""
+        print(f"Parsing event: {event}")
         return TaskDTO(**event)
 
 

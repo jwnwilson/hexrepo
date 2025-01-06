@@ -1,7 +1,8 @@
 from uuid import UUID
 
-from fastapi import Depends
+from fastapi import Depends, HTTPException
 from hexrepo_api import CrudRouter
+from hexrepo_db.exception import RecordNotFound
 from hexrepo_task import TaskAdaptor
 from hexrepo_task.interface import TaskDTO
 
@@ -36,4 +37,7 @@ def start_task(task_adaptor: TaskAdaptor = Depends(get_task_adaptor)) -> TaskDTO
 def get_task(
     id: UUID, task_adaptor: TaskAdaptor = Depends(get_task_adaptor)
 ) -> TaskDTO:
-    return task_adaptor.read(id)
+    try:
+        return task_adaptor.read(id)
+    except RecordNotFound as e:
+        raise HTTPException(status_code=404, detail=str(e))
