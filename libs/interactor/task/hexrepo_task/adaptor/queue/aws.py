@@ -90,10 +90,8 @@ class SqsQueueAdaptor(QueueAdaptor):
                 QueueUrl=self.queue_url,
                 ReceiptHandle=sqs_resp["Messages"][0]["ReceiptHandle"],
             )
-        elif not sqs_resp:
-            yield None
         else:
-            raise ValueError("Unrecognized SQS response")
+            yield None
 
     def create_queue(self, queue_name: str):
         # Create a new SQS queue
