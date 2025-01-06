@@ -50,6 +50,8 @@ module "example_api" {
     CLOUD_PROVIDER          = "AWS"
     DB_URL                  = local.db_url
     DB_PASSWORD_SECRET_NAME = data.aws_secretsmanager_secret.db_secret.name
+    PROJECT                 = var.project
+
   }
 }
 
@@ -82,13 +84,14 @@ module "example_tasks" {
     CLOUD_PROVIDER          = "AWS"
     DB_URL                  = local.db_url
     DB_PASSWORD_SECRET_NAME = data.aws_secretsmanager_secret.db_secret.name
+    PROJECT                 = var.project
   }
 }
 
 module "example_task_nosql" {
   source = "../../../../../../infra/tf/aws/modules/dynamodb"
   project = var.project
-  table_name = "hexrepo_${terraform.workspace}_tasks"
+  table_name = "tasks"
   environment = terraform.workspace
 }
 
