@@ -44,8 +44,6 @@ AWS_SECRET_ACCESS_KEY
 
 - Setup backend
     bugs:
-        - Fix library deployments
-        - stop killing terraform apply jobs
         - only run test / deploy ci for single project / lib if needed. skip unchanged projects
         - need terraform lock
         - need error on db migrate
