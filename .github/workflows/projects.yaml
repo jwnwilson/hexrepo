@@ -79,12 +79,13 @@ jobs:
     needs: plan_infra
     if: github.ref == 'refs/heads/main' && needs.plan_infra.result == 'success'
     strategy:
+      fail-fast: false
       matrix:
         project:
-        - "projects/example"
-        - "projects/monitor"
+          - "projects/example"
+          - "projects/monitor"
         env:
-        - "default"
+          - "default"
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
