@@ -23,9 +23,9 @@ build:
 # DB management
 {% if cookiecutter.use_db == "y" and cookiecutter.use_db_logic == "sql" %}
 db_migrate:
-	bash -c "uv run alembic upgrade head"
-	@EXIT_CODE=$$?
-    @exit $$EXIT_CODE
+	bash -c "uv run alembic upgrade head" ;\
+	EXIT_CODE=$$?;\
+    exit $$EXIT_CODE
 
 db_migrate_local:
 	bash -c "env $$(cat env/local.env|xargs) uv run alembic upgrade head"

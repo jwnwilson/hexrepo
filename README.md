@@ -45,7 +45,6 @@ AWS_SECRET_ACCESS_KEY
 - Setup backend
     bugs:
         - only run test / deploy ci for single project / lib if needed. skip unchanged projects
-        - need error on db migrate
     - move values from .zshrc to .hexrepo file
     - Improve serverless async tasks
         - Make dependency handling fastapi compatible check for fastapi depends class
