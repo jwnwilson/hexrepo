@@ -44,7 +44,6 @@ AWS_SECRET_ACCESS_KEY
 
 - Setup backend
     bugs:
-        - need terraform lock
         - only run test / deploy ci for single project / lib if needed. skip unchanged projects
         - need error on db migrate
     - move values from .zshrc to .hexrepo file
