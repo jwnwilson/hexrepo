@@ -84,6 +84,7 @@ jobs:
   deploy_libs:
     needs: test_libs
     strategy:
+      fail-fast: false
       matrix:
         library:
         - "libs/adaptor/db"

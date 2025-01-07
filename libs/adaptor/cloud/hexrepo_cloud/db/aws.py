@@ -84,3 +84,33 @@ class AWSRDSManager:
     @classmethod
     def instance_tags_to_dict(cls, instance: Dict[str, Any]) -> Dict[str, str]:
         return {tag["Key"]: tag["Value"] for tag in instance.get("TagList", [])}
+
+
+class DynamoDBManager():
+    def __init__(self, config: AWSConfig):
+        self.config: AWSConfig = config
+        self.client = boto3.client("dynamodb", self.config.AWS_REGION)
+
+    def table_exists(self, table_name: str) -> bool:
+        try:
+            self.client.describe_table(TableName=table_name)
+            return True
+        except self.client.exceptions.ResourceNotFoundException:
+            return False
+
+    def create_table(
+            self, table_name: str, key_schema: List[Dict[str, str]], attr_definitions: List[Dict[str, str]]
+        ) -> None:
+        self.client.create_table(
+            TableName=table_name,
+            KeySchema=key_schema,
+            AttributeDefinitions=[
+                {
+                    "AttributeName": key["AttributeName"], 
+                    "AttributeType": key["AttributeType"]
+                }
+                for key in attr_definitions
+            ],
+            ProvisionedThroughput={"ReadCapacityUnits": 5, "WriteCapacityUnits": 5},
+        )
+        logger.info(f"Created DynamoDB table: {table_name}")

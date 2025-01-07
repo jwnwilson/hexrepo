@@ -104,6 +104,17 @@ class S3Adaptor(StorageAdaptor):
         logger.info(f"Deleted file: {path} from s3 bucket: {self.bucket_name}")
 
     @classmethod
+    def bucket_exists(cls, bucket_name: str, config: AWSConfig) -> bool:
+        s3 = boto3.client("s3")
+        try:
+            s3.head_bucket(Bucket=bucket_name)
+            return True
+        except Exception as err:
+            if "404" in str(err):
+                return False
+            raise err
+
+    @classmethod
     def create_bucket(cls, bucket_name: str, config: AWSConfig) -> None:
         client = boto3.client("s3")
         try:

@@ -62,7 +62,7 @@ def publish_libs(
         lib_type = get_library_type(lib)
         with chdir(f"libs/{lib_type}/{lib}"):
             run_system_command(
-                f"make publish PUBLISH_URL={config.hexrepo_lib_repo_url}"
+                f"make publish HEXREPO_LIB_REPO_URL={config.hexrepo_lib_repo_url}"
             )
     # Placeholder for publishing libraries to repo
     typer.echo("Libraries published successfully.")

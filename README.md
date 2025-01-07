@@ -43,16 +43,12 @@ AWS_SECRET_ACCESS_KEY
 # To Do
 
 - Setup backend
-    - Setup serverless async tasks
-        - deploy and validate task logic in aws
+    bugs:
+        - only run test / deploy ci for single project / lib if needed. skip unchanged projects
+    - move values from .zshrc to .hexrepo file
+    - Improve serverless async tasks
         - Make dependency handling fastapi compatible check for fastapi depends class
         - task param pydantic style
-    - move values from .zshrc to .hexrepo file
-    bugs:
-        - stop killing terraform apply jobs
-        - only run test / deploy ci for single project / lib if needed. skip unchanged projects
-        - need terraform lock
-        - need error on db migrate
     - Play with AI crawler project 
         - Setup crawl spider for PLP pages
         - Cache all page data to avoid recrawls
@@ -68,19 +64,21 @@ AWS_SECRET_ACCESS_KEY
         - Setup Idempotent re-run
         - Dectorator based workflow setup e.g.:
             https://github.com/aws/chalice/blob/master/chalice/app.py#L719
-    - Add ability to disable / destroy projects
     - Setup auth / cross project auth / authorisation
+    - Enforce architecture rules:
+        - tach: https://github.com/gauge-sh/tach
+        - https://roman.pt/posts/python-architecture-linter/
+        - [deply](https://github.com/Vashkatsi/deply)
     - Setup command to run local against bastion db
+    - Add ability to disable / destroy projects
     - Improve docker container builds
         - Reduce image size
             https://github.com/astral-sh/uv/issues/8935
         - Setup base lib image to re-use for projects
-    - Enforce architecture rules:
-        - https://roman.pt/posts/python-architecture-linter/
-        - [deply](https://github.com/Vashkatsi/deply)
     - Combine shared infra + env infra pull add envs to config and pull them down
     - Add smoke test / E2E tests
     - Implement template -> project update:
+        - Copier https://copier.readthedocs.io/en/stable/
         - Look at cruft again
         - Re-render template with project settings 
         - Create Diff with changes

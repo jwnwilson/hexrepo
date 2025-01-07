@@ -22,7 +22,9 @@ build:
 
 # DB management
 db_migrate:
-	bash -c "source $(VENV_DIR)/bin/activate && alembic upgrade head"
+	bash -c "source $(VENV_DIR)/bin/activate && alembic upgrade head" ;\
+	EXIT_CODE=$$?;\
+    exit $$EXIT_CODE
 
 db_migrate_docker:
 	docker compose run api bash -c "alembic upgrade head"

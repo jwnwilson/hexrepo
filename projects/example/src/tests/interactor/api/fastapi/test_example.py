@@ -68,7 +68,10 @@ def test_example_delete(client: TestClient, created_example):
 
 
 def test_example_create_task(client: TestClient, queue: QueueAdaptor):
-    response = client.post("/api/v1/example/task")
+    response = client.post(
+        "/api/v1/example/task",
+        json={"name": "test", "url": "test.com", "location": "test location"},
+    )
     response_data: Dict = response.json()
 
     with queue.get_task() as task:
@@ -81,7 +84,10 @@ def test_example_create_task(client: TestClient, queue: QueueAdaptor):
 
 
 def test_example_get_task(client: TestClient, created_example):
-    response = client.post("/api/v1/example/task")
+    response = client.post(
+        "/api/v1/example/task",
+        json={"name": "test", "url": "test.com", "location": "test location"},
+    )
     response_data: Dict = response.json()
 
     response = client.get(f"/api/v1/example/task/{response_data["id"]}")
