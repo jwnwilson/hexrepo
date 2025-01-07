@@ -3,6 +3,7 @@ terraform {
     region = "eu-west-1"
     bucket = "hexrepo-jwn"
     key = "hexrepo-shared.tfstate"
+    dynamodb_table = "terraform-state-lock-dynamo"
   }
   required_providers {
     aws = {
