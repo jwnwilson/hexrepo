@@ -5,14 +5,14 @@ import typer
 from hexrepo_cloud.config import AWSConfig
 from pydantic_settings import BaseSettings
 
-from hextech.domain.prompts.common import prompt_cloud_provider, prompt_shell_file
+from hextech.domain.prompts.common import prompt_cloud_provider
 from hextech.domain.prompts.config import prompt_config_setup, prompt_environments
 from hextech.domain.system import set_env_var
 
 
 class HexrepoConfig(BaseSettings):
     project_name: str = "hexrepo"
-    shell_file: str = "~/.zshrc"
+    shell_file: str = "~/.hexrepo"
     cloud_provider: str = "aws"
     cloud_provider_config: Optional[Union[AWSConfig]] = None
     environments: List[str] = ["dev", "prd"]
@@ -71,7 +71,7 @@ def aws_config(config: HexrepoConfig) -> HexrepoConfig:
 
 
 def setup_project_config() -> HexrepoConfig:
-    shell_file = prompt_shell_file()
+    shell_file = "~/.hexrepo"
     cloud_provider = prompt_cloud_provider()
     environments = prompt_environments()
     domain = typer.prompt("Please enter your registered domain name")

@@ -31,19 +31,37 @@ jobs:
         - "projects/example"
         - "projects/monitor"
     runs-on: ubuntu-latest
+    outputs:
+      skip: ${{ steps.check_modified.outputs.skip }}
     steps:
     - uses: actions/checkout@v4
+      with:
+        fetch-depth: 2
     - id: python_venv
       name: Cache project venv
       uses: ./.github/actions/be_venv
       with:
         lock_file: "${{ matrix.project }}/uv.lock"
+    - name: Check Project Modified
+      id: check_modified
+      run: |
+        set +e
+        export PROJ=`basename "${{ matrix.project }}"`
+        make check_project_modified PROJECT=${PROJ}
+        if [ $? -ne 0 ]; then
+            echo "Setting skip = false"
+            echo "skip=false" >> $GITHUB_OUTPUT
+        else
+            echo "Setting skip = true"
+            echo "skip=true" >> $GITHUB_OUTPUT
+        fi
     - name: Start Test DB
-      if: matrix.project == 'projects/example'
+      if: matrix.project == 'projects/example' && steps.check_modified.outputs.skip == 'false'
       working-directory: ${{ matrix.project }}
       run: |
         make db
     - name: Test Projects
+      if: steps.check_modified.outputs.skip == 'false'
       working-directory: ${{ matrix.project }}
       run: |
         make lint
@@ -56,20 +74,45 @@ jobs:
         - "projects/example"
         - "projects/monitor"
     runs-on: ubuntu-latest
+    outputs:
+      skip: ${{ steps.check_modified.outputs.skip }}
     steps:
     - uses: actions/checkout@v4
+      with:
+        fetch-depth: 2
+    - id: python_venv
+      name: Cache project venv
+      uses: ./.github/actions/be_venv
+      with:
+        lock_file: "${{ matrix.project }}/uv.lock"
+    - name: Check Project Modified
+      id: check_modified
+      run: |
+       set +e
+        export PROJ=`basename "${{ matrix.project }}"`
+        make check_project_modified PROJECT=${PROJ}
+        if [ $? -ne 0 ]; then
+            echo "Setting skip = false"
+            echo "skip=false" >> $GITHUB_OUTPUT
+        else
+            echo "Setting skip = true"
+            echo "skip=true" >> $GITHUB_OUTPUT
+        fi
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v2
+      if: steps.check_modified.outputs.skip == 'false'
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID}}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ vars.AWS_DEFAULT_REGION }}
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v3
+      if: steps.check_modified.outputs.skip == 'false'
       with:
           terraform_version: "^1.3.7"
           terraform_wrapper: false
     - name: Infra plan
+      if: steps.check_modified.outputs.skip == 'false'
       working-directory: ${{ matrix.project }}
       run: |
         make tf_init
@@ -77,6 +120,8 @@ jobs:
   deploy_projects:
     environment: production
     needs: plan_infra
+    outputs:
+      skip: ${{ steps.check_modified.outputs.skip }}
     if: github.ref == 'refs/heads/main' && needs.plan_infra.result == 'success'
     strategy:
       fail-fast: false
@@ -102,17 +147,33 @@ jobs:
       uses: ./.github/actions/be_venv
       with:
         lock_file: "${{ matrix.project }}/uv.lock"
+    - name: Check Project Modified
+      id: check_modified
+      run: |
+       set +e
+        export PROJ=`basename "${{ matrix.project }}"`
+        make check_project_modified PROJECT=${PROJ}
+        if [ $? -ne 0 ]; then
+            echo "Setting skip = false"
+            echo "skip=false" >> $GITHUB_OUTPUT
+        else
+            echo "Setting skip = true"
+            echo "skip=true" >> $GITHUB_OUTPUT
+        fi
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v3
+      if: steps.check_modified.outputs.skip == 'false'
       with:
           terraform_version: "^1.3.7"
           terraform_wrapper: false
     - name: DB migration
+      if: steps.check_modified.outputs.skip == 'false'
       shell: bash
       run: |
         export PROJ=`basename "${{ matrix.project }}"`
         make migrate_db PROJECT=${PROJ} ENV=${{ matrix.env }} 
     - name: Deploy Project
+      if: steps.check_modified.outputs.skip == 'false'
       shell: bash
       run: |
         export PROJ=`basename "${{ matrix.project }}"`

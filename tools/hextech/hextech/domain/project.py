@@ -46,11 +46,17 @@ def validate_libraries(libraries: Optional[List[str]] = None) -> List[str]:
     return libraries
 
 
+def get_modified_files() -> str:
+    current_branch = subprocess.getoutput("git branch --show-current")
+    if current_branch != "main":
+        return subprocess.getoutput("git fetch --unshallow origin main && git diff origin/main HEAD --name-only")
+    else:
+        return subprocess.getoutput("git fetch && git diff origin/main HEAD^ --name-only")
+
+
 def library_version_bump_required(library: str) -> bool:
     library_type: str = get_library_type(library)
-    modified_files = subprocess.getoutput(
-        "git fetch && git diff origin/main HEAD --name-only"
-    )
+    modified_files = get_modified_files()
     if f"libs/{library_type}/{library}" in modified_files:
         pyproject_diff: str = subprocess.getoutput(
             f"git diff origin/main HEAD libs/{library_type}/{library}/pyproject.toml"
@@ -64,9 +70,7 @@ def library_version_bump_required(library: str) -> bool:
 def get_modified_libraries(libraries: Optional[List[str]] = None) -> List[str]:
     libraries = libraries or get_libraries()
     modified_libs: List[str] = []
-    modified_files = subprocess.getoutput(
-        "git fetch && git diff origin/main HEAD^ --name-only"
-    )
+    modified_files = get_modified_files()
     for lib in libraries:
         lib_type = get_library_type(lib)
         if f"libs/{lib_type}/{lib}" in modified_files:
@@ -76,9 +80,7 @@ def get_modified_libraries(libraries: Optional[List[str]] = None) -> List[str]:
 
 def get_modified_projects(projects: List[str]) -> List[str]:
     modified_projects: List[str] = []
-    modified_files = subprocess.getoutput(
-        "git fetch && git diff origin/main HEAD^ --name-only"
-    )
+    modified_files = get_modified_files()
     for proj in projects:
         if f"projects/{proj}" in modified_files:
             modified_projects.append(proj)
