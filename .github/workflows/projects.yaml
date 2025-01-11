@@ -45,6 +45,7 @@ jobs:
     - name: Check Project Modified
       id: check_modified
       run: |
+        set +e
         export PROJ=`basename "${{ matrix.project }}"`
         make check_project_modified PROJECT=${PROJ}
         retVal=$?
@@ -88,6 +89,7 @@ jobs:
     - name: Check Project Modified
       id: check_modified
       run: |
+        set +e
         export PROJ=`basename "${{ matrix.project }}"`
         make check_project_modified PROJECT=${PROJ}
         retVal=$?
@@ -148,6 +150,7 @@ jobs:
     - name: Check Project Modified
       id: check_modified
       run: |
+        set +e
         export PROJ=`basename "${{ matrix.project }}"`
         make check_project_modified PROJECT=${PROJ}
         retVal=$?

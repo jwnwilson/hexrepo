@@ -50,6 +50,7 @@ jobs:
     - name: Check Library Modified
       id: check_modified
       run: |
+        set +e
         export LIB=`basename "${{ matrix.library }}"`
         make check_library_modified LIBRARY=${LIB}
         retVal=$?
@@ -123,6 +124,7 @@ jobs:
     - name: Check Library Modified
       id: check_modified
       run: |
+        set +e
         export LIB=`basename "${{ matrix.library }}"`
         make check_library_modified LIBRARY=${LIB}
         retVal=$?
