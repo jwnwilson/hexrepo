@@ -46,6 +46,7 @@ AWS_SECRET_ACCESS_KEY
     bugs:
         - only run test / deploy ci for single project / lib if needed. skip unchanged projects
     - move values from .zshrc to .hexrepo file
+    - setup better logging with loguru
     - Improve serverless async tasks
         - Make dependency handling fastapi compatible check for fastapi depends class
         - task param pydantic style

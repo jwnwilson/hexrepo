@@ -26,6 +26,8 @@ from hextech.domain.infra.storage import create_tf_state
 from hextech.domain.project import (
     get_libraries,
     get_library_type,
+    get_modified_libraries,
+    get_modified_projects,
     get_projects,
     install_library_in_project,
     library_version_bump_required,
@@ -191,15 +193,39 @@ def test_tools():
 
 
 @app.command()
-def check_version_bump(libraries: Optional[List[str]] = None):
+def check_library_bump(lib: str):
     libraries: List[str] = validate_libraries(libraries)
-    for lib in libraries:
-        if library_version_bump_required(lib):
-            typer.echo(f"Library: '{lib}' needs version bump")
-            raise typer.Abort(
-                f"library '{lib}' needs version bump, (please commit version bump)"
-            )
-        typer.echo(f"Library: '{lib}' version is valid...")
+    assert lib in libraries, "Invalid library name provided"
+    if library_version_bump_required(lib):
+        typer.echo(f"Library: '{lib}' needs version bump")
+        raise typer.Abort(
+            f"library '{lib}' needs version bump, (please commit version bump)"
+        )
+    typer.echo(f"Library: '{lib}' version is valid...")
+
+
+@app.command()
+def check_library_modified(lib: str):
+    libraries: List[str] = validate_libraries(libraries)
+    assert lib in libraries, "Invalid library name provided"
+    if get_modified_libraries([lib]):
+        typer.echo(f"Library: '{lib}' modified")
+        raise typer.Abort(
+            f"library '{lib}' modified"
+        )
+    typer.echo(f"Library: '{lib}' unmodified...")
+
+
+@app.command()
+def check_project_modified(project: str):
+    projects: List[str] = get_projects()
+    assert project in projects, "Invalid project name provided"
+    if get_modified_projects([project]):
+        typer.echo(f"Project: '{project}' modified")
+        raise typer.Abort(
+            f"Project: '{project}' modified"
+        )
+    typer.echo(f"Project: '{project}' unmodified...")
 
 
 @app.command()

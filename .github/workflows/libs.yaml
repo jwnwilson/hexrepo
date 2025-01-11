@@ -36,6 +36,8 @@ jobs:
         - "libs/interactor/api"
         - "libs/interactor/task"
     runs-on: ubuntu-latest
+    outputs:
+      skip: ${{ steps.check_modified.outputs.skip }}
     steps:
     - uses: actions/checkout@v4
     - id: python_venv
@@ -43,18 +45,30 @@ jobs:
       uses: ./.github/actions/be_venv
       with:
         lock_file: "${{ matrix.library }}/uv.lock"
+    - name: Check Library Modified
+      id: check_modified
+      run: |
+        export LIB=`basename "${{ matrix.library }}"`
+        make check_library_modified LIBRARY=${LIB}
+        retVal=$?
+        if [ $retVal -ne 0 ]; then
+            echo "skip=false" >> $GITHUB_OUTPUT
+        else
+            echo "skip=true" >> $GITHUB_OUTPUT
+        fi
     - name: Start LocalStack
-      if: matrix.library == 'libs/adaptor/db' || matrix.library == 'libs/interactor/task'
+      if: (matrix.library == 'libs/adaptor/db' || matrix.library == 'libs/interactor/task') && ${{ steps.check_modified.outputs.skip == 'false' }}
       uses: LocalStack/setup-localstack@v0.2.2
       with:
         image-tag: 'latest'
         install-awslocal: 'true'
     - name: Setup Test DBs
-      if: matrix.library == 'libs/adaptor/db'
+      if: matrix.library == 'libs/adaptor/db' && ${{ steps.check_modified.outputs.skip == 'false' }}
       working-directory: ${{ matrix.library }}
       run: |
         docker compose up postgres_db mongodb -d
     - name: Test Library
+      if: ${{ steps.check_modified.outputs.skip == 'false' }}
       working-directory: ${{ matrix.library }}
       run: |
         make lint
@@ -80,7 +94,7 @@ jobs:
     - name: Check Version Bump Needed
       run: |
         export LIB=`basename "${{ matrix.library }}"`
-        make check_version_bump LIBRARY=${LIB}
+        make check_library_bump LIBRARY=${LIB}
   deploy_libs:
     needs: test_libs
     strategy:
@@ -92,6 +106,8 @@ jobs:
         - "libs/interactor/api"
         - "libs/interactor/task"
     runs-on: ubuntu-latest
+    outputs:
+      skip: ${{ steps.check_modified.outputs.skip }}
     if: github.ref == 'refs/heads/main' && needs.test_libs.result == 'success'
     steps:
     - uses: actions/checkout@v4
@@ -102,7 +118,19 @@ jobs:
       uses: ./.github/actions/be_venv
       with:
         lock_file: "${{ matrix.library }}/uv.lock"
+    - name: Check Library Modified
+      id: check_modified
+      run: |
+        export LIB=`basename "${{ matrix.library }}"`
+        make check_library_modified LIBRARY=${LIB}
+        retVal=$?
+        if [ $retVal -ne 0 ]; then
+            echo "skip=false" >> $GITHUB_OUTPUT
+        else
+            echo "skip=true" >> $GITHUB_OUTPUT
+        fi
     - name: Deploy Library
+      if: ${{ steps.check_modified.outputs.skip == 'false' }}
       run: |
         export LIB=`basename "${{ matrix.library }}"`
         make deploy_libs_check_modified LIBRARY=${LIB}
