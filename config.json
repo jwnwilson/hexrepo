@@ -1,6 +1,6 @@
 {
     "project_name": "hexrepo",
-    "shell_file": "~/.zshrc",
+    "shell_file": "~/.hexrepo",
     "cloud_provider": "aws",
     "cloud_provider_config": {
         "AWS_REGION": "eu-west-1",

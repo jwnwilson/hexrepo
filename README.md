@@ -43,8 +43,6 @@ AWS_SECRET_ACCESS_KEY
 # To Do
 
 - Setup backend
-    bugs:
-        - only run test / deploy ci for single project / lib if needed. skip unchanged projects
     - move values from .zshrc to .hexrepo file
     - setup better logging with loguru
     - Improve serverless async tasks

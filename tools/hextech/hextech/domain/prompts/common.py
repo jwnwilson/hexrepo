@@ -48,11 +48,11 @@ def prompt_library_type() -> str:
 
 def prompt_shell_file() -> str:
     print("Please enter shell file:")
-    print("1 - ~/.bashrc")
+    print("1 - ~/.hexrepo")
     print("2 - ~/.zshrc")
     shell_option: str = typer.prompt("Choose from [1, 2]")
     try:
-        shell_file = {"1": "~/.bashrc", "2": "~/.zshrc"}[shell_option]
+        shell_file = {"1": "~/.hexrepo", "2": "~/.zshrc"}[shell_option]
     except KeyError:
         typer.echo("Invalid shell file, please select an option: 1, 2.")
         return
