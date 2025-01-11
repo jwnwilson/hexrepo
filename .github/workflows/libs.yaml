@@ -53,8 +53,7 @@ jobs:
         set +e
         export LIB=`basename "${{ matrix.library }}"`
         make check_library_modified LIBRARY=${LIB}
-        retVal=$?
-        if [ $retVal -ne 0 ]; then
+        if [ $? -ne 0 ]; then
             echo "skip=false" >> $GITHUB_OUTPUT
         else
             echo "skip=true" >> $GITHUB_OUTPUT
@@ -127,10 +126,10 @@ jobs:
         set +e
         export LIB=`basename "${{ matrix.library }}"`
         make check_library_modified LIBRARY=${LIB}
-        retVal=$?
-        if [ $retVal -ne 0 ]; then
+        if [ $? -ne 0 ]; then
             echo "skip=false" >> $GITHUB_OUTPUT
         else
+            echo "Setting skip = true"
             echo "skip=true" >> $GITHUB_OUTPUT
         fi
     - name: Deploy Library

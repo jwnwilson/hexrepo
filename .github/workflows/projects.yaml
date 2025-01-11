@@ -48,11 +48,10 @@ jobs:
         set +e
         export PROJ=`basename "${{ matrix.project }}"`
         make check_project_modified PROJECT=${PROJ}
-        retVal=$?
-        echo "retVal: $retVal"
-        if [ $retVal -ne 0 ]; then
+        if [ $? -ne 0 ]; then
             echo "skip=false" >> $GITHUB_OUTPUT
         else
+            echo "Setting skip = true"
             echo "skip=true" >> $GITHUB_OUTPUT
         fi
     - name: Start Test DB
@@ -92,10 +91,10 @@ jobs:
         set +e
         export PROJ=`basename "${{ matrix.project }}"`
         make check_project_modified PROJECT=${PROJ}
-        retVal=$?
-        if [ $retVal -ne 0 ]; then
+        if [ $? -ne 0 ]; then
             echo "skip=false" >> $GITHUB_OUTPUT
         else
+            echo "Setting skip = true"
             echo "skip=true" >> $GITHUB_OUTPUT
         fi
     - name: Configure AWS credentials
@@ -153,8 +152,7 @@ jobs:
         set +e
         export PROJ=`basename "${{ matrix.project }}"`
         make check_project_modified PROJECT=${PROJ}
-        retVal=$?
-        if [ $retVal -ne 0 ]; then
+        if [ $? -ne 0 ]; then
             echo "skip=false" >> $GITHUB_OUTPUT
         else
             echo "skip=true" >> $GITHUB_OUTPUT
