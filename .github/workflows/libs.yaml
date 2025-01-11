@@ -86,6 +86,7 @@ jobs:
         - "libs/interactor/api"
         - "libs/interactor/task"
     runs-on: ubuntu-latest
+    if: github.ref != 'refs/heads/main'
     steps:
     - uses: actions/checkout@v4
       with:

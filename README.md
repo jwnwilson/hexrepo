@@ -43,7 +43,6 @@ AWS_SECRET_ACCESS_KEY
 # To Do
 
 - Setup backend
-    - move values from .zshrc to .hexrepo file
     - setup better logging with loguru
     - Improve serverless async tasks
         - Make dependency handling fastapi compatible check for fastapi depends class
