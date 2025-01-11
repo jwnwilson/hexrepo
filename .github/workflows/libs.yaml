@@ -40,6 +40,8 @@ jobs:
       skip: ${{ steps.check_modified.outputs.skip }}
     steps:
     - uses: actions/checkout@v4
+      with:
+        fetch-depth: 2
     - id: python_venv
       name: Cache project venv
       uses: ./.github/actions/be_venv
