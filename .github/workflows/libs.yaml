@@ -54,8 +54,10 @@ jobs:
         export LIB=`basename "${{ matrix.library }}"`
         make check_library_modified LIBRARY=${LIB}
         if [ $? -ne 0 ]; then
+            echo "Setting skip = false"
             echo "skip=false" >> $GITHUB_OUTPUT
         else
+            echo "Setting skip = true"
             echo "skip=true" >> $GITHUB_OUTPUT
         fi
     - name: Start LocalStack
@@ -127,6 +129,7 @@ jobs:
         export LIB=`basename "${{ matrix.library }}"`
         make check_library_modified LIBRARY=${LIB}
         if [ $? -ne 0 ]; then
+            echo "Setting skip = false"
             echo "skip=false" >> $GITHUB_OUTPUT
         else
             echo "Setting skip = true"

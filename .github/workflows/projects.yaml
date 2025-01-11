@@ -49,6 +49,7 @@ jobs:
         export PROJ=`basename "${{ matrix.project }}"`
         make check_project_modified PROJECT=${PROJ}
         if [ $? -ne 0 ]; then
+            echo "Setting skip = false"
             echo "skip=false" >> $GITHUB_OUTPUT
         else
             echo "Setting skip = true"
@@ -87,10 +88,11 @@ jobs:
     - name: Check Project Modified
       id: check_modified
       run: |
-        set +e
+       set +e
         export PROJ=`basename "${{ matrix.project }}"`
         make check_project_modified PROJECT=${PROJ}
         if [ $? -ne 0 ]; then
+            echo "Setting skip = false"
             echo "skip=false" >> $GITHUB_OUTPUT
         else
             echo "Setting skip = true"
@@ -148,12 +150,14 @@ jobs:
     - name: Check Project Modified
       id: check_modified
       run: |
-        set +e
+       set +e
         export PROJ=`basename "${{ matrix.project }}"`
         make check_project_modified PROJECT=${PROJ}
         if [ $? -ne 0 ]; then
+            echo "Setting skip = false"
             echo "skip=false" >> $GITHUB_OUTPUT
         else
+            echo "Setting skip = true"
             echo "skip=true" >> $GITHUB_OUTPUT
         fi
     - name: Setup Terraform
