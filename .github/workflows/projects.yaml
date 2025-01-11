@@ -53,9 +53,10 @@ jobs:
             echo "skip=true" >> $GITHUB_OUTPUT
         fi
     - name: Start Test DB
-      if: matrix.project == 'projects/example' && ${{ steps.check_modified.outputs.skip == 'false' }}
+      if: matrix.project == 'projects/example' && steps.check_modified.outputs.skip == 'false'
       working-directory: ${{ matrix.project }}
       run: |
+        echo ${{ steps.check_modified.outputs.skip }}
         make db
     - name: Test Projects
       if: ${{ steps.check_modified.outputs.skip == 'false' }}
