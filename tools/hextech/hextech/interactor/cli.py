@@ -193,27 +193,25 @@ def test_tools():
 
 
 @app.command()
-def check_library_bump(lib: str):
-    libraries: List[str] = validate_libraries(libraries)
-    assert lib in libraries, "Invalid library name provided"
-    if library_version_bump_required(lib):
-        typer.echo(f"Library: '{lib}' needs version bump")
+def check_library_bump(library: str):
+    validate_libraries([library])
+    if library_version_bump_required(library):
+        typer.echo(f"Library: '{library}' needs version bump")
         raise typer.Abort(
-            f"library '{lib}' needs version bump, (please commit version bump)"
+            f"library '{library}' needs version bump, (please commit version bump)"
         )
-    typer.echo(f"Library: '{lib}' version is valid...")
+    typer.echo(f"Library: '{library}' version is valid...")
 
 
 @app.command()
-def check_library_modified(lib: str):
-    libraries: List[str] = validate_libraries(libraries)
-    assert lib in libraries, "Invalid library name provided"
-    if get_modified_libraries([lib]):
-        typer.echo(f"Library: '{lib}' modified")
+def check_library_modified(library: str):
+    validate_libraries([library])
+    if get_modified_libraries([library]):
+        typer.echo(f"Library: '{library}' modified")
         raise typer.Abort(
-            f"library '{lib}' modified"
+            f"library '{library}' modified"
         )
-    typer.echo(f"Library: '{lib}' unmodified...")
+    typer.echo(f"Library: '{library}' unmodified...")
 
 
 @app.command()
