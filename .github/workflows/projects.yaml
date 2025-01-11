@@ -46,6 +46,7 @@ jobs:
         export PROJ=`basename "${{ matrix.project }}"`
         make check_project_modified PROJECT=${PROJ}
         retVal=$?
+        echo "retVal: $retVal"
         if [ $retVal -ne 0 ]; then
             echo "skip=false" >> $GITHUB_OUTPUT
         else
