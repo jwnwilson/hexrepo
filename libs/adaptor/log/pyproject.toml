@@ -1,0 +1,49 @@
+[project]
+authors = [
+    {name = "Noel Wilson", email = "jwnwilson@hotmail.co.uk"},
+]
+requires-python = "<4.0,>=3.12"
+name = "hexrepo_log"
+version = "0.1.0"
+description = "Standardised Logging"
+readme = "README.md"
+dependencies = [
+    "pydantic<3.0.0,>=2.9.2",
+    "pydantic-settings<3.0.0,>=2.6.1",
+    "fastapi<1.0.0,>=0.115.4",
+]
+
+[dependency-groups]
+dev = [
+    "pytest<9.0.0,>=8.3.3",
+    "mypy<2.0.0,>=1.13.0",
+    "ruff>=0.8.4",
+    "httpx<1.0.0,>=0.27.2",
+    "pytest-dotenv<1.0.0,>=0.5.2",
+    "pytest-cov<7.0.0,>=6.0.0",
+    "pytest-xdist<4.0.0,>=3.6.1",
+    "gevent<25.0.0,>=24.10.3",
+    "polyfactory<3.0.0,>=2.18.0",
+]
+
+[tool.pdm.build]
+includes = []
+
+[build-system]
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
+
+[tool.pytest.ini_options]
+addopts = "-vv --cov --cov-report xml --cov-report term-missing"
+asyncio_mode = "auto"
+testpaths = ["tests"]
+env_files = ["env/local.env"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+
+[tool.coverage.run]
+concurrency = ["gevent"]
+omit = ["tests/*"]
+source = ["hexrepo_log"]
