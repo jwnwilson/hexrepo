@@ -1,8 +1,9 @@
 import contextlib
 import os
 from contextlib import chdir
-from typing import TYPE_CHECKING, List, Optional
+from typing import List, Optional
 from typing_extensions import Annotated
+import typer
 
 from hextech.config import get_or_create_config, HexrepoConfig
 from hextech.domain.infra.bastion import bastion_ssh_tunnel
