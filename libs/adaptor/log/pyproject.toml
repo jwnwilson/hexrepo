@@ -3,19 +3,13 @@ authors = [
     {name = "Noel Wilson", email = "jwnwilson@hotmail.co.uk"},
 ]
 requires-python = "<4.0,>=3.12"
-name = "hexrepo-cloud"
-version = "0.3.12"
-description = ""
+name = "hexrepo_log"
+version = "0.1.0"
+description = "standard logging"
 readme = "README.md"
 dependencies = [
-    "pydantic<3.0.0,>=2.9.2",
-    "pydantic-settings<3.0.0,>=2.6.1",
-    "boto3-stubs[essential]<2.0.0,>=1.35.86",
-]
-
-[project.optional-dependencies]
-aws = [
-    "boto3<2.0.0,>=1.35.54",
+    "fastapi>=0.115.6",
+    "loguru>=0.7.3",
 ]
 
 [dependency-groups]
@@ -28,26 +22,27 @@ dev = [
     "pytest-cov<7.0.0,>=6.0.0",
     "pytest-xdist<4.0.0,>=3.6.1",
     "gevent<25.0.0,>=24.10.3",
+    "polyfactory<3.0.0,>=2.18.0",
 ]
 
 [tool.pdm.build]
 includes = []
+
 [build-system]
 requires = ["pdm-backend"]
 build-backend = "pdm.backend"
 
 [tool.pytest.ini_options]
-addopts = "-vv --cov --cov-report xml --cov-report term-missing --cov-fail-under=30"
+addopts = "-vv --cov --cov-report xml --cov-report term-missing"
 asyncio_mode = "auto"
 testpaths = ["tests"]
 env_files = ["env/local.env"]
 
-[tool.coverage.run]
-concurrency = ["gevent"]
-omit = ["tests/*"]
-source = ["hexrepo_cloud"]
-
 [tool.mypy]
 python_version = "3.12"
 strict = true
-no_implicit_reexport = false
+
+[tool.coverage.run]
+concurrency = ["gevent"]
+omit = ["tests/*"]
+source = ["hexrepo_log"]

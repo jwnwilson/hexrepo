@@ -1,6 +1,6 @@
 import typer
-from hexrepo_cloud.storage import S3Adaptor
 from hexrepo_cloud.db.aws import DynamoDBManager
+from hexrepo_cloud.storage import S3Adaptor
 
 from hextech.config import HexrepoConfig
 
@@ -24,7 +24,9 @@ def create_tf_lock(table_name: str, config: HexrepoConfig) -> None:
                 db_manager.create_table(
                     table_name,
                     key_schema=[{"AttributeName": "LockID", "KeyType": "HASH"}],
-                    attr_definitions=[{"AttributeName": "LockID", "AttributeType": "S"}]
+                    attr_definitions=[
+                        {"AttributeName": "LockID", "AttributeType": "S"}
+                    ],
                 )
             else:
                 typer.echo(f"Table {table_name} already exists, skipping.")

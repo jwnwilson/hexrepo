@@ -43,7 +43,6 @@ AWS_SECRET_ACCESS_KEY
 # To Do
 
 - Setup backend
-    - setup better logging with loguru
     - Improve serverless async tasks
         - Make dependency handling fastapi compatible check for fastapi depends class
         - task param pydantic style
@@ -54,6 +53,7 @@ AWS_SECRET_ACCESS_KEY
         - Categorise PLP pages
         - Fan out and crawl web page PDP page contents
     - Setup auth / cross project auth / authorisation
+        - Look at okta
     - Create orchestrator project 
         - 1 task table per hexrepo
         - Setup ECS for long running async orchestrator on fargate

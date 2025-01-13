@@ -36,6 +36,7 @@ dependencies = [
     {% if cookiecutter.use_task == 'y' %}
     "hexrepo-task",
     {% endif %}
+    "hexrepo-log",
 ]
 
 [dependency-groups]
@@ -89,3 +90,4 @@ hexrepo-cloud = { path = "../../libs/adaptor/cloud", editable = true }
 {% if cookiecutter.use_task == 'y' %}
 hexrepo-task = { path = "../../libs/interactor/task", editable = true }
 {% endif %}
+hexrepo-log = { path = "../../libs/adaptor/log", editable = true }

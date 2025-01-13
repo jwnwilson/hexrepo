@@ -308,7 +308,7 @@ wheels = [
 
 [[package]]
 name = "hexrepo-api"
-version = "0.1.7"
+version = "0.1.9"
 source = { directory = "../../libs/interactor/api" }
 dependencies = [
     { name = "fastapi" },
@@ -340,7 +340,7 @@ dev = [
 
 [[package]]
 name = "hexrepo-cloud"
-version = "0.3.9"
+version = "0.3.11"
 source = { editable = "../../libs/adaptor/cloud" }
 dependencies = [
     { name = "boto3-stubs", extra = ["essential"] },
@@ -370,7 +370,7 @@ dev = [
 
 [[package]]
 name = "hexrepo-db"
-version = "0.1.8"
+version = "0.1.10"
 source = { editable = "../../libs/adaptor/db" }
 dependencies = [
     { name = "boto3" },

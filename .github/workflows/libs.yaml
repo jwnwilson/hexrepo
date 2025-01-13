@@ -33,6 +33,7 @@ jobs:
         library:
         - "libs/adaptor/db"
         - "libs/adaptor/cloud"
+        - "libs/adaptor/log"
         - "libs/interactor/api"
         - "libs/interactor/task"
     runs-on: ubuntu-latest
@@ -83,6 +84,7 @@ jobs:
         library:
         - "libs/adaptor/db"
         - "libs/adaptor/cloud"
+        - "libs/adaptor/log"
         - "libs/interactor/api"
         - "libs/interactor/task"
     runs-on: ubuntu-latest
@@ -108,6 +110,7 @@ jobs:
         library:
         - "libs/adaptor/db"
         - "libs/adaptor/cloud"
+        - "libs/adaptor/log"
         - "libs/interactor/api"
         - "libs/interactor/task"
     runs-on: ubuntu-latest
