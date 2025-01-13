@@ -1,15 +1,14 @@
-from contextlib import contextmanager
 import json
 import logging
 import os
 import sys
 import traceback
+import uuid
+from contextlib import contextmanager
 from types import TracebackType
 from typing import Optional
-import uuid
-from loguru import logger
-import sys
 
+from loguru import logger
 
 LOG_LEVEL = os.environ.get("LOG_LEVEL", "DEBUG")
 JSON_LOGS = True if os.environ.get("JSON_LOGS") else False
@@ -63,7 +62,7 @@ def trim_exception(exc: Exception):
 
     value: Exception = exc
     tb: TracebackType = exc.__traceback__
-    
+
     lib_dir: str = get_python_lib(True, False).lower()
     current_tb: TracebackType = tb
     prev_node = None
@@ -83,7 +82,7 @@ def trim_exception(exc: Exception):
 
 
 def setup_logger():
-    level:str = LOG_LEVEL
+    level: str = LOG_LEVEL
 
     # intercept everything at the root logger
     logging.root.handlers = [InterceptHandler()]
@@ -94,7 +93,6 @@ def setup_logger():
     for name in logging.root.manager.loggerDict.keys():
         logging.getLogger(name).handlers = []
         logging.getLogger(name).propagate = True
-
 
     if JSON_LOGS:
         logger.configure(

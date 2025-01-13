@@ -49,9 +49,13 @@ def validate_libraries(libraries: Optional[List[str]] = None) -> List[str]:
 def get_modified_files() -> str:
     current_branch = subprocess.getoutput("git branch --show-current")
     if current_branch != "main":
-        return subprocess.getoutput("git fetch --unshallow origin main && git diff origin/main HEAD --name-only")
+        return subprocess.getoutput(
+            "git fetch --unshallow origin main && git diff origin/main HEAD --name-only"
+        )
     else:
-        return subprocess.getoutput("git fetch && git diff origin/main HEAD^ --name-only")
+        return subprocess.getoutput(
+            "git fetch && git diff origin/main HEAD^ --name-only"
+        )
 
 
 def library_version_bump_required(library: str) -> bool:
