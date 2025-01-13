@@ -8,9 +8,8 @@ version = "0.1.0"
 description = "standard logging"
 readme = "README.md"
 dependencies = [
-    "pydantic<3.0.0,>=2.9.2",
-    "pydantic-settings<3.0.0,>=2.6.1",
-    "fastapi<1.0.0,>=0.115.4",
+    "fastapi>=0.115.6",
+    "loguru>=0.7.3",
 ]
 
 [dependency-groups]

@@ -23,6 +23,7 @@ dependencies = [
     "hexrepo-db[sql]",
     "hexrepo-api",
     "hexrepo-task",
+    "hexrepo-log",
 ]
 
 [dependency-groups]
@@ -69,3 +70,4 @@ hexrepo-api = { path = "../../libs/interactor/api", editable = true }
 hexrepo-db = { path = "../../libs/adaptor/db", editable = true }
 hexrepo-cloud = { path = "../../libs/adaptor/cloud", editable = true }
 hexrepo-task = { path = "../../libs/interactor/task", editable = true }
+hexrepo-log = { path = "../../libs/adaptor/log", editable = true }

@@ -54,6 +54,7 @@ AWS_SECRET_ACCESS_KEY
         - Categorise PLP pages
         - Fan out and crawl web page PDP page contents
     - Setup auth / cross project auth / authorisation
+        - Look at okta
     - Create orchestrator project 
         - 1 task table per hexrepo
         - Setup ECS for long running async orchestrator on fargate
