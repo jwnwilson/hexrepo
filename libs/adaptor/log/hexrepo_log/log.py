@@ -104,6 +104,7 @@ def setup_logger():
                     "diagnose": True,
                     "backtrace": True,
                     "catch": True,
+                    "enqueue": LOG_MULTIPROCESS,
                 }
             ]
         )
