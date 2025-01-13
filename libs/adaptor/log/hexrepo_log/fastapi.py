@@ -1,7 +1,7 @@
 
 from typing import Dict
 import uuid
-from hexrepo_log.log import trim_exception
+from hexrepo_log.log import log_manager
 from loguru import logger
 from starlette.types import Receive, Scope, Send
 
@@ -16,8 +16,5 @@ class LogMiddleware:
             return await self.app(scope, receive, send)
         headers: Dict = dict(scope["headers"])
         correlation_id: str = headers.get(self.header_name, None) or str(uuid.uuid4())
-        with logger.contextualize(correlation_id=correlation_id):
-            try:
-                await self.app(scope, receive, send)
-            except Exception as exc:
-                trim_exception(exc)
+        with log_manager(correlation_id=correlation_id) as logger:
+            await self.app(scope, receive, send)

@@ -23,7 +23,6 @@ app = FastAPI(
 )
 
 app.add_middleware(LogMiddleware)
-
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 # Sets all CORS enabled origins
 app.add_middleware(

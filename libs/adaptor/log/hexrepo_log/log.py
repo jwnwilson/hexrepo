@@ -1,9 +1,12 @@
+from contextlib import contextmanager
 import json
 import logging
 import os
 import sys
 import traceback
 from types import TracebackType
+from typing import Optional
+import uuid
 from loguru import logger
 import sys
 
@@ -121,3 +124,13 @@ def setup_logger():
             ]
         )
     return logger
+
+
+@contextmanager
+def log_manager(correlation_id: Optional[str] = None):
+    correlation_id: str = correlation_id or str(uuid.uuid4())
+    with logger.contextualize(correlation_id=correlation_id):
+        try:
+            yield logger
+        except Exception as exc:
+            trim_exception(exc)
