@@ -43,6 +43,7 @@ AWS_SECRET_ACCESS_KEY
 # To Do
 
 - Setup backend
+    - Fix library version deploy bug
     - Improve serverless async tasks
         - Make dependency handling fastapi compatible check for fastapi depends class
         - task param pydantic style
