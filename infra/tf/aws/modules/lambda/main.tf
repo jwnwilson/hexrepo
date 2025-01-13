@@ -75,6 +75,7 @@ module "lambda" {
   environment_variables = merge(
     {
       ENVIRONMENT = var.environment
+      LOG_JSON    = "true"
     },
     var.environment_variables,
   )

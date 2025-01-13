@@ -11,7 +11,8 @@ from typing import Optional
 from loguru import logger
 
 LOG_LEVEL = os.environ.get("LOG_LEVEL", "DEBUG")
-JSON_LOGS = True if os.environ.get("JSON_LOGS") else False
+LOG_JSON = True if os.environ.get("LOG_JSON") else False
+LOG_MULTIPROCESS = True if os.environ.get("LOG_MULTIPROCESS") else False
 
 
 def serialize(record) -> str:
@@ -94,7 +95,7 @@ def setup_logger():
         logging.getLogger(name).handlers = []
         logging.getLogger(name).propagate = True
 
-    if JSON_LOGS:
+    if LOG_JSON:
         logger.configure(
             handlers=[
                 {
@@ -117,7 +118,7 @@ def setup_logger():
                     diagnose=True,
                     colorize=True,
                     format=format,
-                    enqueue=True,
+                    enqueue=LOG_MULTIPROCESS,
                 )
             ]
         )
