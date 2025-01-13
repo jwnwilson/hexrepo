@@ -6,16 +6,17 @@ import traceback
 import uuid
 from contextlib import contextmanager
 from types import TracebackType
-from typing import Optional
+from typing import Dict, Optional
 
 from loguru import logger
+from loguru._handler import Message
 
 LOG_LEVEL = os.environ.get("LOG_LEVEL", "DEBUG")
 LOG_JSON = True if os.environ.get("LOG_JSON") else False
 LOG_MULTIPROCESS = True if os.environ.get("LOG_MULTIPROCESS") else False
 
 
-def serialize(record) -> str:
+def serialize(record: Dict) -> str:
     exception = record.get("exception")
     trace = None
     if exception:
@@ -35,7 +36,13 @@ def serialize(record) -> str:
         time=record["time"],
         labels=record["extra"],
     )
-    return json.dumps(subset)
+    return json.dumps(subset, default=str)
+
+
+def aws_sink(message: Message):
+    """Serialises messages into pydantic json before rendering"""
+    log = serialize(message.record)
+    print(log, file=sys.stderr)
 
 
 class InterceptHandler(logging.Handler):
@@ -99,9 +106,8 @@ def setup_logger():
         logger.configure(
             handlers=[
                 {
-                    "sink": serialize,
-                    "serialize": json,
-                    "diagnose": True,
+                    "sink": aws_sink,
+                    "level": level,
                     "backtrace": True,
                     "catch": True,
                     "enqueue": LOG_MULTIPROCESS,

@@ -46,7 +46,7 @@ db_create_migration: down
 # Local Development
 # Host API locally, loading local env file
 run: down db venv
-	LOGURU_BACKTRACE=NO PYTHONPATH=src uv run uvicorn app.interactor.api.fastapi.main:app --reload --env-file env/local.env
+	PYTHONPATH=src uv run uvicorn app.interactor.api.fastapi.main:app --reload --env-file env/local.env
 
 docker_stop:
 	@-bash -c "docker ps -aq | xargs docker stop | xargs docker rm"
