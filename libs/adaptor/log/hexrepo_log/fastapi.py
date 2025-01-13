@@ -1,7 +1,7 @@
 
 from typing import Dict
 import uuid
-from hexrepo_log.log import trim_exceptions
+from hexrepo_log.log import trim_exception
 from loguru import logger
 from starlette.types import Receive, Scope, Send
 
@@ -20,4 +20,4 @@ class LogMiddleware:
             try:
                 await self.app(scope, receive, send)
             except Exception as exc:
-                trim_exceptions(exc)
+                trim_exception(exc)

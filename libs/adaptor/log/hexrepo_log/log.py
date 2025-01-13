@@ -3,6 +3,7 @@ import logging
 import os
 import sys
 import traceback
+from types import TracebackType
 from loguru import logger
 import sys
 
@@ -53,15 +54,15 @@ class InterceptHandler(logging.Handler):
         )
 
 
-def trim_exceptions(exc: Exception):
+def trim_exception(exc: Exception):
     """trim system packages from the exception printout"""
     from distutils.sysconfig import get_python_lib
 
-    value = exc
-    tb = exc.__traceback__
+    value: Exception = exc
+    tb: TracebackType = exc.__traceback__
     
-    lib_dir = get_python_lib(True, False).lower()
-    current_tb = tb
+    lib_dir: str = get_python_lib(True, False).lower()
+    current_tb: TracebackType = tb
     prev_node = None
 
     while current_tb:
