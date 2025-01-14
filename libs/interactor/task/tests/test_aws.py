@@ -1,6 +1,7 @@
 from typing import Tuple
 from uuid import uuid4
 
+from fastapi import Depends
 import pytest
 
 from hexrepo_task.adaptor.queue.aws import SqsQueueAdaptor
@@ -145,6 +146,33 @@ def test_aws_task_dependency(task_A, queue: SqsQueueAdaptor):
 
     @app.task
     def task_A_dependency(task: TaskDTO, test: str = Dependency(get_test_str)):
+        return test
+
+    # queue task
+    task_queue_instance: TaskPromise = app.queue_task(
+        task_A_dependency, params=dict(name="example", status="running")
+    )
+    # get task
+    with queue.get_task() as event:
+        # handle task
+        result = app.handle(event)
+        assert result == "dependency value"
+
+    # Assert task updated
+    task_queue_instance.wait()
+    assert task_queue_instance.task.status == "completed"
+
+
+def test_aws_task_depends(task_A, queue: SqsQueueAdaptor):
+    app: TaskApp
+    task_A: TaskFuncWrapper
+    app, task_A = task_A
+
+    def get_test_str():
+        return "dependency value"
+
+    @app.task
+    def task_A_dependency(task: TaskDTO, test: str = Depends(get_test_str)):
         return test
 
     # queue task
