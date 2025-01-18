@@ -269,7 +269,7 @@ class TaskFuncWrapper:
 
             if name in kwargs:
                 dependencies[name] = kwargs[name]
-            elif isinstance(param.default, Dependency) or param.default.__class__.__name__ == "Depends":
+            elif isinstance(param.default, Dependency) or ( hasattr(param.default, "__class__") and param.default.__class__.__name__ == "Depends"):
                 dep_func: Generator = param.default.dependency
                 # For testing purposes
                 if dep_func in self.dependency_overrides:

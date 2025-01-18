@@ -45,16 +45,15 @@ AWS_SECRET_ACCESS_KEY
 - Setup backend
     - Fix library version deploy bug
     - Improve serverless async tasks
-        - Make dependency handling fastapi compatible check for fastapi depends class
         - task param pydantic style
+    - Setup auth / cross project auth / authorisation
+        - Look at okta
     - Play with AI crawler project 
         - Setup crawl spider for PLP pages
         - Cache all page data to avoid recrawls
         - Store data in graph format and visualise it
         - Categorise PLP pages
         - Fan out and crawl web page PDP page contents
-    - Setup auth / cross project auth / authorisation
-        - Look at okta
     - Create orchestrator project 
         - 1 task table per hexrepo
         - Setup ECS for long running async orchestrator on fargate
