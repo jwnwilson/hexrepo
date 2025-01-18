@@ -290,12 +290,12 @@ class TaskFuncWrapper:
                 and param.default.__class__.__name__ == "Depends"
             )
 
-            # Parse pydnaic models
+            # Parse pydantic models
             if BaseModel in inspect.getmro(param.annotation) and isinstance(
                 kwargs[name], dict
             ):
                 dependencies[name] = param.annotation(**kwargs[name])
-            # Pass raw param types
+            # Parse raw param types
             elif name in kwargs:
                 dependencies[name] = kwargs[name]
             # Load dependencies
@@ -322,7 +322,6 @@ class TaskFuncWrapper:
             except StopIteration:
                 pass
 
-    # move task dto to depends function
     def __call__(self, *args, **kwargs) -> Any:
         if len(args) > 0:
             raise RuntimeError("Task functions must be called with kwargs")
