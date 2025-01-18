@@ -3,19 +3,14 @@ from hexrepo_task.interface import QueueAdaptor
 
 from app.adaptor.db.sql import SqlUOW
 from app.interactor.event.tasks.app import create_example_task
+from app.domain.example import CreateExampleDTO
 
 
 def test_example_event_create_example_task(
     task_app: TaskApp, queue: QueueAdaptor, uow: SqlUOW
 ):
-    task_promise: TaskPromise = task_app.queue_task(
-        create_example_task,
-        # Can we use a DTO here?
-        params={
-            "name": "test_01",
-            "url": "https://test.com",
-            "location": "test location",
-        },
+    task_promise: TaskPromise = create_example_task.queue_task(
+        example=CreateExampleDTO(name="example", url="https://example.com", location="example location")
     )
     assert uow.example.read_multi().total == 0
 
