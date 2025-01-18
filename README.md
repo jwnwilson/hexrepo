@@ -43,9 +43,6 @@ AWS_SECRET_ACCESS_KEY
 # To Do
 
 - Setup backend
-    - Fix library version deploy bug
-    - Improve serverless async tasks
-        - task param pydantic style
     - Setup auth / cross project auth / authorisation
         - Look at okta
     - Play with AI crawler project 

@@ -513,7 +513,7 @@ sql = [
 
 [[package]]
 name = "hexrepo-log"
-version = "0.1.0"
+version = "0.1.1"
 source = { editable = "../../libs/adaptor/log" }
 dependencies = [
     { name = "fastapi" },
@@ -541,15 +541,17 @@ dev = [
 
 [[package]]
 name = "hexrepo-task"
-version = "0.1.4"
+version = "0.1.5"
 source = { editable = "../../libs/interactor/task" }
 dependencies = [
+    { name = "fastapi" },
     { name = "hexrepo-db" },
     { name = "pymongo" },
 ]
 
 [package.metadata]
 requires-dist = [
+    { name = "fastapi", specifier = ">=0.115.6" },
     { name = "hexrepo-db", editable = "../../libs/adaptor/db" },
     { name = "pymongo", specifier = ">=4.10.1" },
 ]
