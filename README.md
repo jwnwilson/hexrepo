@@ -51,6 +51,10 @@ AWS_SECRET_ACCESS_KEY
         - Store data in graph format and visualise it
         - Categorise PLP pages
         - Fan out and crawl web page PDP page contents
+    - Enforce architecture rules:
+        - tach: https://github.com/gauge-sh/tach
+        - https://roman.pt/posts/python-architecture-linter/
+        - [deply](https://github.com/Vashkatsi/deply)
     - Create orchestrator project 
         - 1 task table per hexrepo
         - Setup ECS for long running async orchestrator on fargate
@@ -59,11 +63,7 @@ AWS_SECRET_ACCESS_KEY
         - Setup workflow orchestration
         - Setup Idempotent re-run
         - Dectorator based workflow setup e.g.:
-            https://github.com/aws/chalice/blob/master/chalice/app.py#L719
-    - Enforce architecture rules:
-        - tach: https://github.com/gauge-sh/tach
-        - https://roman.pt/posts/python-architecture-linter/
-        - [deply](https://github.com/Vashkatsi/deply)
+            https://github.com/aws/chalice/blob/master/chalice/app.py#L719 
     - Setup command to run local against bastion db
     - Add ability to disable / destroy projects
     - Improve docker container builds
