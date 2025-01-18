@@ -7,6 +7,8 @@ from inspect import signature
 from typing import Any, Callable, Dict, Generator, Optional, cast
 from uuid import UUID
 
+from fastapi import Depends
+
 from hexrepo_task.exception import DuplicateTaskName, TaskNotFound
 
 from ...config import TaskConfig
@@ -219,11 +221,9 @@ class Dependency:
     def __init__(self, get_dependency: Callable):
         self._get_dependency = get_dependency
 
-    def get_dependency(self) -> Callable:
+    @property
+    def dependency(self) -> Callable:
         return self._get_dependency
-
-    def get_dependency_iter(self) -> Generator:
-        return self._get_dependency()
 
 
 class TaskFuncWrapper:
@@ -266,16 +266,17 @@ class TaskFuncWrapper:
         for name, param in inspect.signature(func).parameters.items():
             name: str
             param: inspect.Parameter
+
             if name in kwargs:
                 dependencies[name] = kwargs[name]
-            elif isinstance(param.default, Dependency):
-                dep_func: Generator = param.default.get_dependency()
-                dep_iter: Callable = param.default.get_dependency_iter()
+            elif isinstance(param.default, Dependency) or ( hasattr(param.default, "__class__") and param.default.__class__.__name__ == "Depends"):
+                dep_func: Generator = param.default.dependency
                 # For testing purposes
                 if dep_func in self.dependency_overrides:
-                    dep_return = self.dependency_overrides[dep_func]()
-                else:
-                    dep_return = dep_iter
+                    dep_func = self.dependency_overrides[dep_func]
+                
+                dep_return = dep_func()
+
                 if isinstance(dep_return, Generator):
                     dependency_generators[name] = dep_return
                     dependencies[name] = next(dependency_generators[name])
