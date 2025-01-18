@@ -10,7 +10,9 @@ from pydantic import BaseModel
 
 
 class TaskDTO(BaseModel):
+    # Task id record
     id: Optional[UUID] = None
+    # Task id from queue
     task_id: Optional[UUID] = None
     name: str
     params: Optional[Dict] = None

@@ -7,7 +7,7 @@ from inspect import signature
 from typing import Any, Callable, Dict, Generator, Optional, cast
 from uuid import UUID
 
-from fastapi import Depends
+from pydantic import BaseModel
 
 from hexrepo_task.exception import DuplicateTaskName, TaskNotFound
 
@@ -19,7 +19,7 @@ from ...interface import TaskUOW as UOW
 logger = logging.getLogger(__name__)
 
 
-TaskFunc = Callable[[TaskDTO], Any]
+TaskFunc = Callable[..., Any]
 GetQueue = Callable[[], QueueAdaptor]
 GetUOW = Callable[[], UOW]
 
@@ -76,7 +76,9 @@ class TaskApp:
     def task(self, func: TaskFunc, **config) -> "TaskFuncWrapper":
         """Task decorator to register task functions"""
         self.add_task_func(func)
-        return TaskFuncWrapper(func, dependency_overrides=self.dependency_overrides)
+        return TaskFuncWrapper(
+            func, self, dependency_overrides=self.dependency_overrides
+        )
 
     def handle(self, event: Dict | TaskDTO) -> Any:
         """Handle event and run task"""
@@ -95,10 +97,16 @@ class TaskApp:
                 )
                 raise
 
-    def queue_task(self, func: str | TaskFunc, params: Dict) -> "TaskPromise":
+    def queue_task(
+        self, func: TaskFunc | "TaskFuncWrapper", params: Dict
+    ) -> "TaskPromise":
         """Queue task from app initialising deodependencies"""
+        if isinstance(func, TaskFuncWrapper):
+            func = func.func
         # Check name is right even with wrapper
         func_name = func if isinstance(func, str) else func.__name__
+        # Validate params
+        self._validate_params(func, params)
         with self.get_queue() as queue, self.get_uow() as uow:
             try:
                 task_adaptor: TaskAdaptor = self._get_task_adaptor(uow, queue)
@@ -108,6 +116,24 @@ class TaskApp:
                     f"Error queueing task: {func_name}, param: {params}, error: {e}"
                 )
                 raise
+
+    def _validate_params(self, func: TaskFunc, params: Dict):
+        func_signature = signature(func)
+        func_name: str = func.__name__
+        for name, param in func_signature.parameters.items():
+            if name not in params:
+                if param.default == inspect.Parameter.empty:
+                    raise ValueError(
+                        f"Missing required parameter: {name} for task: {func_name}"
+                    )
+            is_dependency = isinstance(param.default, Dependency) or (
+                hasattr(param.default, "__class__")
+                and param.default.__class__.__name__ == "Depends"
+            )
+            if not is_dependency and not isinstance(params[name], param.annotation):
+                raise ValueError(
+                    f"Invalid type for parameter: {name} for task: {func_name}"
+                )
 
     def _get_task_adaptor(self, uow: UOW, queue: QueueAdaptor) -> "TaskAdaptor":
         """Get task by name"""
@@ -153,10 +179,18 @@ class TaskAdaptor:
         # validate kwargs
         return self._uow.task.update(id, task)
 
-    def queue(self, func: str | TaskFunc, params: Dict) -> "TaskPromise":
+    def _serialize_params(self, params: Dict) -> Dict:
+        return {
+            k: json.loads(v.model_dump_json()) if isinstance(v, BaseModel) else v
+            for k, v in params.items()
+        }
+
+    def queue(self, func: TaskFunc, params: Dict[str, Any]) -> "TaskPromise":
         # Send task to queue
-        func_name: str = func if isinstance(func, str) else func.__name__
-        task_data: TaskCreateDTO = TaskCreateDTO(name=func_name, params=params)
+        func_name: str = func.__name__
+        task_data: TaskCreateDTO = TaskCreateDTO(
+            name=func_name, params=self._serialize_params(params)
+        )
         self._validate_task(task_data)
         # Validate task param and error if invalid types
         task: TaskDTO = self._uow.task.create(task_data)
@@ -182,9 +216,9 @@ class TaskAdaptor:
         try:
             logger.info(f"Running task: {task.name}, id: {task.id}")
             task_wrapper: TaskFuncWrapper = TaskFuncWrapper(
-                func, dependency_overrides=self._app.dependency_overrides
+                func, self, dependency_overrides=self._app.dependency_overrides
             )
-            result: Any = task_wrapper(task)
+            result: Any = task_wrapper(**task.params)
         except Exception as e:
             logger.error(f"Error running task: {task.name}, id: {task.id}, error: {e}")
             self.update(task.id, TaskUpdateDTO(status="error", error=str(e)))
@@ -231,27 +265,12 @@ class TaskFuncWrapper:
     Call task function and handle dependencies
     """
 
-    def __init__(self, func: TaskFunc, dependency_overrides: Optional[Dict] = None):
-        # validate func is compatible with task app error if invalid args
-        self._validate_func(func)
+    def __init__(
+        self, func: TaskFunc, app: TaskApp, dependency_overrides: Optional[Dict] = None
+    ):
+        self.app: TaskApp = app
         self.func: TaskFunc = func
         self.dependency_overrides: Dict = dependency_overrides or {}
-
-    def _validate_func(self, func: TaskFunc):
-        func_signature = signature(func)
-        try:
-            first_arg = list(func_signature.parameters.keys())[0]
-        except IndexError:
-            raise ValueError(
-                f"Task function: {func} must have first parameter as TaskDTO"
-            )
-        if (
-            func_signature.parameters[first_arg].name != "task"
-            or func_signature.parameters[first_arg].annotation is not TaskDTO
-        ):
-            raise ValueError(
-                f"Task function: {func} must have first parameter as TaskDTO"
-            )
 
     @property
     def __name__(self) -> str:
@@ -266,15 +285,26 @@ class TaskFuncWrapper:
         for name, param in inspect.signature(func).parameters.items():
             name: str
             param: inspect.Parameter
+            is_dependency: bool = isinstance(param.default, Dependency) or (
+                hasattr(param.default, "__class__")
+                and param.default.__class__.__name__ == "Depends"
+            )
 
-            if name in kwargs:
+            # Parse pydnaic models
+            if BaseModel in inspect.getmro(param.annotation) and isinstance(
+                kwargs[name], dict
+            ):
+                dependencies[name] = param.annotation(**kwargs[name])
+            # Pass raw param types
+            elif name in kwargs:
                 dependencies[name] = kwargs[name]
-            elif isinstance(param.default, Dependency) or ( hasattr(param.default, "__class__") and param.default.__class__.__name__ == "Depends"):
+            # Load dependencies
+            elif is_dependency:
                 dep_func: Generator = param.default.dependency
                 # For testing purposes
                 if dep_func in self.dependency_overrides:
                     dep_func = self.dependency_overrides[dep_func]
-                
+
                 dep_return = dep_func()
 
                 if isinstance(dep_return, Generator):
@@ -293,11 +323,15 @@ class TaskFuncWrapper:
             except StopIteration:
                 pass
 
-    def __call__(self, task: TaskDTO, **kwargs) -> Any:
-        task_kwargs: Dict = kwargs.copy()
-        task_kwargs["task"] = task
-        with self._get_dependencies(self.func, task_kwargs) as dependencies:
+    # move task dto to depends function
+    def __call__(self, *args, **kwargs) -> Any:
+        if len(args) > 0:
+            raise RuntimeError("Task functions must be called with kwargs")
+        with self._get_dependencies(self.func, kwargs) as dependencies:
             return self.func(**dependencies)
+
+    def queue_task(self, **kwargs) -> TaskPromise:
+        return self.app.queue_task(self.func, kwargs)
 
 
 # if __name__ == "__main__":
