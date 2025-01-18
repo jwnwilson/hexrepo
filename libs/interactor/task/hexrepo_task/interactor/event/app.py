@@ -7,11 +7,7 @@ from inspect import signature
 from typing import Any, Callable, Dict, Generator, Optional, cast
 from uuid import UUID
 
-<<<<<<< HEAD
 from pydantic import BaseModel
-=======
-from fastapi import Depends
->>>>>>> origin/main
 
 from hexrepo_task.exception import DuplicateTaskName, TaskNotFound
 
