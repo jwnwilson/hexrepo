@@ -7,7 +7,11 @@ from inspect import signature
 from typing import Any, Callable, Dict, Generator, Optional, cast
 from uuid import UUID
 
+<<<<<<< HEAD
 from pydantic import BaseModel
+=======
+from fastapi import Depends
+>>>>>>> origin/main
 
 from hexrepo_task.exception import DuplicateTaskName, TaskNotFound
 
@@ -304,7 +308,6 @@ class TaskFuncWrapper:
                 # For testing purposes
                 if dep_func in self.dependency_overrides:
                     dep_func = self.dependency_overrides[dep_func]
-
                 dep_return = dep_func()
 
                 if isinstance(dep_return, Generator):
