@@ -22,5 +22,4 @@ variable "zone_id" {
 
 variable "api_gateway_id" {
   type = string
-  
 }

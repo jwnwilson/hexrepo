@@ -18,13 +18,13 @@ Features include:
 ### Prerequesites
 
 - Terraform installed
-- Pipx & Pyenv installed
+- python uv intalled
 - An AWS Account with:
     - AWS account access key and secret
     - AWS account permissions set as detailed later
-- Route53 domain purchased if API setup required
 - AWS CLI + SSM installed:
     https://docs.aws.amazon.com/systems-manager/latest/userguide/install-plugin-macos-overview.html#install-plugin-macos
+- Route53 domain purchased if API setup required
 
 
 ### Setup
@@ -32,13 +32,6 @@ Features include:
 Setup the following env vars directly or run:
 
 `make setup`
-
-```
-AWS_ACCOUNT
-AWS_DEFAULT_REGION
-AWS_ACCESS_KEY_ID
-AWS_SECRET_ACCESS_KEY
-```
 
 # To Do
 

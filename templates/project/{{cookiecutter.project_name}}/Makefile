@@ -103,6 +103,8 @@ tf_workspace:
 
 tf_init:
 	@echo "Initializing Terraform infra"
+	@rm -rf ./infra/tf/aws/shared/.terraform
+	@rm -rf ./infra/tf/aws/environment/.terraform
 	cd infra/tf/aws/shared  && terraform init -input=false
 	cd infra/tf/aws/environment  && terraform init -input=false
 
