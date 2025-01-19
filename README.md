@@ -36,9 +36,12 @@ Setup the following env vars directly or run:
 # To Do
 
 - Setup backend
-    - Setup auth / cross project auth / authorisation
-        - Look at okta / auth0 / cognito
-            - cognito is cheaper
+    - Setup auth with cognito
+        - Look at different auth flows
+        - Pass user data to the api
+        - Look at moving cognito to shared infra 
+        - Add Auth to the project template
+        - Enable cors? (Maybe later?)
     - Play with AI crawler project 
         - Setup crawl spider for PLP pages
         - Cache all page data to avoid recrawls

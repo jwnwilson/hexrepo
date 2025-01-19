@@ -1,3 +1,8 @@
+provider "aws" {
+  alias  = "virginia"
+  region = "us-east-1"
+}
+
 locals {
   name = var.project
 }
@@ -12,6 +17,9 @@ module "certificate" {
   wait_for_validation = true
   names = {
     "auth.${var.domain_name}" : var.zone_id
+  }
+  providers = {
+    aws = aws.virginia
   }
 }
 
@@ -36,7 +44,7 @@ resource "aws_cognito_user_pool_client" "client" {
   name                                 = local.name
   user_pool_id                         = aws_cognito_user_pool.user_pool.id
   generate_secret                      = true
-  allowed_oauth_flows                  = ["code", "implicit", "client_credentials"]
+  allowed_oauth_flows                  = ["client_credentials"]
   supported_identity_providers         = ["COGNITO"]
   allowed_oauth_flows_user_pool_client = true
   allowed_oauth_scopes                 = aws_cognito_resource_server.resource_server.scope_identifiers
