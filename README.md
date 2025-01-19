@@ -44,18 +44,26 @@ AWS_SECRET_ACCESS_KEY
 
 - Setup backend
     - Setup auth / cross project auth / authorisation
-        - Look at okta
+        - Look at okta / auth0 / cognito
+            - cognito is cheaper
     - Play with AI crawler project 
         - Setup crawl spider for PLP pages
         - Cache all page data to avoid recrawls
         - Store data in graph format and visualise it
         - Categorise PLP pages
         - Fan out and crawl web page PDP page contents
+    - Play with Alt text generation using image analysis
     - Enforce architecture rules:
         - tach: https://github.com/gauge-sh/tach
         - https://roman.pt/posts/python-architecture-linter/
         - [deply](https://github.com/Vashkatsi/deply)
-    - Create orchestrator project 
+    - Implement template -> project update:
+        - Copier https://copier.readthedocs.io/en/stable/
+        - Look at cruft again
+        - Re-render template with project settings 
+        - Create Diff with changes
+        - Add CI job to detect template changes and add a new PR with applied patch to projects
+    - Create orchestrator / workflow project 
         - 1 task table per hexrepo
         - Setup ECS for long running async orchestrator on fargate
             - Could move to celery here as celery doesn't work well with lambda as need to start worker to manage tasks
@@ -72,23 +80,15 @@ AWS_SECRET_ACCESS_KEY
         - Setup base lib image to re-use for projects
     - Combine shared infra + env infra pull add envs to config and pull them down
     - Add smoke test / E2E tests
-    - Implement template -> project update:
-        - Copier https://copier.readthedocs.io/en/stable/
-        - Look at cruft again
-        - Re-render template with project settings 
-        - Create Diff with changes
-        - Add CI job to detect template changes and add a new PR with applied patch to projects
-    - Add another cloud provider - GCP
     - Add user setup to infra as code
         - During project config setup define hexrepo user with admin account
         - login with mono repo user and store credentials to work specifically with hexrepo
 
-- Full hexrepo setup with hextech cli command like turbo repo
 - Investigate setting up company services
     - Create generic hexrepo setup cli tool to setup projects like turborepo
     - Feature Flagging / A / B testing
-    - Good stack tracing / logging
     - Switching calculation verisons
+    - Better stack tracing / logging
     - Analytics
     - JIRA / Confluence
     - Spendesk
@@ -97,10 +97,11 @@ AWS_SECRET_ACCESS_KEY
     - Payments
     - Automated API docs
     - External APIs
-    - Serverless setup
     - Free infra under my own domain to allow users to try it out
 
 - Setup Frontend
+    - rename project -> backend?
+    - create frontend folder?
     - Setup micro fe
     - Add app creation script for micro fe
     - Add component lib
