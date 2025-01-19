@@ -13,7 +13,7 @@ resource "aws_cognito_user_pool" "user_pool" {
 }
 
 module "certificate" {
-  source = "../acm"
+  source              = "../acm"
   wait_for_validation = true
   names = {
     "auth.${var.domain_name}" : var.zone_id
@@ -26,7 +26,7 @@ module "certificate" {
 resource "aws_cognito_resource_server" "resource_server" {
   name         = local.name
   identifier   = "https://${var.api_subdomain}.${var.domain_name}"
-  user_pool_id = "${aws_cognito_user_pool.user_pool.id}"
+  user_pool_id = aws_cognito_user_pool.user_pool.id
 
   scope {
     scope_name        = "all"
@@ -43,14 +43,33 @@ resource "aws_cognito_user_pool_domain" "domain" {
 resource "aws_cognito_user_pool_client" "client" {
   name                                 = local.name
   user_pool_id                         = aws_cognito_user_pool.user_pool.id
-  generate_secret                      = true
-  allowed_oauth_flows                  = ["client_credentials"]
-  supported_identity_providers         = ["COGNITO"]
   allowed_oauth_flows_user_pool_client = true
-  allowed_oauth_scopes                 = aws_cognito_resource_server.resource_server.scope_identifiers
+  generate_secret                      = false
+  allowed_oauth_scopes                 = ["aws.cognito.signin.user.admin", "email", "openid", "profile"]
+  allowed_oauth_flows                  = ["implicit", "code"]
+  explicit_auth_flows                  = ["ADMIN_NO_SRP_AUTH", "USER_PASSWORD_AUTH"]
+  supported_identity_providers         = ["COGNITO"]
+
+  callback_urls = var.callback_urls
+  logout_urls   = var.logout_urls
 
   depends_on = [
     aws_cognito_user_pool.user_pool,
     aws_cognito_resource_server.resource_server,
   ]
 }
+
+# resource "aws_cognito_user_pool_client" "client" {
+#   name                                 = local.name
+#   user_pool_id                         = aws_cognito_user_pool.user_pool.id
+#   generate_secret                      = true
+#   allowed_oauth_flows                  = ["client_credentials"]
+#   supported_identity_providers         = ["COGNITO"]
+#   allowed_oauth_flows_user_pool_client = true
+#   allowed_oauth_scopes                 = aws_cognito_resource_server.resource_server.scope_identifiers
+
+#   depends_on = [
+#     aws_cognito_user_pool.user_pool,
+#     aws_cognito_resource_server.resource_server,
+#   ]
+# }

@@ -23,3 +23,13 @@ variable "zone_id" {
 variable "api_gateway_id" {
   type = string
 }
+
+variable "callback_urls" {
+  type = list(string)
+  default = [ ]
+}
+
+variable "logout_urls" {
+  type = list(string)
+  default = [ ]
+}
