@@ -42,6 +42,15 @@ Setup the following env vars directly or run:
         - Look at moving cognito to shared infra 
         - Add Auth to the project template
         - Enable cors? (Maybe later?)
+        - Setup simple FE with auth?
+            - Rename projects -> backend
+            - Create frontend folder
+            - Add turborepo with auth
+    - Enforce architecture rules:
+        - Remove lib type
+        - tach: https://github.com/gauge-sh/tach
+        - https://roman.pt/posts/python-architecture-linter/
+        - restricting adaptors imports to a dependencies module
     - Play with AI crawler project 
         - Setup crawl spider for PLP pages
         - Cache all page data to avoid recrawls
@@ -49,10 +58,6 @@ Setup the following env vars directly or run:
         - Categorise PLP pages
         - Fan out and crawl web page PDP page contents
     - Play with Alt text generation using image analysis
-    - Enforce architecture rules:
-        - tach: https://github.com/gauge-sh/tach
-        - https://roman.pt/posts/python-architecture-linter/
-        - [deply](https://github.com/Vashkatsi/deply)
     - Implement template -> project update:
         - Copier https://copier.readthedocs.io/en/stable/
         - Look at cruft again

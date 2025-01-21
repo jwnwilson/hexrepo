@@ -162,6 +162,7 @@ module "cognito" {
   api_subdomain  = var.api_subdomain
   zone_id        = data.aws_route53_zone.api_zone.zone_id
   api_gateway_id = aws_api_gateway_rest_api.apiLambda.id
+  callback_urls  = ["api.${var.domain}"] 
 }
 
 resource "aws_route53_record" "auth" {
