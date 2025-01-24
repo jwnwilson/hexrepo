@@ -37,20 +37,19 @@ Setup the following env vars directly or run:
 
 - Setup backend
     - Setup auth with cognito
-        - Look at different auth flows
-        - Pass user data to the api
-        - Look at moving cognito to shared infra 
-        - Add Auth to the project template
-        - Enable cors? (Maybe later?)
-        - Setup simple FE with auth?
-            - Rename projects -> backend
-            - Create frontend folder
-            - Add turborepo with auth
+        - Create auth project
+            - Add users / groups permissions
+        - Add Auth lib to interact with it
+        - Create lambda authorizer
     - Enforce architecture rules:
         - Remove lib type
         - tach: https://github.com/gauge-sh/tach
         - https://roman.pt/posts/python-architecture-linter/
         - restricting adaptors imports to a dependencies module
+    - Setup simple FE with auth?
+        - Rename projects -> backend
+        - Create frontend folder
+        - Add turborepo with auth
     - Play with AI crawler project 
         - Setup crawl spider for PLP pages
         - Cache all page data to avoid recrawls

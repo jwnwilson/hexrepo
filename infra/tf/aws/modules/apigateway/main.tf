@@ -104,26 +104,6 @@ resource "aws_api_gateway_integration" "lambda_root" {
 }
 
 
-# No Auth
-
-# resource "aws_api_gateway_method" "proxyMethod" {
-#    rest_api_id   = aws_api_gateway_rest_api.apiLambda.id
-#    resource_id   = aws_api_gateway_resource.proxy.id
-#    http_method   = "ANY"
-#    authorization = "NONE"
-# }
-
-# resource "aws_api_gateway_integration" "lambda" {
-#    rest_api_id = aws_api_gateway_rest_api.apiLambda.id
-#    resource_id = aws_api_gateway_method.proxyMethod.resource_id
-#    http_method = aws_api_gateway_method.proxyMethod.http_method
-
-#    integration_http_method = "POST"
-#    type                    = "AWS_PROXY"
-#    uri                     = var.lambda_invoke_arn
-# }
-
-
 resource "aws_api_gateway_deployment" "apideploy" {
   depends_on = [
     aws_api_gateway_integration.lambda,
@@ -153,58 +133,50 @@ output "base_url" {
   value = aws_api_gateway_deployment.apideploy.invoke_url
 }
 
-# Auth infrastructure
-module "cognito" {
-  source         = "../cognito"
-  project        = var.project
-  environment    = var.environment
-  domain_name    = var.domain
-  api_subdomain  = var.api_subdomain
-  zone_id        = data.aws_route53_zone.api_zone.zone_id
-  api_gateway_id = aws_api_gateway_rest_api.apiLambda.id
-  callback_urls  = ["api.${var.domain}"] 
-}
-
-resource "aws_route53_record" "auth" {
-  name    = "auth.${var.domain}"
-  type    = "A"
-  zone_id = data.aws_route53_zone.api_zone.id
-
-  alias {
-    name                   = module.cognito.cloudfront_distribution_arn
-    zone_id                = "Z2FDTNDATAQYW2" # AWS' global zone ID
-    evaluate_target_health = false
-  }
-}
-
-resource "aws_api_gateway_authorizer" "authorizer" {
-  name          = var.project
-  type          = "COGNITO_USER_POOLS"
-  rest_api_id   = aws_api_gateway_rest_api.apiLambda.id
-  provider_arns = [module.cognito.user_pool_arn]
-}
-
 resource "aws_api_gateway_resource" "proxy" {
   rest_api_id = aws_api_gateway_rest_api.apiLambda.id
   parent_id   = aws_api_gateway_rest_api.apiLambda.root_resource_id
   path_part   = "{proxy+}"
 }
 
-resource "aws_api_gateway_method" "proxyMethod" {
-  rest_api_id          = aws_api_gateway_rest_api.apiLambda.id
-  resource_id          = aws_api_gateway_resource.proxy.id
-  http_method          = "ANY"
-  authorization        = "COGNITO_USER_POOLS"
-  authorizer_id        = aws_api_gateway_authorizer.authorizer.id
-  authorization_scopes = module.cognito.scope_identifiers
-}
 
 resource "aws_api_gateway_integration" "lambda" {
+  count               = var.auth_enabled ? 1 : 0
   rest_api_id = aws_api_gateway_rest_api.apiLambda.id
-  resource_id = aws_api_gateway_method.proxyMethod.resource_id
-  http_method = aws_api_gateway_method.proxyMethod.http_method
+  resource_id = var.auth_enabled ? aws_api_gateway_method.proxyMethod_auth[0].resource_id : aws_api_gateway_method.proxyMethod_no_auth[0].resource_id
+  http_method = var.auth_enabled ? aws_api_gateway_method.proxyMethod_auth[0].http_method : aws_api_gateway_method.proxyMethod_no_auth[0].http_method
 
   integration_http_method = "POST"
   type                    = "AWS_PROXY"
   uri                     = var.lambda_invoke_arn
+}
+
+
+# Auth infrastructure
+
+resource "aws_api_gateway_authorizer" "authorizer" {
+  count         = var.auth_enabled ? 1 : 0
+  name          = var.project
+  type          = "COGNITO_USER_POOLS"
+  rest_api_id   = aws_api_gateway_rest_api.apiLambda.id
+  provider_arns = [var.cognito_user_pool_arn]
+}
+
+resource "aws_api_gateway_method" "proxyMethod_auth" {
+  count               = var.auth_enabled ? 1 : 0
+  rest_api_id          = aws_api_gateway_rest_api.apiLambda.id
+  resource_id          = aws_api_gateway_resource.proxy.id
+  http_method          = "ANY"
+  authorization        = "COGNITO_USER_POOLS"
+  authorizer_id        = aws_api_gateway_authorizer.authorizer[0].id
+  authorization_scopes = var.cognito_scope_identifiers
+}
+
+# No Auth
+resource "aws_api_gateway_method" "proxyMethod_no_auth" {
+  count         = var.auth_enabled ? 0 : 1
+   rest_api_id   = aws_api_gateway_rest_api.apiLambda.id
+   resource_id   = aws_api_gateway_resource.proxy.id
+   http_method   = "ANY"
+   authorization = "NONE"
 }

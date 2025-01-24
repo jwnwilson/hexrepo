@@ -59,6 +59,18 @@ resource "aws_cognito_user_pool_client" "client" {
   ]
 }
 
+resource "aws_route53_record" "auth" {
+  name    = "auth.${var.domain_name}"
+  type    = "A"
+  zone_id = var.zone_id
+
+  alias {
+    name                   = aws_cognito_user_pool_domain.domain.cloudfront_distribution_arn
+    zone_id                = "Z2FDTNDATAQYW2" # AWS' global zone ID
+    evaluate_target_health = false
+  }
+}
+
 # resource "aws_cognito_user_pool_client" "client" {
 #   name                                 = local.name
 #   user_pool_id                         = aws_cognito_user_pool.user_pool.id

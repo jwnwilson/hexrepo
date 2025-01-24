@@ -106,6 +106,7 @@ module "example_api_gateway" {
   domain            = var.domain
   api_subdomain     = "example-${terraform.workspace}"
   project           = "example"
+  auth_enabled      = false 
 }
 
 module "example_postgres" {
