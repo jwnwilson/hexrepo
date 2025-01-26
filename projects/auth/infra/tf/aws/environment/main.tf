@@ -84,12 +84,11 @@ module "auth_dynamodb" {
 
 # Auth infrastructure
 module "cognito" {
-  source         = "../cognito"
+  source         = "../../../../../../infra/tf/aws/modules/cognito"
   project        = var.project
-  environment    = var.environment
+  environment    = terraform.workspace
   domain_name    = var.domain
   api_subdomain  = var.api_subdomain
-  zone_id        = data.aws_route53_zone.api_zone.zone_id
   callback_urls  = ["https://api.${var.domain}"] 
 }
 

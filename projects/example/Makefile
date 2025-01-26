@@ -102,12 +102,12 @@ tf_setup: tf_init
 tf_plan:
 	@echo "Planning Terraform infra"
 	cd infra/tf/aws/shared  && terraform plan
-	cd infra/tf/aws/environment && terraform plan -lock=false
+	cd infra/tf/aws/environment && terraform plan
 
 tf_apply:
 	@echo "Applying Terraform infra"
 	cd infra/tf/aws/shared && terraform apply
-	cd infra/tf/aws/environment && terraform apply -lock=false
+	cd infra/tf/aws/environment && terraform apply
 
 tf_apply_no_input:
 	@echo "Applying Terraform infra"

@@ -1,7 +1,7 @@
 from hexrepo_task.interactor.event.app import Dependency, TaskApp, TaskDTO
 
 from app.adaptor.db.sql import SqlUOW
-from app.domain.example import ExampleDTO
+from projects.auth.src.app.domain.user import ExampleDTO
 
 from ...dependencies import get_queue_uow, get_task_queue, get_uow
 

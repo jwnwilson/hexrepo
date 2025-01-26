@@ -38,6 +38,8 @@ Setup the following env vars directly or run:
 - Setup backend
     - Setup auth with cognito
         - Create auth project
+            - API level auth in auth project
+            - auth at gateway level for all other apps
             - Add users / groups permissions
         - Add Auth lib to interact with it
         - Create lambda authorizer

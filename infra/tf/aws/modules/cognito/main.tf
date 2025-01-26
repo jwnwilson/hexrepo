@@ -7,16 +7,32 @@ locals {
   name = var.project
 }
 
+data "aws_route53_zone" "api_zone" {
+  name = var.domain_name
+}
+
 resource "aws_cognito_user_pool" "user_pool" {
   name = var.project
   tags = var.tags
+
+  schema {
+    attribute_data_type = "String"
+    name = "email"
+    developer_only_attribute = false
+    mutable                  = true
+    required                 = true
+    string_attribute_constraints {
+      max_length = 50
+      min_length = 1
+    }
+  }
 }
 
 module "certificate" {
   source              = "../acm"
   wait_for_validation = true
   names = {
-    "auth.${var.domain_name}" : var.zone_id
+    "auth.${var.domain_name}" : data.aws_route53_zone.api_zone.id
   }
   providers = {
     aws = aws.virginia
@@ -47,9 +63,9 @@ resource "aws_cognito_user_pool_client" "client" {
   generate_secret                      = false
   allowed_oauth_scopes                 = ["aws.cognito.signin.user.admin", "email", "openid", "profile"]
   allowed_oauth_flows                  = ["implicit", "code"]
-  explicit_auth_flows                  = ["ADMIN_NO_SRP_AUTH", "USER_PASSWORD_AUTH"]
+  explicit_auth_flows                  = ["ADMIN_NO_SRP_AUTH", "USER_PASSWORD_AUTH", "ALLOW_USER_PASSWORD_AUTH", "ALLOW_REFRESH_TOKEN_AUTH"]
   supported_identity_providers         = ["COGNITO"]
-
+  
   callback_urls = var.callback_urls
   logout_urls   = var.logout_urls
 
@@ -62,7 +78,7 @@ resource "aws_cognito_user_pool_client" "client" {
 resource "aws_route53_record" "auth" {
   name    = "auth.${var.domain_name}"
   type    = "A"
-  zone_id = var.zone_id
+  zone_id = data.aws_route53_zone.api_zone.id
 
   alias {
     name                   = aws_cognito_user_pool_domain.domain.cloudfront_distribution_arn

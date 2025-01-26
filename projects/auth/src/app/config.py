@@ -29,6 +29,11 @@ class Config(BaseSettings):
     DB_SQL_LOGGING: bool = os.environ.get("DB_SQL_LOGGING", "false") == "true"
     DB_SSL_CONNECTION: bool = os.environ.get("DB_SSL_CONNECTION", "false") == "true"
 
+    # Auth settings
+    JWT_SECRET: str = os.environ["JWT_SECRET"]
+    # This needs to come from cognito
+    CLIENT_ID: str = os.environ["CLIENT_ID"]
+
     # API settings
     API_PREFIX: str = "/api/v1"
     HOST: str = "0.0.0.0"

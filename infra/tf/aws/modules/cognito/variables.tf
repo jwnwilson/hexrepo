@@ -16,14 +16,6 @@ variable "api_subdomain" {
   
 }
 
-variable "zone_id" {
-  type = string
-}
-
-variable "api_gateway_id" {
-  type = string
-}
-
 variable "callback_urls" {
   type = list(string)
   default = [ ]
