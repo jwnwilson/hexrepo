@@ -33,6 +33,7 @@ class Config(BaseSettings):
     JWT_SECRET: str = os.environ["JWT_SECRET"]
     # This needs to come from cognito
     CLIENT_ID: str = os.environ["CLIENT_ID"]
+    USER_POOL_ID: str = os.environ["USER_POOL_ID"]
 
     # API settings
     API_PREFIX: str = "/api/v1"

@@ -13,9 +13,13 @@ class UserDTO(BaseModel):
 
 class AuthAdapter(ABC):
     @abstractmethod
-    def authenticate(self, user: UserDTO) -> Dict:
+    def login(self, user: UserDTO) -> Dict:
         pass
-
+    
+    @abstractmethod
+    def logout(self, token: str) -> None:
+        pass
+    
     @abstractmethod
     def register(self, user: UserDTO) -> Dict:
         pass
@@ -24,6 +28,4 @@ class AuthAdapter(ABC):
     def verify(self, token: str) -> None:
         pass
 
-    @abstractmethod
-    def logout(self, token: str) -> None:
-        pass
+    

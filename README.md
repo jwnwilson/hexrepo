@@ -39,6 +39,7 @@ Setup the following env vars directly or run:
     - Setup auth with cognito
         - Create auth project
             - API level auth in auth project
+            - Add endpoint to verify auth setup
             - auth at gateway level for all other apps
             - Add users / groups permissions
         - Add Auth lib to interact with it

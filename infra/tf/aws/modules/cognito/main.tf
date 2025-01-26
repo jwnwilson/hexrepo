@@ -15,9 +15,23 @@ resource "aws_cognito_user_pool" "user_pool" {
   name = var.project
   tags = var.tags
 
+  auto_verified_attributes = ["email"]
+
   schema {
     attribute_data_type = "String"
     name = "email"
+    developer_only_attribute = false
+    mutable                  = true
+    required                 = true
+    string_attribute_constraints {
+      max_length = 50
+      min_length = 1
+    }
+  }
+
+  schema {
+    attribute_data_type = "String"
+    name = "name"
     developer_only_attribute = false
     mutable                  = true
     required                 = true
@@ -63,7 +77,7 @@ resource "aws_cognito_user_pool_client" "client" {
   generate_secret                      = false
   allowed_oauth_scopes                 = ["aws.cognito.signin.user.admin", "email", "openid", "profile"]
   allowed_oauth_flows                  = ["implicit", "code"]
-  explicit_auth_flows                  = ["ADMIN_NO_SRP_AUTH", "USER_PASSWORD_AUTH", "ALLOW_USER_PASSWORD_AUTH", "ALLOW_REFRESH_TOKEN_AUTH"]
+  explicit_auth_flows                  = ["ADMIN_NO_SRP_AUTH", "USER_PASSWORD_AUTH"]
   supported_identity_providers         = ["COGNITO"]
   
   callback_urls = var.callback_urls

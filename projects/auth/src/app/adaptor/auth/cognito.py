@@ -6,16 +6,14 @@ from app.config import config
 from projects.auth.src.app.adaptor.auth.exceptions import UserExistsException, UnathorizedException
 from .interface import AuthAdapter, UserDTO
 
-JWT_SECRET = config.JWT_SECRET
-
 
 class CognitoAuthAdapter(AuthAdapter):
     def __init__(self):
         self.client_id: str = config.CLIENT_ID
-        self.jwn_secret: str = JWT_SECRET
+        self.jwn_secret: str = config.JWT_SECRET
         self.cognito_client = boto3.client('cognito-idp', config.REGION)
 
-    def authenticate(self, username: str, password: str) -> str:
+    def login(self, username: str, password: str) -> str:
         try:
             response = self.cognito_client.initiate_auth(
                 AuthFlow='USER_PASSWORD_AUTH',
