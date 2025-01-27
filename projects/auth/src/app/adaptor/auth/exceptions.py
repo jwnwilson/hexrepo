@@ -13,5 +13,6 @@ class InvalidPasswordException(AuthException):
 class InvalidVerificationCodeException(AuthException):
     pass
 
+
 class UnathorizedException(AuthException):
     pass

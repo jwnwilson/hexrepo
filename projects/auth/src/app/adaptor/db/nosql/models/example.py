@@ -1,8 +1,8 @@
 from typing import Optional
 
+from hexrepo_db.nosql.dynamo.repository import DynamoRepository
 from pydantic import BaseModel
 
-from hexrepo_db.nosql.dynamo.repository import DynamoRepository
 from .base_model import Base
 
 

@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
-from .routes.healthcheck import router_v1 as healthcheck_router
 from .routes.auth import router_v1 as auth_router
+from .routes.healthcheck import router_v1 as healthcheck_router
 
 api_router_v1 = APIRouter()
 

@@ -1,17 +1,17 @@
-from loguru import logger
-import requests
-from typing import Dict, Optional, List
+from typing import Dict, List, Optional
 
-from fastapi import HTTPException
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from jose import jwt, jwk, JWTError
+import requests
+from fastapi import Depends, HTTPException
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from jose import JWTError, jwk, jwt
 from jose.utils import base64url_decode
+from loguru import logger
 from pydantic import BaseModel
 from starlette.requests import Request
 from starlette.status import HTTP_403_FORBIDDEN
 
+from app.adaptor.auth.interface import UserDTO
 from app.config import config
-
 
 JWK = Dict[str, str]
 
@@ -23,7 +23,7 @@ class JWKS(BaseModel):
 class JWTAuthorizationCredentials(BaseModel):
     jwt_token: str
     header: Dict[str, str]
-    claims: Dict[str, str]
+    claims: Dict[str, str | int]
     signature: str
     message: str
 
@@ -31,8 +31,10 @@ class JWTAuthorizationCredentials(BaseModel):
 class JWTBearer(HTTPBearer):
     def __init__(self, auto_error: bool = True):
         super().__init__(auto_error=auto_error)
-        keys_url = 'https://cognito-idp.{}.amazonaws.com/{}/.well-known/jwks.json'.format(
-            config.REGION, config.USER_POOL_ID
+        keys_url = (
+            "https://cognito-idp.{}.amazonaws.com/{}/.well-known/jwks.json".format(
+                config.REGION, config.USER_POOL_ID
+            )
         )
         try:
             self.jwks: JWKS = JWKS.model_validate(requests.get(keys_url).json())
@@ -76,9 +78,27 @@ class JWTBearer(HTTPBearer):
                     message=message,
                 )
             except JWTError:
-                raise HTTPException(status_code=HTTP_403_FORBIDDEN, detail="JWK invalid")
+                raise HTTPException(
+                    status_code=HTTP_403_FORBIDDEN, detail="JWK invalid"
+                )
 
             if not self.verify_jwk_token(jwt_credentials):
-                raise HTTPException(status_code=HTTP_403_FORBIDDEN, detail="JWK invalid")
+                raise HTTPException(
+                    status_code=HTTP_403_FORBIDDEN, detail="JWK invalid"
+                )
 
             return jwt_credentials
+
+
+get_jwt_token: JWTBearer = JWTBearer()
+
+
+async def get_current_user(
+    credentials: JWTAuthorizationCredentials = Depends(get_jwt_token),
+) -> UserDTO:
+    try:
+        return UserDTO(
+            username=credentials.claims["username"],
+        )
+    except KeyError:
+        HTTPException(status_code=HTTP_403_FORBIDDEN, detail="Username missing")

@@ -69,8 +69,6 @@ class MockRepository:
             key=lambda x: getattr(x, order_by.lstrip("-")),
             reverse=(order_by.startswith("-")),
         )
-        start = (page_number - 1) * page_size
-        end = start + page_size
         return PaginatedData(results=results, total=len(self.data))
 
     def update(self, id: UUID, obj_in):

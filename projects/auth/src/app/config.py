@@ -1,5 +1,6 @@
-import os
 import logging
+import os
+
 from pydantic_settings import BaseSettings
 
 logger = logging.getLogger()
@@ -14,6 +15,7 @@ class Config(BaseSettings):
     These parameters can be configured
     with environment variables.
     """
+
     # Current environment
     PROJECT: str = os.environ.get("PROJECT", "auth")
     CLOUD_PROVIDER: str = os.environ.get("CLOUD_PROVIDER", "local")

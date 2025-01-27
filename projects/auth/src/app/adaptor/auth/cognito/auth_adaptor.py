@@ -1,41 +1,48 @@
 from typing import Dict
+
 import boto3
 from loguru import logger
 
-
 from app.config import config
-from ..exceptions import InvalidPasswordException, InvalidVerificationCodeException, UserExistsException, UnathorizedException
-from ..interface import AuthAdapter, SignupResponse, UserDTO, UserLogin, UserSignupDTO, UserVerifyDTO
+
+from ..exceptions import (
+    InvalidPasswordException,
+    InvalidVerificationCodeException,
+    UnathorizedException,
+    UserExistsException,
+)
+from ..interface import (
+    AuthAdapter,
+    SignupResponse,
+    UserLogin,
+    UserSignupDTO,
+    UserVerifyDTO,
+)
 
 
 class CognitoAuthAdapter(AuthAdapter):
     def __init__(self):
         self.client_id: str = config.CLIENT_ID
         self.jwn_secret: str = config.JWT_SECRET
-        self.cognito_client = boto3.client('cognito-idp', config.REGION)
+        self.cognito_client = boto3.client("cognito-idp", config.REGION)
 
     def login(self, user: UserLogin) -> str:
         try:
             response = self.cognito_client.initiate_auth(
-                AuthFlow='USER_PASSWORD_AUTH',
-                AuthParameters={
-                    'USERNAME': user.username,
-                    'PASSWORD': user.password
-                },
-                ClientId=self.client_id
+                AuthFlow="USER_PASSWORD_AUTH",
+                AuthParameters={"USERNAME": user.username, "PASSWORD": user.password},
+                ClientId=self.client_id,
             )
-            return response['AuthenticationResult']['AccessToken']
+            return response["AuthenticationResult"]["AccessToken"]
         except self.cognito_client.exceptions.NotAuthorizedException:
             raise UnathorizedException
         except Exception as e:
             logger.error(f"Error authenticating user: {e}")
             raise e
-        
+
     def logout(self, token: str) -> Dict:
         try:
-            response = self.cognito_client.global_sign_out(
-                AccessToken=token
-            )
+            response = self.cognito_client.global_sign_out(AccessToken=token)
             return response
         except Exception as e:
             logger.error(f"Error logging out user: {e}")
@@ -48,19 +55,15 @@ class CognitoAuthAdapter(AuthAdapter):
                 Username=user.username,
                 Password=user.password,
                 UserAttributes=[
-                    {
-                        'Name': 'email',
-                        'Value': user.email
-                    },
-                    {
-                        'Name': 'name',
-                        'Value': user.name
-                    }
-                ]
+                    {"Name": "email", "Value": user.email},
+                    {"Name": "name", "Value": user.name},
+                ],
             )
             return SignupResponse(
                 verified=response["UserConfirmed"],
-                verification_code_destination=response["CodeDeliveryDetails"]["DeliveryMedium"]
+                verification_code_destination=response["CodeDeliveryDetails"][
+                    "DeliveryMedium"
+                ],
             )
         except self.cognito_client.exceptions.InvalidPasswordException as err:
             raise InvalidPasswordException(err)
@@ -75,7 +78,7 @@ class CognitoAuthAdapter(AuthAdapter):
             self.cognito_client.confirm_sign_up(
                 ClientId=self.client_id,
                 Username=user.username,
-                ConfirmationCode=user.confirmation_code
+                ConfirmationCode=user.confirmation_code,
             )
             return
         except self.cognito_client.exceptions.CodeMismatchException as err:

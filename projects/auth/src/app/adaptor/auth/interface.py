@@ -20,9 +20,9 @@ class UserVerifyDTO(BaseModel):
     username: str
     confirmation_code: str
 
+
 class UserDTO(BaseModel):
     username: str
-    password: str
     email: Optional[str] = None
 
 
@@ -35,11 +35,11 @@ class AuthAdapter(ABC):
     @abstractmethod
     def login(self, user: UserLogin) -> Dict:
         pass
-    
+
     @abstractmethod
     def logout(self, token: str) -> None:
         pass
-    
+
     @abstractmethod
     def register(self, user: UserSignupDTO) -> SignupResponse:
         pass
@@ -47,5 +47,3 @@ class AuthAdapter(ABC):
     @abstractmethod
     def verify(self, token: str) -> None:
         pass
-
-    

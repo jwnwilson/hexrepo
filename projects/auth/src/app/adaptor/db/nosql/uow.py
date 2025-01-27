@@ -1,7 +1,8 @@
-from logging import config
 from hexrepo_db.nosql import BaseDynamoUOW
-from .models.example import ExampleRepository
+
 from app.config import config
+
+from .models.example import ExampleRepository
 
 
 class DynamoUOW(BaseDynamoUOW):
@@ -19,5 +20,7 @@ class DynamoUOW(BaseDynamoUOW):
         env: str = config.ENVIRONMENT
         full_table_name = f"{project}_{env}_{table_name}"
         return ExampleRepository(
-            self.resource, table=full_table_name, required_filters=self._required_filters
+            self.resource,
+            table=full_table_name,
+            required_filters=self._required_filters,
         )

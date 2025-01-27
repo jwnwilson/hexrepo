@@ -1,5 +1,5 @@
-from fastapi.testclient import TestClient
 import pytest
+from fastapi.testclient import TestClient
 
 
 @pytest.fixture
@@ -25,8 +25,6 @@ def test_example_read(client: TestClient, created_example):
     assert response.status_code == 200
     assert response.json()["name"] == created_example.name
     assert response.json()["url"] == created_example.url
-
-
 
 
 def test_example_update(client: TestClient, created_example):
