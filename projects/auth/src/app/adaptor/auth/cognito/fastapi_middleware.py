@@ -10,7 +10,6 @@ from pydantic import BaseModel
 from starlette.requests import Request
 from starlette.status import HTTP_403_FORBIDDEN
 
-from app.adaptor.auth.interface import UserDTO
 from app.config import config
 
 JWK = Dict[str, str]
@@ -67,7 +66,12 @@ class JWTBearer(HTTPBearer):
 
             jwt_token = credentials.credentials
 
-            message, signature = jwt_token.rsplit(".", 1)
+            try:
+                message, signature = jwt_token.rsplit(".", 1)
+            except ValueError:
+                raise HTTPException(
+                    status_code=HTTP_403_FORBIDDEN, detail="JWT token invalid"
+                )
 
             try:
                 jwt_credentials = JWTAuthorizationCredentials(
@@ -93,12 +97,3 @@ class JWTBearer(HTTPBearer):
 get_jwt_token: JWTBearer = JWTBearer()
 
 
-async def get_current_user(
-    credentials: JWTAuthorizationCredentials = Depends(get_jwt_token),
-) -> UserDTO:
-    try:
-        return UserDTO(
-            username=credentials.claims["username"],
-        )
-    except KeyError:
-        HTTPException(status_code=HTTP_403_FORBIDDEN, detail="Username missing")

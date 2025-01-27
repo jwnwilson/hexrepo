@@ -21,6 +21,7 @@ from ..interface import (
 
 
 class CognitoAuthAdapter(AuthAdapter):
+    # Need to ad UOW to add users and modify groups and permissions
     def __init__(self):
         self.client_id: str = config.CLIENT_ID
         self.jwn_secret: str = config.JWT_SECRET

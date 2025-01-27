@@ -6,7 +6,7 @@ from mangum import Mangum
 logging.basicConfig(level=logging.INFO)
 logging.getLogger().setLevel(logging.INFO)
 
-from ..api.fastapi.main import app  # noqa
+from .main import app  # noqa
 
 # To plug into lambda
 handler = Mangum(app)

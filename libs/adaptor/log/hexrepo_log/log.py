@@ -11,7 +11,7 @@ from typing import Dict, Optional
 from loguru import logger
 from loguru._handler import Message
 
-LOG_LEVEL = os.environ.get("LOG_LEVEL", "DEBUG")
+LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO")
 LOG_JSON = True if os.environ.get("LOG_JSON") else False
 LOG_MULTIPROCESS = True if os.environ.get("LOG_MULTIPROCESS") else False
 
