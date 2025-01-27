@@ -38,12 +38,11 @@ Setup the following env vars directly or run:
 - Setup backend
     - Setup auth with cognito
         - Create auth project
-            - API level auth in auth project
-            - Add endpoint to verify auth setup
-            - auth at gateway level for all other apps
-            - Add users / groups permissions
+            - Add DB logic to create and return permissions for user
+            - Add user groups / permissions CRUD
+            - Authorization at gateway level for all other apps
+            - Authentication via fastapi middleware using jwt token + dynamodb
         - Add Auth lib to interact with it
-        - Create lambda authorizer
     - Enforce architecture rules:
         - Remove lib type
         - tach: https://github.com/gauge-sh/tach
