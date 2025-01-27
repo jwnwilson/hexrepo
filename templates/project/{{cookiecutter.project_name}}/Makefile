@@ -22,6 +22,9 @@ build:
 
 # DB management
 {% if cookiecutter.use_db == "y" and cookiecutter.use_db_logic == "sql" %}
+db: docker_stop
+	docker compose run --service-ports -d db 
+
 db_migrate:
 	bash -c "uv run alembic upgrade head" ;\
 	EXIT_CODE=$$?;\
@@ -44,6 +47,9 @@ db_downgrade: down
 db_create_migration: down
 	bash -c "uv run alembic revision --autogenerate -m \"DB migration\""
 {% elif cookiecutter.use_db == "y" and cookiecutter.use_db_logic == "nosql" %}
+db: docker_stop
+	docker compose run --service-ports -d localstack
+
 db_setup:
 	bash -c "DB_URL=http://localhost:8888 uv run python -m app.interactor.cli.create_dynamo_tables"
 
@@ -53,9 +59,6 @@ db_delete_data: down
 
 docker_stop:
 	@-bash -c "docker ps -aq | xargs docker stop | xargs docker rm"
-
-db: docker_stop
-	docker compose run --service-ports -d db 
 
 down:
 	docker compose down

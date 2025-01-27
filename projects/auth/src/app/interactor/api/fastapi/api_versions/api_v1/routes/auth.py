@@ -7,7 +7,7 @@ from app.interactor.dependencies import get_auth
 router_v1 = APIRouter()
 
 
-@router_v1.post("/", include_in_schema=True)
+@router_v1.post("/signup", include_in_schema=True)
 def signup(user: UserDTO, auth: AuthAdapter = Depends(get_auth)) -> JSONResponse:
     response = auth.register(user)
     return JSONResponse(
@@ -16,7 +16,7 @@ def signup(user: UserDTO, auth: AuthAdapter = Depends(get_auth)) -> JSONResponse
     )
 
 
-@router_v1.post("/", include_in_schema=True)
+@router_v1.post("/verify", include_in_schema=True)
 def verify(user: UserDTO, auth: AuthAdapter = Depends(get_auth)) -> JSONResponse:
     response = auth.verify(user)
     return JSONResponse(
@@ -25,7 +25,7 @@ def verify(user: UserDTO, auth: AuthAdapter = Depends(get_auth)) -> JSONResponse
     )
 
 
-@router_v1.post("/", include_in_schema=True)
+@router_v1.post("/login", include_in_schema=True)
 def login(user: UserDTO, auth: AuthAdapter = Depends(get_auth)) -> JSONResponse:
     response = auth.login(user)
     return JSONResponse(
@@ -34,7 +34,7 @@ def login(user: UserDTO, auth: AuthAdapter = Depends(get_auth)) -> JSONResponse:
     )
 
 
-@router_v1.post("/", include_in_schema=True)
+@router_v1.post("/logout", include_in_schema=True)
 def logout(user: UserDTO, auth: AuthAdapter = Depends(get_auth)) -> JSONResponse:
     response = auth.logout(user)
     return JSONResponse(

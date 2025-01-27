@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
 from .routes.healthcheck import router_v1 as healthcheck_router
-from .routes.example import router_v1 as example_router
+from .routes.auth import router_v1 as auth_router
 
 api_router_v1 = APIRouter()
 
@@ -11,7 +11,7 @@ api_router_v1.include_router(
     prefix="/healthcheck",
 )
 api_router_v1.include_router(
-    example_router,
-    tags=["Example"],
-    prefix="/example",
+    auth_router,
+    tags=["Auth"],
+    prefix="/auth",
 )

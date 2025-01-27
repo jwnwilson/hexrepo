@@ -31,7 +31,7 @@ docker_stop:
 	@-bash -c "docker ps -aq | xargs docker stop | xargs docker rm"
 
 db: docker_stop
-	docker compose run --service-ports -d db 
+	docker compose run --service-ports -d localstack
 
 down:
 	docker compose down

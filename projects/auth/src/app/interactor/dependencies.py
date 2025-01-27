@@ -18,7 +18,7 @@ def get_uow() -> Generator[UOW, None, None]:
 
 
 def get_auth() -> Generator[AuthAdapter, None, None]:
-    from app.adaptor.auth.cognito import CognitoAuthAdapter
+    from app.adaptor.auth.cognito.auth_adaptor import CognitoAuthAdapter
 
     auth = CognitoAuthAdapter()
     yield auth
