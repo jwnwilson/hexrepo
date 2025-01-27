@@ -20,10 +20,12 @@ def get_uow() -> Generator[UOW, None, None]:
     yield uow
 
 
-def get_auth() -> Generator[AuthAdapter, None, None]:
+def get_auth(
+    uow: DynamoUOW = Depends(get_uow),
+) -> Generator[AuthAdapter, None, None]:
     from app.adaptor.auth.cognito.auth_adaptor import CognitoAuthAdapter
 
-    auth = CognitoAuthAdapter()
+    auth = CognitoAuthAdapter(uow=uow)
     yield auth
 
 

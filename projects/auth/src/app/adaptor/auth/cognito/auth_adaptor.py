@@ -70,6 +70,8 @@ class CognitoAuthAdapter(AuthAdapter):
                     name=user.name,
                     permissions={},
                     groups=[],
+                    cognito_id=response["UserSub"],
+                    verified=response["UserConfirmed"],
                 )
             )
             return SignupResponse(

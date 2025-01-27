@@ -14,10 +14,11 @@ class UserPermissionDTO(BaseModel):
     email: str
     permissions: Dict[str, bool]
     groups: List[str]
+    cognito_id: str
+    verified: bool
 
 
 def get_user_data(username: str, uow: DynamoUOW) -> UserPermissionDTO:
-    breakpoint()
     logger.info(f"Getting user data for {username}")
     user = uow.user.read_multi(filters={"username": username})
     if not user:
