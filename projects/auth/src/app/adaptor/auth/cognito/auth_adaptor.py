@@ -1,5 +1,6 @@
 from typing import Dict
 
+from app.domain.user import UserPermissionDTO
 import boto3
 from loguru import logger
 
@@ -18,14 +19,16 @@ from ..interface import (
     UserSignupDTO,
     UserVerifyDTO,
 )
+from app.adaptor.db.interface import UserUOW
 
 
 class CognitoAuthAdapter(AuthAdapter):
     # Need to ad UOW to add users and modify groups and permissions
-    def __init__(self):
+    def __init__(self, uow: UserUOW):
         self.client_id: str = config.CLIENT_ID
         self.jwn_secret: str = config.JWT_SECRET
         self.cognito_client = boto3.client("cognito-idp", config.REGION)
+        self.uow: UserUOW = uow
 
     def login(self, user: UserLogin) -> str:
         try:
@@ -60,6 +63,15 @@ class CognitoAuthAdapter(AuthAdapter):
                     {"Name": "name", "Value": user.name},
                 ],
             )
+            self.uow.user.create(
+                UserPermissionDTO(
+                    username=user.username,
+                    email=user.email,
+                    name=user.name,
+                    permissions={},
+                    groups=[],
+                )
+            )
             return SignupResponse(
                 verified=response["UserConfirmed"],
                 verification_code_destination=response["CodeDeliveryDetails"][
@@ -81,6 +93,7 @@ class CognitoAuthAdapter(AuthAdapter):
                 Username=user.username,
                 ConfirmationCode=user.confirmation_code,
             )
+            # Add user to user group
             return
         except self.cognito_client.exceptions.CodeMismatchException as err:
             raise InvalidVerificationCodeException(err)
