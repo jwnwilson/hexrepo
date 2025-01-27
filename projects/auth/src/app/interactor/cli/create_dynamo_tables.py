@@ -1,3 +1,8 @@
+import os
+from dotenv import load_dotenv
+
+load_dotenv(os.environ.get("ENV_FILE", "./env/local.env"))
+
 from app.adaptor.db.nosql.uow import DynamoUOW
 from app.config import config
 

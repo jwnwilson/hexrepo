@@ -78,7 +78,7 @@ module "auth_dynamodb" {
   source = "../../../../../../infra/tf/aws/modules/dynamodb"
 
   environment   = terraform.workspace
-  table_name    = "example" 
+  table_name    = "user" 
   project       = "auth"
 }
 

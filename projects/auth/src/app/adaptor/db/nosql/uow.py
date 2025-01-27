@@ -8,10 +8,10 @@ from .models.user import UserRepository
 class DynamoUOW(BaseDynamoUOW):
     # Used for testing
     def create_all(self) -> None:
-        self.example.create_table()
+        self.user.create_table()
 
     def drop_all(self) -> None:
-        self.example.delete_table()
+        self.user.delete_table()
 
     @property
     def user(self) -> UserRepository:

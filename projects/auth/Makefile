@@ -22,7 +22,7 @@ build:
 
 # DB management
 db_setup:
-	bash -c "DB_URL=http://localhost:8888 uv run python -m app.interactor.cli.create_dynamo_tables"
+	bash -c "ENV_FILE=./env/local.env uv run python -m app.interactor.cli.create_dynamo_tables"
 
 db_delete_data: down
 	docker compose run db bash -c "rm -rf /home/dynamodblocal/data/*"
