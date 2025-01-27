@@ -104,6 +104,13 @@ def create_project():
     with chdir("projects"):
         # Run cookie cutter command to copy template
         cookiecutter("../templates/project")
+        # Setup infra for service
+        if prompt_setup_project_infra():
+            project_name: str = typer.prompt("Enter project name")
+            with chdir(project_name):
+                typer.echo("Setting up initial infrastructure...")
+                run_system_command("make tf_setup ENVIROMENT=default")
+                typer.echo("Initial infrastructure setup complete.")
 
 
 def add_library():

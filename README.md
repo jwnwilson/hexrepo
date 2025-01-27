@@ -82,6 +82,8 @@ Setup the following env vars directly or run:
             https://github.com/astral-sh/uv/issues/8935
         - Setup base lib image to re-use for projects
     - Combine shared infra + env infra pull add envs to config and pull them down
+    - Project improvements
+        - set pythonpath in vscode settings to current project command
     - Add smoke test / E2E tests
     - Add user setup to infra as code
         - During project config setup define hexrepo user with admin account

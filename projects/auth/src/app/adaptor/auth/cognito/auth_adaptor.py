@@ -1,10 +1,10 @@
-from typing import Dict
 import boto3
 from loguru import logger
-from app.config import config
 
-from projects.auth.src.app.adaptor.auth.exceptions import UserExistsException, UnathorizedException
-from .interface import AuthAdapter, UserDTO
+
+from app.config import config
+from ..exceptions import UserExistsException, UnathorizedException
+from ..interface import AuthAdapter, UserDTO
 
 
 class CognitoAuthAdapter(AuthAdapter):
