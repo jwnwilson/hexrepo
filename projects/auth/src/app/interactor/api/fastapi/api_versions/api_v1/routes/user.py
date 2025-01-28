@@ -16,8 +16,9 @@ router_v1 = CrudRouter(
     update_schema=UserPermissionDTO,
 )
 
-@router_v1.get("/me", include_in_schema=True)
-def user(user: UserDTO = Depends(get_current_user)) -> JSONResponse:
+
+@router_v1.get("/me/", include_in_schema=True)
+def user(user: UserPermissionDTO = Depends(get_current_user)) -> JSONResponse:
     return JSONResponse(
         content=user.model_dump(),
         status_code=status.HTTP_200_OK,

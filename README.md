@@ -38,7 +38,6 @@ Setup the following env vars directly or run:
 - Setup backend
     - Setup auth with cognito
         - Create auth project
-            - Add DB logic to create and return permissions for user
             - Add user groups / permissions CRUD
             - Authorization at gateway level for all other apps
             - Authentication via fastapi middleware using jwt token + dynamodb

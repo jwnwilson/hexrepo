@@ -40,7 +40,7 @@ down:
 # Local Development
 
 # Host API locally, loading local env file
-run: down db venv
+run: db venv
 	PYTHONPATH=src uv run uvicorn app.interactor.api.fastapi.main:app --reload --env-file env/local.env
 
 # Host API locally, connect to cloud db. Still requires manual setting of DB_PASSWORD_SECRET_NAME in bastion.env

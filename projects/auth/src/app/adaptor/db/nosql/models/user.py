@@ -12,6 +12,8 @@ class UserPermissionDTO(Base):
     email: str
     permissions: Dict[str, bool]
     groups: List[str]    
+    cognito_id: str
+    verified: bool
 
 
 class UserRepository(DynamoRepository):
