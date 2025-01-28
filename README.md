@@ -39,8 +39,10 @@ Setup the following env vars directly or run:
     - Setup auth with cognito
         - Create auth project
             - Add user groups / permissions CRUD
-            - Authorization at gateway level for all other apps
+            - Add user id as custom claim on jwt token? 
+            - Authorization at gateway level for all non auth apps
             - Authentication via fastapi middleware using jwt token + dynamodb
+                - Get user data with permissions via id / username
         - Add Auth lib to interact with it
     - Enforce architecture rules:
         - Remove lib type
