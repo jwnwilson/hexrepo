@@ -7,7 +7,7 @@ from app.adaptor.auth.interface import (
     UserSignupDTO,
     UserVerifyDTO,
 )
-from app.interactor.dependencies import get_auth, get_current_user
+from app.interactor.dependencies import get_auth
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 from fastapi.responses import JSONResponse
 
@@ -48,13 +48,5 @@ def login(user: UserLogin, auth: AuthAdapter = Depends(get_auth)) -> JSONRespons
 def logout(token: str, auth: AuthAdapter = Depends(get_auth)) -> JSONResponse:
     auth.logout(token)
     return Response(
-        status_code=status.HTTP_200_OK,
-    )
-
-
-@router_v1.get("/user", include_in_schema=True)
-def user(user: UserDTO = Depends(get_current_user)) -> JSONResponse:
-    return JSONResponse(
-        content=user.model_dump(),
         status_code=status.HTTP_200_OK,
     )

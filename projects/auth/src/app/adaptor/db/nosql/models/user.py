@@ -11,7 +11,7 @@ class UserPermissionDTO(BaseModel):
     name: str
     email: str
     permissions: Dict[str, bool]
-    groups: List[str]
+    groups: List[str]    
 
 
 class UserRepository(DynamoRepository):

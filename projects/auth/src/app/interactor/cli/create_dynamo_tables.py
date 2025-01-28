@@ -1,5 +1,8 @@
 import os
 from dotenv import load_dotenv
+from hexrepo_log import setup_logger
+
+setup_logger()
 
 load_dotenv(os.environ.get("ENV_FILE", "./env/local.env"))
 
