@@ -6,7 +6,7 @@ from pydantic import BaseModel
 from .base_model import Base
 
 
-class UserPermissionDTO(BaseModel):
+class UserPermissionDTO(Base):
     username: str
     name: str
     email: str
