@@ -68,6 +68,12 @@ Setup the following env vars directly or run:
         - Setup Idempotent re-run
         - Dectorator based workflow setup e.g.:
             https://github.com/aws/chalice/blob/master/chalice/app.py#L719 
+    - Play with AI crawler project 
+        - Setup crawl spider for PLP pages
+        - Cache all page data to avoid recrawls
+        - Store data in graph format and visualise it
+        - Categorise PLP pages
+        - Fan out and crawl web page PDP page contents
     - Setup command to run local against bastion db
     - Add ability to disable / destroy projects
     - Improve docker container builds
