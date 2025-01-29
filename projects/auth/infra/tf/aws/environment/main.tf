@@ -74,11 +74,19 @@ module "auth_api_gateway" {
   auth_enabled      = false
 }
 
-module "auth_dynamodb" {
+module "auth_user_dynamodb" {
   source = "../../../../../../infra/tf/aws/modules/dynamodb"
 
   environment   = terraform.workspace
   table_name    = "user" 
+  project       = "auth"
+}
+
+module "auth_group_dynamodb" {
+  source = "../../../../../../infra/tf/aws/modules/dynamodb"
+
+  environment   = terraform.workspace
+  table_name    = "group" 
   project       = "auth"
 }
 
