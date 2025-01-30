@@ -3,6 +3,7 @@ from uuid import UUID
 from pydantic import BaseModel
 from loguru import logger
 from app.adaptor.db.nosql.uow import DynamoUOW 
+from app.adaptor.db.nosql.models.group import GroupPermissionDTO
 
 class Token(BaseModel):
     access_token: str
@@ -56,7 +57,7 @@ class GroupManager:
         logger.info(f"Getting permission data for {filters}")
         return self.uow.user.read_multi(filters)
     
-    def create(self, Group: GroupaCreatePermissionDTO) -> GroupPermissionDTO:
+    def create(self, group: GroupPermissionDTO) -> GroupPermissionDTO:
         logger.info(f"Creating group {group.name}")
         return self.uow.user.create(group)
     
