@@ -37,14 +37,17 @@ Setup the following env vars directly or run:
 
 - Setup backend
     - Setup auth with cognito
-        - Create auth project
-            - Use Django ninja
+        - Create common project
+            - Setup auth + permissions
+            - Use Django ninja + sql
             - Add user groups / permissions CRUD
             - Add user id as custom claim on jwt token? 
             - Authorization at gateway level for all non auth apps
             - Authentication via fastapi middleware using jwt token + dynamodb
                 - Get user data with permissions via id / username
-        - Add Auth lib to interact with it
+            - Add feature flags
+    - Remove sql from example project
+    - Move monitor / infra optimisation into common
     - Enforce architecture rules:
         - Remove lib type
         - tach: https://github.com/gauge-sh/tach
