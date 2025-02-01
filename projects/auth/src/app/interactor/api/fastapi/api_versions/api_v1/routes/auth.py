@@ -1,8 +1,7 @@
-from app.adaptor.auth.exceptions import InvalidPasswordException, UserExistsException
-from app.adaptor.auth.interface import (
+from hexrepo_cloud.auth.exceptions import InvalidPasswordException, UserExistsException
+from hexrepo_cloud.auth.interface import (
     AuthAdapter,
     SignupResponse,
-    UserDTO,
     UserLogin,
     UserSignupDTO,
     UserVerifyDTO,

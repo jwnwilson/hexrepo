@@ -2,7 +2,6 @@ from fastapi import Depends, status
 from fastapi.responses import JSONResponse
 from hexrepo_api import CrudRouter
 
-from app.adaptor.auth.interface import UserDTO
 from app.adaptor.db.nosql.models.user import UserPermissionDTO
 
 from ......dependencies import get_current_user, get_uow
