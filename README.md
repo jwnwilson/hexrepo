@@ -38,6 +38,7 @@ Setup the following env vars directly or run:
 - Setup backend
     - Setup auth with cognito
         - Create auth project
+            - Use Django ninja
             - Add user groups / permissions CRUD
             - Add user id as custom claim on jwt token? 
             - Authorization at gateway level for all non auth apps

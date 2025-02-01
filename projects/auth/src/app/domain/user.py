@@ -63,6 +63,7 @@ class GroupManager:
     
     def update(self, id: UUID, group: GroupPermissionDTO) -> GroupPermissionDTO:
         logger.info(f"Updating group {id}")
+        # Trigger async worker to update all users with this group
         return self.uow.user.update(id, group)
     
     def delete(self, id: UUID) -> None:
