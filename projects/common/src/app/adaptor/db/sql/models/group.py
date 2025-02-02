@@ -12,7 +12,6 @@ from .permission import PermissionGroupsTable, PermissionUsersTable as Permissio
 class UserGroupsTable(Base):
     __tablename__ = "user_groups"
 
-    id: Mapped[UUID] = mapped_column(UUID, primary_key=True, nullable=False)
     user_id: Mapped[UUID] = mapped_column(ForeignKey("user.id"))
     group_id: Mapped[UUID] = mapped_column(ForeignKey("group.id"))
 

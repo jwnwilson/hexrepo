@@ -1,8 +1,8 @@
-"""Adding Company and FeatureFlag
+"""Company & Feature Flag
 
-Revision ID: 189dea131495
+Revision ID: 75aca05b1f20
 Revises: 1637f38542d9
-Create Date: 2025-02-02 21:19:24.791338
+Create Date: 2025-02-02 21:25:45.332884
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '189dea131495'
+revision = '75aca05b1f20'
 down_revision = '1637f38542d9'
 branch_labels = None
 depends_on = None

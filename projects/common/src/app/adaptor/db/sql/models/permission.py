@@ -11,7 +11,6 @@ from app.domain.user import PermissionDTO
 class PermissionGroupsTable(Base):
     __tablename__ = "permission_groups"
 
-    id: Mapped[UUID] = mapped_column(UUID, primary_key=True, nullable=False)
     permission_id: Mapped[UUID] = mapped_column(ForeignKey("permission.id"))
     group_id: Mapped[UUID] = mapped_column(ForeignKey("group.id"))
 
@@ -20,7 +19,6 @@ class PermissionGroupsTable(Base):
 class PermissionUsersTable(Base):
     __tablename__ = "permission_users"
 
-    id: Mapped[UUID] = mapped_column(UUID, primary_key=True, nullable=False)
     permission_id: Mapped[UUID] = mapped_column(ForeignKey("permission.id"))
     user_id: Mapped[UUID] = mapped_column(ForeignKey("user.id"))
 
