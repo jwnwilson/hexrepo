@@ -16,3 +16,9 @@ class UserPermissionDTO(BaseModel):
     groups: List[str]
     cognito_id: str
     verified: bool
+
+
+class GroupPermissionDTO(BaseModel):
+    name: str
+    users: List[str]
+    permissions: Dict[str, bool]

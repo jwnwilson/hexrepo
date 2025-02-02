@@ -7,6 +7,8 @@ from hexrepo_db.sql.repository import SQLRepository
 from app.domain.user import UserPermissionDTO
 
 
+# Need materialized view on user with permissions for quick auth queries
+
 class UserTable(Base):
     __tablename__ = "user"
 
