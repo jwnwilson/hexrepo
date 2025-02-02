@@ -6,6 +6,8 @@ from sqlalchemy import Connection, engine_from_config, pool
 
 from hexrepo_db.sql import get_sql_db_url
 from hexrepo_db.sql.models.base_model import Base
+# Import project UOW class to discover models
+from app.adaptor.db.sql import SqlUOW # type: ignore
 
 
 def get_db_url_alembic():

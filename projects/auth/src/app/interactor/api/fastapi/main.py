@@ -15,7 +15,7 @@ setup_logger()
 
 root_prefix = ""
 
-app = FastAPI(
+app: FastAPI = FastAPI(
     title="auth Service",
     description="auth description",
     version="0.0.1",

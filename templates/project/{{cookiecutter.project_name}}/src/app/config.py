@@ -1,10 +1,13 @@
 import os
 import logging
+from dotenv import load_dotenv
 from pydantic_settings import BaseSettings
 
 logger = logging.getLogger()
 # Silence noisy logs from faker
 logging.getLogger("faker.factory").setLevel(logging.ERROR)
+
+load_dotenv(os.environ.get("ENV_FILE", "./env/local.env"))
 
 
 class Config(BaseSettings):

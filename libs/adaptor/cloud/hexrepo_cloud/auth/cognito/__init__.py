@@ -1,2 +1,2 @@
 from .auth_adaptor import CognitoAuthAdapter as CognitoAuthAdapter
-from .fastapi_middleware import get_jwt_token as get_jwt_token
+from .fastapi_cognito import get_jwt_token as get_jwt_token

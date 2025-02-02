@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Dict, Optional
 
 from pydantic import BaseModel
+from hexrepo_db.interface import UOW, Repository
 
 
 class UserSignupDTO(BaseModel):
@@ -46,4 +47,10 @@ class AuthAdapter(ABC):
 
     @abstractmethod
     def verify(self, token: str) -> None:
+        pass
+
+
+class UserUOW(UOW):
+    @abstractmethod
+    def user(self) -> Repository:
         pass

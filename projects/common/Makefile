@@ -35,15 +35,15 @@ db_migrate_local:
 db_migrate_docker:
 	docker compose run api bash -c "alembic upgrade head"
 
-db_delete_data: down
+db_delete_data:
 	docker compose run db bash -c "rm -rf /var/lib/postgresql/data/*"
 
 db_upgrade: db_migrate down
 
-db_downgrade: down
+db_downgrade:
 	bash -c "uv run alembic downgrade -1"
 
-db_create_migration: down
+db_create_migration:
 	bash -c "uv run alembic revision --autogenerate -m \"DB migration\""
 
 docker_stop:

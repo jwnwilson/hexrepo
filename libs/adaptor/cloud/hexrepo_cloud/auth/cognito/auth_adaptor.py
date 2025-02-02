@@ -18,8 +18,8 @@ from ..interface import (
     UserLogin,
     UserSignupDTO,
     UserVerifyDTO,
+    UserUOW
 )
-from app.adaptor.db.interface import UserUOW
 
 
 class CognitoAuthAdapter(AuthAdapter):

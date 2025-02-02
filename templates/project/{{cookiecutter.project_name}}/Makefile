@@ -36,15 +36,15 @@ db_migrate_local:
 db_migrate_docker:
 	docker compose run api bash -c "alembic upgrade head"
 
-db_delete_data: down
+db_delete_data: 
 	docker compose run db bash -c "rm -rf /var/lib/postgresql/data/*"
 
-db_upgrade: db_migrate down
+db_upgrade: db_migrate 
 
-db_downgrade: down
+db_downgrade: 
 	bash -c "uv run alembic downgrade -1"
 
-db_create_migration: down
+db_create_migration: 
 	bash -c "uv run alembic revision --autogenerate -m \"DB migration\""
 {% elif cookiecutter.use_db == "y" and cookiecutter.use_db_logic == "nosql" %}
 db: docker_stop
@@ -53,7 +53,7 @@ db: docker_stop
 db_setup:
 	bash -c "ENV_FILE=./env/local.env uv run python -m app.interactor.cli.create_dynamo_tables"
 
-db_delete_data: down
+db_delete_data: 
 	docker compose run db bash -c "rm -rf /home/dynamodblocal/data/*"
 {% endif %}
 

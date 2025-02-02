@@ -1,7 +1,7 @@
 {
     "python.analysis.autoSearchPaths": true,
     "python.terminal.activateEnvironment": true,
-    "python.defaultInterpreterPath": "${workspaceFolder}/projects/auth/.venv/bin/python",
+    "python.defaultInterpreterPath": "${workspaceFolder}/projects/common/.venv/bin/python",
     "python.analysis.extraPaths": [
         "${workspaceFolder}/tools/hextech/hextech",
         "${workspaceFolder}/libs/adaptor/cloud",

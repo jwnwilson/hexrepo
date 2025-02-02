@@ -8,7 +8,8 @@ version = "0.1.0"
 description = "Common monorepo logic such as auth, user management and featureflags"
 readme = "README.md"
 dependencies = [
-    "fastapi<1.0.0,>=0.115.3",
+    "sqladmin>=0.20.1",
+    "fastapi>=0.115.8",
     "uvicorn<1.0.0,>=0.32.0",
     "gevent<25.0.0,>=24.10.3",
     "requests<3.0.0,>=2.32.3",
@@ -23,6 +24,7 @@ dependencies = [
     "hexrepo-api",
     "hexrepo-task",
     "hexrepo-log",
+    "python-jose>=3.3.0",
 ]
 
 [dependency-groups]
