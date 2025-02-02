@@ -1,4 +1,4 @@
-"""DB migration
+"""Initial Migration
 
 Revision ID: 1380d451c0a4
 Revises: 

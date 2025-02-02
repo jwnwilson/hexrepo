@@ -10,12 +10,12 @@ from app.domain.user import FeatureFlagDTO
 # Need join table on company and user
 
 class FeatureFlagTable(Base):
-    __tablename__ = "group"
+    __tablename__ = "feature_flag"
 
     name: Mapped[str] = mapped_column(String)
     enabled: Mapped[bool] = mapped_column(Boolean)
 
 
-class FeatureFalgRepository(SQLRepository):
+class FeatureFlagRepository(SQLRepository):
     model = FeatureFlagTable
     model_dto = FeatureFlagDTO

@@ -1,4 +1,4 @@
-"""DB migration
+"""Permissions Groups
 
 Revision ID: 1637f38542d9
 Revises: 1380d451c0a4
