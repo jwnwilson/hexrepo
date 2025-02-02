@@ -37,6 +37,7 @@ Setup the following env vars directly or run:
 
 - Setup backend
     - Create common project
+        - Add feature flags
         - Add user groups / permissions CRUD
         - Add user id as custom claim on jwt token? 
         - Authorization at gateway level for all non auth apps
@@ -44,7 +45,6 @@ Setup the following env vars directly or run:
             - Get user data with permissions via id / username
             - Create materialised view
             - Or cache in dynamodb for cheap serverless option?
-        - Add feature flags
     - Remove sql from example project
     - Move monitor / infra optimisation into common
     - Enforce architecture rules:

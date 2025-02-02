@@ -16,7 +16,7 @@ class UserPermissionDTO(BaseModel):
     email: str
     permissions: Dict[str, bool]
     groups: List[str]
-    cognito_id: str
+    cognito_id: Optional[str] = None
     verified: bool
 
 

@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Type, Union
 from uuid import UUID
 
 from pydantic import BaseModel
@@ -44,7 +44,9 @@ class DefaultQuery(Query):
     def query_multi(self) -> Select[Any]:
         # Query to return list of entities
         default_query = select(self.model)
-        return self._apply_default_filters(default_query)
+        default_query = self._apply_default_filters(default_query)
+        # Load relationships
+        return default_query
 
     def query_single(self, id: UUID) -> Select[Any]:
         # Query to retun a single entity by id
@@ -70,16 +72,16 @@ class DefaultQuery(Query):
 class SQLRepository(Repository):
     model: Any = BaseSQLModel
     model_dto: ModelDTOType = BaseModel
+    query_logic: Type[Query] = DefaultQuery
 
     def __init__(
         self,
         session: Session,
         required_filters: Optional[Dict[str, Any]] = None,
-        query: Optional[Query] = None,
     ):
         self._session: Session = session
         self._required_filters = required_filters
-        self.query: Query = query or DefaultQuery(
+        self.query: Query = self.query_logic(
             self.model, self.model_dto, self.session, default_filters=required_filters
         )
 

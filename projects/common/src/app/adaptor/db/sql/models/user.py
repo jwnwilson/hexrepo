@@ -1,9 +1,11 @@
 
+from typing import Type
 from sqlalchemy import UUID, ForeignKey, String, Text, Boolean
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from hexrepo_db.sql.interface import Query
 from hexrepo_db.sql.models.base_model import Base
-from hexrepo_db.sql.repository import SQLRepository
+from hexrepo_db.sql.repository import DefaultQuery, SQLRepository
 from app.domain.user import UserPermissionDTO
 from .group import UserGroupsTable, PermissionUsersTable
 
@@ -33,6 +35,12 @@ class UserTable(Base):
     def __str__(self) -> str:
         return f"{self.username} | {self.email} | {self.id}"
 
+
+class UserPermissionQuery(DefaultQuery):
+    def update_relationships(self, db_obj, dto):
+        return super().update_relationships(db_obj, dto)
+
 class UserRepository(SQLRepository):
     model = UserTable
     model_dto = UserPermissionDTO
+    query_logic: Type[Query] = UserPermissionQuery
