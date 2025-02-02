@@ -3,11 +3,14 @@ from typing import Any
 from fastapi import FastAPI
 from sqladmin import Admin, ModelView
 from starlette.requests import Request
+import wtforms
 
 from app.config import config
 from app.adaptor.db.sql.uow import SqlUOW
 from app.adaptor.db.sql.models.user import UserTable
-import wtforms
+from app.adaptor.db.sql.models.group import GroupTable
+from app.adaptor.db.sql.models.permission import PermissionTable
+
 
 
 class BaseModelView(ModelView):
@@ -43,10 +46,54 @@ class UserAdmin(BaseModelView, model=UserTable):
         UserTable.username,
         UserTable.email,
     ]
+    form_columns = [
+        UserTable.username,
+        UserTable.email,
+        UserTable.name,
+        UserTable.cognito_id,
+        UserTable.verified,
+        UserTable.permissions,
+        UserTable.groups
+    ]
+    column_details_list = [
+        UserTable.id,
+        UserTable.username,
+        UserTable.email,
+        UserTable.name,
+        UserTable.cognito_id,
+        UserTable.verified,
+        UserTable.permissions,
+        UserTable.groups,
+        UserTable.created_at,
+        UserTable.updated_at
+    ]
 
     form_overrides = dict(
         email=wtforms.EmailField
     )
+
+
+class GroupAdmin(BaseModelView, model=GroupTable):
+    name = "Group"
+    name_plural = "Groups"
+
+    column_searchable_list = [GroupTable.name]
+
+    column_list = [
+        GroupTable.name
+    ]
+
+
+
+class PermissionAdmin(BaseModelView, model=PermissionTable):
+    name = "Permission"
+    name_plural = "Permissions"
+
+    column_searchable_list = [PermissionTable.name]
+
+    column_list = [
+        PermissionTable.name
+    ]
 
 
 def setup_admin(app: FastAPI):
@@ -58,3 +105,5 @@ def setup_admin(app: FastAPI):
     )
 
     admin.add_view(UserAdmin)
+    admin.add_view(GroupAdmin)
+    admin.add_view(PermissionAdmin)

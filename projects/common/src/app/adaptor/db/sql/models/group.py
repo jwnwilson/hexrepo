@@ -1,17 +1,36 @@
 
-from sqlalchemy import String, Text, Boolean
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import UUID, Column, ForeignKey, String, Table, Text, Boolean
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from hexrepo_db.sql.models.base_model import Base
 from hexrepo_db.sql.repository import SQLRepository
 from app.domain.user import GroupPermissionDTO
+from .permission import PermissionGroupsTable, PermissionUsersTable as PermissionUsersTable
 
-# Need join table on user
+
+# Joining table to link groups to users
+class UserGroupsTable(Base):
+    __tablename__ = "user_groups"
+
+    id: Mapped[UUID] = mapped_column(UUID, primary_key=True, autoincrement=True, nullable=False)
+    user_id: Mapped[UUID] = mapped_column(ForeignKey("user.id"))
+    group_id: Mapped[UUID] = mapped_column(ForeignKey("group.id"))
+
 
 class GroupTable(Base):
     __tablename__ = "group"
 
     name: Mapped[str] = mapped_column(String)
+    users: Mapped[list["UserTable"]] = relationship(
+        "UserTable",
+        secondary=UserGroupsTable.__table__,
+        overlaps="users"
+    )
+    permissions: Mapped[list["PermissionTable"]] = relationship(
+        "PermissionTable",
+        secondary=PermissionGroupsTable.__table__,
+        overlaps="groups"
+    )
 
 
 class GroupRepository(SQLRepository):

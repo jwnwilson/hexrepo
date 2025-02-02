@@ -1,14 +1,14 @@
 
 from sqlalchemy import String, Text, Boolean
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from hexrepo_db.sql.models.base_model import Base
 from hexrepo_db.sql.repository import SQLRepository
 from app.domain.user import UserPermissionDTO
+from .group import UserGroupsTable, PermissionUsersTable
 
 
 # Need materialized view on user with permissions for quick auth queries
-
 class UserTable(Base):
     __tablename__ = "user"
 
@@ -17,7 +17,16 @@ class UserTable(Base):
     name: Mapped[str] = mapped_column(String)
     cognito_id: Mapped[str] = mapped_column(String, nullable=True)
     verified: Mapped[bool] = mapped_column(Boolean, default=False)
-
+    permissions: Mapped[list["PermissionTable"]] = relationship(
+        "PermissionTable",
+        secondary=PermissionUsersTable.__table__,
+        overlaps="users"
+    )
+    groups: Mapped[list["GroupTable"]] = relationship(
+        "GroupTable",
+        secondary=UserGroupsTable.__table__,
+        overlaps="users"
+    )
 
 class UserRepository(SQLRepository):
     model = UserTable
