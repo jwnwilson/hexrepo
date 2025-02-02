@@ -4,7 +4,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from hexrepo_db.sql.models.base_model import Base
 from hexrepo_db.sql.repository import SQLRepository
-from app.domain.user import GroupPermissionDTO
+from app.domain.user import PermissionDTO
 
 
 # Joining table to link permissions to groups
@@ -44,6 +44,6 @@ class PermissionTable(Base):
         return f"{self.name} | {self.id}"
 
 
-# class PermissionRepository(SQLRepository):
-#     model = PermissionTable
-#     model_dto = PermissionDTO
+class PermissionRepository(SQLRepository):
+    model = PermissionTable
+    model_dto = PermissionDTO

@@ -21,4 +21,10 @@ class UserPermissionDTO(BaseModel):
 class GroupPermissionDTO(BaseModel):
     name: str
     users: List[str]
-    permissions: Dict[str, bool]
+    permissions: List[str]
+
+
+class PermissionDTO(BaseModel):
+    name: str
+    users: List[str]
+    groups: List[str]

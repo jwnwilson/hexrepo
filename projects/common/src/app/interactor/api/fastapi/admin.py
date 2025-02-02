@@ -12,7 +12,6 @@ from app.adaptor.db.sql.models.group import GroupTable
 from app.adaptor.db.sql.models.permission import PermissionTable
 
 
-
 class BaseModelView(ModelView):
     form_widget_args = dict(
         created_at=dict(readonly=True),

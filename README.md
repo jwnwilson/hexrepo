@@ -37,15 +37,13 @@ Setup the following env vars directly or run:
 
 - Setup backend
     - Create common project
-        - Use sqladmin
-            - Add classmethod to create engine from sqlrepo class
-        - Setup auth + permissions
         - Add user groups / permissions CRUD
         - Add user id as custom claim on jwt token? 
         - Authorization at gateway level for all non auth apps
         - Authentication via fastapi middleware using jwt token + dynamodb
             - Get user data with permissions via id / username
-            - Create materialised view 
+            - Create materialised view
+            - Or cache in dynamodb for cheap serverless option?
         - Add feature flags
     - Remove sql from example project
     - Move monitor / infra optimisation into common
