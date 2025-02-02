@@ -42,9 +42,9 @@ class UserAdmin(BaseModelView, model=UserTable):
     column_searchable_list = [UserTable.username, UserTable.email]
 
     column_list = [
-        UserTable.id,
         UserTable.username,
         UserTable.email,
+        UserTable.id,
     ]
     form_columns = [
         UserTable.username,
@@ -72,28 +72,64 @@ class UserAdmin(BaseModelView, model=UserTable):
         email=wtforms.EmailField
     )
 
+    form_ajax_refs = {
+        "groups": {
+            "fields": ("name",),
+            "order_by": "created_at",
+        },
+        "permissions": {
+            "fields": ("name",),
+            "order_by": "created_at",
+        }
+    }
+
 
 class GroupAdmin(BaseModelView, model=GroupTable):
     name = "Group"
     name_plural = "Groups"
+    icon = "fa-solid fa-user-group"
 
     column_searchable_list = [GroupTable.name]
 
     column_list = [
-        GroupTable.name
+        GroupTable.name,
+        GroupTable.id
     ]
 
+    form_ajax_refs = {
+        "permissions": {
+            "fields": ("name",),
+            "order_by": "created_at",
+        },
+        "users": {
+            "fields": ("id","username", "email"),
+            "order_by": "created_at",
+        }
+    }
 
 
 class PermissionAdmin(BaseModelView, model=PermissionTable):
     name = "Permission"
     name_plural = "Permissions"
+    icon = "fa-solid fa-lock"
 
     column_searchable_list = [PermissionTable.name]
 
     column_list = [
-        PermissionTable.name
+        PermissionTable.name,
+        PermissionTable.id
     ]
+
+    form_ajax_refs = {
+        "groups": {
+            "fields": ("name",),
+            "order_by": "created_at",
+        },
+        "users": {
+            "fields": ("name",),
+            "order_by": "created_at",
+        }
+    }
 
 
 def setup_admin(app: FastAPI):

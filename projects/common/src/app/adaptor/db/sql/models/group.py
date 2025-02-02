@@ -12,7 +12,7 @@ from .permission import PermissionGroupsTable, PermissionUsersTable as Permissio
 class UserGroupsTable(Base):
     __tablename__ = "user_groups"
 
-    id: Mapped[UUID] = mapped_column(UUID, primary_key=True, autoincrement=True, nullable=False)
+    id: Mapped[UUID] = mapped_column(UUID, primary_key=True, nullable=False)
     user_id: Mapped[UUID] = mapped_column(ForeignKey("user.id"))
     group_id: Mapped[UUID] = mapped_column(ForeignKey("group.id"))
 
@@ -31,6 +31,9 @@ class GroupTable(Base):
         secondary=PermissionGroupsTable.__table__,
         overlaps="groups"
     )
+
+    def __str__(self) -> str:
+        return f"{self.name} | {self.id}"
 
 
 class GroupRepository(SQLRepository):

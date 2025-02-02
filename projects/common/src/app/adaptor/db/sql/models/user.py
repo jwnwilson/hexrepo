@@ -28,6 +28,9 @@ class UserTable(Base):
         overlaps="users"
     )
 
+    def __str__(self) -> str:
+        return f"{self.username} | {self.email} | {self.id}"
+
 class UserRepository(SQLRepository):
     model = UserTable
     model_dto = UserPermissionDTO
