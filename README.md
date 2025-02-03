@@ -39,6 +39,7 @@ Setup the following env vars directly or run:
     - Create common project
         - Add feature flags
         - Add user groups / permissions CRUD
+            - Validate update relationships logic
         - Add user id as custom claim on jwt token? 
         - Authorization at gateway level for all non auth apps
         - Authentication via fastapi middleware using jwt token + dynamodb
