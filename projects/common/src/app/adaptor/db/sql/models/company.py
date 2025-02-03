@@ -13,6 +13,9 @@ class CompanyTable(Base):
     name: Mapped[str] = mapped_column(Text, nullable=False, unique=True)    
     website: Mapped[str] = mapped_column(Text, nullable=False, unique=True)
 
+    def __str__(self) -> str:
+        return f"{self.name} | {self.id}"
+
 
 class CompanyRepository(SQLRepository):
     model = CompanyTable

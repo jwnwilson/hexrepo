@@ -42,3 +42,4 @@ class CompanyDTO(BaseModel):
 class FeatureFlagDTO(BaseModel):
     name: str
     enabled: bool
+    company_id: Optional[UUID] = None

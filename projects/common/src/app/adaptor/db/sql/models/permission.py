@@ -55,6 +55,7 @@ class PermissionQuery(DefaultQuery):
         # Load relationships
         return query
 
+
 class PermissionRepository(SQLRepository):
     model = PermissionTable
     model_dto = PermissionDTO

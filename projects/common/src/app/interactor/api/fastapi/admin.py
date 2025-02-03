@@ -10,7 +10,8 @@ from app.adaptor.db.sql.uow import SqlUOW
 from app.adaptor.db.sql.models.user import UserTable
 from app.adaptor.db.sql.models.group import GroupTable
 from app.adaptor.db.sql.models.permission import PermissionTable
-
+from app.adaptor.db.sql.models.feature_flag import FeatureFlagTable
+from app.adaptor.db.sql.models.company import CompanyTable
 
 class BaseModelView(ModelView):
     form_widget_args = dict(
@@ -131,6 +132,40 @@ class PermissionAdmin(BaseModelView, model=PermissionTable):
     }
 
 
+class FeatureFlagAdmin(BaseModelView, model=FeatureFlagTable):
+    name = "Feature Flag"
+    name_plural = "Feature Flags"
+    icon = "fa-solid fa-flag"
+
+    column_searchable_list = [FeatureFlagTable.name]
+
+    column_list = [
+        FeatureFlagTable.name,
+        FeatureFlagTable.id,
+        FeatureFlagTable.company_id
+    ]
+
+    form_ajax_refs = {
+        "company": {
+            "fields": ("name",),
+            "order_by": "created_at",
+        }
+    }
+
+
+class CompanyAdmin(BaseModelView, model=CompanyTable):
+    name = "Company"
+    name_plural = "Companies"
+    icon = "fa-solid fa-building"
+
+    column_searchable_list = [CompanyTable.name]
+
+    column_list = [
+        CompanyTable.name,
+        CompanyTable.id,
+    ]
+
+
 def setup_admin(app: FastAPI):
     engine = SqlUOW(db_url=config.DB_URL).session_manager._engine
     admin: Admin = Admin(
@@ -142,3 +177,5 @@ def setup_admin(app: FastAPI):
     admin.add_view(UserAdmin)
     admin.add_view(GroupAdmin)
     admin.add_view(PermissionAdmin)
+    admin.add_view(FeatureFlagAdmin)
+    admin.add_view(CompanyAdmin)

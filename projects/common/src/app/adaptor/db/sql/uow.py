@@ -22,7 +22,7 @@ class SqlUOW(BaseSqlUOW):
         return PermissionRepository(self.session)
     
     @property
-    def featureflag(self) -> FeatureFlagRepository:
+    def feature_flag(self) -> FeatureFlagRepository:
         return FeatureFlagRepository(self.session)
     
     @property
