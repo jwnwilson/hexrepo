@@ -37,17 +37,18 @@ Setup the following env vars directly or run:
 
 - Setup backend
     - Create common project
-        - Add feature flags
         - Add user groups / permissions CRUD
-            - Validate update relationships logic
+            - Add relationships update logic
         - Add user id as custom claim on jwt token? 
         - Authorization at gateway level for all non auth apps
         - Authentication via fastapi middleware using jwt token + dynamodb
             - Get user data with permissions via id / username
             - Create materialised view
             - Or cache in dynamodb for cheap serverless option?
+    - Remove Auth project
     - Remove sql from example project
     - Move monitor / infra optimisation into common
+        - Enable disable project via admin
     - Enforce architecture rules:
         - Remove lib type
         - tach: https://github.com/gauge-sh/tach
