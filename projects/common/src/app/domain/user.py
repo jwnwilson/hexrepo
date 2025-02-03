@@ -9,6 +9,7 @@ class Token(BaseModel):
 
 
 class UserPermissionDTO(BaseModel):
+    id: UUID
     username: str
     name: str
     email: str
@@ -20,12 +21,14 @@ class UserPermissionDTO(BaseModel):
 
 
 class GroupPermissionDTO(BaseModel):
+    id: UUID
     name: str
     users: List[str]
     permissions: List[str]
 
 
 class PermissionDTO(BaseModel):
+    id: UUID
     name: str
     users: List[str]
     groups: List[str]

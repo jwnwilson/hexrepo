@@ -1,9 +1,10 @@
 
-from sqlalchemy import UUID, Column, ForeignKey, String, Table
+from typing import Any
+from sqlalchemy import UUID, Column, ForeignKey, Select, String, Table, select
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from hexrepo_db.sql.models.base_model import Base
-from hexrepo_db.sql.repository import SQLRepository
+from hexrepo_db.sql.repository import DefaultQuery, SQLRepository
 from app.domain.user import PermissionDTO
 
 
@@ -42,6 +43,26 @@ class PermissionTable(Base):
         return f"{self.name} | {self.id}"
 
 
+class PermissionQuery(DefaultQuery):
+    def update_relationships(self, db_obj, dto):
+        return super().update_relationships(db_obj, dto)
+    
+    def query_multi(self) -> Select[Any]:
+        from .permission import PermissionTable
+        # Query to return list of entities
+        default_query = select(self.model).outerjoin(PermissionTable.groups).outerjoin(PermissionTable.users)
+        query = self._apply_default_filters(default_query)
+        # Load relationships
+        return query
+
 class PermissionRepository(SQLRepository):
     model = PermissionTable
     model_dto = PermissionDTO
+
+    def _model_to_dto(self, row):
+        return PermissionDTO(
+            id=row.id,
+            name=row.name,
+            groups=[str(g.id) for g in row.groups],
+            users=[str(u.id) for u in row.users],
+        )
