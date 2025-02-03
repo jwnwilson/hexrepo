@@ -39,6 +39,7 @@ Setup the following env vars directly or run:
     - Create common project
         - Add user groups / permissions CRUD
             - Add relationships update logic, look at how sqladmin does this
+        - On signup create user
         - Add user id as custom claim on jwt token? 
         - Authorization at gateway level for all non auth apps
         - Authentication via fastapi middleware using jwt token + dynamodb
