@@ -9,7 +9,9 @@ class SqlUOW(BaseSqlUOW):
 
     @property
     def user(self) -> UserRepository:
-        return UserRepository(self.session)
+        return UserRepository(
+            self.session
+        )
     
     @property
     def group(self) -> GroupRepository:

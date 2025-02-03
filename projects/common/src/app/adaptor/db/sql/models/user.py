@@ -1,6 +1,6 @@
 
-from typing import Type
-from sqlalchemy import UUID, ForeignKey, String, Text, Boolean
+from typing import Any, Dict, Type
+from sqlalchemy import UUID, ForeignKey, Select, String, Text, Boolean, select
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from hexrepo_db.sql.interface import Query
@@ -39,8 +39,30 @@ class UserTable(Base):
 class UserPermissionQuery(DefaultQuery):
     def update_relationships(self, db_obj, dto):
         return super().update_relationships(db_obj, dto)
+    
+    def query_multi(self) -> Select[Any]:
+        from .user import UserTable
+        # Query to return list of entities
+        default_query = select(self.model).outerjoin(UserTable.permissions).outerjoin(UserTable.groups).outerjoin(UserTable.company)
+        query = self._apply_default_filters(default_query)
+        # Load relationships
+        return query
+
 
 class UserRepository(SQLRepository):
     model = UserTable
     model_dto = UserPermissionDTO
     query_logic: Type[Query] = UserPermissionQuery
+
+    def _model_to_dto(self, row):
+        return UserPermissionDTO(
+            id=row.id,
+            username=row.username,
+            email=row.email,
+            name=row.name,
+            cognito_id=row.cognito_id,
+            verified=row.verified,
+            permissions=[p.name for p in row.permissions],
+            groups=[p.name for p in row.groups],
+            company=row.company.name if row.company else None
+        )

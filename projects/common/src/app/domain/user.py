@@ -12,7 +12,7 @@ class UserPermissionDTO(BaseModel):
     username: str
     name: str
     email: str
-    permissions: Dict[str, bool]
+    permissions: List[str]
     groups: List[str]
     cognito_id: Optional[str] = None
     verified: bool
