@@ -37,8 +37,6 @@ Setup the following env vars directly or run:
 
 - Setup backend
     - Create common project
-        - Add user groups / permissions CRUD
-            - Add relationships update logic, look at how sqladmin does this
         - On signup create user
         - Add user id as custom claim on jwt token? 
         - Authorization at gateway level for all non auth apps
@@ -46,6 +44,10 @@ Setup the following env vars directly or run:
             - Get user data with permissions via id / username
             - Create materialised view
             - Or cache in dynamodb for cheap serverless option?
+        - Tests:
+            - User, Group, Permission, Featureflag, Company CRUD
+            - Test relationship CRUD logic
+            - Test auth and permission logic
     - Remove Auth project
     - Remove sql from example project
     - Move monitor / infra optimisation into common
