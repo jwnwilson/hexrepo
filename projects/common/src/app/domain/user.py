@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 from uuid import UUID
 from pydantic import BaseModel
 from loguru import logger
@@ -13,25 +13,25 @@ class UserPermissionDTO(BaseModel):
     username: str
     name: str
     email: str
-    permissions: List[str]
-    groups: List[str]
+    permissions: List[Dict[str, Any]]
+    groups: List[Dict[str, Any]]
     cognito_id: Optional[str] = None
     verified: bool
-    company: Optional[str]
+    company: Optional[Dict[str, Any]]
 
 
 class GroupPermissionDTO(BaseModel):
     id: UUID
     name: str
-    users: List[str]
-    permissions: List[str]
+    users: List[Dict[str, Any]]
+    permissions: List[Dict[str, Any]]
 
 
 class PermissionDTO(BaseModel):
     id: UUID
     name: str
-    users: List[str]
-    groups: List[str]
+    users: List[Dict[str, Any]]
+    groups: List[Dict[str, Any]]
 
 
 class CompanyDTO(BaseModel):

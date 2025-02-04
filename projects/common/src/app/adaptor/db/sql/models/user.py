@@ -1,5 +1,5 @@
 
-from typing import Any, Dict, Type
+from typing import Any, Dict, List, Type
 from sqlalchemy import UUID, ForeignKey, Select, String, Text, Boolean, select
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -37,16 +37,10 @@ class UserTable(Base):
 
 
 class UserPermissionQuery(DefaultQuery):
-    def update_relationships(self, db_obj, dto):
-        return super().update_relationships(db_obj, dto)
-    
-    def query_multi(self) -> Select[Any]:
+    def query_select(self) -> Select[Any]:
         from .user import UserTable
         # Query to return list of entities
-        default_query = select(self.model).outerjoin(UserTable.permissions).outerjoin(UserTable.groups).outerjoin(UserTable.company)
-        query = self._apply_default_filters(default_query)
-        # Load relationships
-        return query
+        return select(self.model).outerjoin(UserTable.permissions).outerjoin(UserTable.groups).outerjoin(UserTable.company)
 
 
 class UserRepository(SQLRepository):
@@ -62,7 +56,7 @@ class UserRepository(SQLRepository):
             name=row.name,
             cognito_id=row.cognito_id,
             verified=row.verified,
-            permissions=[p.name for p in row.permissions],
-            groups=[p.name for p in row.groups],
-            company=row.company.name if row.company else None
+            permissions=[{"id": p.id} for p in row.permissions],
+            groups=[{"id": p.id} for p in row.groups],
+            company=row.company.id if row.company else None
         )

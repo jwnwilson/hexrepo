@@ -37,16 +37,11 @@ class GroupTable(Base):
 
 
 class UserPermissionQuery(DefaultQuery):
-    def update_relationships(self, db_obj, dto):
-        return super().update_relationships(db_obj, dto)
     
-    def query_multi(self) -> Select[Any]:
+    def query_select(self) -> Select[Any]:
         from .group import GroupTable
         # Query to return list of entities
-        default_query = select(self.model).outerjoin(GroupTable.permissions).outerjoin(GroupTable.users)
-        query = self._apply_default_filters(default_query)
-        # Load relationships
-        return query
+        return select(self.model).outerjoin(GroupTable.permissions).outerjoin(GroupTable.users)
 
 
 class GroupRepository(SQLRepository):
@@ -57,6 +52,6 @@ class GroupRepository(SQLRepository):
         return GroupPermissionDTO(
             id=row.id,
             name=row.name,
-            permissions=[str(p.id) for p in row.permissions],
-            users=[str(u.id) for u in row.users]
+            permissions=[{"id": str(p.id)} for p in row.permissions],
+            users=[{"id": str(u.id)} for u in row.users]
         )

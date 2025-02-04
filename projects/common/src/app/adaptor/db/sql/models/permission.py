@@ -44,17 +44,11 @@ class PermissionTable(Base):
 
 
 class PermissionQuery(DefaultQuery):
-    def update_relationships(self, db_obj, dto):
-        return super().update_relationships(db_obj, dto)
-    
-    def query_multi(self) -> Select[Any]:
+
+    def query_select(self) -> Select[Any]:
         from .permission import PermissionTable
         # Query to return list of entities
-        default_query = select(self.model).outerjoin(PermissionTable.groups).outerjoin(PermissionTable.users)
-        query = self._apply_default_filters(default_query)
-        # Load relationships
-        return query
-
+        return select(self.model).outerjoin(PermissionTable.groups).outerjoin(PermissionTable.users)
 
 class PermissionRepository(SQLRepository):
     model = PermissionTable
@@ -64,6 +58,6 @@ class PermissionRepository(SQLRepository):
         return PermissionDTO(
             id=row.id,
             name=row.name,
-            groups=[str(g.id) for g in row.groups],
-            users=[str(u.id) for u in row.users],
+            groups=[{"id": str(g.id)} for g in row.groups],
+            users=[{"id": str(u.id)} for u in row.users],
         )
