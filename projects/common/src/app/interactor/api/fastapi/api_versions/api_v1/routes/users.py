@@ -1,4 +1,4 @@
-from app.domain.user import UserPermissionDTO
+from app.domain.user import UserPermissionCreateDTO, UserPermissionDTO
 from fastapi import Depends, status
 from fastapi.responses import JSONResponse
 from hexrepo_api import CrudRouter
@@ -10,7 +10,7 @@ router_v1 = CrudRouter(
     repository="user",
     methods=["CREATE", "READ", "UPDATE", "DELETE"],
     response_schema=UserPermissionDTO,
-    create_schema=UserPermissionDTO,
+    create_schema=UserPermissionCreateDTO,
     update_schema=UserPermissionDTO,
 )
 

@@ -1,6 +1,6 @@
 from typing import Dict
 
-from app.domain.user import UserPermissionDTO
+from app.domain.user import UserPermissionCreateDTO, UserPermissionDTO
 import boto3
 from loguru import logger
 
@@ -64,14 +64,15 @@ class CognitoAuthAdapter(AuthAdapter):
                 ],
             )
             self.uow.user.create(
-                UserPermissionDTO(
+                UserPermissionCreateDTO(
                     username=user.username,
                     email=user.email,
                     name=user.name,
-                    permissions={},
+                    permissions=[],
                     groups=[],
                     cognito_id=response["UserSub"],
                     verified=response["UserConfirmed"],
+                    company=None,
                 )
             )
             return SignupResponse(

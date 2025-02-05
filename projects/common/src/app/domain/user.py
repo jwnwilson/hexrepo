@@ -11,8 +11,7 @@ class Token(BaseModel):
     token_type: str
 
 
-class UserPermissionDTO(BaseModel):
-    id: UUID
+class UserPermissionCreateDTO(BaseModel):
     username: str
     name: str
     email: str
@@ -21,6 +20,10 @@ class UserPermissionDTO(BaseModel):
     cognito_id: Optional[str] = None
     verified: bool
     company: Optional[Dict[str, Any]]
+
+
+class UserPermissionDTO(UserPermissionCreateDTO):
+    id: UUID
 
 
 class GroupPermissionDTO(BaseModel):

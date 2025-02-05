@@ -37,7 +37,10 @@ Setup the following env vars directly or run:
 
 - Setup backend
     - Create common project
-        - Validate on sign up create user
+        - Validate auth on endpoint
+        - Add auth to all non auth endpoints
+        - Add auth to admin screen
+        - on delete user, remove from cognito
         - Add user id as custom claim on jwt token? 
         - Authorization at gateway level for all non auth apps
         - Authentication via fastapi middleware using jwt token + dynamodb
