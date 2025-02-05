@@ -37,7 +37,7 @@ Setup the following env vars directly or run:
 
 - Setup backend
     - Create common project
-        - On signup create user
+        - Validate on sign up create user
         - Add user id as custom claim on jwt token? 
         - Authorization at gateway level for all non auth apps
         - Authentication via fastapi middleware using jwt token + dynamodb

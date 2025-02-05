@@ -3,6 +3,9 @@ from uuid import UUID
 from pydantic import BaseModel
 from loguru import logger
 
+from app.adaptor.db.interface import UOW
+from hexrepo_cloud.auth.interface import AuthAdapter, SignupResponse, UserLogin, UserSignupDTO, UserVerifyDTO
+
 class Token(BaseModel):
     access_token: str
     token_type: str
