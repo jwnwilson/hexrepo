@@ -16,8 +16,8 @@ setup_logger()
 root_prefix = f""
 
 app: FastAPI = FastAPI(
-    title="common Service",
-    description="common description",
+    title="Hexrepo Service",
+    description="Hexrepo common service, for users, groups, auth and feature flags",
     version="0.0.1",
     root_path=root_prefix,
 )
@@ -39,4 +39,4 @@ setup_admin(app)
 
 @app.get("/")
 async def version():
-    return {"message": "common service"}
+    return {"message": "Hexrepo service"}

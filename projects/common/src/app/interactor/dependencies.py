@@ -48,7 +48,9 @@ def get_current_user(
 ) -> UserPermissionDTO:
     try:
         # Run authorization logic here
-        user_data: PaginatedData = uow.user.read_multi(username=credentials.claims["username"])
+        user_data: PaginatedData = uow.user.read_multi(filters=dict(
+            username=credentials.claims["username"])
+        )
         if not user_data.results:
             raise ValueError("User not found")
         user: UserPermissionDTO = user_data.results[0]

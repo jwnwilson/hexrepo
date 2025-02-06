@@ -1,4 +1,4 @@
-from hexrepo_cloud.auth.exceptions import InvalidPasswordException, UserExistsException
+from hexrepo_cloud.auth.exceptions import InvalidPasswordException, UserExistsException, AuthException
 from hexrepo_cloud.auth.interface import (
     AuthAdapter,
     SignupResponse,
@@ -36,7 +36,10 @@ def verify(user: UserVerifyDTO, auth: AuthAdapter = Depends(get_auth)) -> JSONRe
 
 @router_v1.post("/login", include_in_schema=True)
 def login(user: UserLogin, auth: AuthAdapter = Depends(get_auth)) -> JSONResponse:
-    response = auth.login(user)
+    try:
+        response = auth.login(user)
+    except AuthException:
+        raise HTTPException(status_code=403, detail="Invalid username or password")
     return JSONResponse(
         content=response,
         status_code=status.HTTP_200_OK,
