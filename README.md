@@ -37,10 +37,9 @@ Setup the following env vars directly or run:
 
 - Setup backend
     - Create common project
-        - Validate auth on endpoint
-        - Add auth to all non auth endpoints
-        - Add auth to admin screen
         - on delete user, remove from cognito
+        - Add permissions to admin screen
+        - Add permissions to limit crud endpoints
         - Add user id as custom claim on jwt token? 
         - Authorization at gateway level for all non auth apps
         - Authentication via fastapi middleware using jwt token + dynamodb
@@ -51,7 +50,6 @@ Setup the following env vars directly or run:
             - User, Group, Permission, Featureflag, Company CRUD
             - Test relationship CRUD logic
             - Test auth and permission logic
-    - Remove Auth project
     - Remove sql from example project
     - Move monitor / infra optimisation into common
         - Enable disable project via admin
