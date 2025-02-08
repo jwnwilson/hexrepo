@@ -14,8 +14,12 @@ class DatabaseSessionManager:
         self._engine_args = engine_args or dict(
             future=True,
             echo=config.DB_SQL_LOGGING,
+            pool_pre_ping=True,
             pool_size=5,
-            max_overflow=10
+            max_overflow=10,
+            pool_recycle=10,
+            pool_timeout=5,
+
         )
         if config.DB_SSL_CONNECTION:
             self._engine_args["connect_args"] = {"sslmode": "require"}
