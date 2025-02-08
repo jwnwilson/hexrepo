@@ -36,7 +36,6 @@ Setup the following env vars directly or run:
 # To Do
 
 - Setup backend
-    - Load test and verify connection pooling
     - Create common project
         - on delete user, remove from cognito
         - Add permissions to admin screen
