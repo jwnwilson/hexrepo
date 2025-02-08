@@ -12,12 +12,14 @@ from hexrepo_db.config import config
 class DatabaseSessionManager:
     def __init__(self, host: str, engine_args: Optional[Dict[str, Any]] = None):
         self._engine_args = engine_args or dict(
-            poolclass=sqlalchemy.pool.NullPool,
             future=True,
             echo=config.DB_SQL_LOGGING,
+            pool_size=5,
+            max_overflow=10
         )
         if config.DB_SSL_CONNECTION:
             self._engine_args["connect_args"] = {"sslmode": "require"}
+        host += "?application_name=sqlalchemy"
 
         self._engine: Optional[Engine] = create_engine(host, **self._engine_args)
         self._sessionmaker: Optional[sessionmaker[Session]] = sessionmaker(
