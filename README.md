@@ -37,7 +37,6 @@ Setup the following env vars directly or run:
 
 - Setup backend
     - Create common project
-        - on delete user, remove from cognito
         - Add permissions to admin screen
         - Add permissions to limit crud endpoints
         - Add user id as custom claim on jwt token? 

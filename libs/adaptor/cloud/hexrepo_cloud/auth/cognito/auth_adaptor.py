@@ -15,6 +15,7 @@ from ..exceptions import (
 from ..interface import (
     AuthAdapter,
     SignupResponse,
+    UserDTO,
     UserLogin,
     UserSignupDTO,
     UserVerifyDTO,
@@ -102,4 +103,14 @@ class CognitoAuthAdapter(AuthAdapter):
             raise InvalidVerificationCodeException(err)
         except Exception as e:
             logger.error(f"Error verifying user: {e}")
+            raise e
+        
+    def delete_user(self, user: UserDTO) -> None:
+        try:
+            self.cognito_client.admin_delete_user(
+                UserPoolId=config.USER_POOL_ID,
+                Username=user.username,
+            )
+        except Exception as e:
+            logger.error(f"Error deleting user: {e}")
             raise e

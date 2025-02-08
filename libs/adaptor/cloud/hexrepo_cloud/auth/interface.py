@@ -49,6 +49,10 @@ class AuthAdapter(ABC):
     def verify(self, token: str) -> None:
         pass
 
+    @abstractmethod
+    def delete_user(self, user: UserDTO) -> None:
+        pass
+
 
 class UserUOW(UOW):
     @abstractmethod

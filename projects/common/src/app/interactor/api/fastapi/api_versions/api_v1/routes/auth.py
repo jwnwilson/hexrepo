@@ -37,7 +37,9 @@ def verify(user: UserVerifyDTO, auth: AuthAdapter = Depends(get_auth)) -> JSONRe
 @router_v1.post("/login", include_in_schema=True)
 def login(user: UserLogin, auth: AuthAdapter = Depends(get_auth)) -> JSONResponse:
     try:
-        response = auth.login(user)
+        response = {
+            "access_token": auth.login(user)
+        }
     except AuthException:
         raise HTTPException(status_code=403, detail="Invalid username or password")
     return JSONResponse(

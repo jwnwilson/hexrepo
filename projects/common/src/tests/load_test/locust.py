@@ -6,7 +6,7 @@ class GetUsers(HttpUser):
 
     def on_start(self):
         resp = self.client.post("api/v1/auth/login", json={"username":"test", "password":"TestTest1!"})
-        self.client.headers = {"Authorization": f"Bearer {resp.content.decode().replace('\"', '')}"}
+        self.client.headers = {"Authorization": f"Bearer {resp.json()['access_token']}"}
     
     @task
     def get_users(self):
