@@ -8,12 +8,14 @@ from .session import DatabaseSessionManager
 
 
 class BaseSqlUOW(UOW):
+    session_manager_map: Dict[str, DatabaseSessionManager] = {}
+    
     def __init__(self, db_url: str, required_filters: Optional[Dict[str, str]] = None):
         self._db_url: str = db_url
         self._required_filters: Optional[Dict[str, str]] = required_filters
-        self.session_manager: DatabaseSessionManager = DatabaseSessionManager(
-            self._db_url
-        )
+        if db_url not in self.session_manager_map:
+            self.session_manager_map[db_url] = DatabaseSessionManager(db_url)
+        self.session_manager: DatabaseSessionManager = self.session_manager_map[db_url]
 
     @contextlib.contextmanager
     def transaction(self) -> Generator[DatabaseSessionManager, None, None]:

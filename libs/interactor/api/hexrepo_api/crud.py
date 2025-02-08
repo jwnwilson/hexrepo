@@ -159,6 +159,7 @@ class CrudRouter(APIRouter):
             page_number: int = 1,
             order_by: str = "-created_at",
         ) -> PaginatedData:  # type: ignore
+            breakpoint()
             repository: Repository = getattr(uow, self.repository)
             try:
                 parsed_filters: Dict[str, Any] = json.loads(filters)
