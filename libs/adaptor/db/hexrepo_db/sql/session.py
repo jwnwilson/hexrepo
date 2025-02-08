@@ -10,6 +10,8 @@ from hexrepo_db.config import config
 
 
 class DatabaseSessionManager:
+    _engine_map: Dict[str, Engine] = {}
+
     def __init__(self, host: str, engine_args: Optional[Dict[str, Any]] = None):
         self._engine_args = engine_args or dict(
             future=True,
@@ -23,9 +25,12 @@ class DatabaseSessionManager:
         )
         if config.DB_SSL_CONNECTION:
             self._engine_args["connect_args"] = {"sslmode": "require"}
+        # Sets application name for debugging in pg_stat_activity table if using postgres
         host += "?application_name=sqlalchemy"
 
-        self._engine: Optional[Engine] = create_engine(host, **self._engine_args)
+        if host not in self._engine_map:
+            self._engine_map[host] = create_engine(host, **self._engine_args)
+        self._engine: Optional[Engine] = self._engine_map[host]
         self._sessionmaker: Optional[sessionmaker[Session]] = sessionmaker(
             autocommit=False, bind=self._engine
         )
@@ -63,7 +68,7 @@ class DatabaseSessionManager:
             raise Exception("DatabaseSessionManager is not initialized")
 
         if self._session:
-            return self._session  # type: ignore
+            raise RuntimeError("Session already initialized, transaction in progress")
 
         self._session = self._sessionmaker()
         assert self._session is not None, "Session not initialized"

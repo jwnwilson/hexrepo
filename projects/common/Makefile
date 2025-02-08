@@ -72,6 +72,10 @@ test: venv db down
 	@echo "Running unit tests"
 	uv run pytest
 
+load_test: venv
+	@echo "Running load tests"
+	PYTHONPATH=src uv run locust -f src/tests/load_test/locust.py
+
 coverage:
 	@echo "Running unit tests"	
 	uv run pytest --cov-report html	
