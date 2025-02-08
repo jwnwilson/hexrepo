@@ -36,7 +36,6 @@ Setup the following env vars directly or run:
 # To Do
 
 - Setup backend
-    - Verify sqlalchemy connection pool, load test and verify throughput
     - Create common project
         - on delete user, remove from cognito
         - Add permissions to admin screen
