@@ -76,7 +76,7 @@ class DatabaseSessionManager:
                 raise
             finally:
                 self._session.close()
-                self.close()
+
         self._session = None
 
     @contextlib.contextmanager

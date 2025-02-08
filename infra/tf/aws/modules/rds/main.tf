@@ -120,6 +120,10 @@ module "db" {
     {
       name  = "rds.force_ssl"
       value = 0
+    },
+    {
+      name = "idle_in_transaction_session_timeout"
+      value = 30000
     }
   ]
 
