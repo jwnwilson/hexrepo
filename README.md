@@ -51,6 +51,7 @@ Setup the following env vars directly or run:
             - User, Group, Permission, Featureflag, Company CRUD
             - Test relationship CRUD logic
             - Test auth and permission logic
+            - Load test to verify connection pooling
     - Remove sql from example project
     - Move monitor / infra optimisation into common
         - Enable disable project via admin

@@ -9,7 +9,6 @@ from hexrepo_db.interface import UOW
 from app.adaptor.db.sql.uow import SqlUOW
 from hexrepo_db import UOW
 
-from app.domain.example import ExampleDTO
 
 # Silence SQLALchemy deprecation warning until we can upgrade
 os.environ["SQLALCHEMY_SILENCE_UBER_WARNING"] = "1"
@@ -54,10 +53,3 @@ def example_data():
         "url": "https://test.com",
         "location": "test location",
     }
-
-
-@pytest.fixture
-def created_example(client: TestClient, example_data) -> ExampleDTO:
-    response = client.post("/api/v1/example/", json=example_data)
-    return ExampleDTO(**response.json())
-
