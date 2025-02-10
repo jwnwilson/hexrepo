@@ -26,8 +26,8 @@ class DatabaseSessionManager:
         if config.DB_SSL_CONNECTION:
             self._engine_args["connect_args"] = {"sslmode": "require"}
         # Sets application name for debugging in pg_stat_activity table if using postgres
-        host += "?application_name=sqlalchemy"
-
+        if "postgresql" in host:
+            host += "?application_name=sqlalchemy"
         if host not in self._engine_map:
             self._engine_map[host] = create_engine(host, **self._engine_args)
         self._engine: Optional[Engine] = self._engine_map[host]
