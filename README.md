@@ -68,6 +68,9 @@ Setup the following env vars directly or run:
         - Re-render template with project settings 
         - Create Diff with changes
         - Add CI job to detect template changes and add a new PR with applied patch to projects
+    - Add monitoring dashboard for services
+        - Add log based event tracking
+        - Setup BI dashboard
     - Create orchestrator / workflow project 
         - 1 task table per hexrepo
         - Setup ECS for long running async orchestrator on fargate
