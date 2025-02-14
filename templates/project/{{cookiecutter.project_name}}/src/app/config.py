@@ -38,6 +38,7 @@ class Config(BaseSettings):
     PORT: int = 8000
 
     ALLOWED_ORIGINS: str = os.environ.get("ALLOWED_ORIGINS", "localhost")
+    TESTING: bool = "pytest" in sys.argv[0]
 
 
 config = Config()  # type: ignore

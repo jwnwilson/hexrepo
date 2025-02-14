@@ -33,6 +33,13 @@ def create_tables(uow: UOW):
     uow.create_all()
 
 
+@pytest.fixture(scope="function")
+def drop_tables(uow: UOW):
+    try:
+        uow.drop_all()
+    except Exception:
+        pass
+
 
 @pytest.fixture
 def client(uow):

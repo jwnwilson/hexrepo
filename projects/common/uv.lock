@@ -269,6 +269,7 @@ dependencies = [
     { name = "hexrepo-task" },
     { name = "psycopg2-binary" },
     { name = "pydantic-settings" },
+    { name = "pytest-alembic" },
     { name = "python-dotenv" },
     { name = "python-jose" },
     { name = "requests" },
@@ -306,6 +307,7 @@ requires-dist = [
     { name = "hexrepo-task", editable = "../../libs/interactor/task" },
     { name = "psycopg2-binary", specifier = ">=2.9.10,<3.0.0" },
     { name = "pydantic-settings", specifier = ">=2.6.0,<3.0.0" },
+    { name = "pytest-alembic", specifier = ">=0.11.1" },
     { name = "python-dotenv", specifier = ">=1.0.1,<2.0.0" },
     { name = "python-jose", specifier = ">=3.3.0" },
     { name = "requests", specifier = ">=2.32.3,<3.0.0" },
@@ -1250,6 +1252,20 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/05/35/30e0d83068951d90a01852cb1cef56e5d8a09d20c7f511634cc2f7e0372a/pytest-8.3.4.tar.gz", hash = "sha256:965370d062bce11e73868e0335abac31b4d3de0e82f4007408d242b4f8610761", size = 1445919 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/11/92/76a1c94d3afee238333bc0a42b82935dd8f9cf8ce9e336ff87ee14d9e1cf/pytest-8.3.4-py3-none-any.whl", hash = "sha256:50e16d954148559c9a74109af1eaf0c945ba2d8f30f0a3d3335edde19788b6f6", size = 343083 },
+]
+
+[[package]]
+name = "pytest-alembic"
+version = "0.11.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "alembic" },
+    { name = "pytest" },
+    { name = "sqlalchemy" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/7e/7b/cd3c7a07dcdf01d66ed14aa8cea89f5877c3d0a8e657be196f87ac38dfd1/pytest_alembic-0.11.1.tar.gz", hash = "sha256:a920d8770b5be77326c5c1b2bd8d4d4a0dd8fc2c2d57abbcd1fec28a21131b85", size = 29977 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/40/1c/b2b34ee85c01582fb0bd4088a12b4e243f5edb4dc2caa0c6c3b90edf42a4/pytest_alembic-0.11.1-py3-none-any.whl", hash = "sha256:f83e8c1534d50ced053aa4b1dbf6e261f4674aa626cb852fc1dcb565049ae152", size = 35970 },
 ]
 
 [[package]]
