@@ -2,7 +2,7 @@ import contextlib
 from typing import Any, Dict, Generator, Iterator, Optional
 
 import sqlalchemy
-from sqlalchemy import create_engine, event
+from sqlalchemy import NullPool, create_engine, event
 from sqlalchemy.engine.base import Connection, Engine
 from sqlalchemy.orm import Session, sessionmaker
 
@@ -12,7 +12,9 @@ from hexrepo_db.config import config
 class DatabaseSessionManager:
     _engine_map: Dict[str, Engine] = {}
 
-    def __init__(self, host: str, engine_args: Optional[Dict[str, Any]] = None):
+    def __init__(self, host: str, engine_args: Optional[Dict[str, Any]] = None, disable_connection_pool: bool = False,
+        read_only: bool = False,):
+        # By default enable connection pooling as this has significant performance benefits
         self._engine_args = engine_args or dict(
             future=True,
             echo=config.DB_SQL_LOGGING,
@@ -21,15 +23,28 @@ class DatabaseSessionManager:
             max_overflow=10,
             pool_recycle=10,
             pool_timeout=5,
-
         )
+        # Ability to disable connection pooling, E.G. Legacy DB doesn't work well due to unique schema per customer
+        if disable_connection_pool:
+            self._engine_args["poolclass"] = NullPool
+            del self._engine_args["pool_size"]
+            del self._engine_args["max_overflow"]
+            del self._engine_args["pool_recycle"]
+            del self._engine_args["pool_timeout"]
         if config.DB_SSL_CONNECTION:
             self._engine_args["connect_args"] = {"sslmode": "require"}
         # Sets application name for debugging in pg_stat_activity table if using postgres
-        if "postgresql" in host:
+        if "postgresql" in host and "pytest" not in sys.argv[0]:
             host += "?application_name=sqlalchemy"
+        # Update host url for _engine_map so we can have read_only and read_write pools
+        if read_only:
+            host += "?read+only"
+        # Generate an engine for each new host or use cached version to access it's connection pool
         if host not in self._engine_map:
             self._engine_map[host] = create_engine(host, **self._engine_args)
+            if read_only:
+                self._engine_map[host] = self._engine_map[host].execution_options(postgresql_readonly=True)
+
         self._engine: Optional[Engine] = self._engine_map[host]
         self._sessionmaker: Optional[sessionmaker[Session]] = sessionmaker(
             autocommit=False, bind=self._engine
