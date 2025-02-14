@@ -36,6 +36,7 @@ Setup the following env vars directly or run:
 # To Do
 
 - Setup backend
+    - Add DB Read replica
     - Create common project
         - Add permissions to admin screen
         - Add permissions to limit crud endpoints
