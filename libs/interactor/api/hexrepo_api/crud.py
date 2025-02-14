@@ -49,12 +49,14 @@ class CrudRouter(APIRouter):
         methods: List[str],
         create_schema: Type[BaseModel],
         update_schema: Type[BaseModel],
+        db_dependency_ro: Callable | None = None,
         prefix: Optional[str] = None,
         tags: Optional[List[Union[str, Enum]]] = None,
         auth_adaptor: Optional[Callable[[], AuthAdapter]] = None,
         **kwargs: Any,
     ):
         self.db_dependency: Callable[[], UOW] = db_dependency
+        self.db_dependency_ro: Callable | None = db_dependency_ro
         self.auth_adaptor: Optional[Callable[[], AuthAdapter]]  = auth_adaptor
         self.repository: str = repository
         self.methods = methods or ["READ"]
@@ -139,7 +141,7 @@ class CrudRouter(APIRouter):
     def _read(self) -> Callable[[Any], Any]:
         def read_record(
             id: UUID,
-            uow: UOW = Depends(self.db_dependency),
+            uow: UOW = Depends(self.db_dependency_ro if self.db_dependency_ro else self.db_dependency),
         ) -> self.response_schema:  # type: ignore
             try:
                 repository: Repository = getattr(uow, self.repository)
@@ -153,7 +155,7 @@ class CrudRouter(APIRouter):
 
     def _read_multi(self) -> Callable[[UOW], Any]:
         def read_multiple_records(
-            uow: UOW = Depends(self.db_dependency),
+            uow: UOW = Depends(self.db_dependency_ro if self.db_dependency_ro else self.db_dependency),
             filters: str = "{}",
             page_size: int = 0,
             page_number: int = 1,

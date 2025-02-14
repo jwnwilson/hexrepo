@@ -23,6 +23,16 @@ def get_uow() -> Generator[SqlUOW, None, None]:
     with uow.transaction():
         yield uow
 
+
+def get_uow_ro(uow: SqlUOW = Depends(get_uow)) -> Generator[SqlUOW, None, None]:
+    if config.READ_REPLICA_ENABLED:
+        uow = SqlUOW(db_url=get_sql_db_url(read_only=True))
+        with uow.transaction():
+            yield uow
+    else:
+        return uow
+
+
 def get_queue_uow() -> Generator[QueueUOW, None, None]:
     uow: QueueUOW = QueueUOW()
     yield uow
@@ -44,7 +54,7 @@ def get_auth(
 
 def get_current_user(
     credentials: JWTAuthorizationCredentials = Depends(get_jwt_token),
-    uow: SqlUOW = Depends(get_uow),
+    uow: SqlUOW = Depends(get_uow_ro),
 ) -> UserPermissionDTO:
     try:
         # Run authorization logic here

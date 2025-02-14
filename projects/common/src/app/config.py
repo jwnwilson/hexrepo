@@ -31,6 +31,7 @@ class Config(BaseSettings):
     USER_POOL_ID: str = os.environ["USER_POOL_ID"]
 
     # Database settings
+    READ_REPLICA_ENABLED: bool = os.environ.get("READ_REPLICA_ENABLED", "false") == "true"
     DB_PASSWORD_SECRET_NAME: str = os.environ.get("DB_PASSWORD_SECRET_NAME", "")
     DB_URL: str = os.environ["DB_URL"]
 
