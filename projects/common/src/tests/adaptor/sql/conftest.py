@@ -1,6 +1,6 @@
 import pytest
 from pytest_alembic.config import Config
-from hexrepo_db.sql.session import DatabaseSessionManager
+from app.adaptor.db.sql import SqlUOW
 
 
 @pytest.fixture
@@ -10,6 +10,6 @@ def alembic_config(alembic_engine):
 
 
 @pytest.fixture
-def alembic_engine(session_maker: DatabaseSessionManager, drop_tables):
+def alembic_engine(uow: SqlUOW, drop_tables):
     """Override this fixture to provide pytest-alembic powered tests with a database handle."""
-    return session_maker.engine
+    return uow.session.get_bind()

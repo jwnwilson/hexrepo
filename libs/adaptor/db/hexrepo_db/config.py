@@ -1,5 +1,6 @@
 import logging
 import os
+import sys
 
 from pydantic_settings import BaseSettings
 
@@ -24,6 +25,6 @@ class Config(BaseSettings):
     DB_SQL_LOGGING: bool = os.environ.get("DB_SQL_LOGGING", "false") == "true"
     DB_SSL_CONNECTION: bool = os.environ.get("DB_SSL_CONNECTION", "false") == "true"
     CLOUD_PROVIDER: str = os.environ.get("CLOUD_PROVIDER", "local")
-
+    TESTING: bool = "pytest" in sys.argv[0]
 
 config = Config()

@@ -36,8 +36,8 @@ Setup the following env vars directly or run:
 # To Do
 
 - Setup backend
-    - Add DB Read replica
     - Validate alembic tests
+    - Add DB Read replica
     - Create common project
         - Add permissions to admin screen
         - Add permissions to limit crud endpoints
@@ -48,7 +48,8 @@ Setup the following env vars directly or run:
             - Create materialised view
             - Or cache in dynamodb for cheap serverless option?
         - Tests:
-            - User, Group, Permission, Featureflag, Company CRUD
+            - Create dynamic CRUD tests
+                - User, Group, Permission, Featureflag, Company CRUD
             - Test relationship CRUD logic
             - Test auth and permission logic
             - Load test to verify connection pooling

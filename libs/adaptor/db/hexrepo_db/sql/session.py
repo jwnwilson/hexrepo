@@ -34,7 +34,7 @@ class DatabaseSessionManager:
         if config.DB_SSL_CONNECTION:
             self._engine_args["connect_args"] = {"sslmode": "require"}
         # Sets application name for debugging in pg_stat_activity table if using postgres
-        if "postgresql" in host and "pytest" not in sys.argv[0]:
+        if "postgresql" in host and not config.TESTING:
             host += "?application_name=sqlalchemy"
         # Update host url for _engine_map so we can have read_only and read_write pools
         if read_only:

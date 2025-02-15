@@ -7,6 +7,9 @@ def example_data_missing_url():
     return {"name": "test"}
 
 
+# Create dynamic CRUD tests
+
+
 def test_example_create(client: TestClient, example_data):
     response = client.post("/api/v1/example/", json=example_data)
     assert response.status_code == 200

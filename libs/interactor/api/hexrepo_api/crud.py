@@ -73,6 +73,7 @@ class CrudRouter(APIRouter):
     def _dependencies(self) -> Optional[Callable]:
         if self.auth_adaptor:
             return [Depends(self.auth_adaptor)]
+        return []
 
     def _setup_routes(self) -> None:
         if "CREATE" in self.methods:
