@@ -28,6 +28,7 @@ class Config(BaseSettings):
 
     # Auth settings
     JWT_SECRET: str = os.environ["JWT_SECRET"]
+    ADMIN_SECRET: str = os.environ["ADMIN_SECRET"]
     # This needs to come from cognito
     CLIENT_ID: str = os.environ["CLIENT_ID"]
     USER_POOL_ID: str = os.environ["USER_POOL_ID"]

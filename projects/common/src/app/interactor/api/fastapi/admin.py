@@ -1,9 +1,13 @@
 from datetime import datetime
 from typing import Any
 
+from app.domain.user import get_user
 import wtforms
 from sqladmin import Admin, ModelView
 from starlette.requests import Request
+from sqladmin.authentication import AuthenticationBackend
+from fastapi import Depends, FastAPI, HTTPException
+from hexrepo_cloud.auth.interface import AuthAdapter, UserLogin
 
 from app.adaptor.db.sql.models.company import CompanyTable
 from app.adaptor.db.sql.models.feature_flag import FeatureFlagTable
@@ -12,10 +16,18 @@ from app.adaptor.db.sql.models.permission import PermissionTable
 from app.adaptor.db.sql.models.user import UserTable
 from app.adaptor.db.sql.uow import SqlUOW
 from app.config import config
-from fastapi import FastAPI
+from app.interactor.dependencies import get_auth, get_uow_ro
 
 
 class BaseModelView(ModelView):
+    def is_visible(self, request: Request) -> bool:
+        assert request.user, "User not found"
+        return "superadmin" in request.user.permissions
+
+    def is_accessible(self, request: Request) -> bool:
+        assert request.user, "User not found"
+        return "superadmin" in request.user.permissions
+    
     form_widget_args = dict(
         created_at=dict(readonly=True), updated_at=dict(readonly=True)
     )
@@ -158,10 +170,61 @@ class CompanyAdmin(BaseModelView, model=CompanyTable):
     ]
 
 
+class AdminAuth(AuthenticationBackend):
+    async def login(self, request: Request) -> bool:
+        breakpoint()
+        # Check this gets cleaned up propery
+        auth_gen = get_auth()
+        auth: AuthAdapter = next(auth_gen)
+        form = await request.form()
+        username, password = form["username"], form["password"]
+
+        # Validate username/password credentials
+        try:
+            resp = auth.login(UserLogin(
+                username=username,
+                password=password
+            ))
+        except Exception as e:
+            raise HTTPException(status_code=403, detail="Invalid username or password")
+        # And update session
+        request.session.update({
+            "token": resp["access_token"],
+            "username": username,
+        })
+
+        return True
+
+    async def logout(self, request: Request) -> bool:
+        # Usually you'd want to just clear the session
+        request.session.clear()
+        return True
+
+    async def authenticate(self, request: Request) -> bool:
+        breakpoint()
+        auth_gen = get_auth()
+        uow_gen = get_uow_ro()
+        auth: AuthAdapter = next(auth_gen)
+        uow: SqlUOW = next(uow_gen)
+        token: str = request.session.get("token")
+        username: str = request.session.get("username")
+
+        if not token:
+            return False
+
+        auth.verify(token)
+        request.user = get_user(uow, username)
+        return True
+
+
 def setup_admin(app: FastAPI):
     engine = SqlUOW(db_url=config.DB_URL).session_manager._engine
+    authentication_backend: AdminAuth = AdminAuth(secret_key=config.ADMIN_SECRET)
     admin: Admin = Admin(
-        app, engine, favicon_url="https://jwnwilson.co.uk/images/headshot_500.png"
+        app,
+        engine,
+        favicon_url="https://jwnwilson.co.uk/images/headshot_500.png",
+        authentication_backend=authentication_backend
     )
 
     admin.add_view(UserAdmin)

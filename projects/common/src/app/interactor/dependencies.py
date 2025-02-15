@@ -13,7 +13,7 @@ from starlette.status import HTTP_403_FORBIDDEN
 
 from app.adaptor.db.sql import SqlUOW
 from app.config import config
-from app.domain.user import UserPermissionDTO
+from app.domain.user import UserPermissionDTO, get_user
 
 logger = logging.getLogger(__name__)
 
@@ -57,13 +57,6 @@ def get_current_user(
     uow: SqlUOW = Depends(get_uow_ro),
 ) -> UserPermissionDTO:
     try:
-        # Run authorization logic here
-        user_data: PaginatedData = uow.user.read_multi(
-            filters=dict(username=credentials.claims["username"])
-        )
-        if not user_data.results:
-            raise ValueError("User not found")
-        user: UserPermissionDTO = user_data.results[0]
-        return user
+        return get_user(uow, credentials.claims["username"])
     except KeyError:
         raise HTTPException(status_code=HTTP_403_FORBIDDEN, detail="Username missing")

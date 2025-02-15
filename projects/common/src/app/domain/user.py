@@ -3,6 +3,8 @@ from uuid import UUID
 
 from pydantic import BaseModel
 
+from hexrepo_db.interface import UOW, PaginatedData
+
 
 class Token(BaseModel):
     access_token: str
@@ -47,3 +49,12 @@ class FeatureFlagDTO(BaseModel):
     name: str
     enabled: bool
     company_id: Optional[UUID] = None
+
+
+def get_user(uow: UOW, username: str) -> UserPermissionDTO:
+    user_data: PaginatedData = uow.user.read_multi(
+        filters=dict(username=username)
+    )
+    if not user_data.results:
+        raise ValueError("User not found")
+    return user_data.results[0]
