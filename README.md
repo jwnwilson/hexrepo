@@ -37,6 +37,7 @@ Setup the following env vars directly or run:
 
 - Setup backend
     - Add DB Read replica
+    - Validate alembic tests
     - Create common project
         - Add permissions to admin screen
         - Add permissions to limit crud endpoints
