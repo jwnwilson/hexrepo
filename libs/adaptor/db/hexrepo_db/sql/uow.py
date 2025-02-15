@@ -1,6 +1,7 @@
 import contextlib
 from typing import Dict, Generator, Optional
 
+from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from ..interface import UOW
@@ -34,3 +35,5 @@ class BaseSqlUOW(UOW):
         from .models.base_model import Base
 
         Base.metadata.drop_all(self.session.get_bind())
+        self.session.execute(text("DROP TABLE IF EXISTS alembic_version;"))
+        self.session.commit()
