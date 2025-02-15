@@ -1,26 +1,26 @@
 from datetime import datetime
 from typing import Any
-from fastapi import FastAPI
+
+import wtforms
 from sqladmin import Admin, ModelView
 from starlette.requests import Request
-import wtforms
 
-from app.config import config
-from app.adaptor.db.sql.uow import SqlUOW
-from app.adaptor.db.sql.models.user import UserTable
+from app.adaptor.db.sql.models.company import CompanyTable
+from app.adaptor.db.sql.models.feature_flag import FeatureFlagTable
 from app.adaptor.db.sql.models.group import GroupTable
 from app.adaptor.db.sql.models.permission import PermissionTable
-from app.adaptor.db.sql.models.feature_flag import FeatureFlagTable
-from app.adaptor.db.sql.models.company import CompanyTable
+from app.adaptor.db.sql.models.user import UserTable
+from app.adaptor.db.sql.uow import SqlUOW
+from app.config import config
+from fastapi import FastAPI
+
 
 class BaseModelView(ModelView):
     form_widget_args = dict(
-        created_at=dict(readonly=True),
-        updated_at=dict(readonly=True)
+        created_at=dict(readonly=True), updated_at=dict(readonly=True)
     )
     form_args = dict(
-        created_at=dict(default=datetime.now()),
-        updated_at=dict(default=datetime.now())
+        created_at=dict(default=datetime.now()), updated_at=dict(default=datetime.now())
     )
 
     column_sortable_list = ["created_at"]
@@ -53,7 +53,7 @@ class UserAdmin(BaseModelView, model=UserTable):
         UserTable.cognito_id,
         UserTable.verified,
         UserTable.permissions,
-        UserTable.groups
+        UserTable.groups,
     ]
     column_details_list = [
         UserTable.id,
@@ -65,12 +65,10 @@ class UserAdmin(BaseModelView, model=UserTable):
         UserTable.permissions,
         UserTable.groups,
         UserTable.created_at,
-        UserTable.updated_at
+        UserTable.updated_at,
     ]
 
-    form_overrides = dict(
-        email=wtforms.EmailField
-    )
+    form_overrides = dict(email=wtforms.EmailField)
 
     form_ajax_refs = {
         "groups": {
@@ -80,7 +78,7 @@ class UserAdmin(BaseModelView, model=UserTable):
         "permissions": {
             "fields": ("name",),
             "order_by": "created_at",
-        }
+        },
     }
 
 
@@ -91,10 +89,7 @@ class GroupAdmin(BaseModelView, model=GroupTable):
 
     column_searchable_list = [GroupTable.name]
 
-    column_list = [
-        GroupTable.name,
-        GroupTable.id
-    ]
+    column_list = [GroupTable.name, GroupTable.id]
 
     form_ajax_refs = {
         "permissions": {
@@ -102,9 +97,9 @@ class GroupAdmin(BaseModelView, model=GroupTable):
             "order_by": "created_at",
         },
         "users": {
-            "fields": ("id","username", "email"),
+            "fields": ("id", "username", "email"),
             "order_by": "created_at",
-        }
+        },
     }
 
 
@@ -115,10 +110,7 @@ class PermissionAdmin(BaseModelView, model=PermissionTable):
 
     column_searchable_list = [PermissionTable.name]
 
-    column_list = [
-        PermissionTable.name,
-        PermissionTable.id
-    ]
+    column_list = [PermissionTable.name, PermissionTable.id]
 
     form_ajax_refs = {
         "groups": {
@@ -128,7 +120,7 @@ class PermissionAdmin(BaseModelView, model=PermissionTable):
         "users": {
             "fields": ("name",),
             "order_by": "created_at",
-        }
+        },
     }
 
 
@@ -142,7 +134,7 @@ class FeatureFlagAdmin(BaseModelView, model=FeatureFlagTable):
     column_list = [
         FeatureFlagTable.name,
         FeatureFlagTable.id,
-        FeatureFlagTable.company_id
+        FeatureFlagTable.company_id,
     ]
 
     form_ajax_refs = {
@@ -169,9 +161,7 @@ class CompanyAdmin(BaseModelView, model=CompanyTable):
 def setup_admin(app: FastAPI):
     engine = SqlUOW(db_url=config.DB_URL).session_manager._engine
     admin: Admin = Admin(
-        app,
-        engine,
-        favicon_url="https://jwnwilson.co.uk/images/headshot_500.png"
+        app, engine, favicon_url="https://jwnwilson.co.uk/images/headshot_500.png"
     )
 
     admin.add_view(UserAdmin)

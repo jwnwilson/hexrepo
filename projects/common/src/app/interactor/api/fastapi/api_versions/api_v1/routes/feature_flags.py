@@ -1,7 +1,8 @@
-from app.domain.user import FeatureFlagDTO
 from hexrepo_api import CrudRouter
 
-from ......dependencies import get_uow, get_current_user, get_uow_ro
+from app.domain.user import FeatureFlagDTO
+
+from ......dependencies import get_current_user, get_uow, get_uow_ro
 
 router_v1 = CrudRouter(
     db_dependency=get_uow,

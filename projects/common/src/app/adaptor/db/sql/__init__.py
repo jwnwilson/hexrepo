@@ -1,1 +1,1 @@
-from .uow import SqlUOW
+from .uow import SqlUOW as SqlUOW

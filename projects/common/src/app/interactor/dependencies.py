@@ -1,19 +1,19 @@
 import logging
 from collections.abc import Generator
-from app.domain.user import UserPermissionDTO
-from fastapi import Depends, HTTPException
-from starlette.status import HTTP_403_FORBIDDEN
 
-from hexrepo_cloud.auth.cognito.fastapi_cognito import JWTAuthorizationCredentials
+from fastapi import Depends, HTTPException
 from hexrepo_cloud.auth.cognito import get_jwt_token
+from hexrepo_cloud.auth.cognito.fastapi_cognito import JWTAuthorizationCredentials
 from hexrepo_cloud.auth.interface import AuthAdapter
 from hexrepo_db.interface import PaginatedData
+from hexrepo_db.sql import get_sql_db_url
 from hexrepo_task import QueueAdaptor, SqsQueueAdaptor
 from hexrepo_task.adaptor.db import QueueUOW
-from hexrepo_db.sql import get_sql_db_url
+from starlette.status import HTTP_403_FORBIDDEN
 
-from app.config import config
 from app.adaptor.db.sql import SqlUOW
+from app.config import config
+from app.domain.user import UserPermissionDTO
 
 logger = logging.getLogger(__name__)
 
@@ -30,7 +30,7 @@ def get_uow_ro(uow: SqlUOW = Depends(get_uow)) -> Generator[SqlUOW, None, None]:
         with uow.transaction():
             yield uow
     else:
-        return uow
+        yield uow
 
 
 def get_queue_uow() -> Generator[QueueUOW, None, None]:
@@ -58,8 +58,8 @@ def get_current_user(
 ) -> UserPermissionDTO:
     try:
         # Run authorization logic here
-        user_data: PaginatedData = uow.user.read_multi(filters=dict(
-            username=credentials.claims["username"])
+        user_data: PaginatedData = uow.user.read_multi(
+            filters=dict(username=credentials.claims["username"])
         )
         if not user_data.results:
             raise ValueError("User not found")

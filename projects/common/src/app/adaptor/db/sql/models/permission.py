@@ -1,11 +1,16 @@
-
-from typing import Any
-from sqlalchemy import UUID, Column, ForeignKey, Select, String, Table, select
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from typing import TYPE_CHECKING, Any
 
 from hexrepo_db.sql.models.base_model import Base
 from hexrepo_db.sql.repository import DefaultQuery, SQLRepository
+from sqlalchemy import UUID, ForeignKey, Select, String, select
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
 from app.domain.user import PermissionDTO
+
+if TYPE_CHECKING:
+    from .group import GroupTable
+    from .permission import PermissionTable
+    from .user import UserTable
 
 
 # Joining table to link permissions to groups
@@ -29,14 +34,10 @@ class PermissionTable(Base):
 
     name: Mapped[str] = mapped_column(String)
     groups: Mapped[list["GroupTable"]] = relationship(
-        "GroupTable",
-        secondary=PermissionGroupsTable.__table__,
-        overlaps="groups"
+        "GroupTable", secondary=PermissionGroupsTable.__table__, overlaps="groups"
     )
     users: Mapped[list["UserTable"]] = relationship(
-        "UserTable",
-        secondary=PermissionUsersTable.__table__,
-        overlaps="users"
+        "UserTable", secondary=PermissionUsersTable.__table__, overlaps="users"
     )
 
     def __str__(self) -> str:
@@ -44,11 +45,16 @@ class PermissionTable(Base):
 
 
 class PermissionQuery(DefaultQuery):
-
     def query_select(self) -> Select[Any]:
         from .permission import PermissionTable
+
         # Query to return list of entities
-        return select(self.model).outerjoin(PermissionTable.groups).outerjoin(PermissionTable.users)
+        return (
+            select(self.model)
+            .outerjoin(PermissionTable.groups)
+            .outerjoin(PermissionTable.users)
+        )
+
 
 class PermissionRepository(SQLRepository):
     model = PermissionTable

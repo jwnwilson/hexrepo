@@ -68,7 +68,7 @@ run_docker:
 	docker compose up
 
 # Testing commands
-test: venv db down
+test: venv db 
 	@echo "Running unit tests"
 	uv run pytest
 

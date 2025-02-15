@@ -1,18 +1,17 @@
 from logging.config import fileConfig
 
 from alembic import context
-from app.config import config as app_config
-from sqlalchemy import Connection, engine_from_config, pool
-
 from hexrepo_db.sql import get_sql_db_url
 from hexrepo_db.sql.models.base_model import Base
+from sqlalchemy import Connection, engine_from_config, pool
+
 # Import project UOW class to discover models
-from app.adaptor.db.sql import SqlUOW # type: ignore
+from app.config import config as app_config
 
 
 def get_db_url_alembic():
     # Escape % in the db_url
-    return get_sql_db_url().replace('%', '%%') 
+    return get_sql_db_url().replace("%", "%%")
 
 
 # this is the Alembic Config object, which provides

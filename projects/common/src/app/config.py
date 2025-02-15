@@ -1,6 +1,7 @@
-import os
 import logging
+import os
 import sys
+
 from dotenv import load_dotenv
 from pydantic_settings import BaseSettings
 
@@ -18,12 +19,13 @@ class Config(BaseSettings):
     These parameters can be configured
     with environment variables.
     """
+
     # Current environment
     PROJECT: str = os.environ.get("PROJECT", "common")
     CLOUD_PROVIDER: str = os.environ.get("CLOUD_PROVIDER", "local")
     ENVIRONMENT: str = os.environ.get("ENVIRONMENT", "dev")
     REGION: str = os.environ.get("REGION", "eu-west-1")
-    
+
     # Auth settings
     JWT_SECRET: str = os.environ["JWT_SECRET"]
     # This needs to come from cognito
@@ -31,7 +33,9 @@ class Config(BaseSettings):
     USER_POOL_ID: str = os.environ["USER_POOL_ID"]
 
     # Database settings
-    READ_REPLICA_ENABLED: bool = os.environ.get("READ_REPLICA_ENABLED", "false") == "true"
+    READ_REPLICA_ENABLED: bool = (
+        os.environ.get("READ_REPLICA_ENABLED", "false") == "true"
+    )
     DB_PASSWORD_SECRET_NAME: str = os.environ.get("DB_PASSWORD_SECRET_NAME", "")
     DB_URL: str = os.environ["DB_URL"]
 
@@ -45,5 +49,6 @@ class Config(BaseSettings):
 
     ALLOWED_ORIGINS: str = os.environ.get("ALLOWED_ORIGINS", "localhost")
     TESTING: bool = "pytest" in sys.argv[0]
+
 
 config = Config()  # type: ignore

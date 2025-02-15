@@ -1,49 +1,54 @@
 import os
 from collections.abc import Generator
-from typing import Any
-from unittest.mock import Mock
+
 import pytest
 from fastapi.testclient import TestClient
-
-from hexrepo_db.interface import UOW
-from app.adaptor.db.sql.uow import SqlUOW
 from hexrepo_db import UOW
 
-
-# Create local file db
-SQLITE_DATABASE_URL = "sqlite:///test.db"
-SQLALCHEMY_DATABASE_URL = "postgresql+psycopg2://postgres:password@localhost:5432/test_db"
+from app.adaptor.db.sql.uow import SqlUOW
 
 
 def reset_db(uow: UOW, drop_only: bool = False):
     try:
         uow.drop_all()
-    except:
+    except Exception:
         pass
     if not drop_only:
         uow.create_all()
 
 
 @pytest.fixture
-def uow_lite() -> Generator[UOW, None, None]:
+def SQLALCHEMY_DATABASE_URL():
+    return os.getenv(
+        "TEST_DB_URL", "postgresql+psycopg2://postgres:password@localhost:5432/test_db"
+    )
+
+
+@pytest.fixture
+def SQLITE_DATABASE_URL():
+    return "sqlite:///test.db"
+
+
+@pytest.fixture
+def uow_lite(SQLITE_DATABASE_URL) -> Generator[UOW, None, None]:
     """
     Return db adaptor with initialised DB & DB session.
     """
     uow = SqlUOW(db_url=SQLITE_DATABASE_URL)
     # Create DB session
-    with uow.transaction() as session:
+    with uow.transaction() as session:  # noqa
         reset_db(uow)
         yield uow
 
 
 @pytest.fixture
-def uow() -> Generator[UOW, None, None]:
+def uow(SQLALCHEMY_DATABASE_URL) -> Generator[UOW, None, None]:
     """
     Return db adaptor with initialised DB & DB session.
     """
     uow = SqlUOW(db_url=SQLALCHEMY_DATABASE_URL)
     # Create DB session
-    with uow.transaction() as session:
+    with uow.transaction() as session:  # noqa
         reset_db(uow)
         yield uow
 

@@ -1,12 +1,25 @@
-
-from typing import Any
-from sqlalchemy import UUID, Column, ForeignKey, Select, String, Table, Text, Boolean, select
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from typing import TYPE_CHECKING, Any
 
 from hexrepo_db.sql.models.base_model import Base
 from hexrepo_db.sql.repository import DefaultQuery, SQLRepository
+from sqlalchemy import (
+    UUID,
+    ForeignKey,
+    Select,
+    String,
+    select,
+)
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
 from app.domain.user import GroupPermissionDTO
-from .permission import PermissionGroupsTable, PermissionUsersTable as PermissionUsersTable
+
+from .permission import PermissionGroupsTable
+from .permission import PermissionUsersTable as PermissionUsersTable
+
+if TYPE_CHECKING:
+    from .group import GroupTable
+    from .permission import PermissionTable
+    from .user import UserTable
 
 
 # Joining table to link groups to users
@@ -22,14 +35,10 @@ class GroupTable(Base):
 
     name: Mapped[str] = mapped_column(String)
     users: Mapped[list["UserTable"]] = relationship(
-        "UserTable",
-        secondary=UserGroupsTable.__table__,
-        overlaps="users"
+        "UserTable", secondary=UserGroupsTable.__table__, overlaps="users"
     )
     permissions: Mapped[list["PermissionTable"]] = relationship(
-        "PermissionTable",
-        secondary=PermissionGroupsTable.__table__,
-        overlaps="groups"
+        "PermissionTable", secondary=PermissionGroupsTable.__table__, overlaps="groups"
     )
 
     def __str__(self) -> str:
@@ -37,11 +46,15 @@ class GroupTable(Base):
 
 
 class UserPermissionQuery(DefaultQuery):
-    
     def query_select(self) -> Select[Any]:
         from .group import GroupTable
+
         # Query to return list of entities
-        return select(self.model).outerjoin(GroupTable.permissions).outerjoin(GroupTable.users)
+        return (
+            select(self.model)
+            .outerjoin(GroupTable.permissions)
+            .outerjoin(GroupTable.users)
+        )
 
 
 class GroupRepository(SQLRepository):
@@ -53,5 +66,5 @@ class GroupRepository(SQLRepository):
             id=row.id,
             name=row.name,
             permissions=[{"id": str(p.id)} for p in row.permissions],
-            users=[{"id": str(u.id)} for u in row.users]
+            users=[{"id": str(u.id)} for u in row.users],
         )
