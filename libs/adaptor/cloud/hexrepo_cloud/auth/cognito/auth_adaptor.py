@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, Optional
 
 from app.domain.user import UserPermissionCreateDTO, UserPermissionDTO
 import boto3
@@ -25,11 +25,11 @@ from ..interface import (
 
 class CognitoAuthAdapter(AuthAdapter):
     # Need to ad UOW to add users and modify groups and permissions
-    def __init__(self, uow: UserUOW):
+    def __init__(self, uow: Optional[UserUOW] = None):
         self.client_id: str = config.CLIENT_ID
         self.jwn_secret: str = config.JWT_SECRET
         self.cognito_client = boto3.client("cognito-idp", config.REGION)
-        self.uow: UserUOW = uow
+        self.uow: Optional[UserUOW] = uow
 
     def login(self, user: UserLogin) -> str:
         try:
@@ -38,6 +38,8 @@ class CognitoAuthAdapter(AuthAdapter):
                 AuthParameters={"USERNAME": user.username, "PASSWORD": user.password},
                 ClientId=self.client_id,
             )
+            if "AuthenticationResult" not in response:
+                raise UnathorizedException(response["ChallengeName"])
             return response["AuthenticationResult"]["AccessToken"]
         except self.cognito_client.exceptions.NotAuthorizedException:
             raise UnathorizedException
@@ -54,6 +56,7 @@ class CognitoAuthAdapter(AuthAdapter):
             raise e
 
     def register(self, user: UserSignupDTO) -> SignupResponse:
+        assert self.uow, "Miss configured auth, unable to register user"
         try:
             response: Dict = self.cognito_client.sign_up(
                 ClientId=self.client_id,

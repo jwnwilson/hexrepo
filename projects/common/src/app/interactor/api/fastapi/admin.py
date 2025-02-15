@@ -1,13 +1,19 @@
 from datetime import datetime
+import json
 from typing import Any
 
 from app.domain.user import get_user
+from fastapi.middleware import Middleware
+from fastapi.responses import JSONResponse
 import wtforms
 from sqladmin import Admin, ModelView
 from starlette.requests import Request
+from starlette.middleware.authentication import AuthenticationMiddleware
 from sqladmin.authentication import AuthenticationBackend
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException
+from hexrepo_cloud.auth.cognito.fastapi_cognito import JWTBearer
 from hexrepo_cloud.auth.interface import AuthAdapter, UserLogin
+from hexrepo_cloud.auth.cognito.auth_adaptor import CognitoAuthAdapter
 
 from app.adaptor.db.sql.models.company import CompanyTable
 from app.adaptor.db.sql.models.feature_flag import FeatureFlagTable
@@ -16,17 +22,19 @@ from app.adaptor.db.sql.models.permission import PermissionTable
 from app.adaptor.db.sql.models.user import UserTable
 from app.adaptor.db.sql.uow import SqlUOW
 from app.config import config
-from app.interactor.dependencies import get_auth, get_uow_ro
+from app.interactor.dependencies import get_auth, get_uow_ro, get_jwt_token
+
+from hexrepo_db.sql.config import get_sql_db_url
 
 
 class BaseModelView(ModelView):
     def is_visible(self, request: Request) -> bool:
-        assert request.user, "User not found"
-        return "superadmin" in request.user.permissions
+        assert "user" in request.session, "User not found"
+        return "superadmin" in request.session["user"]["permissions"]
 
     def is_accessible(self, request: Request) -> bool:
-        assert request.user, "User not found"
-        return "superadmin" in request.user.permissions
+        assert "user" in request.session, "User not found"
+        return "superadmin" in request.session["user"]["permissions"]
     
     form_widget_args = dict(
         created_at=dict(readonly=True), updated_at=dict(readonly=True)
@@ -170,18 +178,22 @@ class CompanyAdmin(BaseModelView, model=CompanyTable):
     ]
 
 
+def on_auth_error(request: Request, exc: Exception):
+    return JSONResponse({"error": str(exc)}, status_code=401)
+
+
 class AdminAuth(AuthenticationBackend):
+    @property
+    def auth(self) -> AuthAdapter:
+        return CognitoAuthAdapter()
+
     async def login(self, request: Request) -> bool:
-        breakpoint()
         # Check this gets cleaned up propery
-        auth_gen = get_auth()
-        auth: AuthAdapter = next(auth_gen)
         form = await request.form()
         username, password = form["username"], form["password"]
-
         # Validate username/password credentials
         try:
-            resp = auth.login(UserLogin(
+            access_token: str = self.auth.login(UserLogin(
                 username=username,
                 password=password
             ))
@@ -189,8 +201,7 @@ class AdminAuth(AuthenticationBackend):
             raise HTTPException(status_code=403, detail="Invalid username or password")
         # And update session
         request.session.update({
-            "token": resp["access_token"],
-            "username": username,
+            "token": access_token,
         })
 
         return True
@@ -201,19 +212,20 @@ class AdminAuth(AuthenticationBackend):
         return True
 
     async def authenticate(self, request: Request) -> bool:
-        breakpoint()
-        auth_gen = get_auth()
-        uow_gen = get_uow_ro()
-        auth: AuthAdapter = next(auth_gen)
-        uow: SqlUOW = next(uow_gen)
         token: str = request.session.get("token")
-        username: str = request.session.get("username")
-
         if not token:
             return False
-
-        auth.verify(token)
-        request.user = get_user(uow, username)
+        # Verify jwt token
+        jwt = get_jwt_token.verify_jwt_token(token)
+        username = jwt.claims["username"]
+        if "user" not in request.session:
+            uow = SqlUOW(db_url=get_sql_db_url())
+            with uow.transaction():
+                user = get_user(uow, username)
+                breakpoint()
+                request.session.update({
+                    "user": json.loads(user.model_dump_json()),
+                })
         return True
 
 
@@ -224,7 +236,7 @@ def setup_admin(app: FastAPI):
         app,
         engine,
         favicon_url="https://jwnwilson.co.uk/images/headshot_500.png",
-        authentication_backend=authentication_backend
+        authentication_backend=authentication_backend,
     )
 
     admin.add_view(UserAdmin)

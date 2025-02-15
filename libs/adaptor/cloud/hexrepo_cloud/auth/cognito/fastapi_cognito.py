@@ -42,7 +42,7 @@ class JWTBearer(HTTPBearer):
             raise
         self.kid_to_jwk = {jwk["kid"]: jwk for jwk in self.jwks.keys}
 
-    def verify_jwk_token(self, jwt_credentials: JWTAuthorizationCredentials) -> bool:
+    def verify_jwk_credentials(self, jwt_credentials: JWTAuthorizationCredentials) -> bool:
         try:
             public_key = self.kid_to_jwk[jwt_credentials.header["kid"]]
         except KeyError:
@@ -55,6 +55,34 @@ class JWTBearer(HTTPBearer):
 
         return key.verify(jwt_credentials.message.encode(), decoded_signature)
 
+    def verify_jwt_token(self, jwt_token: str) -> JWTAuthorizationCredentials:
+        try:
+            message, signature = jwt_token.rsplit(".", 1)
+        except ValueError:
+            raise HTTPException(
+                status_code=HTTP_403_FORBIDDEN, detail="JWT token invalid"
+            )
+
+        try:
+            jwt_credentials = JWTAuthorizationCredentials(
+                jwt_token=jwt_token,
+                header=jwt.get_unverified_header(jwt_token),
+                claims=jwt.get_unverified_claims(jwt_token),
+                signature=signature,
+                message=message,
+            )
+        except JWTError:
+            raise HTTPException(
+                status_code=HTTP_403_FORBIDDEN, detail="JWK invalid"
+            )
+
+        if not self.verify_jwk_credentials(jwt_credentials):
+            raise HTTPException(
+                status_code=HTTP_403_FORBIDDEN, detail="JWK invalid"
+            )
+
+        return jwt_credentials
+
     async def __call__(self, request: Request) -> Optional[JWTAuthorizationCredentials]:
         credentials: HTTPAuthorizationCredentials = await super().__call__(request)
 
@@ -65,33 +93,9 @@ class JWTBearer(HTTPBearer):
                 )
 
             jwt_token = credentials.credentials
+            return self.verify_jwt_token(jwt_token)
 
-            try:
-                message, signature = jwt_token.rsplit(".", 1)
-            except ValueError:
-                raise HTTPException(
-                    status_code=HTTP_403_FORBIDDEN, detail="JWT token invalid"
-                )
-
-            try:
-                jwt_credentials = JWTAuthorizationCredentials(
-                    jwt_token=jwt_token,
-                    header=jwt.get_unverified_header(jwt_token),
-                    claims=jwt.get_unverified_claims(jwt_token),
-                    signature=signature,
-                    message=message,
-                )
-            except JWTError:
-                raise HTTPException(
-                    status_code=HTTP_403_FORBIDDEN, detail="JWK invalid"
-                )
-
-            if not self.verify_jwk_token(jwt_credentials):
-                raise HTTPException(
-                    status_code=HTTP_403_FORBIDDEN, detail="JWK invalid"
-                )
-
-            return jwt_credentials
+            
 
 
 get_jwt_token: JWTBearer = JWTBearer()
