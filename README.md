@@ -55,11 +55,6 @@ Setup the following env vars directly or run:
     - Remove sql from example project
     - Move monitor / infra optimisation into common
         - Enable disable project via admin
-    - Enforce architecture rules:
-        - Remove lib type
-        - tach: https://github.com/gauge-sh/tach
-        - https://roman.pt/posts/python-architecture-linter/
-        - restricting adaptors imports to a dependencies module
     - Setup simple FE with auth?
         - Rename projects -> backend
         - Create frontend folder
@@ -82,6 +77,11 @@ Setup the following env vars directly or run:
         - Setup Idempotent re-run
         - Dectorator based workflow setup e.g.:
             https://github.com/aws/chalice/blob/master/chalice/app.py#L719 
+    - Enforce architecture rules:
+        - Remove lib type
+        - tach: https://github.com/gauge-sh/tach
+        - https://roman.pt/posts/python-architecture-linter/
+        - restricting adaptors imports to a dependencies module
     - Play with AI crawler project 
         - Setup crawl spider for PLP pages
         - Cache all page data to avoid recrawls
