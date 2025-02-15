@@ -71,10 +71,10 @@ module "queue" {
 
 resource "aws_lambda_event_source_mapping" "queue_lambda_mapping" {
   event_source_arn = module.queue.queue_arn
-  function_name    = module.example_tasks.lambda_function_name
+  function_name    = module.common_tasks.lambda_function_name
 }
 
-module "example_tasks" {
+module "common_tasks" {
   source = "../../../../../../infra/tf/aws/modules/lambda"
 
   environment        = terraform.workspace
@@ -83,7 +83,7 @@ module "example_tasks" {
   docker_tag         = var.docker_tag
   vpc_id             = data.aws_vpc.hexrepo.id
   lambda_command     = ["src.app.interactor.event.lambda_handler"]
-  security_group_ids = [module.example_postgres.db_security_group_id]
+  security_group_ids = [module.common_postgres.db_security_group_id]
 
   environment_variables = {
     ENVIRONMENT             = terraform.workspace
@@ -122,7 +122,6 @@ data "aws_secretsmanager_secret" "db_secret" {
 module "common_bucket" {
   source = "../../../../../../infra/tf/aws/modules/s3"
 
-  environment = terraform.workspace
   project     = "common"
   name        = "example"
 }
