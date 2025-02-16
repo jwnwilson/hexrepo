@@ -1,7 +1,8 @@
 from typing import Dict, List, Optional
 
 import requests
-from fastapi import Depends, HTTPException
+from fastapi import HTTPException
+from fastapi.security.utils import get_authorization_scheme_param
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import JWTError, jwk, jwt
 from jose.utils import base64url_decode
@@ -78,20 +79,30 @@ class FastapiJWTCognitoMiddleware(FastapiJWTMiddleware, HTTPBearer):
         return jwt_credentials
 
     async def __call__(self, request: Request) -> Optional[JWTAuthorizationCredentials]:
-        credentials: HTTPAuthorizationCredentials = await super().__call__(request)
+        authorization: Optional[str] = request.headers.get("Authorization") or request.session.get("token")
+        scheme, credentials = get_authorization_scheme_param(authorization)
+        if not (authorization and scheme and credentials):
+            if self.auto_error:
+                raise HTTPException(
+                    status_code=HTTP_403_FORBIDDEN, detail="Not authenticated"
+                )
+            else:
+                return None
+        if scheme.lower() != "bearer":
+            if self.auto_error:
+                raise HTTPException(
+                    status_code=HTTP_403_FORBIDDEN,
+                    detail="Invalid authentication credentials",
+                )
+            else:
+                return None
+        credentials = HTTPAuthorizationCredentials(scheme=scheme, credentials=credentials)
 
         if credentials:
-            if not credentials.scheme == "Bearer":
-                raise HTTPException(
-                    status_code=HTTP_403_FORBIDDEN, detail="Wrong authentication method"
-                )
-
             jwt_token = credentials.credentials
             return self.verify_jwt_token(jwt_token)
-
-            
+        
+        return None
 
 
 get_jwt_token: FastapiJWTMiddleware = FastapiJWTCognitoMiddleware()
-
-

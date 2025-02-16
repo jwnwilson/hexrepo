@@ -37,18 +37,12 @@ Setup the following env vars directly or run:
 
 - Setup backend
     - Create common project
-        - Authentication via fastapi middleware using jwt token + 
-        dynamodb / api call?
-            - Get user data with permissions via username from header or session
-            - Create materialised view or cache in dynamodb for cheap serverless option?
-        - deploy validate with read replica
+        - deploy common validate auth with read replica
         - Tests:
             - Create dynamic CRUD tests
                 - User, Group, Permission, Featureflag, Company CRUD
-                - Test permissions
-            - Test relationship CRUD logic
+            - Test relationship CRUD logic (check create)
             - Test auth and permission logic
-            - Load test to verify connection pooling
         - Create superuser command
             - Add way to run depends without fastpi
     - Remove sql from example project
@@ -59,6 +53,7 @@ Setup the following env vars directly or run:
         - Create frontend folder
         - Add turborepo with auth
     - Add monitoring dashboard for services
+        - Load testing
         - Latency tracking and visualisation
         - Add log based event tracking
         - Setup BI dashboard
@@ -83,6 +78,10 @@ Setup the following env vars directly or run:
         - tach: https://github.com/gauge-sh/tach
         - https://roman.pt/posts/python-architecture-linter/
         - restricting adaptors imports to a dependencies module
+    - Authentication via fastapi middleware using jwt token + 
+dynamodb / api call?
+        - Get user data with permissions via username from header or session
+        - Create materialised view or cache in dynamodb for cheap serverless option?
     - Play with AI crawler project 
         - Setup crawl spider for PLP pages
         - Cache all page data to avoid recrawls

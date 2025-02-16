@@ -94,6 +94,14 @@ module "common_tasks" {
   }
 }
 
+module "common_auth" {
+  source = "../../../../../../infra/tf/aws/modules/cognito"
+
+  project     = "common"
+  domain_name = var.domain
+  api_subdomain  = module.common_api_gateway.api_domain
+}
+
 module "common_api_gateway" {
   source = "../../../../../../infra/tf/aws/modules/apigateway"
 
@@ -102,7 +110,7 @@ module "common_api_gateway" {
   lambda_name       = module.common_api.lambda_function_name
   domain            = var.domain
   api_subdomain     = "common-${terraform.workspace}"
-  project           = "common"
+  project           = "common" 
 }
 
 module "common_postgres" {

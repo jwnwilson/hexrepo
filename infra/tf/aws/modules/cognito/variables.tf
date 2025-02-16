@@ -1,5 +1,3 @@
-variable "environment" {}
-
 variable "project" {}
 
 variable "tags" {
