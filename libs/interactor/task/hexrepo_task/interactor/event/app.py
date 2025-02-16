@@ -1,12 +1,14 @@
+from functools import wraps
 import inspect
 import json
 import logging
 from asyncio import sleep
 from contextlib import contextmanager
 from inspect import signature
-from typing import Any, Callable, Dict, Generator, Optional, cast
+from typing import Any, Callable, Dict, Generator, List, Optional, cast
 from uuid import UUID
 
+from fastapi import Depends
 from pydantic import BaseModel
 
 from hexrepo_task.exception import DuplicateTaskName, TaskNotFound
@@ -251,13 +253,66 @@ class TaskPromise:
         return
 
 
-class Dependency:
-    def __init__(self, get_dependency: Callable):
-        self._get_dependency = get_dependency
+# class Dependency:
+#     def __init__(self, get_dependency: Callable):
+#         self._get_dependency = get_dependency
 
-    @property
-    def dependency(self) -> Callable:
-        return self._get_dependency
+#     @property
+#     def dependency(self) -> Callable:
+#         return self._get_dependency
+class Dependency:
+    cache: Dict[Callable, Any] = {}
+
+    def __init__(self, func: Callable, use_cache: bool = True, top_level: bool = True):
+        self.func = resolve_dependencies(func, top_level=False)
+        self.use_cache: bool = use_cache
+        self.generator: Optional[Generator] = None
+        self.top_level: bool = top_level
+
+    def cleanup(self):
+        if self.generator and self.top_level:
+            try:
+                next(self.generator)
+            except StopIteration:
+                pass
+
+    def __call__(self) -> Any:
+        if self.func in Dependency.cache:
+            return Dependency.cache[self.func]
+        
+        result = self.func()
+        if type(result) is Generator:
+            self.generator = result
+            result = next(result)
+        if self.use_cache:
+            Dependency.cache[self.func] = result
+        return result
+
+
+def resolve_dependencies(func: Callable):
+    f_sig = inspect.signature(func)
+
+    @wraps(func)
+    def resolve_depends(*arg, **kwargs):
+        breakpoint()
+        bound = f_sig.bind(*arg, **kwargs)
+        bound.apply_defaults()
+        dependencies: List[Dependency] = []
+
+        for key, arg_v in bound.arguments.items():
+            breakpoint()
+            if type(arg_v) == Dependency or type(arg_v) == Depends:
+                dependencies.append(arg_v)
+                bound.arguments[key] = arg_v()
+
+        result = func(*bound.args, **bound.kwargs)
+
+        for dep in dependencies:
+            dep.cleanup()
+
+        return result
+    
+    return resolve_depends
 
 
 class TaskFuncWrapper:
@@ -269,67 +324,75 @@ class TaskFuncWrapper:
         self, func: TaskFunc, app: TaskApp, dependency_overrides: Optional[Dict] = None
     ):
         self.app: TaskApp = app
-        self.func: TaskFunc = func
+        self.func: TaskFunc = resolve_dependencies(func)
         self.dependency_overrides: Dict = dependency_overrides or {}
 
     @property
     def __name__(self) -> str:
         return self.func.__name__
 
-    @contextmanager
-    def _get_dependencies(
-        self, func: TaskFunc, kwargs: Dict
-    ) -> Generator[Dict, None, None]:
-        dependencies = {}
-        dependency_generators = {}
-        for name, param in inspect.signature(func).parameters.items():
-            name: str
-            param: inspect.Parameter
-            is_dependency: bool = isinstance(param.default, Dependency) or (
-                hasattr(param.default, "__class__")
-                and param.default.__class__.__name__ == "Depends"
-            )
+    # @contextmanager
+    # def _get_dependencies(
+    #     self, func: TaskFunc, kwargs: Dict
+    # ) -> Generator[Dict, None, None]:
+    #     dependencies = {}
+    #     dependency_generators = {}
+    #     for name, param in inspect.signature(func).parameters.items():
+    #         name: str
+    #         param: inspect.Parameter
+    #         is_dependency: bool = isinstance(param.default, Dependency) or (
+    #             hasattr(param.default, "__class__")
+    #             and param.default.__class__.__name__ == "Depends"
+    #         )
 
-            # Parse pydantic models
-            if BaseModel in inspect.getmro(param.annotation) and isinstance(
-                kwargs[name], dict
-            ):
-                dependencies[name] = param.annotation(**kwargs[name])
-            # Parse raw param types
-            elif name in kwargs:
-                dependencies[name] = kwargs[name]
-            # Load dependencies
-            elif is_dependency:
-                dep_func: Generator = param.default.dependency
-                # For testing purposes
-                if dep_func in self.dependency_overrides:
-                    dep_func = self.dependency_overrides[dep_func]
-                dep_return = dep_func()
+    #         # Parse pydantic models
+    #         if BaseModel in inspect.getmro(param.annotation) and isinstance(
+    #             kwargs[name], dict
+    #         ):
+    #             dependencies[name] = param.annotation(**kwargs[name])
+    #         # Parse raw param types
+    #         elif name in kwargs:
+    #             dependencies[name] = kwargs[name]
+    #         # Load dependencies
+    #         elif is_dependency:
+    #             dep_func: Generator = param.default.dependency
+    #             # For testing purposes
+    #             if dep_func in self.dependency_overrides:
+    #                 dep_func = self.dependency_overrides[dep_func]
+    #             dep_return = dep_func()
 
-                if isinstance(dep_return, Generator):
-                    dependency_generators[name] = dep_return
-                    dependencies[name] = next(dependency_generators[name])
-                else:
-                    dependencies[name] = dep_return
-            else:
-                dependencies[name] = param.default
-        yield dependencies
+    #             if isinstance(dep_return, Generator):
+    #                 dependency_generators[name] = dep_return
+    #                 dependencies[name] = next(dependency_generators[name])
+    #             else:
+    #                 dependencies[name] = dep_return
+    #         else:
+    #             dependencies[name] = param.default
+    #     yield dependencies
 
-        # Clean up dependence generators
-        for dep in dependency_generators:
-            try:
-                next(dependency_generators[dep])
-            except StopIteration:
-                pass
+    #     # Clean up dependence generators
+    #     for dep in dependency_generators:
+    #         try:
+    #             next(dependency_generators[dep])
+    #         except StopIteration:
+    #             pass
+
+    # def __call__(self, *args, **kwargs) -> Any:
+    #     if len(args) > 0:
+    #         raise RuntimeError("Task functions must be called with kwargs")
+    #     with self._get_dependencies(self.func, kwargs) as dependencies:
+    #         return self.func(**dependencies)
 
     def __call__(self, *args, **kwargs) -> Any:
-        if len(args) > 0:
-            raise RuntimeError("Task functions must be called with kwargs")
-        with self._get_dependencies(self.func, kwargs) as dependencies:
-            return self.func(**dependencies)
+        return self.func(*args, **kwargs)
 
     def queue_task(self, **kwargs) -> TaskPromise:
         return self.app.queue_task(self.func, kwargs)
+
+
+# @resolve_dependencies
+# def call_with_dependencies(func: Callable = Depends(get_uow)):
+#     return resolve_dependencies(func)()
 
 
 # if __name__ == "__main__":
