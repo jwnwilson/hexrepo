@@ -44,7 +44,10 @@ Setup the following env vars directly or run:
             - Test relationship CRUD logic (check create)
             - Test auth and permission logic
         - Create superuser command
-            - Add way to run depends without fastpi
+        - Authentication via fastapi middleware using jwt token + 
+dynamodb / api call?
+            - Get user data with permissions via username from header or session
+            - Create materialised view or cache in dynamodb for cheap serverless option?
     - Remove sql from example project
     - Move monitor / infra optimisation into common
         - Enable disable project via admin
@@ -78,10 +81,6 @@ Setup the following env vars directly or run:
         - tach: https://github.com/gauge-sh/tach
         - https://roman.pt/posts/python-architecture-linter/
         - restricting adaptors imports to a dependencies module
-    - Authentication via fastapi middleware using jwt token + 
-dynamodb / api call?
-        - Get user data with permissions via username from header or session
-        - Create materialised view or cache in dynamodb for cheap serverless option?
     - Play with AI crawler project 
         - Setup crawl spider for PLP pages
         - Cache all page data to avoid recrawls

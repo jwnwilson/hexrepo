@@ -283,6 +283,17 @@ class Dependency:
 
 
 def resolve_dependencies(func: Callable, top_level: bool = True) -> Callable:
+    """Run functions with dependencies and resolve them.
+    E.G.: 
+
+    @resolve_dependencies
+    def my_func(id:str, get_uow: Dependency = Dependency(get_uow)) -> Any:
+        return get_uow.user.read(id)
+
+    OR
+
+    resolve_dependencies(my_func)(id)
+    """
     f_sig = inspect.signature(func)
 
     @wraps(func)
