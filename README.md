@@ -39,7 +39,7 @@ Setup the following env vars directly or run:
     - Create common project
         - Authentication via fastapi middleware using jwt token + 
         dynamodb / api call?
-            - Get user data with permissions via username
+            - Get user data with permissions via username from header or session
             - Create materialised view or cache in dynamodb for cheap serverless option?
         - deploy validate with read replica
         - Tests:
@@ -58,17 +58,12 @@ Setup the following env vars directly or run:
         - Rename projects -> backend
         - Create frontend folder
         - Add turborepo with auth
-    - Implement template -> project update:
-        - Copier https://copier.readthedocs.io/en/stable/
-        - Look at cruft again
-        - Re-render template with project settings 
-        - Create Diff with changes
-        - Add CI job to detect template changes and add a new PR with applied patch to projects
     - Add monitoring dashboard for services
         - Latency tracking and visualisation
         - Add log based event tracking
         - Setup BI dashboard
     - Create orchestrator / workflow project 
+        - Investigate better fire and forget task setup like run 1 off ECS / GCP job with task status update?
         - 1 task table per hexrepo
         - Setup ECS for long running async orchestrator on fargate
             - Could move to celery here as celery doesn't work well with lambda as need to start worker to manage tasks
@@ -77,6 +72,12 @@ Setup the following env vars directly or run:
         - Setup Idempotent re-run
         - Dectorator based workflow setup e.g.:
             https://github.com/aws/chalice/blob/master/chalice/app.py#L719 
+    - Implement template -> project update:
+        - Copier https://copier.readthedocs.io/en/stable/
+        - Look at cruft again
+        - Re-render template with project settings 
+        - Create Diff with changes
+        - Add CI job to detect template changes and add a new PR with applied patch to projects
     - Enforce architecture rules:
         - Remove lib type
         - tach: https://github.com/gauge-sh/tach
