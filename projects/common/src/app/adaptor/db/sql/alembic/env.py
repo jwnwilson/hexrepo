@@ -1,12 +1,12 @@
 from logging.config import fileConfig
+from app.config import config as app_config
 
 from alembic import context
+from sqlalchemy import Connection, engine_from_config, pool
 from hexrepo_db.sql import get_sql_db_url
 from hexrepo_db.sql.models.base_model import Base
-from sqlalchemy import Connection, engine_from_config, pool
-
 # Import project UOW class to discover models
-from app.config import config as app_config
+from app.adaptor.db.sql import SqlUOW # noqa
 
 
 def get_db_url_alembic():

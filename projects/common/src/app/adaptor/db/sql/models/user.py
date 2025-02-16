@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING, Any, Type
 from hexrepo_db.sql.interface import Query
 from hexrepo_db.sql.models.base_model import Base
 from hexrepo_db.sql.repository import DefaultQuery, SQLRepository
-from sqlalchemy import UUID, Boolean, ForeignKey, Select, String, Text, select
+from sqlalchemy import UUID, Boolean, ForeignKey, Index, Select, String, Text, select
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.domain.user import UserPermissionDTO
@@ -32,6 +32,11 @@ class UserTable(Base):
     )
     groups: Mapped[list["GroupTable"]] = relationship(
         "GroupTable", secondary=UserGroupsTable.__table__, overlaps="users"
+    )
+
+    __table_args__ = (
+        Index("user_username_idx", "username"),
+        Index("user_email_idx", "email"),
     )
 
     def __str__(self) -> str:
