@@ -37,20 +37,20 @@ Setup the following env vars directly or run:
 
 - Setup backend
     - Create common project
-        - Add permissions to limit crud endpoints
-        - Authorization at gateway level for all non auth apps
         - Authentication via fastapi middleware using jwt token + 
-        dynamodb
-            - Get user data with permissions via id / username
-            - Create materialised view
-            - Or cache in dynamodb for cheap serverless option?
+        dynamodb / api call?
+            - Get user data with permissions via username
+            - Create materialised view or cache in dynamodb for cheap serverless option?
         - deploy validate with read replica
         - Tests:
             - Create dynamic CRUD tests
                 - User, Group, Permission, Featureflag, Company CRUD
+                - Test permissions
             - Test relationship CRUD logic
             - Test auth and permission logic
             - Load test to verify connection pooling
+        - Create superuser command
+            - Add way to run depends without fastpi
     - Remove sql from example project
     - Move monitor / infra optimisation into common
         - Enable disable project via admin

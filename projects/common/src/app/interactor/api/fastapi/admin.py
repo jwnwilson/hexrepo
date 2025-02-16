@@ -3,15 +3,12 @@ import json
 from typing import Any
 
 from app.domain.user import get_user
-from fastapi.middleware import Middleware
 from fastapi.responses import JSONResponse
 import wtforms
 from sqladmin import Admin, ModelView
 from starlette.requests import Request
-from starlette.middleware.authentication import AuthenticationMiddleware
 from sqladmin.authentication import AuthenticationBackend
 from fastapi import FastAPI, HTTPException
-from hexrepo_cloud.auth.cognito.fastapi_cognito import JWTBearer
 from hexrepo_cloud.auth.interface import AuthAdapter, UserLogin
 from hexrepo_cloud.auth.cognito.auth_adaptor import CognitoAuthAdapter
 

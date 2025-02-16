@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Dict, Optional
 
+from fastapi import Request
 from pydantic import BaseModel
 from hexrepo_db.interface import UOW, Repository
 
@@ -52,6 +53,25 @@ class AuthAdapter(ABC):
     @abstractmethod
     def delete_user(self, user: UserDTO) -> None:
         pass
+
+
+class JWTAuthorizationCredentials(BaseModel):
+    jwt_token: str
+    header: Dict[str, str]
+    claims: Dict[str, str | int]
+    signature: str
+    message: str
+
+
+class FastapiJWTMiddleware:
+    def verify_jwk_credentials(self, jwt_credentials: JWTAuthorizationCredentials) -> bool:
+        raise NotImplementedError
+
+    def verify_jwt_token(self, jwt_token: str) -> JWTAuthorizationCredentials:
+        raise NotImplementedError
+
+    async def __call__(self, request: Request) -> Optional[JWTAuthorizationCredentials]:
+        raise NotImplementedError
 
 
 class UserUOW(UOW):

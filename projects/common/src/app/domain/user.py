@@ -27,9 +27,8 @@ class UserPermissionDTO(UserPermissionCreateDTO):
     id: UUID
 
     def is_superuser(self) -> bool:
-        return any(
-            [x["name"] == "superadmin" for x in self.permissions]
-        )
+        permissions = set([x["name"] for x in self.permissions])
+        return "superadmin" in permissions
 
 
 class GroupPermissionDTO(BaseModel):

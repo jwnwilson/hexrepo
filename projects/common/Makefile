@@ -20,6 +20,9 @@ venv:
 build:
 	docker compose build
 
+create_superuser:
+	PYTHONPATH=src uv run python src/app/interactor/cli/create_superuser.py
+
 # DB management
 db: docker_stop
 	docker compose run --service-ports -d db 

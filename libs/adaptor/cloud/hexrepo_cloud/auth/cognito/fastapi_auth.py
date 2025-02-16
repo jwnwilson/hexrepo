@@ -9,8 +9,10 @@ from loguru import logger
 from pydantic import BaseModel
 from starlette.requests import Request
 from starlette.status import HTTP_403_FORBIDDEN
+from hexrepo_cloud.auth.interface import FastapiJWTMiddleware, JWTAuthorizationCredentials
 
 from app.config import config
+
 
 JWK = Dict[str, str]
 
@@ -19,15 +21,7 @@ class JWKS(BaseModel):
     keys: List[JWK]
 
 
-class JWTAuthorizationCredentials(BaseModel):
-    jwt_token: str
-    header: Dict[str, str]
-    claims: Dict[str, str | int]
-    signature: str
-    message: str
-
-
-class JWTBearer(HTTPBearer):
+class FastapiJWTCognitoMiddleware(FastapiJWTMiddleware, HTTPBearer):
     def __init__(self, auto_error: bool = True):
         super().__init__(auto_error=auto_error)
         keys_url = (
@@ -98,6 +92,6 @@ class JWTBearer(HTTPBearer):
             
 
 
-get_jwt_token: JWTBearer = JWTBearer()
+get_jwt_token: FastapiJWTMiddleware = FastapiJWTCognitoMiddleware()
 
 
