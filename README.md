@@ -36,6 +36,9 @@ Setup the following env vars directly or run:
 # To Do
 
 - Setup backend
+    - Ability to easily use depends logic outside fastapi
+        - with context manager to call dependency functions
+    - Refator event logic to use depends logic seamlessly
     - Create common project
         - Authentication via fastapi middleware using jwt token + 
         dynamodb / api call?

@@ -10,6 +10,7 @@ from fastapi.responses import JSONResponse
 
 from ......dependencies import get_auth, get_current_user, get_superadmin_user, get_uow, get_uow_ro
 
+
 router_v1 = CrudRouter(
     db_dependency=get_uow,
     db_dependency_ro=get_uow_ro,

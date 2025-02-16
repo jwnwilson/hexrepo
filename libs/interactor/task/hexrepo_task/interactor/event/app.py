@@ -8,7 +8,7 @@ from inspect import signature
 from typing import Any, Callable, Dict, Generator, List, Optional, cast
 from uuid import UUID
 
-from fastapi import Depends
+from fastapi.params import Depends
 from pydantic import BaseModel
 
 from hexrepo_task.exception import DuplicateTaskName, TaskNotFound
@@ -264,7 +264,7 @@ class Dependency:
     cache: Dict[Callable, Any] = {}
 
     def __init__(self, func: Callable, use_cache: bool = True, top_level: bool = True):
-        self.func = resolve_dependencies(func, top_level=False)
+        self.func = func
         self.use_cache: bool = use_cache
         self.generator: Optional[Generator] = None
         self.top_level: bool = top_level
@@ -289,26 +289,40 @@ class Dependency:
         return result
 
 
-def resolve_dependencies(func: Callable):
+def resolve_dependencies(func: Callable, top_level: bool = True) -> Callable:
     f_sig = inspect.signature(func)
 
     @wraps(func)
     def resolve_depends(*arg, **kwargs):
-        breakpoint()
         bound = f_sig.bind(*arg, **kwargs)
         bound.apply_defaults()
         dependencies: List[Dependency] = []
 
         for key, arg_v in bound.arguments.items():
-            breakpoint()
-            if type(arg_v) == Dependency or type(arg_v) == Depends:
+            # parse dependencies
+            if type(arg_v) == Dependency:
                 dependencies.append(arg_v)
-                bound.arguments[key] = arg_v()
+                bound.arguments[key] = resolve_dependencies(arg_v, top_level=False)()
+            elif type(arg_v) == Depends:
+                dependencies.append(arg_v.dependency)
+                bound.arguments[key] = resolve_dependencies(arg_v.dependency, top_level=False)()
+            # parse pydantic models
+            elif BaseModel in inspect.getmro(f_sig.parameters[key].annotation) and isinstance(
+                arg_v, dict
+            ):
+                bound.arguments[key] = f_sig.parameters[key].annotation(**arg_v)
 
         result = func(*bound.args, **bound.kwargs)
 
-        for dep in dependencies:
-            dep.cleanup()
+        if top_level:
+            for dep in dependencies:
+                if isinstance(dep, Dependency):
+                    dep.cleanup()
+                elif isinstance(dep, Generator):
+                    try:
+                        next(dep)
+                    except StopIteration:
+                        pass
 
         return result
     

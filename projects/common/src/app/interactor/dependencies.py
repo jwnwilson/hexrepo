@@ -3,7 +3,7 @@ from collections.abc import Generator
 
 from fastapi import Depends, HTTPException
 from hexrepo_cloud.auth.cognito import get_jwt_token
-from hexrepo_cloud.auth.cognito.fastapi_cognito import JWTAuthorizationCredentials
+from hexrepo_cloud.auth.cognito.fastapi_auth import JWTAuthorizationCredentials
 from hexrepo_cloud.auth.interface import AuthAdapter
 from hexrepo_db.interface import PaginatedData
 from hexrepo_db.sql import get_sql_db_url
