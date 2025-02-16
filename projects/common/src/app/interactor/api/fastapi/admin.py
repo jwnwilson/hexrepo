@@ -22,19 +22,25 @@ from app.adaptor.db.sql.models.permission import PermissionTable
 from app.adaptor.db.sql.models.user import UserTable
 from app.adaptor.db.sql.uow import SqlUOW
 from app.config import config
-from app.interactor.dependencies import get_auth, get_uow_ro, get_jwt_token
-
+from app.interactor.dependencies import get_jwt_token
 from hexrepo_db.sql.config import get_sql_db_url
 
 
 class BaseModelView(ModelView):
-    def is_visible(self, request: Request) -> bool:
+    def get_user_permissions(self, request: Request) -> list[str]:
         assert "user" in request.session, "User not found"
-        return "superadmin" in request.session["user"]["permissions"]
+        permissions = []
+        try:
+            permissions = [x["name"] for x in request.session["user"]["permissions"]]
+        except KeyError:
+            pass
+        return permissions
+
+    def is_visible(self, request: Request) -> bool:
+        return "superadmin" in self.get_user_permissions(request) 
 
     def is_accessible(self, request: Request) -> bool:
-        assert "user" in request.session, "User not found"
-        return "superadmin" in request.session["user"]["permissions"]
+        return "superadmin" in self.get_user_permissions(request)
     
     form_widget_args = dict(
         created_at=dict(readonly=True), updated_at=dict(readonly=True)
@@ -222,7 +228,6 @@ class AdminAuth(AuthenticationBackend):
             uow = SqlUOW(db_url=get_sql_db_url())
             with uow.transaction():
                 user = get_user(uow, username)
-                breakpoint()
                 request.session.update({
                     "user": json.loads(user.model_dump_json()),
                 })

@@ -64,7 +64,7 @@ class UserRepository(SQLRepository):
             name=row.name,
             cognito_id=row.cognito_id,
             verified=row.verified,
-            permissions=[{"id": p.id} for p in row.permissions],
-            groups=[{"id": p.id} for p in row.groups],
+            permissions=[{"id": p.id, "name": p.name} for p in row.permissions],
+            groups=[{"id": p.id, "name": p.name} for p in row.groups],
             company=row.company.id if row.company else None,
         )
