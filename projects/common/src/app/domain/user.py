@@ -3,7 +3,8 @@ from uuid import UUID
 
 from pydantic import BaseModel
 
-from hexrepo_db.interface import UOW, PaginatedData
+from hexrepo_db.interface import PaginatedData
+from app.adaptor.db.interface import UOW
 
 
 class Token(BaseModel):
@@ -24,6 +25,11 @@ class UserPermissionCreateDTO(BaseModel):
 
 class UserPermissionDTO(UserPermissionCreateDTO):
     id: UUID
+
+    def is_superuser(self) -> bool:
+        return any(
+            [x["name"] == "superadmin" for x in self.permissions]
+        )
 
 
 class GroupPermissionDTO(BaseModel):
@@ -52,7 +58,7 @@ class FeatureFlagDTO(BaseModel):
 
 
 def get_user(uow: UOW, username: str) -> UserPermissionDTO:
-    user_data: PaginatedData = uow.user.read_multi(
+    user_data: PaginatedData[UserPermissionDTO] = uow.user.read_multi(
         filters=dict(username=username)
     )
     if not user_data.results:

@@ -8,12 +8,12 @@ from app.domain.user import UserPermissionCreateDTO, UserPermissionDTO
 from fastapi import Depends, Response, status
 from fastapi.responses import JSONResponse
 
-from ......dependencies import get_auth, get_current_user, get_uow, get_uow_ro
+from ......dependencies import get_auth, get_current_user, get_superadmin_user, get_uow, get_uow_ro
 
 router_v1 = CrudRouter(
     db_dependency=get_uow,
     db_dependency_ro=get_uow_ro,
-    auth_adaptor=get_current_user,
+    auth_adaptor=get_superadmin_user,
     repository="user",
     methods=["CREATE", "READ", "UPDATE", "DELETE"],
     response_schema=UserPermissionDTO,
@@ -33,7 +33,7 @@ def user(user: UserPermissionDTO = Depends(get_current_user)) -> JSONResponse:
 
 @router_v1.delete("/{id}", include_in_schema=True)
 def delete(
-    id: UUID, uow: UOW = Depends(get_uow), auth: AuthAdapter = Depends(get_auth)
+    id: UUID, uow: UOW = Depends(get_uow), auth: AuthAdapter = Depends(get_auth), user: UserPermissionDTO = Depends(get_superadmin_user)
 ) -> Response:
     user: UserDTO = uow.user.read(id)
     auth.delete_user(user)

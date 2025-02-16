@@ -37,16 +37,14 @@ Setup the following env vars directly or run:
 
 - Setup backend
     - Create common project
-        - Add permissions to admin screen
         - Add permissions to limit crud endpoints
-        - Add user id as custom claim on jwt token? 
         - Authorization at gateway level for all non auth apps
-        - deploy validate with read replica
         - Authentication via fastapi middleware using jwt token + 
         dynamodb
             - Get user data with permissions via id / username
             - Create materialised view
             - Or cache in dynamodb for cheap serverless option?
+        - deploy validate with read replica
         - Tests:
             - Create dynamic CRUD tests
                 - User, Group, Permission, Featureflag, Company CRUD
@@ -67,6 +65,7 @@ Setup the following env vars directly or run:
         - Create Diff with changes
         - Add CI job to detect template changes and add a new PR with applied patch to projects
     - Add monitoring dashboard for services
+        - Latency tracking and visualisation
         - Add log based event tracking
         - Setup BI dashboard
     - Create orchestrator / workflow project 
