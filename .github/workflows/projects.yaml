@@ -30,6 +30,7 @@ jobs:
         project:
         - "projects/example"
         - "projects/monitor"
+        - "projects/common"
     runs-on: ubuntu-latest
     outputs:
       skip: ${{ steps.check_modified.outputs.skip }}
@@ -73,6 +74,7 @@ jobs:
         project:
         - "projects/example"
         - "projects/monitor"
+        - "projects/common"
     runs-on: ubuntu-latest
     outputs:
       skip: ${{ steps.check_modified.outputs.skip }}
@@ -129,6 +131,7 @@ jobs:
         project:
           - "projects/example"
           - "projects/monitor"
+          - "projects/common"
         env:
           - "default"
     runs-on: ubuntu-latest
