@@ -299,31 +299,34 @@ def resolve_dependencies(func: Callable, top_level: bool = True, overrides: Opti
     overrides: Used to replace dependencies during testing
     """
     f_sig = inspect.signature(func)
+    overrides = overrides or {}
+    def load_overrides(dep: Dependency | Depends) -> None:
+        # replace dependency with override for testing if needed
+        if type(dep) is Dependency:
+            if dep.func in overrides:
+                dep.func = overrides[dep.func]
+        elif type(dep) is Depends:
+            if dep.dependency in overrides:
+                dep.dependency = overrides[dep.dependency]
 
     @wraps(func)
     def resolve_depends(*arg, **kwargs):
-        def get_override(dep):
-            # Get override for dependency used for testing
-            if dep in overrides:
-                return overrides[dep]
-            return dep
-            
         bound = f_sig.bind(*arg, **kwargs)
         bound.apply_defaults()
         dependencies: List[Dependency] = []
 
+        # resolve dependency function args and parse dicts into pydantic models
         for key, arg_v in bound.arguments.items():
-            # parse dependencies
-            breakpoint()
+            load_overrides(arg_v)
             if type(arg_v) is Dependency:
-                arg_v = get_override(arg_v)
                 dependencies.append(arg_v)
-                bound.arguments[key] = resolve_dependencies(arg_v, top_level=False)()
-            elif type(arg_v) is Depends:
-                arg_v = get_override(arg_v)
-                dependencies.append(arg_v.dependency)
                 bound.arguments[key] = resolve_dependencies(
-                    arg_v.dependency, top_level=False
+                    arg_v, top_level=False, overrides=overrides
+                )()
+            elif type(arg_v) is Depends:
+                dependencies.append(arg_v)
+                bound.arguments[key] = resolve_dependencies(
+                    arg_v, top_level=False, overrides=overrides
                 )()
             # parse pydantic models
             elif BaseModel in inspect.getmro(
@@ -363,7 +366,7 @@ class TaskFuncWrapper:
     @property
     def __name__(self) -> str:
         return self.func.__name__
-
+    
     def __call__(self, *args, **kwargs) -> Any:
         resolved_func = resolve_dependencies(self.func, overrides=self.dependency_overrides)
         return resolved_func(*args, **kwargs)
