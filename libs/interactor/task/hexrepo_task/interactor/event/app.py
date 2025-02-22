@@ -1,10 +1,11 @@
-from functools import wraps
 import inspect
 import json
 import logging
 from asyncio import sleep
 from contextlib import contextmanager
+from functools import wraps
 from inspect import signature
+import types
 from typing import Any, Callable, Dict, Generator, List, Optional, cast
 from uuid import UUID
 
@@ -272,9 +273,9 @@ class Dependency:
     def __call__(self) -> Any:
         if self.func in Dependency.cache:
             return Dependency.cache[self.func]
-        
+
         result = self.func()
-        if type(result) is Generator:
+        if type(result) is types.GeneratorType:
             self.generator = result
             result = next(result)
         if self.use_cache:
@@ -282,9 +283,9 @@ class Dependency:
         return result
 
 
-def resolve_dependencies(func: Callable, top_level: bool = True) -> Callable:
+def resolve_dependencies(func: Callable, top_level: bool = True, overrides: Optional[Dict[Callable, Callable]] = None) -> Callable:
     """Run functions with dependencies and resolve them.
-    E.G.: 
+    E.G.:
 
     @resolve_dependencies
     def my_func(id:str, get_uow: Dependency = Dependency(get_uow)) -> Any:
@@ -293,27 +294,41 @@ def resolve_dependencies(func: Callable, top_level: bool = True) -> Callable:
     OR
 
     resolve_dependencies(my_func)(id)
+
+    top_level: Used to cleanup dependencies after function is run, avoids clean up in nested functions
+    overrides: Used to replace dependencies during testing
     """
     f_sig = inspect.signature(func)
 
     @wraps(func)
     def resolve_depends(*arg, **kwargs):
+        def get_override(dep):
+            # Get override for dependency used for testing
+            if dep in overrides:
+                return overrides[dep]
+            return dep
+            
         bound = f_sig.bind(*arg, **kwargs)
         bound.apply_defaults()
         dependencies: List[Dependency] = []
 
         for key, arg_v in bound.arguments.items():
             # parse dependencies
-            if type(arg_v) == Dependency:
+            breakpoint()
+            if type(arg_v) is Dependency:
+                arg_v = get_override(arg_v)
                 dependencies.append(arg_v)
                 bound.arguments[key] = resolve_dependencies(arg_v, top_level=False)()
-            elif type(arg_v) == Depends:
+            elif type(arg_v) is Depends:
+                arg_v = get_override(arg_v)
                 dependencies.append(arg_v.dependency)
-                bound.arguments[key] = resolve_dependencies(arg_v.dependency, top_level=False)()
+                bound.arguments[key] = resolve_dependencies(
+                    arg_v.dependency, top_level=False
+                )()
             # parse pydantic models
-            elif BaseModel in inspect.getmro(f_sig.parameters[key].annotation) and isinstance(
-                arg_v, dict
-            ):
+            elif BaseModel in inspect.getmro(
+                f_sig.parameters[key].annotation
+            ) and isinstance(arg_v, dict):
                 bound.arguments[key] = f_sig.parameters[key].annotation(**arg_v)
 
         result = func(*bound.args, **bound.kwargs)
@@ -329,7 +344,7 @@ def resolve_dependencies(func: Callable, top_level: bool = True) -> Callable:
                         pass
 
         return result
-    
+
     return resolve_depends
 
 
@@ -342,7 +357,7 @@ class TaskFuncWrapper:
         self, func: TaskFunc, app: TaskApp, dependency_overrides: Optional[Dict] = None
     ):
         self.app: TaskApp = app
-        self.func: TaskFunc = resolve_dependencies(func)
+        self.func: TaskFunc = func
         self.dependency_overrides: Dict = dependency_overrides or {}
 
     @property
@@ -350,7 +365,8 @@ class TaskFuncWrapper:
         return self.func.__name__
 
     def __call__(self, *args, **kwargs) -> Any:
-        return self.func(*args, **kwargs)
+        resolved_func = resolve_dependencies(self.func, overrides=self.dependency_overrides)
+        return resolved_func(*args, **kwargs)
 
     def queue_task(self, **kwargs) -> TaskPromise:
         return self.app.queue_task(self.func, kwargs)

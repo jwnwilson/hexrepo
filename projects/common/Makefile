@@ -27,11 +27,6 @@ create_superuser:
 db: docker_stop
 	docker compose run --service-ports -d db 
 
-db_migrate:
-	bash -c "uv run alembic upgrade head" ;\
-	EXIT_CODE=$$?;\
-    exit $$EXIT_CODE
-
 db_migrate_local:
 	bash -c "env $$(cat env/local.env|xargs) uv run alembic upgrade head"
 

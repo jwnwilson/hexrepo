@@ -1,6 +1,5 @@
 from typing import Tuple
 
-from fastapi import Depends
 import pytest
 from fastapi import Depends
 from pydantic import BaseModel
