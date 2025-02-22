@@ -25,17 +25,50 @@ from app.domain.example import ExampleDTO
 # Silence SQLALchemy deprecation warning until we can upgrade
 os.environ["SQLALCHEMY_SILENCE_UBER_WARNING"] = "1"
 
+
+def reset_db(uow: UOW, drop_only: bool = False):
+    try:
+        uow.drop_all()
+    except Exception:
+        pass
+    if not drop_only:
+        uow.create_all()
+
+
 # Create local file db
-SQLALCHEMY_DATABASE_URL = "sqlite:///test.db"
+@pytest.fixture
+def SQLALCHEMY_DATABASE_URL():
+    return os.getenv(
+        "TEST_DB_URL", "postgresql+psycopg2://postgres:password@localhost:5432/test_db"
+    )
+
 
 @pytest.fixture
-def uow() -> Generator[UOW, None, None]:
+def SQLITE_DATABASE_URL():
+    return "sqlite:///test.db"
+
+
+@pytest.fixture
+def uow_lite(SQLITE_DATABASE_URL) -> Generator[UOW, None, None]:
+    """
+    Return db adaptor with initialised DB & DB session.
+    """
+    uow = SqlUOW(db_url=SQLITE_DATABASE_URL)
+    # Create DB session
+    with uow.transaction() as session:  # noqa
+        reset_db(uow)
+        yield uow
+
+
+@pytest.fixture
+def uow(SQLALCHEMY_DATABASE_URL) -> Generator[UOW, None, None]:
     """
     Return db adaptor with initialised DB & DB session.
     """
     uow = SqlUOW(db_url=SQLALCHEMY_DATABASE_URL)
     # Create DB session
     with uow.transaction() as session:
+        reset_db(uow)
         yield uow
 {% elif cookiecutter.use_db == "y" and cookiecutter.use_db_logic == "nosql" %}
 @pytest.fixture
@@ -50,10 +83,14 @@ def uow() -> Generator[UOW, None, None]:
 
 
 {% if cookiecutter.use_db == "y" and cookiecutter.use_db == "y" %}
-@pytest.fixture(scope="function", autouse=True)
+@pytest.fixture(scope="function")
 def create_tables(uow: UOW):
-    uow.drop_all()
-    uow.create_all()
+    reset_db(uow)
+
+
+@pytest.fixture(scope="function")
+def drop_tables(uow: UOW):
+    reset_db(uow, drop_only=True)
 {% endif %}
 
 

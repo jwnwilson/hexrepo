@@ -80,7 +80,7 @@ run_docker:
 
 # Testing commands
 {% if cookiecutter.use_db == "y"%}
-test: venv db down
+test: venv db
 {% else %}
 test: venv
 {% endif %}
