@@ -324,9 +324,9 @@ def resolve_dependencies(func: Callable, top_level: bool = True, overrides: Opti
                     arg_v, top_level=False, overrides=overrides
                 )()
             elif type(arg_v) is Depends:
-                dependencies.append(arg_v)
+                dependencies.append(arg_v.dependency)
                 bound.arguments[key] = resolve_dependencies(
-                    arg_v, top_level=False, overrides=overrides
+                    arg_v.dependency, top_level=False, overrides=overrides
                 )()
             # parse pydantic models
             elif BaseModel in inspect.getmro(
