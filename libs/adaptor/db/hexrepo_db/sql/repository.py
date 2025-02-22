@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Type, Union
 from uuid import UUID
 
 from pydantic import BaseModel
@@ -40,11 +40,17 @@ class DefaultQuery(Query):
             for key, value in self.default_filters.items():
                 query = query.where(getattr(self.model, key) == value)
         return query
+    
+    def query_select(self) -> Select[Any]:
+        # Base select / join query for this model
+        return select(self.model)
 
     def query_multi(self) -> Select[Any]:
         # Query to return list of entities
-        default_query = select(self.model)
-        return self._apply_default_filters(default_query)
+        default_query = self.query_select()
+        default_query = self._apply_default_filters(default_query)
+        # Load relationships
+        return default_query
 
     def query_single(self, id: UUID) -> Select[Any]:
         # Query to retun a single entity by id
@@ -59,27 +65,42 @@ class DefaultQuery(Query):
         # logic to convert pydantic DTO to db model and add FK relationship data if needed
         db_obj: BaseSQLModel = self.model(**dto.model_dump())  # type: ignore
         return db_obj
-
-    def update_relationships(
-        self, db_obj: Union[Row[Any], BaseSQLModel], dto: ModelDTO
-    ) -> Row[Any] | BaseSQLModel:
+    
+    def update_relationships(self, db_obj: Union[Row[Any], BaseSQLModel], dto: ModelDTO) -> Row[Any] | BaseSQLModel:
         # logic to update FK relationships during update logic
+        # Find intrumentedLists
+        relationships: List[str] = [attr for attr in dir(db_obj) if getattr(db_obj, attr).__class__.__name__ == "InstrumentedList"]
+        # For each instrumentedList check for diff against dto
+        for relationship in relationships:
+            # If diff, update relationship
+            dto_ids: List[str] = [str(r["id"]) for r in getattr(dto, relationship)]
+            db_ids: List[str] = [str(r.id) for r in getattr(db_obj, relationship)]
+            id_diff: bool = set(db_ids) != set(dto_ids)
+            if id_diff:
+                # Get relationship table
+                relationship_table = getattr(db_obj.__class__, relationship)
+                # Get relationship model
+                relationship_model: BaseSQLModel = relationship_table.property.mapper.class_
+                # Get new relationship objects
+                new_relationships = self.session.query(relationship_model).filter(relationship_model.id.in_(dto_ids)).all()
+                # Update relationship
+                setattr(db_obj, relationship, new_relationships)
         return db_obj
 
 
 class SQLRepository(Repository):
     model: Any = BaseSQLModel
     model_dto: ModelDTOType = BaseModel
+    query_logic: Type[Query] = DefaultQuery
 
     def __init__(
         self,
         session: Session,
         required_filters: Optional[Dict[str, Any]] = None,
-        query: Optional[Query] = None,
     ):
         self._session: Session = session
         self._required_filters = required_filters
-        self.query: Query = query or DefaultQuery(
+        self.query: Query = self.query_logic(
             self.model, self.model_dto, self.session, default_filters=required_filters
         )
 

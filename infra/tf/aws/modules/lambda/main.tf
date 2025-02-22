@@ -115,41 +115,31 @@ resource "aws_iam_policy" "lambda-policy" {
   name        = "${var.name}-${var.environment}-lambda-policy"
   description = "allow lambda access necessary resources"
 
-  policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": [
-        "sqs:*"
-      ],
-      "Effect": "Allow",
-      "Resource": "*"
-    },
-    {
-      "Action": [
-        "secretsmanager:*"
-      ],
-      "Effect": "Allow",
-      "Resource": "*"
-    },
-    {
-      "Action": [
-        "dynamodb:*"
-      ],
-      "Effect": "Allow",
-      "Resource": "${var.dynamodb_arn}"
-    },
-    {
-      "Action": [
-        "s3:*"
-      ],
-      "Effect": "Allow",
-      "Resource": "arn:aws:s3:::${var.bucket}/*"
-    }
-  ]
-}
-EOF
+  policy = jsonencode({
+    Version   = "2012-10-17"
+    Statement = [
+      {
+        Action   = ["sqs:*"]
+        Effect   = "Allow"
+        Resource = "*"
+      },
+      {
+        Action   = ["secretsmanager:*"]
+        Effect   = "Allow"
+        Resource = "*"
+      },
+      {
+        Action   = ["dynamodb:*"]
+        Effect   = "Allow"
+        Resource = var.dynamodb_arn 
+      },
+      {
+        Action   = ["s3:*"]
+        Effect   = "Allow"
+        Resource = "arn:aws:s3:::${var.bucket}/*"
+      },
+    ]
+  })
 }
 
 resource "aws_iam_role_policy_attachment" "permissions-attach" {

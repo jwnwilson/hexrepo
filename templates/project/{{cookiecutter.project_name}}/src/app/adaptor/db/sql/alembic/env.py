@@ -16,11 +16,13 @@ def get_db_url_alembic():
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
-config.set_main_option("sqlalchemy.url", get_db_url_alembic())
+if not app_config.TESTING:
+    config.set_main_option("sqlalchemy.url", get_db_url_alembic())
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
-fileConfig(config.config_file_name)  # type: ignore
+if not app_config.TESTING:
+    fileConfig(config.config_file_name)  # type: ignore
 
 # add your model's MetaData object here
 # for 'autogenerate' support

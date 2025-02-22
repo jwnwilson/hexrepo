@@ -11,9 +11,10 @@ from typing import Dict, Optional
 from loguru import logger
 from loguru._handler import Message
 
-LOG_LEVEL = os.environ.get("LOG_LEVEL", "DEBUG")
+LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO")
 LOG_JSON = True if os.environ.get("LOG_JSON") else False
 LOG_MULTIPROCESS = True if os.environ.get("LOG_MULTIPROCESS") else False
+LOG_TRIM_EXCEPTION = False if os.environ.get("LOG_TRIM_EXCEPTION", "").lower() == "false" else True
 
 
 def serialize(record: Dict) -> str:
@@ -139,4 +140,7 @@ def log_manager(correlation_id: Optional[str] = None):
         try:
             yield logger
         except Exception as exc:
-            trim_exception(exc)
+            if LOG_TRIM_EXCEPTION:
+                trim_exception(exc)
+            else:
+                logger.exception(exc)

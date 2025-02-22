@@ -106,9 +106,11 @@ def create_project():
         cookiecutter("../templates/project")
         # Setup infra for service
         if prompt_setup_project_infra():
-            typer.echo("Setting up initial infrastructure...")
-            run_system_command("make tf_setup ENVIROMENT=default")
-            typer.echo("Initial infrastructure setup complete.")
+            project_name: str = typer.prompt("Please Re-Enter project name")
+            with chdir(project_name):
+                typer.echo("Setting up initial infrastructure...")
+                run_system_command("make tf_setup ENVIROMENT=default")
+                typer.echo("Initial infrastructure setup complete.")
 
 
 def add_library():

@@ -21,11 +21,6 @@ build:
 	docker compose build
 
 # DB management
-db_migrate:
-	bash -c "uv run alembic upgrade head" ;\
-	EXIT_CODE=$$?;\
-    exit $$EXIT_CODE
-
 db_migrate_local:
 	bash -c "env $$(cat env/local.env|xargs) uv run alembic upgrade head"
 
@@ -89,6 +84,8 @@ tf_workspace:
 
 tf_init:
 	@echo "Initializing Terraform infra"
+	@rm -rf ./infra/tf/aws/shared/.terraform
+	@rm -rf ./infra/tf/aws/environment/.terraform
 	cd infra/tf/aws/shared  && terraform init -input=false
 	cd infra/tf/aws/environment  && terraform init -input=false
 

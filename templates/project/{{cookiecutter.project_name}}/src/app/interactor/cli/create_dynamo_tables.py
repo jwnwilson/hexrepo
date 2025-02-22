@@ -1,3 +1,7 @@
+from hexrepo_log import setup_logger
+
+setup_logger()
+
 from app.adaptor.db.nosql.uow import DynamoUOW
 from app.config import config
 

@@ -1,10 +1,14 @@
 import os
 import logging
+import sys
+from dotenv import load_dotenv
 from pydantic_settings import BaseSettings
 
 logger = logging.getLogger()
 # Silence noisy logs from faker
 logging.getLogger("faker.factory").setLevel(logging.ERROR)
+
+load_dotenv(os.environ.get("ENV_FILE", "./env/local.env"))
 
 
 class Config(BaseSettings):
@@ -35,6 +39,7 @@ class Config(BaseSettings):
     PORT: int = 8000
 
     ALLOWED_ORIGINS: str = os.environ.get("ALLOWED_ORIGINS", "localhost")
+    TESTING: bool = "pytest" in sys.argv[0]
 
 
 config = Config()  # type: ignore

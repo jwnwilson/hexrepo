@@ -222,7 +222,7 @@ class DynamoRepository(Repository):
 
     def create_table(self) -> None:
         if self.table_exists():
-            logger.info(f"Skipping Table {self.table_name} create as it does not exist")
+            logger.info(f"Skipping Table {self.table_name} create as it already exists")
             return
         try:
             # attr_defs: List[Dict[str, Any]] = []

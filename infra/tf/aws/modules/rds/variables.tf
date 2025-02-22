@@ -42,3 +42,23 @@ variable "stop_time" {
   default = ""
   
 }
+
+variable "read_replica" {
+  default = false
+  type = bool
+}
+
+variable "high_availability" {
+  default = false
+  type = bool
+}
+
+variable "deleteion_protection" {
+  default = false
+  type = bool
+}
+
+variable "storage_encrypted" {
+  default = false
+  type = bool
+}

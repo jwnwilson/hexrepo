@@ -22,6 +22,9 @@ build:
 
 # DB management
 {% if cookiecutter.use_db == "y" and cookiecutter.use_db_logic == "sql" %}
+db: docker_stop
+	docker compose run --service-ports -d db 
+
 db_migrate:
 	bash -c "uv run alembic upgrade head" ;\
 	EXIT_CODE=$$?;\
@@ -33,29 +36,29 @@ db_migrate_local:
 db_migrate_docker:
 	docker compose run api bash -c "alembic upgrade head"
 
-db_delete_data: down
+db_delete_data: 
 	docker compose run db bash -c "rm -rf /var/lib/postgresql/data/*"
 
-db_upgrade: db_migrate down
+db_upgrade: db_migrate 
 
-db_downgrade: down
+db_downgrade: 
 	bash -c "uv run alembic downgrade -1"
 
-db_create_migration: down
+db_create_migration: 
 	bash -c "uv run alembic revision --autogenerate -m \"DB migration\""
 {% elif cookiecutter.use_db == "y" and cookiecutter.use_db_logic == "nosql" %}
-db_setup:
-	bash -c "DB_URL=http://localhost:8888 uv run python -m app.interactor.cli.create_dynamo_tables"
+db: docker_stop
+	docker compose run --service-ports -d localstack
 
-db_delete_data: down
+db_setup:
+	bash -c "ENV_FILE=./env/local.env uv run python -m app.interactor.cli.create_dynamo_tables"
+
+db_delete_data: 
 	docker compose run db bash -c "rm -rf /home/dynamodblocal/data/*"
 {% endif %}
 
 docker_stop:
 	@-bash -c "docker ps -aq | xargs docker stop | xargs docker rm"
-
-db: docker_stop
-	docker compose run --service-ports -d db 
 
 down:
 	docker compose down
@@ -77,7 +80,7 @@ run_docker:
 
 # Testing commands
 {% if cookiecutter.use_db == "y"%}
-test: venv db down
+test: venv db
 {% else %}
 test: venv
 {% endif %}
@@ -103,6 +106,8 @@ tf_workspace:
 
 tf_init:
 	@echo "Initializing Terraform infra"
+	@rm -rf ./infra/tf/aws/shared/.terraform
+	@rm -rf ./infra/tf/aws/environment/.terraform
 	cd infra/tf/aws/shared  && terraform init -input=false
 	cd infra/tf/aws/environment  && terraform init -input=false
 

@@ -6,6 +6,7 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Response
 from fastapi.types import DecoratedCallable
+from hexrepo_cloud.auth.interface import AuthAdapter
 from hexrepo_db.exception import IntegrityError, InvalidArgument, RecordNotFound
 from hexrepo_db.interface import UOW, PaginatedData, Repository
 from pydantic import BaseModel
@@ -48,12 +49,15 @@ class CrudRouter(APIRouter):
         methods: List[str],
         create_schema: Type[BaseModel],
         update_schema: Type[BaseModel],
+        db_dependency_ro: Callable | None = None,
         prefix: Optional[str] = None,
         tags: Optional[List[Union[str, Enum]]] = None,
-        paginate: Optional[int] = None,
+        auth_adaptor: Optional[Callable[[], AuthAdapter]] = None,
         **kwargs: Any,
     ):
         self.db_dependency: Callable[[], UOW] = db_dependency
+        self.db_dependency_ro: Callable | None = db_dependency_ro
+        self.auth_adaptor: Optional[Callable[[], AuthAdapter]]  = auth_adaptor
         self.repository: str = repository
         self.methods = methods or ["READ"]
 
@@ -66,6 +70,11 @@ class CrudRouter(APIRouter):
         super().__init__(prefix=prefix, tags=tags, redirect_slashes=True, **kwargs)
         self._setup_routes()
 
+    def _dependencies(self) -> Optional[Callable]:
+        if self.auth_adaptor:
+            return [Depends(self.auth_adaptor)]
+        return []
+
     def _setup_routes(self) -> None:
         if "CREATE" in self.methods:
             assert self.create_schema
@@ -74,6 +83,7 @@ class CrudRouter(APIRouter):
                 self._create(),
                 methods=["POST"],
                 response_model=self.response_schema,
+                dependencies=self._dependencies()
             )
         if "READ" in self.methods:
             self.add_api_route(
@@ -81,6 +91,7 @@ class CrudRouter(APIRouter):
                 self._read(),
                 methods=["GET"],
                 response_model=self.response_schema,
+                dependencies=self._dependencies()
             )
 
             self.add_api_route(
@@ -88,6 +99,7 @@ class CrudRouter(APIRouter):
                 self._read_multi(),
                 methods=["GET"],
                 response_model=PaginatedData[self.response_schema],  # type: ignore
+                dependencies=self._dependencies()
             )
         if "UPDATE" in self.methods:
             assert self.update_schema
@@ -96,6 +108,7 @@ class CrudRouter(APIRouter):
                 self._update(),
                 methods=["PATCH"],
                 response_model=self.response_schema,
+                dependencies=self._dependencies()
             )
         if "DELETE" in self.methods:
             self.add_api_route(
@@ -104,6 +117,7 @@ class CrudRouter(APIRouter):
                 methods=["DELETE"],
                 status_code=204,
                 response_class=Response,
+                dependencies=self._dependencies()
             )
 
     @property
@@ -128,7 +142,7 @@ class CrudRouter(APIRouter):
     def _read(self) -> Callable[[Any], Any]:
         def read_record(
             id: UUID,
-            uow: UOW = Depends(self.db_dependency),
+            uow: UOW = Depends(self.db_dependency_ro if self.db_dependency_ro else self.db_dependency),
         ) -> self.response_schema:  # type: ignore
             try:
                 repository: Repository = getattr(uow, self.repository)
@@ -142,7 +156,7 @@ class CrudRouter(APIRouter):
 
     def _read_multi(self) -> Callable[[UOW], Any]:
         def read_multiple_records(
-            uow: UOW = Depends(self.db_dependency),
+            uow: UOW = Depends(self.db_dependency_ro if self.db_dependency_ro else self.db_dependency),
             filters: str = "{}",
             page_size: int = 0,
             page_number: int = 1,

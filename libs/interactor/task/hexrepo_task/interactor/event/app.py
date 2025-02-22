@@ -3,10 +3,13 @@ import json
 import logging
 from asyncio import sleep
 from contextlib import contextmanager
+from functools import wraps
 from inspect import signature
-from typing import Any, Callable, Dict, Generator, Optional, cast
+import types
+from typing import Any, Callable, Dict, Generator, List, Optional, cast
 from uuid import UUID
 
+from fastapi.params import Depends
 from pydantic import BaseModel
 
 from hexrepo_task.exception import DuplicateTaskName, TaskNotFound
@@ -252,12 +255,100 @@ class TaskPromise:
 
 
 class Dependency:
-    def __init__(self, get_dependency: Callable):
-        self._get_dependency = get_dependency
+    cache: Dict[Callable, Any] = {}
 
-    @property
-    def dependency(self) -> Callable:
-        return self._get_dependency
+    def __init__(self, func: Callable, use_cache: bool = True, top_level: bool = True):
+        self.func = func
+        self.use_cache: bool = use_cache
+        self.generator: Optional[Generator] = None
+        self.top_level: bool = top_level
+
+    def cleanup(self):
+        if self.generator and self.top_level:
+            try:
+                next(self.generator)
+            except StopIteration:
+                pass
+
+    def __call__(self) -> Any:
+        if self.func in Dependency.cache:
+            return Dependency.cache[self.func]
+
+        result = self.func()
+        if type(result) is types.GeneratorType:
+            self.generator = result
+            result = next(result)
+        if self.use_cache:
+            Dependency.cache[self.func] = result
+        return result
+
+
+def resolve_dependencies(func: Callable, top_level: bool = True, overrides: Optional[Dict[Callable, Callable]] = None) -> Callable:
+    """Run functions with dependencies and resolve them.
+    E.G.:
+
+    @resolve_dependencies
+    def my_func(id:str, get_uow: Dependency = Dependency(get_uow)) -> Any:
+        return get_uow.user.read(id)
+
+    OR
+
+    resolve_dependencies(my_func)(id)
+
+    top_level: Used to cleanup dependencies after function is run, avoids clean up in nested functions
+    overrides: Used to replace dependencies during testing
+    """
+    f_sig = inspect.signature(func)
+    overrides = overrides or {}
+    def load_overrides(dep: Dependency | Depends) -> None:
+        # replace dependency with override for testing if needed
+        if type(dep) is Dependency:
+            if dep.func in overrides:
+                dep.func = overrides[dep.func]
+        elif type(dep) is Depends:
+            if dep.dependency in overrides:
+                dep.dependency = overrides[dep.dependency]
+
+    @wraps(func)
+    def resolve_depends(*arg, **kwargs):
+        bound = f_sig.bind(*arg, **kwargs)
+        bound.apply_defaults()
+        dependencies: List[Dependency] = []
+
+        # resolve dependency function args and parse dicts into pydantic models
+        for key, arg_v in bound.arguments.items():
+            load_overrides(arg_v)
+            if type(arg_v) is Dependency:
+                dependencies.append(arg_v)
+                bound.arguments[key] = resolve_dependencies(
+                    arg_v, top_level=False, overrides=overrides
+                )()
+            elif type(arg_v) is Depends:
+                dependencies.append(arg_v.dependency)
+                bound.arguments[key] = resolve_dependencies(
+                    arg_v.dependency, top_level=False, overrides=overrides
+                )()
+            # parse pydantic models
+            elif BaseModel in inspect.getmro(
+                f_sig.parameters[key].annotation
+            ) and isinstance(arg_v, dict):
+                bound.arguments[key] = f_sig.parameters[key].annotation(**arg_v)
+
+        result = func(*bound.args, **bound.kwargs)
+
+        if top_level:
+            for dep in dependencies:
+                if isinstance(dep, Dependency):
+                    dep.cleanup()
+                elif isinstance(dep, Generator):
+                    try:
+                        next(dep)
+                    except StopIteration:
+                        pass
+
+        return result
+
+    return resolve_depends
 
 
 class TaskFuncWrapper:
@@ -275,102 +366,10 @@ class TaskFuncWrapper:
     @property
     def __name__(self) -> str:
         return self.func.__name__
-
-    @contextmanager
-    def _get_dependencies(
-        self, func: TaskFunc, kwargs: Dict
-    ) -> Generator[Dict, None, None]:
-        dependencies = {}
-        dependency_generators = {}
-        for name, param in inspect.signature(func).parameters.items():
-            name: str
-            param: inspect.Parameter
-            is_dependency: bool = isinstance(param.default, Dependency) or (
-                hasattr(param.default, "__class__")
-                and param.default.__class__.__name__ == "Depends"
-            )
-
-            # Parse pydantic models
-            if BaseModel in inspect.getmro(param.annotation) and isinstance(
-                kwargs[name], dict
-            ):
-                dependencies[name] = param.annotation(**kwargs[name])
-            # Parse raw param types
-            elif name in kwargs:
-                dependencies[name] = kwargs[name]
-            # Load dependencies
-            elif is_dependency:
-                dep_func: Generator = param.default.dependency
-                # For testing purposes
-                if dep_func in self.dependency_overrides:
-                    dep_func = self.dependency_overrides[dep_func]
-                dep_return = dep_func()
-
-                if isinstance(dep_return, Generator):
-                    dependency_generators[name] = dep_return
-                    dependencies[name] = next(dependency_generators[name])
-                else:
-                    dependencies[name] = dep_return
-            else:
-                dependencies[name] = param.default
-        yield dependencies
-
-        # Clean up dependence generators
-        for dep in dependency_generators:
-            try:
-                next(dependency_generators[dep])
-            except StopIteration:
-                pass
-
+    
     def __call__(self, *args, **kwargs) -> Any:
-        if len(args) > 0:
-            raise RuntimeError("Task functions must be called with kwargs")
-        with self._get_dependencies(self.func, kwargs) as dependencies:
-            return self.func(**dependencies)
+        resolved_func = resolve_dependencies(self.func, overrides=self.dependency_overrides)
+        return resolved_func(*args, **kwargs)
 
     def queue_task(self, **kwargs) -> TaskPromise:
         return self.app.queue_task(self.func, kwargs)
-
-
-# if __name__ == "__main__":
-
-#     def get_queue() -> QueueAdaptor:
-#         return SqsQueueAdaptor(queue="hexrepo-tasks")
-#     def get_uow() -> UOW:
-#         return DynamoUOW()
-
-#     app = TaskApp(uow=get_uow(), queue=get_queue())
-
-#     @app.task
-#     def task_A(event: TaskDTO):
-#         print(event)
-
-#     @app.task
-#     def task_B(event: TaskDTO):
-#         print(event)
-
-#     # run task directly
-#     task_result = task_A(param=dict(name="example", status="running"))
-
-#     # queue task
-#     task_queue_instance: TaskPromise = task_A.queue()
-
-#     # Using generator will require server instead of being serverless
-#     # need to do this but keep it serverless
-#     # Might need to have a long running async lambda process to manage these tasks
-#     @app.flow
-#     async def workflow_a(*args, **kwargs):
-#         try:
-#             queue: TaskPromise = task_A.queue(*args, **kwargs)
-#             results = queue.wait()
-
-#             concurrent = []
-#             for res in results:
-#                 concurrent.append(task_B.queue(res))
-#                 concurrent.append(task_C.queue(res))
-
-#             all(c.wait() for c in concurrent)
-#         except:
-#             error_logic()
-
-#     workflow_a.trigger()

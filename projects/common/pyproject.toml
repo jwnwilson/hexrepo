@@ -1,0 +1,75 @@
+[project]
+authors = [
+    {name = "Noel Wilson", email = "jwnwilson@hotmail.co.uk"},
+]
+requires-python = "<4.0,>=3.12"
+name = "common"
+version = "0.1.0"
+description = "Common monorepo logic such as auth, user management and featureflags"
+readme = "README.md"
+dependencies = [
+    "sqladmin>=0.20.1",
+    "fastapi>=0.115.8",
+    "uvicorn<1.0.0,>=0.32.0",
+    "gevent<25.0.0,>=24.10.3",
+    "requests<3.0.0,>=2.32.3",
+    "python-dotenv<2.0.0,>=1.0.1",
+    "pydantic-settings<3.0.0,>=2.6.0",
+    "alembic<2.0.0,>=1.13.3",
+    "psycopg2-binary<3.0.0,>=2.9.10",
+    "boto3<2.0.0,>=1.35.66",
+    "boto3-stubs[essential]<2.0.0,>=1.35.86",
+    "hexrepo-cloud",
+    "hexrepo-db",
+    "hexrepo-api",
+    "hexrepo-task",
+    "hexrepo-log",
+    "python-jose>=3.3.0",
+]
+
+[dependency-groups]
+aws = [
+    "mangum<1.0.0,>=0.19.0",
+]
+dev = [
+    "pytest<9.0.0,>=8.3.3",
+    "mypy<2.0.0,>=1.13.0",
+    "ruff>=0.8.4",
+    "httpx<1.0.0,>=0.27.2",
+    "pytest-alembic>=0.11.1",
+    "pytest-dotenv<1.0.0,>=0.5.2",
+    "pytest-cov<7.0.0,>=6.0.0",
+    "pytest-xdist<4.0.0,>=3.6.1",
+    "polyfactory<3.0.0,>=2.17.0",
+    "locust>=2.32.8",
+]
+
+[tool.pdm.build]
+includes = []
+[build-system]
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
+
+[tool.pytest.ini_options]
+addopts = "-vv --cov --cov-report xml --cov-report term-missing --cov-fail-under=50"
+testpaths = ["app/tests"]
+env_files = ["env/local.env"]
+pythonpath = [
+  "src"
+]
+
+[tool.coverage.run]
+concurrency = ["gevent"]
+omit = ["app/tests/*"]
+source = ["app"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+
+[tool.uv.sources]
+hexrepo-api = { path = "../../libs/interactor/api", editable = true }
+hexrepo-db = { path = "../../libs/adaptor/db", editable = true }
+hexrepo-cloud = { path = "../../libs/adaptor/cloud", editable = true }
+hexrepo-task = { path = "../../libs/interactor/task", editable = true }
+hexrepo-log = { path = "../../libs/adaptor/log", editable = true }

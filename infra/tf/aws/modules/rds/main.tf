@@ -99,6 +99,9 @@ resource "aws_db_subnet_group" "default" {
   }
 }
 
+################################################################################
+# Master DB
+################################################################################
 module "db" {
   source  = "terraform-aws-modules/rds/aws"
   version = "~> 6.10"
@@ -120,6 +123,10 @@ module "db" {
     {
       name  = "rds.force_ssl"
       value = 0
+    },
+    {
+      name = "idle_in_transaction_session_timeout"
+      value = 30000
     }
   ]
 
@@ -132,7 +139,7 @@ module "db" {
 
   allocated_storage     = 20
   max_allocated_storage = 100
-  storage_encrypted     = false
+  storage_encrypted     = var.storage_encrypted
 
   # NOTE: Do NOT use 'user' as the value for 'username' as it throws:
   # "Error creating DB Instance: InvalidParameterValue: MasterUsername
@@ -142,10 +149,16 @@ module "db" {
   manage_master_user_password = true
   port                        = 5432
 
-  multi_az               = false
+  multi_az               = var.high_availability
   subnet_ids             = data.aws_subnets.private_subnet_ids.ids
   vpc_security_group_ids = [module.security_group.security_group_id]
   db_subnet_group_name   = aws_db_subnet_group.default.name
+
+  maintenance_window              = "Tue:00:00-Tue:03:00"
+  backup_window                   = "03:00-06:00"
+  enabled_cloudwatch_logs_exports = ["postgresql", "upgrade"]
+
+  deletion_protection     = var.deleteion_protection
 
   tags = {
     Environment = terraform.workspace
@@ -154,4 +167,48 @@ module "db" {
     Project     = var.project
   }
 
+}
+
+################################################################################
+# Replica DB
+################################################################################
+module "replica" {
+  count   = var.read_replica ? 1 : 0 
+  source  = "terraform-aws-modules/rds/aws"
+  version = "~> 6.10"
+
+  identifier = "${var.project}-db-ro-${var.environment}"
+
+  # Source database. For cross-region use db_instance_arn
+  replicate_source_db = module.db.db_instance_identifier
+
+  engine               = "postgres"
+  engine_version       = "16"
+  family               = "postgres16" # DB parameter group
+  major_engine_version = "16"         # DB option group
+  instance_class       = var.db_instance_class
+
+  allocated_storage     = 20
+  max_allocated_storage = 100
+  storage_encrypted     = var.storage_encrypted
+
+  port                        = 5432
+
+  multi_az               = var.high_availability
+  vpc_security_group_ids = [module.security_group.security_group_id]
+
+  maintenance_window              = "Tue:00:00-Tue:03:00"
+  backup_window                   = "03:00-06:00"
+  enabled_cloudwatch_logs_exports = ["postgresql", "upgrade"]
+
+  backup_retention_period = 0
+  skip_final_snapshot     = true
+  deletion_protection     = var.deleteion_protection
+
+  tags = {
+    Environment = terraform.workspace
+    StartTime   = var.start_time
+    StopTime    = var.stop_time
+    Project     = var.project
+  }
 }

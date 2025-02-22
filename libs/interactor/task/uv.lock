@@ -200,7 +200,7 @@ wheels = [
 
 [[package]]
 name = "hexrepo-cloud"
-version = "0.3.13"
+version = "0.3.14"
 source = { editable = "../../adaptor/cloud" }
 dependencies = [
     { name = "boto3-stubs", extra = ["essential"] },
@@ -230,7 +230,7 @@ dev = [
 
 [[package]]
 name = "hexrepo-db"
-version = "0.1.11"
+version = "0.1.12"
 source = { editable = "../../adaptor/db" }
 dependencies = [
     { name = "boto3" },
@@ -269,7 +269,7 @@ sql = [
 
 [[package]]
 name = "hexrepo-task"
-version = "0.1.5"
+version = "0.1.7"
 source = { virtual = "." }
 dependencies = [
     { name = "fastapi" },

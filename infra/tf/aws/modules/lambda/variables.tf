@@ -31,7 +31,7 @@ variable "lambda_schedule_expression" {
 }
 
 variable "dynamodb_arn" {
-  default = "*"
+  default = ""
   type = string
   
 }
