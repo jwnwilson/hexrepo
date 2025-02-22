@@ -7,7 +7,7 @@ output "db_instance_endpoint" {
 }
 
 output "db_instance_ro_endpoint" {
-  value = module.replica[0].db_instance_endpoint
+  value = length(module.replica) > 0 ? module.replica[0].db_instance_endpoint : null
 }
 
 
