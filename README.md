@@ -45,7 +45,7 @@ Setup the following env vars directly or run:
             - Test auth and permission logic
         - Create superuser command
         - Authentication via fastapi middleware using jwt token + 
-dynamodb / api call?
+dynamodb / api call for permissions?
             - Get user data with permissions via username from header or session
             - Create materialised view or cache in dynamodb for cheap serverless option?
     - Remove sql from example project

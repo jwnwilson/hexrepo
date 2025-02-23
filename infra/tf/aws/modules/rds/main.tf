@@ -91,7 +91,7 @@ data "aws_secretsmanager_secret_version" "db_password" {
 }
 
 resource "aws_db_subnet_group" "default" {
-  name       = "hexrepo-${var.environment}"
+  name       = "hexrepo-${var.environment}-${var.project}"
   subnet_ids = data.aws_subnets.private_subnet_ids.ids
 
   tags = {

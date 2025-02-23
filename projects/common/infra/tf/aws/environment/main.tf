@@ -15,13 +15,11 @@ data "aws_caller_identity" "current" {}
 data "aws_region" "current" {}
 
 locals {
-    account_id = data.aws_caller_identity.current.account_id
-    region = data.aws_region.current.name
-}
-
-locals {
+  account_id = data.aws_caller_identity.current.account_id
+  region = data.aws_region.current.name
   db_url = "postgresql+psycopg2://postgres:{password}@${module.common_postgres.db_instance_endpoint}/${var.project}"
   db_ro_url = "postgresql+psycopg2://postgres:{password}@${module.common_postgres.db_instance_ro_endpoint}/${var.project}"
+  api_subdomain = "common-${terraform.workspace}"
 }
 
 provider "aws" {
@@ -99,7 +97,7 @@ module "common_auth" {
 
   project     = "common"
   domain_name = var.domain
-  api_subdomain  = module.common_api_gateway.api_domain
+  api_subdomain  = local.api_subdomain
 }
 
 module "common_api_gateway" {
@@ -109,7 +107,7 @@ module "common_api_gateway" {
   lambda_invoke_arn = module.common_api.lambda_function_invoke_arn
   lambda_name       = module.common_api.lambda_function_name
   domain            = var.domain
-  api_subdomain     = "common-${terraform.workspace}"
+  api_subdomain     = local.api_subdomain
   project           = "common" 
 }
 
