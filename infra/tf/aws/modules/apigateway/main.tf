@@ -87,20 +87,20 @@ resource "aws_api_gateway_rest_api" "apiLambda" {
 }
 
 resource "aws_api_gateway_method" "proxy_root" {
-   rest_api_id   = aws_api_gateway_rest_api.apiLambda.id
-   resource_id   = aws_api_gateway_rest_api.apiLambda.root_resource_id
-   http_method   = "ANY"
-   authorization = "NONE"
+  rest_api_id   = aws_api_gateway_rest_api.apiLambda.id
+  resource_id   = aws_api_gateway_rest_api.apiLambda.root_resource_id
+  http_method   = "ANY"
+  authorization = "NONE"
 }
 
 resource "aws_api_gateway_integration" "lambda_root" {
-   rest_api_id = aws_api_gateway_rest_api.apiLambda.id
-   resource_id = aws_api_gateway_method.proxy_root.resource_id
-   http_method = aws_api_gateway_method.proxy_root.http_method
+  rest_api_id = aws_api_gateway_rest_api.apiLambda.id
+  resource_id = aws_api_gateway_method.proxy_root.resource_id
+  http_method = aws_api_gateway_method.proxy_root.http_method
 
-   integration_http_method = "POST"
-   type                    = "AWS_PROXY"
-   uri                     = var.lambda_invoke_arn
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = var.lambda_invoke_arn
 }
 
 
@@ -141,7 +141,6 @@ resource "aws_api_gateway_resource" "proxy" {
 
 
 resource "aws_api_gateway_integration" "lambda" {
-  count               = var.auth_enabled ? 1 : 0
   rest_api_id = aws_api_gateway_rest_api.apiLambda.id
   resource_id = var.auth_enabled ? aws_api_gateway_method.proxyMethod_auth[0].resource_id : aws_api_gateway_method.proxyMethod_no_auth[0].resource_id
   http_method = var.auth_enabled ? aws_api_gateway_method.proxyMethod_auth[0].http_method : aws_api_gateway_method.proxyMethod_no_auth[0].http_method
@@ -153,7 +152,6 @@ resource "aws_api_gateway_integration" "lambda" {
 
 
 # Auth infrastructure
-
 resource "aws_api_gateway_authorizer" "authorizer" {
   count         = var.auth_enabled ? 1 : 0
   name          = var.project
@@ -163,7 +161,7 @@ resource "aws_api_gateway_authorizer" "authorizer" {
 }
 
 resource "aws_api_gateway_method" "proxyMethod_auth" {
-  count               = var.auth_enabled ? 1 : 0
+  count                = var.auth_enabled ? 1 : 0
   rest_api_id          = aws_api_gateway_rest_api.apiLambda.id
   resource_id          = aws_api_gateway_resource.proxy.id
   http_method          = "ANY"
@@ -175,8 +173,9 @@ resource "aws_api_gateway_method" "proxyMethod_auth" {
 # No Auth
 resource "aws_api_gateway_method" "proxyMethod_no_auth" {
   count         = var.auth_enabled ? 0 : 1
-   rest_api_id   = aws_api_gateway_rest_api.apiLambda.id
-   resource_id   = aws_api_gateway_resource.proxy.id
-   http_method   = "ANY"
-   authorization = "NONE"
+  rest_api_id   = aws_api_gateway_rest_api.apiLambda.id
+  resource_id   = aws_api_gateway_resource.proxy.id
+  http_method   = "ANY"
+  authorization = "NONE"
 }
+
