@@ -24,6 +24,10 @@ class Config(BaseSettings):
     ENVIRONMENT: str = os.environ.get("ENVIRONMENT", "dev")
     REGION: str = os.environ.get("REGION", "eu-west-1")
 
+    # Auth settings
+    JWT_SECRET: str = os.environ["JWT_SECRET"]
+    ADMIN_SECRET: str = os.environ["ADMIN_SECRET"]
+
     # FEATURE FLAGS
 
     # Database settings

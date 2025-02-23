@@ -31,7 +31,7 @@ variable "lambda_schedule_expression" {
 }
 
 variable "dynamodb_arn" {
-  default = ""
+  default = "*"
   type = string
   
 }
@@ -39,4 +39,8 @@ variable "dynamodb_arn" {
 variable "bucket" {
   type = string
   default = "*"
+}
+
+variable "jwt_secret" {
+  default = null
 }

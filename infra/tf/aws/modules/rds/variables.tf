@@ -62,3 +62,7 @@ variable "storage_encrypted" {
   default = false
   type = bool
 }
+
+variable "backup_retention_period" {
+  default = 7
+}

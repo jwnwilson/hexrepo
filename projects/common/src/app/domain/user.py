@@ -1,9 +1,9 @@
 from typing import Any, Dict, List, Optional
 from uuid import UUID
 
+from hexrepo_db.interface import PaginatedData
 from pydantic import BaseModel
 
-from hexrepo_db.interface import PaginatedData
 from app.adaptor.db.interface import UOW
 
 

@@ -10,6 +10,7 @@ readme = "README.md"
 dependencies = [
     {% if cookiecutter.use_api == 'y' %}
     "fastapi<1.0.0,>=0.115.3",
+    "itsdangerous>=2.2.0",
     "uvicorn<1.0.0,>=0.32.0",
     "gevent<25.0.0,>=24.10.3",
     {% endif %}

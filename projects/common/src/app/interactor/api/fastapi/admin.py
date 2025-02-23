@@ -1,16 +1,16 @@
-from datetime import datetime
 import json
+from datetime import datetime
 from typing import Any
 
-from app.domain.user import get_user
-from fastapi.responses import JSONResponse
 import wtforms
-from sqladmin import Admin, ModelView
-from starlette.requests import Request
-from sqladmin.authentication import AuthenticationBackend
 from fastapi import FastAPI, HTTPException
-from hexrepo_cloud.auth.interface import AuthAdapter, UserLogin
+from fastapi.responses import JSONResponse
 from hexrepo_cloud.auth.cognito.auth_adaptor import CognitoAuthAdapter
+from hexrepo_cloud.auth.interface import AuthAdapter, UserLogin
+from hexrepo_db.sql.config import get_sql_db_url
+from sqladmin import Admin, ModelView
+from sqladmin.authentication import AuthenticationBackend
+from starlette.requests import Request
 
 from app.adaptor.db.sql.models.company import CompanyTable
 from app.adaptor.db.sql.models.feature_flag import FeatureFlagTable
@@ -19,8 +19,8 @@ from app.adaptor.db.sql.models.permission import PermissionTable
 from app.adaptor.db.sql.models.user import UserTable
 from app.adaptor.db.sql.uow import SqlUOW
 from app.config import config
+from app.domain.user import get_user
 from app.interactor.dependencies import get_jwt_token
-from hexrepo_db.sql.config import get_sql_db_url
 
 
 class BaseModelView(ModelView):
@@ -34,11 +34,11 @@ class BaseModelView(ModelView):
         return permissions
 
     def is_visible(self, request: Request) -> bool:
-        return "superadmin" in self.get_user_permissions(request) 
+        return "superadmin" in self.get_user_permissions(request)
 
     def is_accessible(self, request: Request) -> bool:
         return "superadmin" in self.get_user_permissions(request)
-    
+
     form_widget_args = dict(
         created_at=dict(readonly=True), updated_at=dict(readonly=True)
     )
@@ -196,16 +196,17 @@ class AdminAuth(AuthenticationBackend):
         username, password = form["username"], form["password"]
         # Validate username/password credentials
         try:
-            access_token: str = self.auth.login(UserLogin(
-                username=username,
-                password=password
-            ))
-        except Exception as e:
+            access_token: str = self.auth.login(
+                UserLogin(username=username, password=password)
+            )
+        except Exception:
             raise HTTPException(status_code=403, detail="Invalid username or password")
         # And update session
-        request.session.update({
-            "token": access_token,
-        })
+        request.session.update(
+            {
+                "token": access_token,
+            }
+        )
 
         return True
 
@@ -225,9 +226,11 @@ class AdminAuth(AuthenticationBackend):
             uow = SqlUOW(db_url=get_sql_db_url())
             with uow.transaction():
                 user = get_user(uow, username)
-                request.session.update({
-                    "user": json.loads(user.model_dump_json()),
-                })
+                request.session.update(
+                    {
+                        "user": json.loads(user.model_dump_json()),
+                    }
+                )
         return True
 
 

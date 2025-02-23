@@ -34,20 +34,22 @@ data "aws_security_group" "selected" {
 ################################################################################
 # RDS Module
 ################################################################################
-# resource "random_password" "master"{
-#   length           = 16
-#   special          = true
-#   override_special = "_!%^"
-# }
+resource "random_password" "master"{
+  length           = 16
+  special          = true
+  min_special      = 2
+  min_numeric      = 2
+  override_special = "!@_+"
+}
 
-# resource "aws_secretsmanager_secret" "password" {
-#   name = "${var.project}-db-password"
-# }
+resource "aws_secretsmanager_secret" "password" {
+  name = "${var.project}-${terraform.workspace}-db-password"
+}
 
-# resource "aws_secretsmanager_secret_version" "password" {
-#   secret_id = aws_secretsmanager_secret.password.id
-#   secret_string = random_password.master.result
-# }
+resource "aws_secretsmanager_secret_version" "password" {
+  secret_id = aws_secretsmanager_secret.password.id
+  secret_string = random_password.master.result
+}
 
 module "security_group" {
   source  = "terraform-aws-modules/security-group/aws"
@@ -85,13 +87,8 @@ module "security_group" {
     }
   ]
 }
-
-data "aws_secretsmanager_secret_version" "db_password" {
-  secret_id = module.db.db_instance_master_user_secret_arn
-}
-
 resource "aws_db_subnet_group" "default" {
-  name       = "hexrepo-${var.environment}"
+  name       = "hexrepo-${var.environment}-${var.project}"
   subnet_ids = data.aws_subnets.private_subnet_ids.ids
 
   tags = {
@@ -125,7 +122,7 @@ module "db" {
       value = 0
     },
     {
-      name = "idle_in_transaction_session_timeout"
+      name  = "idle_in_transaction_session_timeout"
       value = 30000
     }
   ]
@@ -146,7 +143,9 @@ module "db" {
   # user cannot be used as it is a reserved word used by the engine"
   db_name                     = var.project
   username                    = var.username
-  manage_master_user_password = true
+  password                    = aws_secretsmanager_secret_version.password.secret_string
+  # This is not possible with read replica
+  manage_master_user_password = false
   port                        = 5432
 
   multi_az               = var.high_availability
@@ -157,7 +156,8 @@ module "db" {
   maintenance_window              = "Tue:00:00-Tue:03:00"
   backup_window                   = "03:00-06:00"
   enabled_cloudwatch_logs_exports = ["postgresql", "upgrade"]
-
+  # Backups are required in order to create a replica
+  backup_retention_period = var.backup_retention_period
   deletion_protection     = var.deleteion_protection
 
   tags = {
@@ -173,7 +173,7 @@ module "db" {
 # Replica DB
 ################################################################################
 module "replica" {
-  count   = var.read_replica ? 1 : 0 
+  count   = var.read_replica ? 1 : 0
   source  = "terraform-aws-modules/rds/aws"
   version = "~> 6.10"
 
@@ -192,18 +192,15 @@ module "replica" {
   max_allocated_storage = 100
   storage_encrypted     = var.storage_encrypted
 
-  port                        = 5432
+  port = 5432
 
   multi_az               = var.high_availability
   vpc_security_group_ids = [module.security_group.security_group_id]
 
   maintenance_window              = "Tue:00:00-Tue:03:00"
-  backup_window                   = "03:00-06:00"
   enabled_cloudwatch_logs_exports = ["postgresql", "upgrade"]
-
-  backup_retention_period = 0
-  skip_final_snapshot     = true
-  deletion_protection     = var.deleteion_protection
+  deletion_protection             = var.deleteion_protection
+  backup_retention_period         = 0
 
   tags = {
     Environment = terraform.workspace
