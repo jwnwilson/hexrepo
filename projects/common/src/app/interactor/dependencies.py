@@ -5,7 +5,6 @@ from fastapi import Depends, HTTPException
 from hexrepo_cloud.auth.cognito import get_jwt_token
 from hexrepo_cloud.auth.cognito.fastapi_auth import JWTAuthorizationCredentials
 from hexrepo_cloud.auth.interface import AuthAdapter
-from hexrepo_db.interface import PaginatedData
 from hexrepo_db.sql import get_sql_db_url
 from hexrepo_task import QueueAdaptor, SqsQueueAdaptor
 from hexrepo_task.adaptor.db import QueueUOW
@@ -68,5 +67,7 @@ def get_superadmin_user(
 ) -> UserPermissionDTO:
     user: UserPermissionDTO = get_current_user(credentials, uow)
     if not user.is_superuser():
-        raise HTTPException(status_code=HTTP_403_FORBIDDEN, detail="Admin access required")
+        raise HTTPException(
+            status_code=HTTP_403_FORBIDDEN, detail="Admin access required"
+        )
     return user

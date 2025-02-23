@@ -1,12 +1,12 @@
 import os
 
-from hexrepo_log import LogMiddleware, setup_logger
-
-from app.config import config
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
+from hexrepo_log import LogMiddleware, setup_logger
 from starlette.middleware.sessions import SessionMiddleware
+
+from app.config import config
 
 from .admin import setup_admin
 from .api_versions.api_v1.api import api_router_v1
