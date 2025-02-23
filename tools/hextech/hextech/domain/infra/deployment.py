@@ -212,6 +212,7 @@ def migrate_db(config: HexrepoConfig, env: str, project: str):
                 )
             except Exception as err:
                 typer.echo(f"Error running migration: {err}")
+                raise typer.Abort()
 
     elif env == "local":
         typer.echo("Running migration locally")
