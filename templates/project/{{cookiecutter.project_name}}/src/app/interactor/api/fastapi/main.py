@@ -1,9 +1,10 @@
 import os
 
+from hexrepo_log import LogMiddleware, setup_logger
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
-from hexrepo_log import LogMiddleware, setup_logger
+from starlette.middleware.sessions import SessionMiddleware
 
 from .api_versions.api_v1.api import api_router_v1
 from app.config import config
@@ -31,7 +32,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
+app.add_middleware(SessionMiddleware, secret_key=config.ADMIN_SECRET, max_age=None)
 app.include_router(api_router_v1, prefix="/api/v1")
 
 
