@@ -25,7 +25,7 @@ build:
 db: docker_stop
 	docker compose run --service-ports -d db 
 
-db_migrate:
+db_migrate_pipeline:
 	bash -c "uv run alembic upgrade head" ;\
 	EXIT_CODE=$$?;\
     exit $$EXIT_CODE

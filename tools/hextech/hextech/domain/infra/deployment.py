@@ -207,7 +207,7 @@ def migrate_db(config: HexrepoConfig, env: str, project: str):
                 run_system_command(
                     f"""
                     cd projects/{project} && \
-                    make --no-print-directory db_migrate DB_PASSWORD_SECRET_NAME={secret_name} DB_URL={db_url} CLOUD_PROVIDER={config.cloud_provider}
+                    make --no-print-directory db_migrate_pipeline DB_PASSWORD_SECRET_NAME={secret_name} DB_URL={db_url} CLOUD_PROVIDER={config.cloud_provider}
                 """
                 )
             except Exception as err:
@@ -217,5 +217,5 @@ def migrate_db(config: HexrepoConfig, env: str, project: str):
     elif env == "local":
         typer.echo("Running migration locally")
         run_system_command(
-            f"cd projects/{project} && make --no-print-directory db_migrate"
+            f"cd projects/{project} && make --no-print-directory db_migrate_local"
         )
