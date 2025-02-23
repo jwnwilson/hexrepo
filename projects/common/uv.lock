@@ -267,6 +267,7 @@ dependencies = [
     { name = "hexrepo-db" },
     { name = "hexrepo-log" },
     { name = "hexrepo-task" },
+    { name = "itsdangerous" },
     { name = "psycopg2-binary" },
     { name = "pydantic-settings" },
     { name = "python-dotenv" },
@@ -305,6 +306,7 @@ requires-dist = [
     { name = "hexrepo-db", editable = "../../libs/adaptor/db" },
     { name = "hexrepo-log", editable = "../../libs/adaptor/log" },
     { name = "hexrepo-task", editable = "../../libs/interactor/task" },
+    { name = "itsdangerous", specifier = ">=2.2.0" },
     { name = "psycopg2-binary", specifier = ">=2.9.10,<3.0.0" },
     { name = "pydantic-settings", specifier = ">=2.6.0,<3.0.0" },
     { name = "python-dotenv", specifier = ">=1.0.1,<2.0.0" },
@@ -650,7 +652,7 @@ dev = [
 
 [[package]]
 name = "hexrepo-db"
-version = "0.1.12"
+version = "0.1.13"
 source = { editable = "../../libs/adaptor/db" }
 dependencies = [
     { name = "boto3" },
