@@ -65,8 +65,11 @@ module "common_api" {
     CLOUD_PROVIDER          = "AWS"
     DB_URL                  = local.db_url
     DB_RO_URL               = local.db_ro_url
+    READ_REPLICA_ENABLED    = "true"
     DB_PASSWORD_SECRET_NAME = data.aws_secretsmanager_secret.db_secret.name
     TASK_QUEUE              = "${var.project}_${terraform.workspace}_tasks"
+    CLIENT_ID               = module.common_auth.client_id
+    USER_POOL_ID            = module.common_auth.user_pool_id
   }
 }
 
@@ -100,7 +103,11 @@ module "common_tasks" {
     CLOUD_PROVIDER          = "AWS"
     DB_URL                  = local.db_url
     DB_RO_URL               = local.db_ro_url
+    READ_REPLICA_ENABLED    = "true"
     DB_PASSWORD_SECRET_NAME = data.aws_secretsmanager_secret.db_secret.name
+    TASK_QUEUE              = "${var.project}_${terraform.workspace}_tasks"
+    CLIENT_ID               = module.common_auth.client_id
+    USER_POOL_ID            = module.common_auth.user_pool_id
   }
 }
 
@@ -123,6 +130,8 @@ module "common_api_gateway" {
   api_subdomain         = local.api_subdomain
   project               = "common"
   cognito_user_pool_arn = module.common_auth.user_pool_arn
+  # Auth handled in api middleware
+  auth_enabled          = false
 }
 
 module "common_postgres" {

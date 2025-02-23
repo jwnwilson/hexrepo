@@ -135,6 +135,9 @@ module "{{cookiecutter.project_slug}}_api_gateway" {
   domain            = var.domain
   api_subdomain     = "{{cookiecutter.project_slug}}-${terraform.workspace}"
   project           = "{{cookiecutter.project_slug}}"
+  cognito_user_pool_arn = module.common_auth.user_pool_arn
+  # Auth handled in api middleware
+  auth_enabled          = false
 }
 
 {% if cookiecutter.use_db == "y" and cookiecutter.use_db_logic == "sql" %}
