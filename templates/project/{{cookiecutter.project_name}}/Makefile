@@ -139,6 +139,9 @@ tf_destroy:
 tf_refresh: tf_workspace
 	@cd infra/tf/aws/environment && terraform refresh
 
+tf_output: tf_workspace
+	@cd infra/tf/aws/environment && terraform output -json
+
 deploy: build tf_workspace
 	PROJECT={{cookiecutter.project_slug}} NO_INPUT=$(NO_INPUT) ENVIRONMENT=$(ENVIRONMENT) ../../tools/bash_scripts/deploy.sh 
 
