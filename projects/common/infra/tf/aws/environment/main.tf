@@ -45,6 +45,9 @@ resource "aws_secretsmanager_secret" "jwt_secret" {
 resource "aws_secretsmanager_secret_version" "jwt_secret" {
   secret_id = aws_secretsmanager_secret.jwt_secret.id
   secret_string = uuid()
+  lifecycle {
+    ignore_changes = [secret_string]
+  }
 }
 
 module "common_api" {

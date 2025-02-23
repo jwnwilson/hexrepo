@@ -38,6 +38,9 @@ Setup the following env vars directly or run:
 - Setup backend
     - Create common project
         - deploy common validate auth with read replica
+            - Verify api auth fix
+            - Verify read replica is working
+            - Verify auth user creation is working
         - Tests:
             - Create dynamic CRUD tests
                 - User, Group, Permission, Featureflag, Company CRUD

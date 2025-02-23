@@ -14,7 +14,7 @@ def get_sql_db_url_from_cloud_provider(cloud_provider: str, read_only: bool = Fa
         password_data: str = AWSSecretAdaptor().get_secret(
             config.DB_PASSWORD_SECRET_NAME
         )
-        password: str = json.loads(password_data)["password"]
+        password: str = password_data
         # url encode password to escape special characters
         password = quote(password)
         if read_only:
