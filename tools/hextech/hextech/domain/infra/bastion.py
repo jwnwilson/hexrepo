@@ -25,7 +25,12 @@ def bastion_ssh_tunnel(
             tags={"Type": "bastion", "Environment": env}
         )
         rds_host: str = rds_manageer.get_rds_host(
-            tags={"Project": project, "Environment": env}
+            tags={
+                "Project": project,
+                "Environment": env,
+                # ReadWrite is the master db
+                "ReadWrite": "ReadWrite"
+            }
         )
 
         if not instance_ids:

@@ -145,6 +145,8 @@ module "common_postgres" {
   vpc_id       = data.aws_vpc.hexrepo.id
   username     = "postgres"
   read_replica = true
+  start_time  = "09:00:00"
+  stop_time   = "17:00:00"
 }
 
 data "aws_secretsmanager_secret" "db_secret" {

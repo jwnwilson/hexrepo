@@ -165,6 +165,7 @@ module "db" {
     StartTime   = var.start_time
     StopTime    = var.stop_time
     Project     = var.project
+    ReadWrite   = "ReadWrite"
   }
 
 }
@@ -207,5 +208,6 @@ module "replica" {
     StartTime   = var.start_time
     StopTime    = var.stop_time
     Project     = var.project
+    ReadWrite   = "ReadOnly"
   }
 }
