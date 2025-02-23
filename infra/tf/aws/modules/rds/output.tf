@@ -1,5 +1,5 @@
 output "db_password_secret_arn" {
-  value = module.db.db_instance_master_user_secret_arn
+  value = aws_secretsmanager_secret.password.arn
 }
 
 output "db_instance_endpoint" {

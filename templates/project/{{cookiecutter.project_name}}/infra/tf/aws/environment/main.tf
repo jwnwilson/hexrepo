@@ -57,7 +57,7 @@ module "{{cookiecutter.project_slug}}_api" {
   docker_tag        = var.docker_tag
   vpc_id            = data.aws_vpc.hexrepo.id
   {% if (cookiecutter.cloud_provider == "aws" and cookiecutter.use_api == "y") %}
-  lambda_command    = ["src.app.interactor.aws.lambda_handler"]
+  lambda_command    = ["src.app.interactor.api.lambda_handler"]
   {% elif cookiecutter.cloud_provider == "aws" %}
   lambda_command    = ["src.app.interactor.event.lambda_handler"]
   {% else %}
@@ -85,6 +85,9 @@ module "{{cookiecutter.project_slug}}_api" {
     {% endif %}
     {% if cookiecutter.use_db == "y" and cookiecutter.use_db_logic == "nosql" %}
     DB_URL                      = ""
+    {% endif %}
+    {% if cookiecutter.use_task == "y" %}
+    TASK_QUEUE              = "${var.project}_${terraform.workspace}_tasks"
     {% endif %}
   }
 }
