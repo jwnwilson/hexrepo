@@ -40,3 +40,7 @@ variable "bucket" {
   type = string
   default = "*"
 }
+
+variable "jwt_secret" {
+  default = null
+}

@@ -51,8 +51,6 @@ resource "aws_secretsmanager_secret_version" "password" {
   secret_string = random_password.master.result
 }
 
-
-
 module "security_group" {
   source  = "terraform-aws-modules/security-group/aws"
   version = "~> 4"
