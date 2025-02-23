@@ -174,7 +174,7 @@ jobs:
       working-directory: ${{ matrix.project }}
       run: |
         make tf_init
-        make tf_apply
+        make tf_apply_no_input
     - name: DB migration
       if: steps.check_modified.outputs.skip == 'false'
       shell: bash
