@@ -69,7 +69,13 @@ def db_exists(
 ) -> bool:
     rds_manageer: AWSRDSManager = AWSRDSManager(config.cloud_provider_config)
     try:
-        rds_manageer.get_rds_host(tags={"Project": project, "Environment": env})
+        rds_manageer.get_rds_host(
+            tags={
+                "Project": project,
+                "Environment": env,
+                # ReadWrite is the master db
+                "ReadWrite": "ReadWrite"
+            })
     except IndexError:
         return False
     return True
