@@ -36,17 +36,19 @@ Setup the following env vars directly or run:
 # To Do
 
 - Setup backend
+    - Debug common services
+        - Create superuser command
+        - Verify api auth fix
+            - Fix auth on admin
+            - Debug slow api calls (suspect jwt url)
+        - Setup aws tracing
+        - Setup better logging
     - Create common project
-        - deploy common validate auth with read replica
-            - Verify api auth fix
-            - Verify read replica is working
-            - Verify auth user creation is working
         - Tests:
             - Create dynamic CRUD tests
                 - User, Group, Permission, Featureflag, Company CRUD
             - Test relationship CRUD logic (check create)
             - Test auth and permission logic
-        - Create superuser command
         - Authentication via fastapi middleware using jwt token + 
 dynamodb / api call for permissions?
             - Get user data with permissions via username from header or session
