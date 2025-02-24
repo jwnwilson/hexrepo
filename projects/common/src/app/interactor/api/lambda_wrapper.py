@@ -10,9 +10,6 @@ logging.getLogger().setLevel(logging.INFO)
 
 from .fastapi.main import app  # noqa
 
-# To plug into lambda
-# handler = Mangum(app, lifespan="off")
-
 @xray_recorder.capture('fastapi_request')
 def handler(event, context):
     if event.get("some-key"):

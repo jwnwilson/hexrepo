@@ -1,3 +1,4 @@
+from functools import lru_cache
 import logging
 from typing import Dict
 
@@ -12,6 +13,7 @@ class AWSSecretAdaptor(SecretAdaptor):
     def __init__(self) -> None:
         self.client = boto3.client("secretsmanager")
 
+    @lru_cache(maxsize=128)
     def get_secret(self, secret_name: str) -> str:
         logger.info(f"Getting secret: {secret_name}")
         try:

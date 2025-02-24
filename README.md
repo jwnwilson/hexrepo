@@ -42,9 +42,11 @@ Setup the following env vars directly or run:
             - Fix auth on admin
                 - disable logging middleware
                 - add print statement
-            - Debug slow api calls (suspect jwt url)
         - Setup aws tracing for performance debugging
+            - Fix slow secrets call
+            - Fix multiple DB calls and add test to catch this (maybe sonarqube?)
         - Setup better logging
+            - Pass correlation id from aws through to logging
     - Create common project
         - Tests:
             - Create dynamic CRUD tests
