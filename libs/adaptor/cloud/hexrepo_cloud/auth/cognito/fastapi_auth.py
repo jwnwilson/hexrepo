@@ -1,19 +1,21 @@
 from typing import Dict, List, Optional
 
 import requests
+from app.config import config
 from fastapi import HTTPException
-from fastapi.security.utils import get_authorization_scheme_param
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from fastapi.security.utils import get_authorization_scheme_param
 from jose import JWTError, jwk, jwt
 from jose.utils import base64url_decode
 from loguru import logger
 from pydantic import BaseModel
 from starlette.requests import Request
 from starlette.status import HTTP_403_FORBIDDEN
-from hexrepo_cloud.auth.interface import FastapiJWTMiddleware, JWTAuthorizationCredentials
 
-from app.config import config
-
+from hexrepo_cloud.auth.interface import (
+    FastapiJWTMiddleware,
+    JWTAuthorizationCredentials,
+)
 
 JWK = Dict[str, str]
 
@@ -37,7 +39,9 @@ class FastapiJWTCognitoMiddleware(FastapiJWTMiddleware, HTTPBearer):
             raise
         self.kid_to_jwk = {jwk["kid"]: jwk for jwk in self.jwks.keys}
 
-    def verify_jwk_credentials(self, jwt_credentials: JWTAuthorizationCredentials) -> bool:
+    def verify_jwk_credentials(
+        self, jwt_credentials: JWTAuthorizationCredentials
+    ) -> bool:
         try:
             public_key = self.kid_to_jwk[jwt_credentials.header["kid"]]
         except KeyError:
@@ -67,19 +71,17 @@ class FastapiJWTCognitoMiddleware(FastapiJWTMiddleware, HTTPBearer):
                 message=message,
             )
         except JWTError:
-            raise HTTPException(
-                status_code=HTTP_403_FORBIDDEN, detail="JWK invalid"
-            )
+            raise HTTPException(status_code=HTTP_403_FORBIDDEN, detail="JWK invalid")
 
         if not self.verify_jwk_credentials(jwt_credentials):
-            raise HTTPException(
-                status_code=HTTP_403_FORBIDDEN, detail="JWK invalid"
-            )
+            raise HTTPException(status_code=HTTP_403_FORBIDDEN, detail="JWK invalid")
 
         return jwt_credentials
 
     async def __call__(self, request: Request) -> Optional[JWTAuthorizationCredentials]:
-        authorization: Optional[str] = request.headers.get("Authorization") or request.session.get("token")
+        authorization: Optional[str] = request.headers.get(
+            "Authorization"
+        ) or request.session.get("token")
         scheme, credentials = get_authorization_scheme_param(authorization)
         if not (authorization and scheme and credentials):
             if self.auto_error:
@@ -96,12 +98,14 @@ class FastapiJWTCognitoMiddleware(FastapiJWTMiddleware, HTTPBearer):
                 )
             else:
                 return None
-        credentials = HTTPAuthorizationCredentials(scheme=scheme, credentials=credentials)
+        credentials = HTTPAuthorizationCredentials(
+            scheme=scheme, credentials=credentials
+        )
 
         if credentials:
             jwt_token = credentials.credentials
             return self.verify_jwt_token(jwt_token)
-        
+
         return None
 
 

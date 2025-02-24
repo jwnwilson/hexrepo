@@ -18,7 +18,9 @@ class Config(BaseSettings):
     environment: str = os.environ.get("environment", "dev")
 
     # Database settings
-    READ_REPLICA_ENABLED: bool = os.environ.get("READ_REPLICA_ENABLED", "false") == "true"
+    READ_REPLICA_ENABLED: bool = (
+        os.environ.get("READ_REPLICA_ENABLED", "false") == "true"
+    )
     DB_URL: str = os.environ["DB_URL"]
     DB_RO_URL: str = os.environ.get("DB_RO_URL", "")
     DB_PASSWORD_SECRET_NAME: str = os.environ.get("DB_PASSWORD_SECRET_NAME", "")
@@ -26,5 +28,6 @@ class Config(BaseSettings):
     DB_SSL_CONNECTION: bool = os.environ.get("DB_SSL_CONNECTION", "false") == "true"
     CLOUD_PROVIDER: str = os.environ.get("CLOUD_PROVIDER", "local")
     TESTING: bool = "pytest" in sys.argv[0]
+
 
 config = Config()

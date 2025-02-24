@@ -19,6 +19,7 @@ dependencies = [
     "psycopg2-binary<3.0.0,>=2.9.10",
     "boto3<2.0.0,>=1.35.66",
     "boto3-stubs[essential]<2.0.0,>=1.35.86",
+    "aws-xray-sdk>=2.14.0",
     "hexrepo-cloud",
     "hexrepo-db[sql]",
     "hexrepo-api",

@@ -14,7 +14,9 @@ from loguru._handler import Message
 LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO")
 LOG_JSON = True if os.environ.get("LOG_JSON") else False
 LOG_MULTIPROCESS = True if os.environ.get("LOG_MULTIPROCESS") else False
-LOG_TRIM_EXCEPTION = False if os.environ.get("LOG_TRIM_EXCEPTION", "").lower() == "false" else True
+LOG_TRIM_EXCEPTION = (
+    False if os.environ.get("LOG_TRIM_EXCEPTION", "").lower() == "false" else True
+)
 
 
 def serialize(record: Dict) -> str:

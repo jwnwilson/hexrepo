@@ -1,7 +1,7 @@
 import logging
 
+from aws_xray_sdk.core import patch_all, xray_recorder
 from mangum import Mangum
-from aws_xray_sdk.core import xray_recorder, patch_all
 
 patch_all()
 # Initialize you log configuration using the base class
@@ -10,13 +10,16 @@ logging.getLogger().setLevel(logging.INFO)
 
 from .main import app  # noqa
 
-@xray_recorder.capture('fastapi_request')
+
+@xray_recorder.capture("fastapi_request")
 def handler(event, context):
     if event.get("some-key"):
         # Do something or return, etc.
         return
 
     asgi_handler = Mangum(app, lifespan="off")
-    response = asgi_handler(event, context) # Call the instance with the event arguments
+    response = asgi_handler(
+        event, context
+    )  # Call the instance with the event arguments
 
     return response
