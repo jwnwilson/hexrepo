@@ -26,6 +26,8 @@ from ..interface import (
 class CognitoAuthAdapter(AuthAdapter):
     # Need to ad UOW to add users and modify groups and permissions
     def __init__(self, uow: Optional[UserUOW] = None):
+        if not config.CLIENT_ID or not config.JWT_SECRET:
+            raise ValueError("Missing client_id or jwt_secret config values")
         self.client_id: str = config.CLIENT_ID
         self.jwn_secret: str = config.JWT_SECRET
         self.cognito_client = boto3.client("cognito-idp", config.REGION)

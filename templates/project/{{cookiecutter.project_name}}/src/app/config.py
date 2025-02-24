@@ -25,8 +25,8 @@ class Config(BaseSettings):
     REGION: str = os.environ.get("REGION", "eu-west-1")
 
     # Auth settings
-    JWT_SECRET: str = os.environ["JWT_SECRET"]
-    ADMIN_SECRET: str = os.environ["ADMIN_SECRET"]
+    JWT_SECRET: str = os.environ.get("JWT_SECRET", "")
+    SESSION_SECRET: str = os.environ.get("SESSION_SECRET", "")
 
     # FEATURE FLAGS
 

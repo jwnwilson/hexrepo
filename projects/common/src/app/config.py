@@ -27,8 +27,8 @@ class Config(BaseSettings):
     REGION: str = os.environ.get("REGION", "eu-west-1")
 
     # Auth settings
-    JWT_SECRET: str = os.environ["JWT_SECRET"]
-    ADMIN_SECRET: str = os.environ["ADMIN_SECRET"]
+    JWT_SECRET: str = os.environ.get("JWT_SECRET", "")
+    SESSION_SECRET: str = os.environ["SESSION_SECRET"]
     # This needs to come from cognito
     CLIENT_ID: str = os.environ["CLIENT_ID"]
     USER_POOL_ID: str = os.environ["USER_POOL_ID"]
@@ -39,6 +39,7 @@ class Config(BaseSettings):
     )
     DB_PASSWORD_SECRET_NAME: str = os.environ.get("DB_PASSWORD_SECRET_NAME", "")
     DB_URL: str = os.environ["DB_URL"]
+    DB_RO_URL: str = os.environ.get("DB_RO_URL", "")
 
     DB_SQL_LOGGING: bool = os.environ.get("DB_SQL_LOGGING", "false") == "true"
     DB_SSL_CONNECTION: bool = os.environ.get("DB_SSL_CONNECTION", "false") == "true"

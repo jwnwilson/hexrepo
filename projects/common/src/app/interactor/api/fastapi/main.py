@@ -34,7 +34,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-app.add_middleware(SessionMiddleware, secret_key=config.ADMIN_SECRET, max_age=None)
+app.add_middleware(SessionMiddleware, secret_key=config.SESSION_SECRET, max_age=None)
 app.include_router(api_router_v1, prefix="/api/v1")
 
 setup_admin(app)

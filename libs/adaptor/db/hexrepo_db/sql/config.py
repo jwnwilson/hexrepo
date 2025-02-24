@@ -18,6 +18,8 @@ def get_sql_db_url_from_cloud_provider(cloud_provider: str, read_only: bool = Fa
         # url encode password to escape special characters
         password = quote(password)
         if read_only:
+            if not config.DB_RO_URL:
+                raise ValueError("DB_RO_URL env var not set")
             return config.DB_RO_URL.format(password=password)
         else:
             return config.DB_URL.format(password=password)
@@ -37,6 +39,8 @@ def get_sql_db_url(read_only: bool = False) -> str:
     else:
         logger.info("Using DB URL env var directly as running locally")
         if read_only:
+            if not config.DB_RO_URL:
+                raise ValueError("DB_RO_URL env var not set")
             return config.DB_RO_URL
         else:
             return config.DB_URL

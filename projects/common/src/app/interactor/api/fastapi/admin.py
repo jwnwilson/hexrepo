@@ -236,7 +236,7 @@ class AdminAuth(AuthenticationBackend):
 
 def setup_admin(app: FastAPI):
     engine = SqlUOW(db_url=config.DB_URL).session_manager._engine
-    authentication_backend: AdminAuth = AdminAuth(secret_key=config.ADMIN_SECRET)
+    authentication_backend: AdminAuth = AdminAuth(secret_key=config.SESSION_SECRET)
     admin: Admin = Admin(
         app,
         engine,

@@ -77,7 +77,7 @@ module "lambda" {
       ENVIRONMENT = var.environment
       LOG_JSON    = "true"
       JWT_SECRET  = var.jwt_secret != null ? var.jwt_secret : uuid()
-      ADMIN_SECRET  = var.jwt_secret != null ? var.jwt_secret : uuid()
+      SESSION_SECRET  = var.jwt_secret != null ? var.jwt_secret : uuid()
     },
     var.environment_variables,
   )
