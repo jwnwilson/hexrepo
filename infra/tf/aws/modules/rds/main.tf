@@ -34,7 +34,7 @@ data "aws_security_group" "selected" {
 ################################################################################
 # RDS Module
 ################################################################################
-resource "random_password" "master"{
+resource "random_password" "master" {
   length           = 16
   special          = true
   min_special      = 2
@@ -47,7 +47,7 @@ resource "aws_secretsmanager_secret" "password" {
 }
 
 resource "aws_secretsmanager_secret_version" "password" {
-  secret_id = aws_secretsmanager_secret.password.id
+  secret_id     = aws_secretsmanager_secret.password.id
   secret_string = random_password.master.result
 }
 
@@ -141,9 +141,9 @@ module "db" {
   # NOTE: Do NOT use 'user' as the value for 'username' as it throws:
   # "Error creating DB Instance: InvalidParameterValue: MasterUsername
   # user cannot be used as it is a reserved word used by the engine"
-  db_name                     = var.project
-  username                    = var.username
-  password                    = aws_secretsmanager_secret_version.password.secret_string
+  db_name  = var.project
+  username = var.username
+  password = aws_secretsmanager_secret_version.password.secret_string
   # This is not possible with read replica
   manage_master_user_password = false
   port                        = 5432
@@ -202,6 +202,7 @@ module "replica" {
   enabled_cloudwatch_logs_exports = ["postgresql", "upgrade"]
   deletion_protection             = var.deleteion_protection
   backup_retention_period         = 0
+  skip_final_snapshot             = true
 
   tags = {
     Environment = terraform.workspace

@@ -141,3 +141,6 @@ bastion: venv
 	@echo "Activating bastion port forwarding..."
 	cd ../../ && \
 	hextech bastion 
+
+create_superuser:
+	PYTHONPATH=src uv run python src/app/interactor/cli/create_superuser.py

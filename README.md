@@ -40,8 +40,10 @@ Setup the following env vars directly or run:
         - Create superuser command
         - Verify api auth fix
             - Fix auth on admin
+                - disable logging middleware
+                - add print statement
             - Debug slow api calls (suspect jwt url)
-        - Setup aws tracing
+        - Setup aws tracing for performance debugging
         - Setup better logging
     - Create common project
         - Tests:

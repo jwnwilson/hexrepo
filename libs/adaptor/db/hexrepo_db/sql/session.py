@@ -1,10 +1,10 @@
 import contextlib
 from typing import Any, Dict, Generator, Iterator, Optional
 
-import sqlalchemy
 from sqlalchemy import NullPool, create_engine, event
 from sqlalchemy.engine.base import Connection, Engine
 from sqlalchemy.orm import Session, sessionmaker
+from loguru import logger
 
 from hexrepo_db.config import config
 
@@ -44,7 +44,9 @@ class DatabaseSessionManager:
             self._engine_map[host] = create_engine(host, **self._engine_args)
             if read_only:
                 self._engine_map[host] = self._engine_map[host].execution_options(postgresql_readonly=True)
-
+        else:
+            logger.info(f"Reusing existing engine for {host}")
+        
         self._engine: Optional[Engine] = self._engine_map[host]
         self._sessionmaker: Optional[sessionmaker[Session]] = sessionmaker(
             autocommit=False, bind=self._engine

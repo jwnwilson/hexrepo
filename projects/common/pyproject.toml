@@ -26,6 +26,7 @@ dependencies = [
     "hexrepo-api",
     "hexrepo-task",
     "hexrepo-log",
+    "aws-xray-sdk>=2.14.0",
 ]
 
 [dependency-groups]

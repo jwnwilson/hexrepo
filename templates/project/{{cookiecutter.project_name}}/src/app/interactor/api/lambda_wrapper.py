@@ -9,4 +9,4 @@ logging.getLogger().setLevel(logging.INFO)
 from .fastapi.main import app  # noqa
 
 # To plug into lambda
-handler = Mangum(app)
+handler = Mangum(app, lifespan="off")
