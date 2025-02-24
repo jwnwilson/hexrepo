@@ -1,4 +1,4 @@
-"""DB migration
+"""Adding common indices to user table
 
 Revision ID: 98e865fe838b
 Revises: f2e5d57ed431
