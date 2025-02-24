@@ -38,12 +38,9 @@ Setup the following env vars directly or run:
 - Setup backend
     - Debug common services
         - Create superuser command
-        - Verify api auth fix
-            - Fix auth on admin
-                - disable logging middleware
-                - add print statement
+            - move to domain logic level
+            - Include cognito setup
         - Setup aws tracing for performance debugging
-            - Fix slow secrets call
             - Fix multiple DB calls and add test to catch this (maybe sonarqube?)
         - Setup better logging
             - Pass correlation id from aws through to logging
