@@ -2,8 +2,8 @@ from abc import ABC, abstractmethod
 from typing import Dict, Optional
 
 from fastapi import Request
-from pydantic import BaseModel
 from hexrepo_db.interface import UOW, Repository
+from pydantic import BaseModel
 
 
 class UserSignupDTO(BaseModel):
@@ -64,7 +64,9 @@ class JWTAuthorizationCredentials(BaseModel):
 
 
 class FastapiJWTMiddleware:
-    def verify_jwk_credentials(self, jwt_credentials: JWTAuthorizationCredentials) -> bool:
+    def verify_jwk_credentials(
+        self, jwt_credentials: JWTAuthorizationCredentials
+    ) -> bool:
         raise NotImplementedError
 
     def verify_jwt_token(self, jwt_token: str) -> JWTAuthorizationCredentials:

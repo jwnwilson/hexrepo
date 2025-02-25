@@ -198,7 +198,6 @@ class DynamoRepository(Repository):
         try:
             self.read(id)
             self.table.delete_item(Key={"id": str(id)})
-            print("here")
         except ClientError as err:
             msg: str = f"Couldn't delete record {id}. Error: {err}"
             logger.error(msg)

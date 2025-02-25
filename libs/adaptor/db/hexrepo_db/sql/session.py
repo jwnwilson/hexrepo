@@ -1,7 +1,7 @@
 import contextlib
 from typing import Any, Dict, Generator, Iterator, Optional
 
-import sqlalchemy
+from loguru import logger
 from sqlalchemy import NullPool, create_engine, event
 from sqlalchemy.engine.base import Connection, Engine
 from sqlalchemy.orm import Session, sessionmaker
@@ -12,8 +12,13 @@ from hexrepo_db.config import config
 class DatabaseSessionManager:
     _engine_map: Dict[str, Engine] = {}
 
-    def __init__(self, host: str, engine_args: Optional[Dict[str, Any]] = None, disable_connection_pool: bool = False,
-        read_only: bool = False,):
+    def __init__(
+        self,
+        host: str,
+        engine_args: Optional[Dict[str, Any]] = None,
+        disable_connection_pool: bool = False,
+        read_only: bool = False,
+    ):
         # By default enable connection pooling as this has significant performance benefits
         self._engine_args = engine_args or dict(
             future=True,
@@ -43,7 +48,11 @@ class DatabaseSessionManager:
         if host not in self._engine_map:
             self._engine_map[host] = create_engine(host, **self._engine_args)
             if read_only:
-                self._engine_map[host] = self._engine_map[host].execution_options(postgresql_readonly=True)
+                self._engine_map[host] = self._engine_map[host].execution_options(
+                    postgresql_readonly=True
+                )
+        else:
+            logger.info(f"Reusing existing engine for {host}")
 
         self._engine: Optional[Engine] = self._engine_map[host]
         self._sessionmaker: Optional[sessionmaker[Session]] = sessionmaker(

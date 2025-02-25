@@ -4,7 +4,7 @@ authors = [
 ]
 requires-python = "<4.0,>=3.12"
 name = "hexrepo_db"
-version = "0.1.14"
+version = "0.1.15"
 description = "A short description of the project"
 readme = "README.md"
 dependencies = [
@@ -13,6 +13,7 @@ dependencies = [
     "boto3<2.0.0,>=1.35.68",
     "boto3-stubs[essential]<2.0.0,>=1.35.86",
     "hexrepo-cloud",
+    "loguru>=0.7.3",
 ]
 
 [tool.uv.sources]

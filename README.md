@@ -36,33 +36,37 @@ Setup the following env vars directly or run:
 # To Do
 
 - Setup backend
+    - Debug common services
+        - Create superuser command
+            - move to domain logic level
+            - Include cognito setup / bastion
+        - Add better tracing for performance debugging
+            - profile endpoints check json parsing isn't slowing them down
+            - Fix multiple DB calls and add test to catch this (maybe sonarqube?)
+        - Setup better logging
+            - Pass correlation id from aws through to logging
     - Create common project
-        - deploy common validate auth with read replica
-            - Verify api auth fix
-            - Verify read replica is working
-            - Verify auth user creation is working
         - Tests:
             - Create dynamic CRUD tests
                 - User, Group, Permission, Featureflag, Company CRUD
             - Test relationship CRUD logic (check create)
             - Test auth and permission logic
-        - Create superuser command
-        - Authentication via fastapi middleware using jwt token + 
-dynamodb / api call for permissions?
+        - Authentication via fastapi middleware
             - Get user data with permissions via username from header or session
             - Create materialised view or cache in dynamodb for cheap serverless option?
-    - Remove sql from example project
+    - Disable example project
     - Move monitor / infra optimisation into common
         - Enable disable project via admin
-    - Setup simple FE with auth?
-        - Rename projects -> backend
-        - Create frontend folder
-        - Add turborepo with auth
     - Add monitoring dashboard for services
+        - Potentially use 3rd party service?
         - Load testing
         - Latency tracking and visualisation
         - Add log based event tracking
         - Setup BI dashboard
+    - Setup simple FE with auth?
+        - Rename projects -> backend
+        - Create frontend folder
+        - Add turborepo with auth
     - Create orchestrator / workflow project 
         - Investigate better fire and forget task setup like run 1 off ECS / GCP job with task status update?
         - 1 task table per hexrepo

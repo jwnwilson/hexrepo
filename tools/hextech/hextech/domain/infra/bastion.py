@@ -29,7 +29,7 @@ def bastion_ssh_tunnel(
                 "Project": project,
                 "Environment": env,
                 # ReadWrite is the master db
-                "ReadWrite": "ReadWrite"
+                "ReadWrite": "ReadWrite",
             }
         )
 
@@ -74,8 +74,9 @@ def db_exists(
                 "Project": project,
                 "Environment": env,
                 # ReadWrite is the master db
-                "ReadWrite": "ReadWrite"
-            })
+                "ReadWrite": "ReadWrite",
+            }
+        )
     except IndexError:
         return False
     return True

@@ -1,12 +1,25 @@
 import logging
 
+from aws_xray_sdk.core import patch_all, xray_recorder
 from mangum import Mangum
 
+patch_all()
 # Initialize you log configuration using the base class
 logging.basicConfig(level=logging.INFO)
 logging.getLogger().setLevel(logging.INFO)
 
 from .fastapi.main import app  # noqa
 
-# To plug into lambda
-handler = Mangum(app)
+
+@xray_recorder.capture("fastapi_request")
+def handler(event, context):
+    if event.get("some-key"):
+        # Do something or return, etc.
+        return
+
+    asgi_handler = Mangum(app, lifespan="off")
+    response = asgi_handler(
+        event, context
+    )  # Call the instance with the event arguments
+
+    return response

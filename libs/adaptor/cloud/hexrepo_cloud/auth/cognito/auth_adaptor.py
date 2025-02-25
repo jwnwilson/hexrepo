@@ -1,10 +1,9 @@
 from typing import Dict, Optional
 
-from app.domain.user import UserPermissionCreateDTO, UserPermissionDTO
 import boto3
-from loguru import logger
-
 from app.config import config
+from app.domain.user import UserPermissionCreateDTO
+from loguru import logger
 
 from ..exceptions import (
     InvalidPasswordException,
@@ -18,8 +17,8 @@ from ..interface import (
     UserDTO,
     UserLogin,
     UserSignupDTO,
+    UserUOW,
     UserVerifyDTO,
-    UserUOW
 )
 
 
@@ -109,7 +108,7 @@ class CognitoAuthAdapter(AuthAdapter):
         except Exception as e:
             logger.error(f"Error verifying user: {e}")
             raise e
-        
+
     def delete_user(self, user: UserDTO) -> None:
         try:
             self.cognito_client.admin_delete_user(

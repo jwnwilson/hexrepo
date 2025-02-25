@@ -1,11 +1,11 @@
 import inspect
 import json
 import logging
+import types
 from asyncio import sleep
 from contextlib import contextmanager
 from functools import wraps
 from inspect import signature
-import types
 from typing import Any, Callable, Dict, Generator, List, Optional, cast
 from uuid import UUID
 
@@ -283,7 +283,11 @@ class Dependency:
         return result
 
 
-def resolve_dependencies(func: Callable, top_level: bool = True, overrides: Optional[Dict[Callable, Callable]] = None) -> Callable:
+def resolve_dependencies(
+    func: Callable,
+    top_level: bool = True,
+    overrides: Optional[Dict[Callable, Callable]] = None,
+) -> Callable:
     """Run functions with dependencies and resolve them.
     E.G.:
 
@@ -300,6 +304,7 @@ def resolve_dependencies(func: Callable, top_level: bool = True, overrides: Opti
     """
     f_sig = inspect.signature(func)
     overrides = overrides or {}
+
     def load_overrides(dep: Dependency | Depends) -> None:
         # replace dependency with override for testing if needed
         if type(dep) is Dependency:
@@ -366,9 +371,11 @@ class TaskFuncWrapper:
     @property
     def __name__(self) -> str:
         return self.func.__name__
-    
+
     def __call__(self, *args, **kwargs) -> Any:
-        resolved_func = resolve_dependencies(self.func, overrides=self.dependency_overrides)
+        resolved_func = resolve_dependencies(
+            self.func, overrides=self.dependency_overrides
+        )
         return resolved_func(*args, **kwargs)
 
     def queue_task(self, **kwargs) -> TaskPromise:
