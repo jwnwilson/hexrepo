@@ -1,8 +1,10 @@
 from typing import Any, Dict, List, Optional
+from pydantic import BaseModel
 from uuid import UUID
+from loguru import logger
 
 from hexrepo_db.interface import PaginatedData
-from pydantic import BaseModel
+from hexrepo_cloud.auth.interface import AuthAdapter, UserSignupDTO
 
 from app.adaptor.db.interface import UOW
 
@@ -56,10 +58,50 @@ class FeatureFlagDTO(BaseModel):
     company_id: Optional[UUID] = None
 
 
-def get_user(uow: UOW, username: str) -> UserPermissionDTO:
-    user_data: PaginatedData[UserPermissionDTO] = uow.user.read_multi(
-        filters=dict(username=username)
-    )
-    if not user_data.results:
-        raise ValueError("User not found")
-    return user_data.results[0]
+class UserCreateDTO(BaseModel):
+    username: str
+    password: str
+    email: str
+    name: str
+
+
+# Create user class with link back to manager to do operations
+class UserManager():
+    def __init__(self, uow: UOW, auth: AuthAdapter):
+        self.uow: UOW = uow
+        self.auth: AuthAdapter = auth
+
+    def get_user(self, username: str) -> UserPermissionDTO:
+        user_data: PaginatedData[UserPermissionDTO] = self.uow.user.read_multi(
+            filters=dict(username=username)
+        )
+        if not user_data.results:
+            raise ValueError("User not found")
+        return user_data.results[0]
+
+
+    def create_user(self, user_dto: UserCreateDTO, superuser: bool=False) -> UserPermissionDTO:
+        self.auth.register(UserSignupDTO(
+            username=user_dto.username,
+            password=user_dto.password,
+            email=user_dto.email,
+            name=user_dto.name)
+        )
+        if superuser:
+            permissions: List[str] = ["superadmin"]
+        else:
+            permissions: List[str] = []
+        
+        user = self.uow.user.create(UserPermissionCreateDTO(
+            username=user_dto.username,
+            email=user_dto.email,
+            name=user_dto.name,
+            permissions=permissions,
+            groups=[],
+            verified=False,
+            company=None
+        ))
+        return user
+    
+    def resend_verification(self, username: str):
+        self.auth.send_verification_code(username)

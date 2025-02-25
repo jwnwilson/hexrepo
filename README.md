@@ -54,9 +54,9 @@ Setup the following env vars directly or run:
         - Authentication via fastapi middleware
             - Get user data with permissions via username from header or session
             - Create materialised view or cache in dynamodb for cheap serverless option?
-    - Disable example project
     - Move monitor / infra optimisation into common
         - Enable disable project via admin
+    - Disable example project
     - Add monitoring dashboard for services
         - Potentially use 3rd party service?
         - Load testing
@@ -95,6 +95,7 @@ Setup the following env vars directly or run:
         - Categorise PLP pages
         - Fan out and crawl web page PDP page contents
     - Setup command to run local against bastion db
+        - Can already do this with bastion command
     - Add ability to disable / destroy projects
     - Improve docker container builds
         - Reduce image size
