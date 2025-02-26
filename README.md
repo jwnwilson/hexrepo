@@ -39,7 +39,6 @@ Setup the following env vars directly or run:
     - Debug common services
         - Create superuser command
             - validate resolve dependency clean up logic 
-            - move to domain logic level
             - Include cognito setup / bastion
         - Add better tracing for performance debugging
             - profile endpoints check json parsing isn't slowing them down
@@ -53,6 +52,7 @@ Setup the following env vars directly or run:
             - Test relationship CRUD logic (check create)
             - Test auth and permission logic
         - Authentication via fastapi middleware
+            - Improve DB calls to make more performant
             - Get user data with permissions via username from header or session
             - Create materialised view or cache in dynamodb for cheap serverless option?
     - Move monitor / infra optimisation into common

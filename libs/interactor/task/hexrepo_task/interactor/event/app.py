@@ -1,11 +1,11 @@
 import inspect
 import json
 import logging
+import types
 from asyncio import sleep
 from contextlib import contextmanager
 from functools import wraps
 from inspect import signature
-import types
 from typing import Any, Callable, Dict, Generator, List, Optional, cast
 from uuid import UUID
 
@@ -269,7 +269,8 @@ class Dependency:
                 next(generator)
             except StopIteration:
                 pass
-        cls.generators = []
+        cls.generators.clear()
+        cls.cache.clear()
 
     def __call__(self, *args, **kwargs) -> Any:
         if self.func in Dependency.cache:
@@ -284,9 +285,15 @@ class Dependency:
         return result
 
 
-def resolve_dependencies(func: Callable | Dependency, top_level: bool = True, overrides: Optional[Dict[Callable, Callable]] = None) -> Callable:
+def resolve_dependencies(
+    func: Callable | Dependency,
+    top_level: bool = True,
+    overrides: Optional[Dict[Callable, Callable]] = None,
+) -> Callable:
     """Run functions with dependencies and resolve them.
     E.G.:
+    top_level: Used to mark this wrapper as root decorator to run clean up logic, avoids clean up in nested functions
+    overrides: Used to replace dependencies during testing
 
     @resolve_dependencies
     def my_func(id:str, get_uow: Dependency = Dependency(get_uow)) -> Any:
@@ -296,14 +303,13 @@ def resolve_dependencies(func: Callable | Dependency, top_level: bool = True, ov
 
     resolve_dependencies(my_func)(id)
 
-    top_level: Used to cleanup dependencies after function is run, avoids clean up in nested functions
-    overrides: Used to replace dependencies during testing
     """
     if type(func) is Dependency:
         f_sig = inspect.signature(func.func)
     else:
         f_sig = inspect.signature(func)
     overrides = overrides or {}
+
     def load_overrides(dep: Dependency) -> None:
         # replace dependency with override for testing if needed
         if dep.func in overrides:
@@ -319,7 +325,7 @@ def resolve_dependencies(func: Callable | Dependency, top_level: bool = True, ov
         for key, arg_v in bound.arguments.items():
             if type(arg_v) is Depends:
                 arg_v = Dependency(arg_v.dependency)
-            
+
             if type(arg_v) is Dependency:
                 load_overrides(arg_v)
                 dependencies.append(arg_v)
@@ -357,9 +363,11 @@ class TaskFuncWrapper:
     @property
     def __name__(self) -> str:
         return self.func.__name__
-    
+
     def __call__(self, *args, **kwargs) -> Any:
-        resolved_func = resolve_dependencies(self.func, overrides=self.dependency_overrides)
+        resolved_func = resolve_dependencies(
+            self.func, overrides=self.dependency_overrides
+        )
         return resolved_func(*args, **kwargs)
 
     def queue_task(self, **kwargs) -> TaskPromise:
