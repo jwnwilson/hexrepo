@@ -1,11 +1,11 @@
 import inspect
 import json
 import logging
-import types
 from asyncio import sleep
 from contextlib import contextmanager
 from functools import wraps
 from inspect import signature
+import types
 from typing import Any, Callable, Dict, Generator, List, Optional, cast
 from uuid import UUID
 
@@ -256,38 +256,35 @@ class TaskPromise:
 
 class Dependency:
     cache: Dict[Callable, Any] = {}
+    generators: List[Generator] = []
 
-    def __init__(self, func: Callable, use_cache: bool = True, top_level: bool = True):
+    def __init__(self, func: Callable, use_cache: bool = True):
         self.func = func
         self.use_cache: bool = use_cache
-        self.generator: Optional[Generator] = None
-        self.top_level: bool = top_level
 
-    def cleanup(self):
-        if self.generator and self.top_level:
+    @classmethod
+    def cleanup(cls):
+        for generator in cls.generators:
             try:
-                next(self.generator)
+                next(generator)
             except StopIteration:
                 pass
+        cls.generators = []
 
-    def __call__(self) -> Any:
+    def __call__(self, *args, **kwargs) -> Any:
         if self.func in Dependency.cache:
             return Dependency.cache[self.func]
 
-        result = self.func()
+        result = self.func(*args, **kwargs)
         if type(result) is types.GeneratorType:
-            self.generator = result
+            self.generators.append(result)
             result = next(result)
         if self.use_cache:
             Dependency.cache[self.func] = result
         return result
 
 
-def resolve_dependencies(
-    func: Callable,
-    top_level: bool = True,
-    overrides: Optional[Dict[Callable, Callable]] = None,
-) -> Callable:
+def resolve_dependencies(func: Callable | Dependency, top_level: bool = True, overrides: Optional[Dict[Callable, Callable]] = None) -> Callable:
     """Run functions with dependencies and resolve them.
     E.G.:
 
@@ -302,17 +299,15 @@ def resolve_dependencies(
     top_level: Used to cleanup dependencies after function is run, avoids clean up in nested functions
     overrides: Used to replace dependencies during testing
     """
-    f_sig = inspect.signature(func)
+    if type(func) is Dependency:
+        f_sig = inspect.signature(func.func)
+    else:
+        f_sig = inspect.signature(func)
     overrides = overrides or {}
-
-    def load_overrides(dep: Dependency | Depends) -> None:
+    def load_overrides(dep: Dependency) -> None:
         # replace dependency with override for testing if needed
-        if type(dep) is Dependency:
-            if dep.func in overrides:
-                dep.func = overrides[dep.func]
-        elif type(dep) is Depends:
-            if dep.dependency in overrides:
-                dep.dependency = overrides[dep.dependency]
+        if dep.func in overrides:
+            dep.func = overrides[dep.func]
 
     @wraps(func)
     def resolve_depends(*arg, **kwargs):
@@ -322,16 +317,14 @@ def resolve_dependencies(
 
         # resolve dependency function args and parse dicts into pydantic models
         for key, arg_v in bound.arguments.items():
-            load_overrides(arg_v)
+            if type(arg_v) is Depends:
+                arg_v = Dependency(arg_v.dependency)
+            
             if type(arg_v) is Dependency:
+                load_overrides(arg_v)
                 dependencies.append(arg_v)
                 bound.arguments[key] = resolve_dependencies(
                     arg_v, top_level=False, overrides=overrides
-                )()
-            elif type(arg_v) is Depends:
-                dependencies.append(arg_v.dependency)
-                bound.arguments[key] = resolve_dependencies(
-                    arg_v.dependency, top_level=False, overrides=overrides
                 )()
             # parse pydantic models
             elif BaseModel in inspect.getmro(
@@ -342,14 +335,7 @@ def resolve_dependencies(
         result = func(*bound.args, **bound.kwargs)
 
         if top_level:
-            for dep in dependencies:
-                if isinstance(dep, Dependency):
-                    dep.cleanup()
-                elif isinstance(dep, Generator):
-                    try:
-                        next(dep)
-                    except StopIteration:
-                        pass
+            Dependency.cleanup()
 
         return result
 
@@ -371,11 +357,9 @@ class TaskFuncWrapper:
     @property
     def __name__(self) -> str:
         return self.func.__name__
-
+    
     def __call__(self, *args, **kwargs) -> Any:
-        resolved_func = resolve_dependencies(
-            self.func, overrides=self.dependency_overrides
-        )
+        resolved_func = resolve_dependencies(self.func, overrides=self.dependency_overrides)
         return resolved_func(*args, **kwargs)
 
     def queue_task(self, **kwargs) -> TaskPromise:

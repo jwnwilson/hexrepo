@@ -38,6 +38,7 @@ Setup the following env vars directly or run:
 - Setup backend
     - Debug common services
         - Create superuser command
+            - validate resolve dependency clean up logic 
             - move to domain logic level
             - Include cognito setup / bastion
         - Add better tracing for performance debugging
