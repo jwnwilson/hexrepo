@@ -59,6 +59,7 @@ Setup the following env vars directly or run:
         - Enable disable project via admin
     - Disable example project
     - Add monitoring dashboard for services
+        - Generic change log
         - Potentially use 3rd party service?
         - Load testing
         - Latency tracking and visualisation
