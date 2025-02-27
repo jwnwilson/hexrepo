@@ -38,7 +38,7 @@ Setup the following env vars directly or run:
 - Setup backend
     - Debug common services
         - Create superuser command
-            - validate resolve dependency clean up logic 
+            - Test resolve deps with async logic or work around with context manager (potentially use conext manager)
             - Include cognito setup / bastion
         - Add better tracing for performance debugging
             - profile endpoints check json parsing isn't slowing them down
