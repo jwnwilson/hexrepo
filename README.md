@@ -37,14 +37,15 @@ Setup the following env vars directly or run:
 
 - Setup backend
     - Debug common services
+        - Test resolve deps with async logic or work around with context manager (potentially use conext manager)
         - Create superuser command
-            - Test resolve deps with async logic or work around with context manager (potentially use conext manager)
             - Include cognito setup / bastion
         - Add better tracing for performance debugging
             - profile endpoints check json parsing isn't slowing them down
             - Fix multiple DB calls and add test to catch this (maybe sonarqube?)
         - Setup better logging
             - Pass correlation id from aws through to logging
+            - Make logs readable in AWS
     - Create common project
         - Tests:
             - Create dynamic CRUD tests
