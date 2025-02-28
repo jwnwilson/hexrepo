@@ -47,6 +47,8 @@ Setup the following env vars directly or run:
             - Pass correlation id from aws through to logging
             - Make logs readable in AWS
     - Create common project
+        - ability to enable version control + versions endpoint
+            https://sqlalchemy-continuum.readthedocs.io/en/latest/
         - Tests:
             - Create dynamic CRUD tests
                 - User, Group, Permission, Featureflag, Company CRUD
