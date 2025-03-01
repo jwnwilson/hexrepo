@@ -69,18 +69,19 @@ class DefaultQuery(Query):
     def update_relationships(
         self, db_obj: Union[Row[Any], BaseSQLModel], dto: ModelDTO, create: bool = False
     ) -> Row[Any] | BaseSQLModel:
-        # logic to update FK relationships during update logic
+        # logic to update FK relationships during update & create logic
         # Find intrumentedLists
         relationships: List[str] = [
             attr
             for attr in dir(db_obj)
             if getattr(db_obj, attr).__class__.__name__ == "InstrumentedList"
         ]
-        # For each instrumentedList check for diff against dto
+        # For each instrumentedList check for diff against dto if updating
+        # if this is a create operation then create new relationships
         for relationship in relationships:
             # If diff, update relationship
             dto_ids: List[str] = [str(r["id"]) for r in getattr(dto, relationship)]
-            # If creating, no need to check for diff
+            # If creating, set empty list
             if create:
                 db_ids: List[str] = []
             else:
