@@ -205,7 +205,6 @@ class SQLRepository(Repository):
 
     def create(self, obj_in: ModelDTO) -> BaseModel:
         db_obj: Any = self.query.parse_dto(obj_in)
-        breakpoint()
         self.query.update_relationships(db_obj, obj_in, create=True)
         try:
             self.session.add(db_obj)

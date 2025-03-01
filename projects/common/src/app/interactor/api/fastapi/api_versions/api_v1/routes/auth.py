@@ -44,7 +44,7 @@ def login(user: UserLogin, auth: AuthAdapter = Depends(get_auth)) -> JSONRespons
     try:
         response = {"access_token": auth.login(user)}
     except AuthException:
-        raise HTTPException(status_code=403, detail="Invalid username or password")
+        raise HTTPException(status_code=403, detail="Invalid username, password or unverified account")
     return JSONResponse(
         content=response,
         status_code=status.HTTP_200_OK,

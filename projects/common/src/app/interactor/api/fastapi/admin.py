@@ -202,7 +202,7 @@ class AdminAuth(AuthenticationBackend):
                 UserLogin(username=username, password=password)
             )
         except Exception:
-            raise HTTPException(status_code=403, detail="Invalid username or password")
+            raise HTTPException(status_code=403, detail="Invalid username, password or unverified account")
         # And update session
         request.session.update(
             {

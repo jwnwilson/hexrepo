@@ -40,7 +40,7 @@ Setup the following env vars directly or run:
         - ability to enable version control + versions endpoint
             https://sqlalchemy-continuum.readthedocs.io/en/latest/
         - Create superuser command
-            - Include cognito setup / bastion
+            - Ability to run against environment
         - Add better tracing for performance debugging
             - profile endpoints check json parsing isn't slowing them down
             - Fix multiple DB calls and add test to catch this (maybe sonarqube?)
