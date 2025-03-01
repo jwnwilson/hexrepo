@@ -11,6 +11,7 @@ from uuid import UUID
 
 from fastapi.params import Depends
 from pydantic import BaseModel
+from asgiref.sync import sync_to_async
 
 from hexrepo_task.exception import DuplicateTaskName, TaskNotFound
 
@@ -287,12 +288,10 @@ class Dependency:
 
 def resolve_dependencies(
     func: Callable | Dependency,
-    top_level: bool = True,
     overrides: Optional[Dict[Callable, Callable]] = None,
 ) -> Callable:
     """Run functions with dependencies and resolve them.
     E.G.:
-    top_level: Used to mark this wrapper as root decorator to run clean up logic, avoids clean up in nested functions
     overrides: Used to replace dependencies during testing
 
     @resolve_dependencies
@@ -306,17 +305,18 @@ def resolve_dependencies(
     """
     if type(func) is Dependency:
         f_sig = inspect.signature(func.func)
+        cleanup: bool = False
     else:
         f_sig = inspect.signature(func)
+        cleanup: bool = True
     overrides = overrides or {}
 
-    def load_overrides(dep: Dependency) -> None:
-        # replace dependency with override for testing if needed
-        if dep.func in overrides:
-            dep.func = overrides[dep.func]
-
-    @wraps(func)
-    def resolve_depends(*arg, **kwargs):
+    def resolve_dependency_args(*arg, **kwargs):
+        def load_overrides(dep: Dependency) -> None:
+            # replace dependency with override for testing if needed
+            if dep.func in overrides:
+                dep.func = overrides[dep.func]
+        
         bound = f_sig.bind(*arg, **kwargs)
         bound.apply_defaults()
         dependencies: List[Dependency] = []
@@ -330,22 +330,36 @@ def resolve_dependencies(
                 load_overrides(arg_v)
                 dependencies.append(arg_v)
                 bound.arguments[key] = resolve_dependencies(
-                    arg_v, top_level=False, overrides=overrides
+                    arg_v, overrides=overrides
                 )()
             # parse pydantic models
             elif BaseModel in inspect.getmro(
                 f_sig.parameters[key].annotation
             ) and isinstance(arg_v, dict):
                 bound.arguments[key] = f_sig.parameters[key].annotation(**arg_v)
-
+        return bound
+    
+    @wraps(func)
+    def resolve_dependencies_wrapper(*arg, **kwargs):
+        bound = resolve_dependency_args(*arg, **kwargs)
         result = func(*bound.args, **bound.kwargs)
-
-        if top_level:
+        if cleanup:
             Dependency.cleanup()
 
         return result
+    
+    @wraps(func)
+    async def resolve_dependencies_wrapper_async(*arg, **kwargs):
+        bound = resolve_dependency_args(*arg, **kwargs)
+        result = await func(*bound.args, **bound.kwargs)
+        Dependency.cleanup()
 
-    return resolve_depends
+        return result
+
+    if inspect.iscoroutinefunction(func):
+        return resolve_dependencies_wrapper_async
+    else:
+        return resolve_dependencies_wrapper
 
 
 class TaskFuncWrapper:
