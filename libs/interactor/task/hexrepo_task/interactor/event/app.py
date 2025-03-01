@@ -11,7 +11,6 @@ from uuid import UUID
 
 from fastapi.params import Depends
 from pydantic import BaseModel
-from asgiref.sync import sync_to_async
 
 from hexrepo_task.exception import DuplicateTaskName, TaskNotFound
 

@@ -28,7 +28,6 @@ dependencies = [
     "hexrepo-api",
     "hexrepo-task",
     "hexrepo-log",
-    "asgiref>=3.8.1",
 ]
 
 [dependency-groups]
