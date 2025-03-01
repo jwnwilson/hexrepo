@@ -37,7 +37,8 @@ Setup the following env vars directly or run:
 
 - Setup backend
     - Debug common services
-        - Test resolve deps with async logic or work around with context manager (potentially use conext manager)
+        - ability to enable version control + versions endpoint
+            https://sqlalchemy-continuum.readthedocs.io/en/latest/
         - Create superuser command
             - Include cognito setup / bastion
         - Add better tracing for performance debugging
@@ -56,8 +57,6 @@ Setup the following env vars directly or run:
             - Improve DB calls to make more performant
             - Get user data with permissions via username from header or session
             - Create materialised view or cache in dynamodb for cheap serverless option?
-        - ability to enable version control + versions endpoint
-            https://sqlalchemy-continuum.readthedocs.io/en/latest/
     - Move monitor / infra optimisation into common
         - Enable disable project via admin
     - Disable example project

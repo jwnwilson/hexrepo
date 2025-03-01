@@ -67,7 +67,7 @@ class DefaultQuery(Query):
         return db_obj
 
     def update_relationships(
-        self, db_obj: Union[Row[Any], BaseSQLModel], dto: ModelDTO
+        self, db_obj: Union[Row[Any], BaseSQLModel], dto: ModelDTO, create: bool = False
     ) -> Row[Any] | BaseSQLModel:
         # logic to update FK relationships during update logic
         # Find intrumentedLists
@@ -80,7 +80,11 @@ class DefaultQuery(Query):
         for relationship in relationships:
             # If diff, update relationship
             dto_ids: List[str] = [str(r["id"]) for r in getattr(dto, relationship)]
-            db_ids: List[str] = [str(r.id) for r in getattr(db_obj, relationship)]
+            # If creating, no need to check for diff
+            if create:
+                db_ids: List[str] = []
+            else:
+                db_ids: List[str] = [str(r.id) for r in getattr(db_obj, relationship)]
             id_diff: bool = set(db_ids) != set(dto_ids)
             if id_diff:
                 # Get relationship table
@@ -201,6 +205,8 @@ class SQLRepository(Repository):
 
     def create(self, obj_in: ModelDTO) -> BaseModel:
         db_obj: Any = self.query.parse_dto(obj_in)
+        breakpoint()
+        self.query.update_relationships(db_obj, obj_in, create=True)
         try:
             self.session.add(db_obj)
             self.session.flush()

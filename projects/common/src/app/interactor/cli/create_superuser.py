@@ -1,4 +1,4 @@
-from hexrepo_task.interactor.event.app import resolve_dependencies
+from hexrepo_task.interactor.event.app import Dependency, resolve_dependencies
 
 from app.domain.user import UserCreateDTO, UserManager, UserPermissionDTO
 from app.interactor.dependencies import get_user_manager
@@ -6,7 +6,7 @@ from app.interactor.dependencies import get_user_manager
 
 @resolve_dependencies
 def create_superuser_cli(
-    username: str, email: str, password: str, name:str, user_manager: UserManager = get_user_manager()
+    username: str, email: str, password: str, name:str, user_manager: UserManager = Dependency(get_user_manager)
 ):
     """
     Create superuser CLI
@@ -27,8 +27,9 @@ def create_superuser_cli(
 
 
 if __name__ == "__main__":
-    username: str = input("Enter username")
-    email: str = input("Enter email")
-    password: str = input("Enter password")
+    username: str = input("Enter username:\n")
+    name: str = input("Enter name:\n")
+    email: str = input("Enter email:\n")
+    password: str = input("Enter password:\n")
 
-    create_superuser_cli(username=username, email=email, password=password)
+    create_superuser_cli(username=username, email=email, password=password, name=name)

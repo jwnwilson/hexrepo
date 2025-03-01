@@ -47,6 +47,10 @@ class PermissionDTO(BaseModel):
     groups: List[Dict[str, Any]]
 
 
+class PermissionCreateDTO(BaseModel):
+    name: str
+
+
 class CompanyDTO(BaseModel):
     name: str
     website: str
@@ -65,11 +69,28 @@ class UserCreateDTO(BaseModel):
     name: str
 
 
+class PerrmissionManager():
+    def __init__(self, uow: UOW):
+        self.uow: UOW = uow
+
+    def create_default_permissions(self) -> None:
+        permission_list: List[str] = [
+            "superadmin",
+            "admin",
+            "user"
+        ]
+        for permission in permission_list:
+            self.uow.permission.create(PermissionCreateDTO(
+                name=permission,
+            ))
+
+
 # Create user class with link back to manager to do operations
 class UserManager():
     def __init__(self, uow: UOW, auth: AuthAdapter):
         self.uow: UOW = uow
         self.auth: AuthAdapter = auth
+        self.permission_manager: PerrmissionManager = PerrmissionManager(uow)
 
     def get_user(self, username: str) -> UserPermissionDTO:
         user_data: PaginatedData[UserPermissionDTO] = self.uow.user.read_multi(
@@ -81,24 +102,33 @@ class UserManager():
 
 
     def create_user(self, user_dto: UserCreateDTO, superuser: bool=False) -> UserPermissionDTO:
-        self.auth.register(UserSignupDTO(
-            username=user_dto.username,
-            password=user_dto.password,
-            email=user_dto.email,
-            name=user_dto.name)
-        )
+        # self.auth.register(UserSignupDTO(
+        #     username=user_dto.username,
+        #     password=user_dto.password,
+        #     email=user_dto.email,
+        #     name=user_dto.name)
+        # )
         if superuser:
-            permissions: List[str] = ["superadmin"]
+            try:
+                superuser_permission: PermissionDTO = self.uow.permission.read_multi(filters=dict(name="superadmin")).results[0]
+            except IndexError:
+                logger.error("Superadmin permission not found")
+            permissions: List[str] = [
+                {
+                    "id": superuser_permission.id
+                }
+            ]
         else:
             permissions: List[str] = []
         
+        breakpoint()
         user = self.uow.user.create(UserPermissionCreateDTO(
             username=user_dto.username,
             email=user_dto.email,
             name=user_dto.name,
             permissions=permissions,
             groups=[],
-            verified=False,
+            verified=True,
             company=None
         ))
         return user
