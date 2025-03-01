@@ -11,6 +11,7 @@ dependencies = [
     "python-jose>=3.3.0",
     "itsdangerous>=2.2.0",
     "sqladmin>=0.20.1",
+    "sqlalchemy-continuum>=1.4.2",
     "fastapi>=0.115.8",
     "uvicorn<1.0.0,>=0.32.0",
     "gevent<25.0.0,>=24.10.3",
@@ -27,6 +28,7 @@ dependencies = [
     "hexrepo-api",
     "hexrepo-task",
     "hexrepo-log",
+    "asgiref>=3.8.1",
 ]
 
 [dependency-groups]

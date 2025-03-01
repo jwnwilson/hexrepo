@@ -47,8 +47,6 @@ Setup the following env vars directly or run:
             - Pass correlation id from aws through to logging
             - Make logs readable in AWS
     - Create common project
-        - ability to enable version control + versions endpoint
-            https://sqlalchemy-continuum.readthedocs.io/en/latest/
         - Tests:
             - Create dynamic CRUD tests
                 - User, Group, Permission, Featureflag, Company CRUD
@@ -58,6 +56,8 @@ Setup the following env vars directly or run:
             - Improve DB calls to make more performant
             - Get user data with permissions via username from header or session
             - Create materialised view or cache in dynamodb for cheap serverless option?
+        - ability to enable version control + versions endpoint
+            https://sqlalchemy-continuum.readthedocs.io/en/latest/
     - Move monitor / infra optimisation into common
         - Enable disable project via admin
     - Disable example project

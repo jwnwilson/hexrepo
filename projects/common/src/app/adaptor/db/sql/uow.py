@@ -1,4 +1,8 @@
+from sqlalchemy_continuum import make_versioned
+from sqlalchemy.orm import configure_mappers
 from hexrepo_db.sql import BaseSqlUOW
+
+make_versioned(user_cls=None)
 
 from .models.company import CompanyRepository
 from .models.feature_flag import FeatureFlagRepository
@@ -6,6 +10,7 @@ from .models.group import GroupRepository
 from .models.permission import PermissionRepository
 from .models.user import UserRepository
 
+configure_mappers()
 
 class SqlUOW(BaseSqlUOW):
     @property

@@ -44,6 +44,15 @@ wheels = [
 ]
 
 [[package]]
+name = "asgiref"
+version = "3.8.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/29/38/b3395cc9ad1b56d2ddac9970bc8f4141312dbaec28bc7c218b0dfafd0f42/asgiref-3.8.1.tar.gz", hash = "sha256:c343bd80a0bec947a9860adb4c432ffa7db769836c64238fc34bdc3fec84d590", size = 35186 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/39/e3/893e8757be2612e6c266d9bb58ad2e3651524b5b40cf56761e985a28b13e/asgiref-3.8.1-py3-none-any.whl", hash = "sha256:3e1e3ecc849832fe52ccf2cb6686b7a55f82bb1d6aee72a58826471390335e47", size = 23828 },
+]
+
+[[package]]
 name = "aws-xray-sdk"
 version = "2.14.0"
 source = { registry = "https://pypi.org/simple" }
@@ -271,6 +280,7 @@ version = "0.1.0"
 source = { editable = "." }
 dependencies = [
     { name = "alembic" },
+    { name = "asgiref" },
     { name = "aws-xray-sdk" },
     { name = "boto3" },
     { name = "boto3-stubs", extra = ["essential"] },
@@ -288,6 +298,7 @@ dependencies = [
     { name = "python-jose" },
     { name = "requests" },
     { name = "sqladmin" },
+    { name = "sqlalchemy-continuum" },
     { name = "uvicorn" },
 ]
 
@@ -311,6 +322,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "alembic", specifier = ">=1.13.3,<2.0.0" },
+    { name = "asgiref", specifier = ">=3.8.1" },
     { name = "aws-xray-sdk", specifier = ">=2.14.0" },
     { name = "boto3", specifier = ">=1.35.66,<2.0.0" },
     { name = "boto3-stubs", extras = ["essential"], specifier = ">=1.35.86,<2.0.0" },
@@ -328,6 +340,7 @@ requires-dist = [
     { name = "python-jose", specifier = ">=3.3.0" },
     { name = "requests", specifier = ">=2.32.3,<3.0.0" },
     { name = "sqladmin", specifier = ">=0.20.1" },
+    { name = "sqlalchemy-continuum", specifier = ">=1.4.2" },
     { name = "uvicorn", specifier = ">=0.32.0,<1.0.0" },
 ]
 
@@ -1561,6 +1574,31 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/b6/04/fcdd103b6871f2110460b8275d1c4828daa806997b0fa5a01c1cd7fd522d/SQLAlchemy-2.0.37-cp313-cp313-win32.whl", hash = "sha256:293f9ade06b2e68dd03cfb14d49202fac47b7bb94bffcff174568c951fbc7af2", size = 2070746 },
     { url = "https://files.pythonhosted.org/packages/d4/7c/e024719205bdc1465b7b7d3d22ece8e1ad57bc7d76ef6ed78bb5f812634a/SQLAlchemy-2.0.37-cp313-cp313-win_amd64.whl", hash = "sha256:d70f53a0646cc418ca4853da57cf3ddddbccb8c98406791f24426f2dd77fd0e2", size = 2094612 },
     { url = "https://files.pythonhosted.org/packages/3b/36/59cc97c365f2f79ac9f3f51446cae56dfd82c4f2dd98497e6be6de20fb91/SQLAlchemy-2.0.37-py3-none-any.whl", hash = "sha256:a8998bf9f8658bd3839cbc44ddbe982955641863da0c1efe5b00c1ab4f5c16b1", size = 1894113 },
+]
+
+[[package]]
+name = "sqlalchemy-continuum"
+version = "1.4.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "sqlalchemy" },
+    { name = "sqlalchemy-utils" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/05/81/76e0b16ca8575463ba83e014afe8a89443bbc6a896dad3c48068ce571611/sqlalchemy_continuum-1.4.2.tar.gz", hash = "sha256:0fd2be79f718eda47c2206879d92ec4ebf1889364637b3caf3ee5d34bd19c8e3", size = 81713 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/84/d4/c404ce46dc2d53e536f470e76d7f657de46cf091d5ba05d19040d420d825/SQLAlchemy_Continuum-1.4.2-py3-none-any.whl", hash = "sha256:154588d79deb8b1683b5f39c130e6f0ad793c0b2f27e8c210565c23fb6fe74de", size = 44789 },
+]
+
+[[package]]
+name = "sqlalchemy-utils"
+version = "0.41.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "sqlalchemy" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/4d/bf/abfd5474cdd89ddd36dbbde9c6efba16bfa7f5448913eba946fed14729da/SQLAlchemy-Utils-0.41.2.tar.gz", hash = "sha256:bc599c8c3b3319e53ce6c5c3c471120bd325d0071fb6f38a10e924e3d07b9990", size = 138017 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/d5/f0/dc4757b83ac1ab853cf222df8535ed73973e0c203d983982ba7b8bc60508/SQLAlchemy_Utils-0.41.2-py3-none-any.whl", hash = "sha256:85cf3842da2bf060760f955f8467b87983fb2e30f1764fd0e24a48307dc8ec6e", size = 93083 },
 ]
 
 [[package]]
