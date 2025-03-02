@@ -38,7 +38,9 @@ Setup the following env vars directly or run:
 - Setup backend
     - Debug common services
         - Setup command to run local against bastion db
-            - Can already do this with bastion command
+            - CLI prompt for env
+            - Update bastion logic to use db secret and find it with password string substituting env var.
+            - Run bastion command
             - Create superuser command
         - Add better tracing for performance debugging
             - profile endpoints check json parsing isn't slowing them down
@@ -47,6 +49,7 @@ Setup the following env vars directly or run:
             - Pass correlation id from aws through to logging
             - Make logs readable in AWS
     - Create common project
+        - Add auth register command to admin create user function
         - Tests:
             - Create dynamic CRUD tests
                 - User, Group, Permission, Featureflag, Company CRUD

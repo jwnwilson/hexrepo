@@ -37,6 +37,7 @@ class Config(BaseSettings):
     API_PREFIX: str = "/api/v1"
     host: str = "0.0.0.0"
     port: int = 8000
+    TRACING_ENABLED: bool = os.environ.get("TRACING_ENABLED", "false") == "true"
 
     ALLOWED_ORIGINS: str = os.environ.get("ALLOWED_ORIGINS", "localhost")
 

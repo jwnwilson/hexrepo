@@ -1,4 +1,4 @@
-"""DB migration
+"""Adding permisisons to users and groups
 
 Revision ID: 509c390208a5
 Revises: ef803cb00ba1

@@ -1,4 +1,4 @@
-"""DB migration
+"""Adding permisisons versioning
 
 Revision ID: ef803cb00ba1
 Revises: 98e865fe838b

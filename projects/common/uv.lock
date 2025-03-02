@@ -669,7 +669,7 @@ dev = [
 
 [[package]]
 name = "hexrepo-db"
-version = "0.1.15"
+version = "0.1.16"
 source = { editable = "../../libs/adaptor/db" }
 dependencies = [
     { name = "boto3" },
@@ -738,7 +738,7 @@ dev = [
 
 [[package]]
 name = "hexrepo-task"
-version = "0.1.9"
+version = "0.1.10"
 source = { editable = "../../libs/interactor/task" }
 dependencies = [
     { name = "fastapi" },
