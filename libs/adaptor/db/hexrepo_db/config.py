@@ -15,7 +15,7 @@ class Config(BaseSettings):
     with environment variables.
     """
 
-    environment: str = os.environ.get("environment", "dev")
+    ENVIRONMENT: str = os.environ.get("environment", "dev")
 
     # Database settings
     READ_REPLICA_ENABLED: bool = (
@@ -23,7 +23,9 @@ class Config(BaseSettings):
     )
     DB_URL: str = os.environ["DB_URL"]
     DB_RO_URL: str = os.environ.get("DB_RO_URL", "")
-    DB_PASSWORD_SECRET_NAME: str = os.environ.get("DB_PASSWORD_SECRET_NAME", "")
+    @property
+    def DB_PASSWORD_SECRET_NAME(self) -> str:
+        return os.environ.get("DB_PASSWORD_SECRET_NAME", "").format(env=self.ENVIRONMENT)
     DB_SQL_LOGGING: bool = os.environ.get("DB_SQL_LOGGING", "false") == "true"
     DB_SSL_CONNECTION: bool = os.environ.get("DB_SSL_CONNECTION", "false") == "true"
     CLOUD_PROVIDER: str = os.environ.get("CLOUD_PROVIDER", "local")
