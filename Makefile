@@ -78,11 +78,11 @@ lint: hextech
 
 deploy_projects: hextech
 	@echo "Deploying projects..."
-	hextech deploy-projects $(ENV) --no-input
+	hextech deploy-projects $(ENV) --no-input --projects=$(PROJECT)
 
 deploy_projects_check_modified: hextech
 	@echo "Deploying projects..."
-	hextech deploy-projects $(ENV) --check-modified --no-input
+	hextech deploy-projects $(ENV) --check-modified --no-input --projects=$(PROJECT)
 
 deploy_libs: hextech
 	@echo "Deploying libraries..."
