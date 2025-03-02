@@ -85,7 +85,6 @@ class PerrmissionManager:
                 )
         except IntegrityError:
             logger.warning("Permissions already created")
-            
 
 
 # Create user class with link back to manager to do operations
@@ -106,11 +105,13 @@ class UserManager:
     def create_user(
         self, user_dto: UserCreateDTO, superuser: bool = False
     ) -> UserPermissionDTO:
-        self.auth.register(UserSignupDTO(
-            username=user_dto.username,
-            password=user_dto.password,
-            email=user_dto.email,
-            name=user_dto.name)
+        self.auth.register(
+            UserSignupDTO(
+                username=user_dto.username,
+                password=user_dto.password,
+                email=user_dto.email,
+                name=user_dto.name,
+            )
         )
         if superuser:
             try:

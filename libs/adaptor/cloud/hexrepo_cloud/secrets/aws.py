@@ -1,5 +1,6 @@
 import logging
-from functools import lru_cache
+import os
+from functools import wraps
 from typing import Dict
 
 import boto3
@@ -9,11 +10,29 @@ from .interface import SecretAdaptor
 logger = logging.getLogger(__name__)
 
 
+def aws_secret_cache(func):
+    # In aws lambda we can cache data across requests for multiple calls in /tmp
+    # This is the cheapest way to cache data in AWS Lambda
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        # hash the function name and the arguments to create a unique key
+        key = f"{func.__name__}-{hash(args)}- {hash(kwargs)}"
+        if key in set(os.listdir("/tmp")):
+            with open(f"/tmp/{key}", "r") as f:
+                return f.read()
+        result = func(*args, **kwargs)
+        with open(f"/tmp/{key}", "w") as f:
+            f.write(result)
+        return result
+
+    return wrapper
+
+
 class AWSSecretAdaptor(SecretAdaptor):
     def __init__(self) -> None:
         self.client = boto3.client("secretsmanager")
 
-    @lru_cache(maxsize=128)
+    @aws_secret_cache
     def get_secret(self, secret_name: str) -> str:
         logger.info(f"Getting secret: {secret_name}")
         try:

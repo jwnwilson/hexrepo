@@ -4,8 +4,8 @@ from typing import Any, Dict, Generator, Iterator, Optional
 from loguru import logger
 from sqlalchemy import NullPool, create_engine, event
 from sqlalchemy.engine.base import Connection, Engine
-from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.exc import InvalidRequestError
+from sqlalchemy.orm import Session, sessionmaker
 
 from hexrepo_db.config import config
 

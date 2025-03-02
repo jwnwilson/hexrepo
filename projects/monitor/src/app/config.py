@@ -23,7 +23,9 @@ class Config(BaseSettings):
     # FEATURE FLAGS
 
     # Database settings
-    DB_PASSWORD_SECRET_NAME: str = os.environ.get("DB_PASSWORD_SECRET_NAME", "").format(env=ENVIRONMENT)
+    DB_PASSWORD_SECRET_NAME: str = os.environ.get("DB_PASSWORD_SECRET_NAME", "").format(
+        env=ENVIRONMENT
+    )
     DB_URL: str = os.environ["DB_URL"]
 
     DB_SQL_LOGGING: bool = os.environ.get("DB_SQL_LOGGING", "false") == "true"

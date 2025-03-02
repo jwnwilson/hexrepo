@@ -2,6 +2,7 @@ import logging
 
 from aws_xray_sdk.core import patch_all, xray_recorder
 from mangum import Mangum
+
 from app.config import config
 
 if config.TRACING_ENABLED:

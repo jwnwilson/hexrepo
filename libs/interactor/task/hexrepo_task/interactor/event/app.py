@@ -315,11 +315,13 @@ def resolve_dependencies(
             # replace dependency with override for testing if needed
             if dep.func in overrides:
                 dep.func = overrides[dep.func]
-        
+
         try:
             bound = f_sig.bind(*arg, **kwargs)
         except TypeError as e:
-            raise TypeError(f"Error resolving dependencies when binding arguments to function: {func.__name__}, error: {e}")
+            raise TypeError(
+                f"Error resolving dependencies when binding arguments to function: {func.__name__}, error: {e}"
+            )
         bound.apply_defaults()
         dependencies: List[Dependency] = []
 
@@ -340,7 +342,7 @@ def resolve_dependencies(
             ) and isinstance(arg_v, dict):
                 bound.arguments[key] = f_sig.parameters[key].annotation(**arg_v)
         return bound
-    
+
     @wraps(func)
     def resolve_dependencies_wrapper(*arg, **kwargs):
         bound = resolve_dependency_args(*arg, **kwargs)
@@ -349,7 +351,7 @@ def resolve_dependencies(
             Dependency.cleanup()
 
         return result
-    
+
     @wraps(func)
     async def resolve_dependencies_wrapper_async(*arg, **kwargs):
         bound = resolve_dependency_args(*arg, **kwargs)

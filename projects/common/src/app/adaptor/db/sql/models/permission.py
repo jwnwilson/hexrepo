@@ -45,10 +45,8 @@ class PermissionTable(Base):
 
     def __str__(self) -> str:
         return f"{self.name} | {self.id}"
-    
-    __table_args__ = (
-        Index("permission_name_idx", "name"),
-    )
+
+    __table_args__ = (Index("permission_name_idx", "name"),)
 
 
 class PermissionQuery(DefaultQuery):

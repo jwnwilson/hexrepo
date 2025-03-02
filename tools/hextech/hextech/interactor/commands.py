@@ -7,7 +7,6 @@ import typer
 from typing_extensions import Annotated
 
 from hextech.config import HexrepoConfig, get_or_create_config
-from hextech.domain.infra.user import create_user_with_permissions, create_user_permissions
 from hextech.domain.infra.bastion import bastion_ssh_tunnel
 from hextech.domain.infra.deployment import (
     create_env_infra,
@@ -23,6 +22,10 @@ from hextech.domain.infra.deployment import deploy_projects as deploy_projects_c
 from hextech.domain.infra.deployment import migrate_db as migrate_db_func
 from hextech.domain.infra.manage import start_infra_command, stop_infra_command
 from hextech.domain.infra.storage import create_tf_state
+from hextech.domain.infra.user import (
+    create_user_permissions,
+    create_user_with_permissions,
+)
 from hextech.domain.project import (
     get_libraries,
     get_library_type,
@@ -317,7 +320,7 @@ def create_permissions(
 
 
 def update_projects_from_template():
-    # Not implmented fully, want to investigate copier for this 
+    # Not implmented fully, want to investigate copier for this
     # Get list of changes to template/project
     with contextlib.chdir("templates/project/{{cookiecutter.project_name}}"):
         os.system("git format-patch --relative main --stdout > ../../../patch")

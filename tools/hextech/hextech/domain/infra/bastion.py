@@ -22,8 +22,7 @@ def bastion_ssh_tunnel(
         )
         rds_manageer: AWSRDSManager = AWSRDSManager(config.cloud_provider_config)
         instance_ids: List[str] = compute_manager.get_instances_ids(
-            state="running",
-            tags={"Type": "bastion", "Environment": env}
+            state="running", tags={"Type": "bastion", "Environment": env}
         )
         rds_host: str = rds_manageer.get_rds_host(
             tags={

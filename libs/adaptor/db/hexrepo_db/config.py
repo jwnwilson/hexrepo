@@ -23,9 +23,13 @@ class Config(BaseSettings):
     )
     DB_URL: str = os.environ["DB_URL"]
     DB_RO_URL: str = os.environ.get("DB_RO_URL", "")
+
     @property
     def DB_PASSWORD_SECRET_NAME(self) -> str:
-        return os.environ.get("DB_PASSWORD_SECRET_NAME", "").format(env=self.ENVIRONMENT)
+        return os.environ.get("DB_PASSWORD_SECRET_NAME", "").format(
+            env=self.ENVIRONMENT
+        )
+
     DB_SQL_LOGGING: bool = os.environ.get("DB_SQL_LOGGING", "false") == "true"
     DB_SSL_CONNECTION: bool = os.environ.get("DB_SSL_CONNECTION", "false") == "true"
     CLOUD_PROVIDER: str = os.environ.get("CLOUD_PROVIDER", "local")

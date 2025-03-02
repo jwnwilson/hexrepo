@@ -3,9 +3,8 @@ from typing import Dict, Optional
 import boto3
 from app.config import config
 from app.domain.user import UserPermissionCreateDTO, UserPermissionDTO
-from loguru import logger
-
 from hexrepo_db.exception import IntegrityError
+from loguru import logger
 
 from ..exceptions import (
     InvalidEmailException,
@@ -101,12 +100,15 @@ class CognitoAuthAdapter(AuthAdapter):
             raise InvalidEmailException(err)
         except self.cognito_client.exceptions.InvalidPasswordException as err:
             raise InvalidPasswordException(err)
-        except (self.cognito_client.exceptions.UsernameExistsException, IntegrityError) as err:
+        except (
+            self.cognito_client.exceptions.UsernameExistsException,
+            IntegrityError,
+        ) as err:
             raise UserExistsException(err)
         except Exception as e:
             logger.error(f"Error registering user: {e}")
             raise e
-        
+
     def send_verification_code(self, username: str) -> None:
         logger.info(f"Sending verification code to {username}")
         self.cognito_client.resend_confirmation_code(
