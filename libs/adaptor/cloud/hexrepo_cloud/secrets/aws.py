@@ -18,6 +18,7 @@ def aws_secret_cache(func):
         # hash the function name and the arguments to create a unique key
         key = f"{func.__name__}-{hash(args)}- {hash(kwargs)}"
         if key in set(os.listdir("/tmp")):
+            logger.info(f"Cache hit for {key}")
             with open(f"/tmp/{key}", "r") as f:
                 return f.read()
         result = func(*args, **kwargs)
