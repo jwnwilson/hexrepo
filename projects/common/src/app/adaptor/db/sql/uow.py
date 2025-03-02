@@ -1,16 +1,19 @@
-from sqlalchemy_continuum import make_versioned
-from sqlalchemy.orm import configure_mappers
 from hexrepo_db.sql import BaseSqlUOW
+from sqlalchemy.orm import configure_mappers
+from sqlalchemy_continuum import make_versioned
 
+# This needs to be done before model definition for versioning to work
 make_versioned(user_cls=None)
 
-from .models.company import CompanyRepository
-from .models.feature_flag import FeatureFlagRepository
-from .models.group import GroupRepository
-from .models.permission import PermissionRepository
-from .models.user import UserRepository
+from .models.company import CompanyRepository  # noqa: E402
+from .models.feature_flag import FeatureFlagRepository  # noqa: E402
+from .models.group import GroupRepository  # noqa: E402
+from .models.permission import PermissionRepository  # noqa: E402
+from .models.user import UserRepository  # noqa: E402
 
+# This nees to be done after model definition for versioning to work
 configure_mappers()
+
 
 class SqlUOW(BaseSqlUOW):
     @property

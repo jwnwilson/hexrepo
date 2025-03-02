@@ -12,7 +12,7 @@ from starlette.status import HTTP_403_FORBIDDEN
 
 from app.adaptor.db.sql import SqlUOW
 from app.config import config
-from app.domain.user import UserPermissionDTO, UserManager
+from app.domain.user import UserManager, UserPermissionDTO
 
 logger = logging.getLogger(__name__)
 
@@ -52,8 +52,7 @@ def get_auth(
 
 
 def get_user_manager(
-    uow: SqlUOW = Depends(get_uow),
-    auth: get_auth = Depends(get_auth)
+    uow: SqlUOW = Depends(get_uow), auth: get_auth = Depends(get_auth)
 ) -> Generator[UserManager, None, None]:
     return UserManager(uow=uow, auth=auth)
 

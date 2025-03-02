@@ -3,7 +3,11 @@ import logging
 from aws_xray_sdk.core import patch_all, xray_recorder
 from mangum import Mangum
 
-patch_all()
+from app.config import config
+
+if config.TRACING_ENABLED:
+    patch_all()
+
 # Initialize you log configuration using the base class
 logging.basicConfig(level=logging.INFO)
 logging.getLogger().setLevel(logging.INFO)

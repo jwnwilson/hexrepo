@@ -8,6 +8,7 @@ from fastapi.responses import JSONResponse
 from hexrepo_cloud.auth.cognito.auth_adaptor import CognitoAuthAdapter
 from hexrepo_cloud.auth.interface import AuthAdapter, UserLogin
 from hexrepo_db.sql.config import get_sql_db_url
+from hexrepo_task.interactor.event.app import resolve_dependencies
 from sqladmin import Admin, ModelView
 from sqladmin.authentication import AuthenticationBackend
 from starlette.requests import Request
@@ -21,8 +22,6 @@ from app.adaptor.db.sql.uow import SqlUOW
 from app.config import config
 from app.domain.user import UserManager
 from app.interactor.dependencies import get_jwt_token, get_user_manager
-
-from hexrepo_task.interactor.event.app import resolve_dependencies
 
 
 class BaseModelView(ModelView):
@@ -202,7 +201,10 @@ class AdminAuth(AuthenticationBackend):
                 UserLogin(username=username, password=password)
             )
         except Exception:
-            raise HTTPException(status_code=403, detail="Invalid username, password or unverified account")
+            raise HTTPException(
+                status_code=403,
+                detail="Invalid username, password or unverified account",
+            )
         # And update session
         request.session.update(
             {
@@ -218,7 +220,9 @@ class AdminAuth(AuthenticationBackend):
         return True
 
     @resolve_dependencies
-    async def authenticate(self, request: Request, user_manager: UserManager = Depends(get_user_manager)) -> bool:
+    async def authenticate(
+        self, request: Request, user_manager: UserManager = Depends(get_user_manager)
+    ) -> bool:
         token: str = request.session.get("token")
         if not token:
             return False

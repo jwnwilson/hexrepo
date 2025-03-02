@@ -25,6 +25,7 @@ if TYPE_CHECKING:
 # Joining table to link groups to users
 class UserGroupsTable(Base):
     __tablename__ = "user_groups"
+    __versioned__ = {}
 
     user_id: Mapped[UUID] = mapped_column(ForeignKey("user.id"))
     group_id: Mapped[UUID] = mapped_column(ForeignKey("group.id"))
@@ -32,6 +33,7 @@ class UserGroupsTable(Base):
 
 class GroupTable(Base):
     __tablename__ = "group"
+    __versioned__ = {}
 
     name: Mapped[str] = mapped_column(String)
     users: Mapped[list["UserTable"]] = relationship(

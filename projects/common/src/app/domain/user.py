@@ -1,10 +1,10 @@
 from typing import Any, Dict, List, Optional
-from pydantic import BaseModel
 from uuid import UUID
-from loguru import logger
 
+from hexrepo_cloud.auth.interface import AuthAdapter
 from hexrepo_db.interface import PaginatedData
-from hexrepo_cloud.auth.interface import AuthAdapter, UserSignupDTO
+from loguru import logger
+from pydantic import BaseModel
 
 from app.adaptor.db.interface import UOW
 
@@ -69,24 +69,22 @@ class UserCreateDTO(BaseModel):
     name: str
 
 
-class PerrmissionManager():
+class PerrmissionManager:
     def __init__(self, uow: UOW):
         self.uow: UOW = uow
 
     def create_default_permissions(self) -> None:
-        permission_list: List[str] = [
-            "superadmin",
-            "admin",
-            "user"
-        ]
+        permission_list: List[str] = ["superadmin", "admin", "user"]
         for permission in permission_list:
-            self.uow.permission.create(PermissionCreateDTO(
-                name=permission,
-            ))
+            self.uow.permission.create(
+                PermissionCreateDTO(
+                    name=permission,
+                )
+            )
 
 
 # Create user class with link back to manager to do operations
-class UserManager():
+class UserManager:
     def __init__(self, uow: UOW, auth: AuthAdapter):
         self.uow: UOW = uow
         self.auth: AuthAdapter = auth
@@ -100,8 +98,9 @@ class UserManager():
             raise ValueError("User not found")
         return user_data.results[0]
 
-
-    def create_user(self, user_dto: UserCreateDTO, superuser: bool=False) -> UserPermissionDTO:
+    def create_user(
+        self, user_dto: UserCreateDTO, superuser: bool = False
+    ) -> UserPermissionDTO:
         # self.auth.register(UserSignupDTO(
         #     username=user_dto.username,
         #     password=user_dto.password,
@@ -110,28 +109,28 @@ class UserManager():
         # )
         if superuser:
             try:
-                superuser_permission: PermissionDTO = self.uow.permission.read_multi(filters=dict(name="superadmin")).results[0]
+                superuser_permission: PermissionDTO = self.uow.permission.read_multi(
+                    filters=dict(name="superadmin")
+                ).results[0]
             except IndexError:
                 logger.error("Superadmin permission not found")
-            permissions: List[str] = [
-                {
-                    "id": superuser_permission.id
-                }
-            ]
+            permissions: List[str] = [{"id": superuser_permission.id}]
         else:
             permissions: List[str] = []
-        
+
         breakpoint()
-        user = self.uow.user.create(UserPermissionCreateDTO(
-            username=user_dto.username,
-            email=user_dto.email,
-            name=user_dto.name,
-            permissions=permissions,
-            groups=[],
-            verified=True,
-            company=None
-        ))
+        user = self.uow.user.create(
+            UserPermissionCreateDTO(
+                username=user_dto.username,
+                email=user_dto.email,
+                name=user_dto.name,
+                permissions=permissions,
+                groups=[],
+                verified=True,
+                company=None,
+            )
+        )
         return user
-    
+
     def resend_verification(self, username: str):
         self.auth.send_verification_code(username)

@@ -37,8 +37,9 @@ Setup the following env vars directly or run:
 
 - Setup backend
     - Debug common services
-        - Create superuser command
-            - Ability to run against environment
+        - Setup command to run local against bastion db
+            - Can already do this with bastion command
+            - Create superuser command
         - Add better tracing for performance debugging
             - profile endpoints check json parsing isn't slowing them down
             - Fix multiple DB calls and add test to catch this (maybe sonarqube?)
@@ -55,7 +56,7 @@ Setup the following env vars directly or run:
             - Improve DB calls to make more performant
             - Get user data with permissions via username from header or session
             - Create materialised view or cache in dynamodb for cheap serverless option?
-    - versions endpoint
+    - versions endpoint if versions enabled
         https://sqlalchemy-continuum.readthedocs.io/en/latest/
     - Move monitor / infra optimisation into common
         - Enable disable project via admin
@@ -98,8 +99,6 @@ Setup the following env vars directly or run:
         - Store data in graph format and visualise it
         - Categorise PLP pages
         - Fan out and crawl web page PDP page contents
-    - Setup command to run local against bastion db
-        - Can already do this with bastion command
     - Add ability to disable / destroy projects
     - Improve docker container builds
         - Reduce image size
