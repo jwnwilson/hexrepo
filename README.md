@@ -62,6 +62,7 @@ Setup the following env vars directly or run:
         - Re-render template with project settings 
         - Create Diff with changes
         - Add CI job to detect template changes and add a new PR with applied patch to projects
+    - Add ECS option to avoid cold startup
     - Add monitoring dashboard for services
         - Generic change log
         - Potentially use 3rd party service?

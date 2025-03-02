@@ -1,7 +1,6 @@
 import logging
 import os
-from functools import wraps
-from typing import Dict
+from typing import Dict, Optional
 
 import boto3
 
@@ -10,31 +9,25 @@ from .interface import SecretAdaptor
 logger = logging.getLogger(__name__)
 
 
-def aws_secret_cache(func):
-    # In aws lambda we can cache data across requests for multiple calls in /tmp
-    # This is the cheapest way to cache data in AWS Lambda
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        # hash the function name and the arguments to create a unique key
-        key = f"{func.__name__}-{hash(str(args))}- {hash(str(kwargs))}"
-        if key in set(os.listdir("/tmp")):
-            logger.info(f"Cache hit for {key}")
-            with open(f"/tmp/{key}", "r") as f:
-                return f.read()
-        result = func(*args, **kwargs)
-        with open(f"/tmp/{key}", "w") as f:
-            f.write(result)
-        return result
-
-    return wrapper
+def aws_cache(secret_name: str) -> Optional[str]:
+    # Check if the secret is already cached in /tmp this is the cheapest and quickest method
+    # for caching in aws lambdas
+    if secret_name in set(os.listdir("/tmp")):
+        with open(f"/tmp/{secret_name}", "r") as f:
+            return f.read()
+    else:
+        return None  
 
 
 class AWSSecretAdaptor(SecretAdaptor):
     def __init__(self) -> None:
         self.client = boto3.client("secretsmanager")
 
-    @aws_secret_cache
     def get_secret(self, secret_name: str) -> str:
+        secret_value: str = aws_cache(secret_name)
+        if secret_value:
+            logger.info(f"Secret: {secret_name} retrieved from file cache.")
+            return secret_value
         logger.info(f"Getting secret: {secret_name}")
         try:
             get_secret_value_response: Dict[str, str] = self.client.get_secret_value(
@@ -46,3 +39,4 @@ class AWSSecretAdaptor(SecretAdaptor):
             msg = f"The requested secret {secret_name} was not found."
             logger.exception(msg)
             raise
+        
