@@ -38,4 +38,4 @@ if __name__ == "__main__":
     email: str = input("Enter email:\n")
     password: str = input("Enter password:\n")
 
-    create_user_cli(username=username, email=email, password=password, name=name, superuser=create_superuser)
+    create_user_cli(username=username, email=email, password=password, name=name, create_superuser=create_superuser)

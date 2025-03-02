@@ -2,6 +2,7 @@ from typing import Any, Dict, List, Optional
 from uuid import UUID
 
 from hexrepo_cloud.auth.interface import AuthAdapter, UserSignupDTO
+from hexrepo_db.exception import IntegrityError
 from hexrepo_db.interface import PaginatedData
 from loguru import logger
 from pydantic import BaseModel
@@ -75,12 +76,16 @@ class PerrmissionManager:
 
     def create_default_permissions(self) -> None:
         permission_list: List[str] = ["superadmin", "admin", "user"]
-        for permission in permission_list:
-            self.uow.permission.create(
-                PermissionCreateDTO(
-                    name=permission,
+        try:
+            for permission in permission_list:
+                self.uow.permission.create(
+                    PermissionCreateDTO(
+                        name=permission,
+                    )
                 )
-            )
+        except IntegrityError:
+            logger.warning("Permissions already created")
+            
 
 
 # Create user class with link back to manager to do operations

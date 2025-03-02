@@ -38,6 +38,9 @@ Setup the following env vars directly or run:
 - Setup backend
     - Debug common services
         - Setup command to run local against bastion db
+            - Move to hextech
+                - Prompt for env
+                - if
             - CLI prompt for env
             - Update bastion logic to use db secret and find it with password string substituting env var.
             - Run bastion command
@@ -49,8 +52,6 @@ Setup the following env vars directly or run:
             - Pass correlation id from aws through to logging
             - Make logs readable in AWS
     - Create common project
-        - Add auth register command to admin create user function
-            - This might have been a bug, verify
         - Tests:
             - Create dynamic CRUD tests
                 - User, Group, Permission, Featureflag, Company CRUD

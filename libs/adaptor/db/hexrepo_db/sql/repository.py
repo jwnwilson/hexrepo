@@ -74,7 +74,8 @@ class DefaultQuery(Query):
         relationships: List[str] = [
             attr
             for attr in dir(db_obj)
-            if getattr(db_obj, attr).__class__.__name__ == "InstrumentedList"
+            if (getattr(db_obj, attr).__class__.__name__ == "InstrumentedList"
+            and attr in dto.model_fields)
         ]
         # For each instrumentedList check for diff against dto if updating
         # if this is a create operation then create new relationships

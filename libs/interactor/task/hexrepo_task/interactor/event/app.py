@@ -316,7 +316,10 @@ def resolve_dependencies(
             if dep.func in overrides:
                 dep.func = overrides[dep.func]
         
-        bound = f_sig.bind(*arg, **kwargs)
+        try:
+            bound = f_sig.bind(*arg, **kwargs)
+        except TypeError as e:
+            raise TypeError(f"Error resolving dependencies when binding arguments to function: {func.__name__}, error: {e}")
         bound.apply_defaults()
         dependencies: List[Dependency] = []
 

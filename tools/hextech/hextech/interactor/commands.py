@@ -3,11 +3,11 @@ import os
 from contextlib import chdir
 from typing import List, Optional
 
-from domain.infra.user import create_user_with_permissions
 import typer
 from typing_extensions import Annotated
 
 from hextech.config import HexrepoConfig, get_or_create_config
+from hextech.domain.infra.user import create_user_with_permissions, create_user_permissions
 from hextech.domain.infra.bastion import bastion_ssh_tunnel
 from hextech.domain.infra.deployment import (
     create_env_infra,

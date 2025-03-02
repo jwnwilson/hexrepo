@@ -140,5 +140,5 @@ bastion: venv
 create_user:
 	PYTHONPATH=src ENVIRONMENT=$(ENVIRONMENT) uv run python src/app/interactor/cli/create_superuser.py
 
-create_default_permissions:
+create_permissions:
 	PYTHONPATH=src ENVIRONMENT=$(ENVIRONMENT) uv run python src/app/interactor/cli/create_default_permissions.py

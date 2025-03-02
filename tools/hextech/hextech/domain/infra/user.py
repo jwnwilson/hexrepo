@@ -1,9 +1,8 @@
-from domain.system import run_system_command
 import typer
-from typing import Dict
-from config import HexrepoConfig
-from domain.infra.bastion import managed_bastion_ssh
-from domain.infra.deployment import get_terrform_output
+from hextech.config import HexrepoConfig
+from hextech.domain.system import run_system_command
+from hextech.domain.infra.bastion import managed_bastion_ssh
+from hextech.domain.infra.deployment import get_terrform_output
 
 
 def create_user_with_permissions(config: HexrepoConfig, env: str) -> None:
