@@ -57,6 +57,12 @@ Setup the following env vars directly or run:
     - Move monitor / infra optimisation into common
         - Enable disable project via admin
     - Disable example project
+    - Implement template -> project update:
+        - Copier https://copier.readthedocs.io/en/stable/
+        - Look at cruft again
+        - Re-render template with project settings 
+        - Create Diff with changes
+        - Add CI job to detect template changes and add a new PR with applied patch to projects
     - Add monitoring dashboard for services
         - Generic change log
         - Potentially use 3rd party service?
@@ -78,12 +84,6 @@ Setup the following env vars directly or run:
         - Setup Idempotent re-run
         - Dectorator based workflow setup e.g.:
             https://github.com/aws/chalice/blob/master/chalice/app.py#L719 
-    - Implement template -> project update:
-        - Copier https://copier.readthedocs.io/en/stable/
-        - Look at cruft again
-        - Re-render template with project settings 
-        - Create Diff with changes
-        - Add CI job to detect template changes and add a new PR with applied patch to projects
     - Enforce architecture rules:
         - Remove lib type
         - tach: https://github.com/gauge-sh/tach
