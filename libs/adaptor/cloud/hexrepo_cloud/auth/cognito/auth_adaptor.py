@@ -5,7 +5,10 @@ from app.config import config
 from app.domain.user import UserPermissionCreateDTO, UserPermissionDTO
 from loguru import logger
 
+from hexrepo_db.exception import IntegrityError
+
 from ..exceptions import (
+    InvalidEmailException,
     InvalidPasswordException,
     InvalidVerificationCodeException,
     UnathorizedException,
@@ -94,9 +97,11 @@ class CognitoAuthAdapter(AuthAdapter):
                     "DeliveryMedium"
                 ],
             )
+        except self.cognito_client.exceptions.InvalidParameterException as err:
+            raise InvalidEmailException(err)
         except self.cognito_client.exceptions.InvalidPasswordException as err:
             raise InvalidPasswordException(err)
-        except self.cognito_client.exceptions.UsernameExistsException as err:
+        except (self.cognito_client.exceptions.UsernameExistsException, IntegrityError) as err:
             raise UserExistsException(err)
         except Exception as e:
             logger.error(f"Error registering user: {e}")

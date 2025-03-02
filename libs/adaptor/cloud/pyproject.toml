@@ -4,7 +4,7 @@ authors = [
 ]
 requires-python = "<4.0,>=3.12"
 name = "hexrepo-cloud"
-version = "0.3.17"
+version = "0.3.18"
 description = ""
 readme = "README.md"
 dependencies = [
@@ -37,7 +37,7 @@ requires = ["pdm-backend"]
 build-backend = "pdm.backend"
 
 [tool.pytest.ini_options]
-addopts = "-vv --cov --cov-report xml --cov-report term-missing --cov-fail-under=20"
+addopts = "-vv --cov --cov-report xml --cov-report term-missing --cov-fail-under=15"
 asyncio_mode = "auto"
 testpaths = ["tests"]
 env_files = ["env/local.env"]

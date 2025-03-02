@@ -186,6 +186,26 @@ def migrate_db(
 
 
 @app.command()
+def create_user(
+    env: Annotated[Optional[str], typer.Argument()] = None,
+    project: Annotated[Optional[str], typer.Argument()] = None,
+):
+    from .commands import create_user
+
+    create_user(env)
+
+
+@app.command()
+def create_permissions(
+    env: Annotated[Optional[str], typer.Argument()] = None,
+    project: Annotated[Optional[str], typer.Argument()] = None,
+):
+    from .commands import create_permissions
+
+    create_permissions(env)
+
+
+@app.command()
 def update_projects_from_template():
     from .commands import update_projects_from_template
 

@@ -5,6 +5,7 @@ from loguru import logger
 from sqlalchemy import NullPool, create_engine, event
 from sqlalchemy.engine.base import Connection, Engine
 from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy.exc import InvalidRequestError
 
 from hexrepo_db.config import config
 
@@ -121,7 +122,11 @@ class DatabaseSessionManager:
         try:
             yield self._query_counts[conn]
         finally:
-            event.remove(conn, "before_cursor_execute", before_cursor_execute)
+            try:
+                event.remove(conn, "before_cursor_execute", before_cursor_execute)
+            # Ignore if event doesn't exist
+            except InvalidRequestError:
+                pass
 
     @property
     def session_query_count(self, session: Optional[Session] = None) -> int:

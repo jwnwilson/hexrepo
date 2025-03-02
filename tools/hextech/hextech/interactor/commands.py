@@ -7,6 +7,7 @@ import typer
 from typing_extensions import Annotated
 
 from hextech.config import HexrepoConfig, get_or_create_config
+from hextech.domain.infra.user import create_user_with_permissions, create_user_permissions
 from hextech.domain.infra.bastion import bastion_ssh_tunnel
 from hextech.domain.infra.deployment import (
     create_env_infra,
@@ -295,7 +296,28 @@ def migrate_db(
     migrate_db_func(config, env, project)
 
 
+def create_user(
+    env: Annotated[Optional[str], typer.Argument()] = None,
+):
+    config: HexrepoConfig
+    config, _ = get_or_create_config(no_input=True)
+    env: str = env or prompt_environment()
+    # Placeholder for creating user
+    create_user_with_permissions(config, env)
+
+
+def create_permissions(
+    env: Annotated[Optional[str], typer.Argument()] = None,
+):
+    config: HexrepoConfig
+    config, _ = get_or_create_config(no_input=True)
+    env: str = env or prompt_environment()
+    # Placeholder for creating user
+    create_user_permissions(config, env)
+
+
 def update_projects_from_template():
+    # Not implmented fully, want to investigate copier for this 
     # Get list of changes to template/project
     with contextlib.chdir("templates/project/{{cookiecutter.project_name}}"):
         os.system("git format-patch --relative main --stdout > ../../../patch")

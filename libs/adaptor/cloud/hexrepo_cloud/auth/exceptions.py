@@ -10,6 +10,9 @@ class InvalidPasswordException(AuthException):
     pass
 
 
+class InvalidEmailException(AuthException):
+    pass
+
 class InvalidVerificationCodeException(AuthException):
     pass
 

@@ -2,7 +2,7 @@ from typing import TYPE_CHECKING, Any
 
 from hexrepo_db.sql.models.base_model import Base
 from hexrepo_db.sql.repository import DefaultQuery, SQLRepository
-from sqlalchemy import UUID, ForeignKey, Select, String, select
+from sqlalchemy import UUID, ForeignKey, Index, Select, String, select
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.domain.user import PermissionDTO
@@ -35,7 +35,7 @@ class PermissionTable(Base):
     __tablename__ = "permission"
     __versioned__ = {}
 
-    name: Mapped[str] = mapped_column(String)
+    name: Mapped[str] = mapped_column(String, unique=True)
     groups: Mapped[list["GroupTable"]] = relationship(
         "GroupTable", secondary=PermissionGroupsTable.__table__, overlaps="groups"
     )
@@ -45,6 +45,10 @@ class PermissionTable(Base):
 
     def __str__(self) -> str:
         return f"{self.name} | {self.id}"
+    
+    __table_args__ = (
+        Index("permission_name_idx", "name"),
+    )
 
 
 class PermissionQuery(DefaultQuery):
