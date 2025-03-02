@@ -112,6 +112,14 @@ migrate_db: hextech
 	@echo "Starting bastion..."
 	hextech migrate-db ${ENV} ${PROJECT}
 
+create_user: hextech
+	@echo "Starting bastion..."
+	hextech create_user ${ENV} ${PROJECT}
+
+create_permissions: hextech
+	@echo "Starting bastion..."
+	hextech create_permissions ${ENV} ${PROJECT}
+
 update_projects_from_template: hextech
 	@echo "Updating projects from template..."
 	hextech update-projects-from-template
