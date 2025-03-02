@@ -22,6 +22,7 @@ def bastion_ssh_tunnel(
         )
         rds_manageer: AWSRDSManager = AWSRDSManager(config.cloud_provider_config)
         instance_ids: List[str] = compute_manager.get_instances_ids(
+            state="running",
             tags={"Type": "bastion", "Environment": env}
         )
         rds_host: str = rds_manageer.get_rds_host(
@@ -53,7 +54,11 @@ def bastion_ssh_tunnel(
 @contextmanager
 def managed_bastion_ssh(config: HexrepoConfig, env: str, project: str):
     typer.echo("Starting ssh tunnel to bastion")
-    bastion_process = bastion_ssh_tunnel(config, env, project, background_task=True)
+    try:
+        bastion_process = bastion_ssh_tunnel(config, env, project, background_task=True)
+    except Exception as e:
+        typer.echo(f"Failed to start ssh tunnel to bastion: {e}")
+        raise e
     try:
         yield bastion_process
     finally:

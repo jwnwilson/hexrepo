@@ -1,7 +1,7 @@
 from typing import Any, Dict, List, Optional
 from uuid import UUID
 
-from hexrepo_cloud.auth.interface import AuthAdapter
+from hexrepo_cloud.auth.interface import AuthAdapter, UserSignupDTO
 from hexrepo_db.interface import PaginatedData
 from loguru import logger
 from pydantic import BaseModel
@@ -101,12 +101,12 @@ class UserManager:
     def create_user(
         self, user_dto: UserCreateDTO, superuser: bool = False
     ) -> UserPermissionDTO:
-        # self.auth.register(UserSignupDTO(
-        #     username=user_dto.username,
-        #     password=user_dto.password,
-        #     email=user_dto.email,
-        #     name=user_dto.name)
-        # )
+        self.auth.register(UserSignupDTO(
+            username=user_dto.username,
+            password=user_dto.password,
+            email=user_dto.email,
+            name=user_dto.name)
+        )
         if superuser:
             try:
                 superuser_permission: PermissionDTO = self.uow.permission.read_multi(
@@ -118,7 +118,6 @@ class UserManager:
         else:
             permissions: List[str] = []
 
-        breakpoint()
         user = self.uow.user.create(
             UserPermissionCreateDTO(
                 username=user_dto.username,

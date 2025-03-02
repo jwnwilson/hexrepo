@@ -50,6 +50,7 @@ Setup the following env vars directly or run:
             - Make logs readable in AWS
     - Create common project
         - Add auth register command to admin create user function
+            - This might have been a bug, verify
         - Tests:
             - Create dynamic CRUD tests
                 - User, Group, Permission, Featureflag, Company CRUD
