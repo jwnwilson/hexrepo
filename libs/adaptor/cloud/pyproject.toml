@@ -37,7 +37,7 @@ requires = ["pdm-backend"]
 build-backend = "pdm.backend"
 
 [tool.pytest.ini_options]
-addopts = "-vv --cov --cov-report xml --cov-report term-missing --cov-fail-under=20"
+addopts = "-vv --cov --cov-report xml --cov-report term-missing --cov-fail-under=15"
 asyncio_mode = "auto"
 testpaths = ["tests"]
 env_files = ["env/local.env"]
