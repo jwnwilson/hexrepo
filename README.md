@@ -36,8 +36,7 @@ Setup the following env vars directly or run:
 # To Do
 
 - Setup backend
-    - Add better tracing for performance debugging
-        - Fix multiple DB calls and add test to catch this (maybe sonarqube?)
+    - Fix bug on permission view / edit page
     - Setup better logging
         - Pass correlation id from aws through to logging
         - Make logs readable in AWS
@@ -47,7 +46,7 @@ Setup the following env vars directly or run:
         - Test relationship CRUD logic (check create)
         - Test auth and permission logic
         - Test cloud libs
-    - Authentication via fastapi middleware
+    - Authentication via fastapi middleware infra agnostic solution
         - Improve DB calls to make more performant
         - Get user data with permissions via username from header or session
         - Create materialised view or cache in dynamodb for cheap serverless option?

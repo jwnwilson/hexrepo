@@ -11,8 +11,8 @@ logger = logging.getLogger(__name__)
 
 
 def secret_cache(func):
-    # Check if the secret is already cached in /tmp this is the cheapest and quickest method
-    # for caching in aws lambdas
+    # Check if the secret is cached in /tmp as fetching secrets can be slow
+    # This is the cheapest and quickest method for caching in aws lambdas
     @functools.wraps(func)
     def wrapper(*args, **kwargs) -> Optional[str]:
         secret_name: str = args[1]
