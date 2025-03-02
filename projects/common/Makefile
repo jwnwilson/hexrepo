@@ -137,8 +137,14 @@ bastion: venv
 	cd ../../ && \
 	hextech bastion 
 
-create_superuser:
+create_superuser_local:
 	PYTHONPATH=src && env $$(cat env/local.env|xargs) uv run python src/app/interactor/cli/create_superuser.py
 
-create_default_permissions:
+create_superuser:
+	PYTHONPATH=src && env $$(cat env/bastion.env|xargs) uv run python src/app/interactor/cli/create_superuser.py
+
+create_default_permissions_local:
 	PYTHONPATH=src && env $$(cat env/local.env|xargs) uv run python src/app/interactor/cli/create_default_permissions.py
+
+create_default_permissions:
+	PYTHONPATH=src && env $$(cat env/bastion.env|xargs) uv run python src/app/interactor/cli/create_default_permissions.py

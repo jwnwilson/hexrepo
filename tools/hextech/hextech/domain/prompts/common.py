@@ -62,6 +62,7 @@ def prompt_shell_file() -> str:
 def prompt_environment() -> str:
     print("Please enter environment:")
     enironments: List[str] = get_environments()
+    enironments.insert(0, "local")
     env_map: List[str] = {str(i + 1): env for i, env in enumerate(enironments)}
     options = "\n".join([f"{i} - {project}" for i, project in env_map.items()])
     selection: str = typer.prompt(f"Choose from:\n{options}\n", default="1")

@@ -3,6 +3,7 @@ import os
 from contextlib import chdir
 from typing import List, Optional
 
+from domain.infra.user import create_user_with_permissions
 import typer
 from typing_extensions import Annotated
 
@@ -295,7 +296,28 @@ def migrate_db(
     migrate_db_func(config, env, project)
 
 
+def create_user(
+    env: Annotated[Optional[str], typer.Argument()] = None,
+    group: Annotated[Optional[str], typer.Argument()] = None,
+):
+    config: HexrepoConfig
+    config, _ = get_or_create_config(no_input=True)
+    env: str = env or prompt_environment()
+    if not group:
+        groups = {
+            1: "superadmin",
+            2: "admin",
+            3: "user"
+        }
+        group_selection: str = group or typer.prompt(f"Choose from:\n{groups}\n", default="1")
+        group = groups[int(group_selection)]
+
+    # Placeholder for creating user
+    create_user_with_permissions(config, env, group)
+
+
 def update_projects_from_template():
+    # Not implmented fully, want to investigate copier for this 
     # Get list of changes to template/project
     with contextlib.chdir("templates/project/{{cookiecutter.project_name}}"):
         os.system("git format-patch --relative main --stdout > ../../../patch")
