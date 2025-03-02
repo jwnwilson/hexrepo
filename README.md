@@ -37,27 +37,35 @@ Setup the following env vars directly or run:
 
 - Setup backend
     - Debug common services
-        - Create superuser command
-            - move to domain logic level
-            - Include cognito setup / bastion
+        - Setup command to run local against bastion db
+            - CLI prompt for env
+            - Update bastion logic to use db secret and find it with password string substituting env var.
+            - Run bastion command
+            - Create superuser command
         - Add better tracing for performance debugging
             - profile endpoints check json parsing isn't slowing them down
             - Fix multiple DB calls and add test to catch this (maybe sonarqube?)
         - Setup better logging
             - Pass correlation id from aws through to logging
+            - Make logs readable in AWS
     - Create common project
+        - Add auth register command to admin create user function
         - Tests:
             - Create dynamic CRUD tests
                 - User, Group, Permission, Featureflag, Company CRUD
             - Test relationship CRUD logic (check create)
             - Test auth and permission logic
         - Authentication via fastapi middleware
+            - Improve DB calls to make more performant
             - Get user data with permissions via username from header or session
             - Create materialised view or cache in dynamodb for cheap serverless option?
-    - Disable example project
+    - versions endpoint if versions enabled
+        https://sqlalchemy-continuum.readthedocs.io/en/latest/
     - Move monitor / infra optimisation into common
         - Enable disable project via admin
+    - Disable example project
     - Add monitoring dashboard for services
+        - Generic change log
         - Potentially use 3rd party service?
         - Load testing
         - Latency tracking and visualisation
@@ -94,7 +102,6 @@ Setup the following env vars directly or run:
         - Store data in graph format and visualise it
         - Categorise PLP pages
         - Fan out and crawl web page PDP page contents
-    - Setup command to run local against bastion db
     - Add ability to disable / destroy projects
     - Improve docker container builds
         - Reduce image size

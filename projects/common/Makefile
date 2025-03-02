@@ -20,9 +20,6 @@ venv:
 build:
 	docker compose build
 
-create_superuser:
-	PYTHONPATH=src uv run python src/app/interactor/cli/create_superuser.py
-
 # DB management
 db_migrate_pipeline:
 	bash -c "uv run alembic upgrade head" ;\
@@ -41,13 +38,11 @@ db_migrate_docker:
 db_delete_data:
 	docker compose run db bash -c "rm -rf /var/lib/postgresql/data/*"
 
-db_upgrade: db_migrate down
-
 db_downgrade:
 	bash -c "uv run alembic downgrade -1"
 
 db_create_migration:
-	bash -c "uv run alembic revision --autogenerate -m \"DB migration\""
+	bash -c "env $$(cat env/local.env|xargs) uv run alembic revision --autogenerate -m \"DB migration\""
 
 docker_stop:
 	@-bash -c "docker ps -aq | xargs docker stop | xargs docker rm"
@@ -143,4 +138,7 @@ bastion: venv
 	hextech bastion 
 
 create_superuser:
-	PYTHONPATH=src uv run python src/app/interactor/cli/create_superuser.py
+	PYTHONPATH=src && env $$(cat env/local.env|xargs) uv run python src/app/interactor/cli/create_superuser.py
+
+create_default_permissions:
+	PYTHONPATH=src && env $$(cat env/local.env|xargs) uv run python src/app/interactor/cli/create_default_permissions.py

@@ -1,28 +1,34 @@
-from hexrepo_task.interactor.event.app import resolve_dependencies
+from hexrepo_task.interactor.event.app import Dependency, resolve_dependencies
 
-from app.adaptor.db.interface import UOW
-from app.domain.user import UserPermissionCreateDTO
-from app.interactor.dependencies import get_uow
+from app.domain.user import UserCreateDTO, UserManager, UserPermissionDTO
+from app.interactor.dependencies import get_user_manager
 
 
 @resolve_dependencies
 def create_superuser_cli(
-    username: str, email: str, password: str, uow: UOW = get_uow()
+    username: str,
+    email: str,
+    password: str,
+    name: str,
+    user_manager: UserManager = Dependency(get_user_manager),
 ):
     """
     Create superuser CLI
     """
     print("Creating superuser...")
     # Need a way to use dependencies outside fastapi
-    uow.user.create(
-        UserPermissionCreateDTO(username=username, password=password, email=email)
+    user_dto: UserPermissionDTO = user_manager.create_user(
+        UserCreateDTO(username=username, password=password, email=email, name=name),
+        superuser=True,
     )
-    print("Superuser created successfully")
+
+    print(f"Superuser {user_dto.username} created successfully")
 
 
 if __name__ == "__main__":
-    username: str = input("Enter username")
-    email: str = input("Enter email")
-    password: str = input("Enter password")
+    username: str = input("Enter username:\n")
+    name: str = input("Enter name:\n")
+    email: str = input("Enter email:\n")
+    password: str = input("Enter password:\n")
 
-    create_superuser_cli(username=username, email=email, password=password)
+    create_superuser_cli(username=username, email=email, password=password, name=name)

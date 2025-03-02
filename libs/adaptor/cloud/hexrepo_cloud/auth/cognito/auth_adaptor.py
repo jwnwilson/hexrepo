@@ -2,7 +2,7 @@ from typing import Dict, Optional
 
 import boto3
 from app.config import config
-from app.domain.user import UserPermissionCreateDTO
+from app.domain.user import UserPermissionCreateDTO, UserPermissionDTO
 from loguru import logger
 
 from ..exceptions import (
@@ -29,8 +29,14 @@ class CognitoAuthAdapter(AuthAdapter):
             raise ValueError("Missing client_id or jwt_secret config values")
         self.client_id: str = config.CLIENT_ID
         self.jwn_secret: str = config.JWT_SECRET
-        self.cognito_client = boto3.client("cognito-idp", config.REGION)
         self.uow: Optional[UserUOW] = uow
+        self._cognito_client: Optional[boto3.client] = None
+
+    @property
+    def cognito_client(self):
+        if not self._cognito_client:
+            self._cognito_client = boto3.client("cognito-idp", config.REGION)
+        return self._cognito_client
 
     def login(self, user: UserLogin) -> str:
         try:
@@ -41,6 +47,7 @@ class CognitoAuthAdapter(AuthAdapter):
             )
             if "AuthenticationResult" not in response:
                 raise UnathorizedException(response["ChallengeName"])
+            logger.info(f"User {user.username} logged in")
             return response["AuthenticationResult"]["AccessToken"]
         except self.cognito_client.exceptions.NotAuthorizedException:
             raise UnathorizedException
@@ -68,7 +75,7 @@ class CognitoAuthAdapter(AuthAdapter):
                     {"Name": "name", "Value": user.name},
                 ],
             )
-            self.uow.user.create(
+            user_dto: UserPermissionDTO = self.uow.user.create(
                 UserPermissionCreateDTO(
                     username=user.username,
                     email=user.email,
@@ -80,6 +87,7 @@ class CognitoAuthAdapter(AuthAdapter):
                     company=None,
                 )
             )
+            logger.info(f"Signed up user {user_dto.id}")
             return SignupResponse(
                 verified=response["UserConfirmed"],
                 verification_code_destination=response["CodeDeliveryDetails"][
@@ -93,6 +101,12 @@ class CognitoAuthAdapter(AuthAdapter):
         except Exception as e:
             logger.error(f"Error registering user: {e}")
             raise e
+        
+    def send_verification_code(self, username: str) -> None:
+        logger.info(f"Sending verification code to {username}")
+        self.cognito_client.resend_confirmation_code(
+            ClientId=self.client_id, Username=username
+        )
 
     def verify(self, user: UserVerifyDTO) -> None:
         try:
@@ -101,6 +115,7 @@ class CognitoAuthAdapter(AuthAdapter):
                 Username=user.username,
                 ConfirmationCode=user.confirmation_code,
             )
+            logger.info(f"User {user.username} verified")
             # Add user to user group
             return
         except self.cognito_client.exceptions.CodeMismatchException as err:
@@ -115,6 +130,7 @@ class CognitoAuthAdapter(AuthAdapter):
                 UserPoolId=config.USER_POOL_ID,
                 Username=user.username,
             )
+            logger.info(f"Removed User {user.username} from auth")
         except Exception as e:
             logger.error(f"Error deleting user: {e}")
             raise e

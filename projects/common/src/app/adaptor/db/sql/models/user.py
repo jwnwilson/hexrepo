@@ -19,6 +19,7 @@ if TYPE_CHECKING:
 # Need materialized view on user with permissions for quick auth queries
 class UserTable(Base):
     __tablename__ = "user"
+    __versioned__ = {}
 
     username: Mapped[str] = mapped_column(Text, nullable=False, unique=True)
     email: Mapped[str] = mapped_column(Text, nullable=False, unique=True)

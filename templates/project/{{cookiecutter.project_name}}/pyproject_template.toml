@@ -19,6 +19,7 @@ dependencies = [
     "pydantic-settings<3.0.0,>=2.6.0",
     {% if cookiecutter.use_db == 'y' and cookiecutter.use_db_logic == 'sql' %}
     "alembic<2.0.0,>=1.13.3",
+    "sqlalchemy-continuum>=1.4.2",
     "psycopg2-binary<3.0.0,>=2.9.10",
     {% elif cookiecutter.use_db == 'y' and cookiecutter.use_db_logic == 'nosql' %}
     "pymongo>=4.10.1",

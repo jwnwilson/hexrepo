@@ -47,6 +47,10 @@ class AuthAdapter(ABC):
         pass
 
     @abstractmethod
+    def send_verification_code(self, user: UserDTO) -> None:
+        pass
+
+    @abstractmethod
     def verify(self, token: str) -> None:
         pass
 

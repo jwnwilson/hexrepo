@@ -3,11 +3,12 @@ from datetime import datetime
 from typing import Any
 
 import wtforms
-from fastapi import FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException
 from fastapi.responses import JSONResponse
 from hexrepo_cloud.auth.cognito.auth_adaptor import CognitoAuthAdapter
 from hexrepo_cloud.auth.interface import AuthAdapter, UserLogin
 from hexrepo_db.sql.config import get_sql_db_url
+from hexrepo_task.interactor.event.app import resolve_dependencies
 from sqladmin import Admin, ModelView
 from sqladmin.authentication import AuthenticationBackend
 from starlette.requests import Request
@@ -19,8 +20,8 @@ from app.adaptor.db.sql.models.permission import PermissionTable
 from app.adaptor.db.sql.models.user import UserTable
 from app.adaptor.db.sql.uow import SqlUOW
 from app.config import config
-from app.domain.user import get_user
-from app.interactor.dependencies import get_jwt_token
+from app.domain.user import UserManager
+from app.interactor.dependencies import get_jwt_token, get_user_manager
 
 
 class BaseModelView(ModelView):
@@ -200,7 +201,10 @@ class AdminAuth(AuthenticationBackend):
                 UserLogin(username=username, password=password)
             )
         except Exception:
-            raise HTTPException(status_code=403, detail="Invalid username or password")
+            raise HTTPException(
+                status_code=403,
+                detail="Invalid username, password or unverified account",
+            )
         # And update session
         request.session.update(
             {
@@ -215,7 +219,10 @@ class AdminAuth(AuthenticationBackend):
         request.session.clear()
         return True
 
-    async def authenticate(self, request: Request) -> bool:
+    @resolve_dependencies
+    async def authenticate(
+        self, request: Request, user_manager: UserManager = Depends(get_user_manager)
+    ) -> bool:
         token: str = request.session.get("token")
         if not token:
             return False
@@ -223,14 +230,12 @@ class AdminAuth(AuthenticationBackend):
         jwt = get_jwt_token.verify_jwt_token(token)
         username = jwt.claims["username"]
         if "user" not in request.session:
-            uow = SqlUOW(db_url=get_sql_db_url())
-            with uow.transaction():
-                user = get_user(uow, username)
-                request.session.update(
-                    {
-                        "user": json.loads(user.model_dump_json()),
-                    }
-                )
+            user = user_manager.get_user(username)
+            request.session.update(
+                {
+                    "user": json.loads(user.model_dump_json()),
+                }
+            )
         return True
 
 

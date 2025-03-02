@@ -16,6 +16,7 @@ if TYPE_CHECKING:
 # Joining table to link permissions to groups
 class PermissionGroupsTable(Base):
     __tablename__ = "permission_groups"
+    __versioned__ = {}
 
     permission_id: Mapped[UUID] = mapped_column(ForeignKey("permission.id"))
     group_id: Mapped[UUID] = mapped_column(ForeignKey("group.id"))
@@ -24,6 +25,7 @@ class PermissionGroupsTable(Base):
 # Joining table to link permissions to users
 class PermissionUsersTable(Base):
     __tablename__ = "permission_users"
+    __versioned__ = {}
 
     permission_id: Mapped[UUID] = mapped_column(ForeignKey("permission.id"))
     user_id: Mapped[UUID] = mapped_column(ForeignKey("user.id"))
@@ -31,6 +33,7 @@ class PermissionUsersTable(Base):
 
 class PermissionTable(Base):
     __tablename__ = "permission"
+    __versioned__ = {}
 
     name: Mapped[str] = mapped_column(String)
     groups: Mapped[list["GroupTable"]] = relationship(

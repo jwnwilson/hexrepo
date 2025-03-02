@@ -1,4 +1,5 @@
 from typing import Tuple
+from unittest.mock import MagicMock, Mock
 
 import pytest
 from fastapi import Depends
@@ -255,3 +256,97 @@ def test_task_param_type_check(task_A: TaskAppValues, queue: SqsQueueAdaptor):
     # Assert task updated
     task_queue_instance.wait()
     assert task_queue_instance.task.status == "completed"
+
+
+def test_nested_cleanup_logic_called(task_A: TaskAppValues, queue: SqsQueueAdaptor):
+    app: TaskApp
+    task_A: TaskFuncWrapper
+    app, task_A = task_A
+    cleanup_mock = Mock()
+
+    def get_nested_test_str():
+        yield "nested dependency value"
+        cleanup_mock()
+
+    def get_test_str(test: str = Depends(get_nested_test_str)):
+        yield test
+        cleanup_mock()
+
+    @app.task
+    def task_A_dependency(task: TaskDTO, test: str = Depends(get_test_str)):
+        assert cleanup_mock.call_count == 0
+        return test
+
+    test_event = TaskDTO(name="task_A", params=dict(name="example", status="running"))
+    # queue task
+    task_queue_instance: TaskPromise = app.queue_task(
+        task_A_dependency, params=dict(task=test_event)
+    )
+    # get task
+    with queue.get_task() as event:
+        # handle task
+        result = app.handle(event)
+        assert result == "nested dependency value"
+
+    # Assert task updated
+    task_queue_instance.wait()
+    assert cleanup_mock.call_count == 2
+
+
+@pytest.fixture
+def mock_dependency_cache():
+    cache_value = Dependency.cache
+    Dependency.cache = MagicMock()
+    Dependency.cache.__getitem__.side_effect = cache_value.__getitem__
+    Dependency.cache.__contains__.side_effect = cache_value.__contains__
+    yield cache_value
+    Dependency.cache = cache_value
+
+
+def test_task_cache_hit(
+    task_A: TaskAppValues, queue: SqsQueueAdaptor, mock_dependency_cache
+):
+    app: TaskApp
+    task_A: TaskFuncWrapper
+    app, task_A = task_A
+    cleanup_mock = Mock()
+
+    def get_nested_test_str():
+        yield "nested dependency value"
+        cleanup_mock()
+
+    def get_test_str_1(test: str = Depends(get_nested_test_str)):
+        yield test
+        cleanup_mock()
+
+    def get_test_str_2(test: str = Depends(get_nested_test_str)):
+        yield test
+        cleanup_mock()
+
+    # Set cache value for test
+    mock_dependency_cache[get_nested_test_str] = "nested dependency value"
+
+    @app.task
+    def task_A_dependency(
+        task: TaskDTO,
+        test_1: str = Depends(get_test_str_1),
+        test_2: str = Depends(get_test_str_2),
+    ):
+        assert cleanup_mock.call_count == 0
+        return test_1, test_2
+
+    test_event = TaskDTO(name="task_A", params=dict(name="example", status="running"))
+    # queue task
+    task_queue_instance: TaskPromise = app.queue_task(
+        task_A_dependency, params=dict(task=test_event)
+    )
+    # get task
+    with queue.get_task() as event:
+        # handle task
+        result = app.handle(event)
+        assert result == ("nested dependency value", "nested dependency value")
+
+    # Assert task updated
+    task_queue_instance.wait()
+    assert cleanup_mock.call_count == 2
+    assert Dependency.cache.__getitem__.call_count == 2

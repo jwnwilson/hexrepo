@@ -12,7 +12,7 @@ from starlette.status import HTTP_403_FORBIDDEN
 
 from app.adaptor.db.sql import SqlUOW
 from app.config import config
-from app.domain.user import UserPermissionDTO, get_user
+from app.domain.user import UserManager, UserPermissionDTO
 
 logger = logging.getLogger(__name__)
 
@@ -51,12 +51,18 @@ def get_auth(
     yield auth
 
 
+def get_user_manager(
+    uow: SqlUOW = Depends(get_uow), auth: get_auth = Depends(get_auth)
+) -> Generator[UserManager, None, None]:
+    return UserManager(uow=uow, auth=auth)
+
+
 def get_current_user(
     credentials: JWTAuthorizationCredentials = Depends(get_jwt_token),
-    uow: SqlUOW = Depends(get_uow_ro),
+    user_manager: UserManager = Depends(get_user_manager),
 ) -> UserPermissionDTO:
     try:
-        return get_user(uow, credentials.claims["username"])
+        return user_manager.get_user(credentials.claims["username"])
     except KeyError:
         raise HTTPException(status_code=HTTP_403_FORBIDDEN, detail="Username missing")
 
