@@ -128,7 +128,7 @@ def handler(event, context):
         tags={"Type": "bastion"}
     )
     db_instances: List[Any] = rds_manager.get_db_instances(
-        tags={"Project": ["example"]}
+        tags={"Project": ["example", "common"]}
     )
 
     # Start / stop compute instances

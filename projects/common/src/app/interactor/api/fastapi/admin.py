@@ -114,7 +114,8 @@ class GroupAdmin(BaseModelView, model=GroupTable):
     column_searchable_list = [GroupTable.name]
 
     column_list = [GroupTable.name, GroupTable.id]
-
+    column_details_exclude_list = ["versions"]
+    
     form_ajax_refs = {
         "permissions": {
             "fields": ("name",),
@@ -135,6 +136,7 @@ class PermissionAdmin(BaseModelView, model=PermissionTable):
     column_searchable_list = [PermissionTable.name]
 
     column_list = [PermissionTable.name, PermissionTable.id]
+    column_details_exclude_list = ["versions"]
 
     form_ajax_refs = {
         "groups": {
