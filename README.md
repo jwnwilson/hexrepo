@@ -36,10 +36,10 @@ Setup the following env vars directly or run:
 # To Do
 
 - Setup backend
-    - Fix bug on permission view / edit page
     - Setup better logging
         - Pass correlation id from aws through to logging
         - Make logs readable in AWS
+        - Switch from xray to sentry to keep platform agnostic
     - Tests:
         - Create dynamic CRUD tests
             - User, Group, Permission, Featureflag, Company CRUD
@@ -47,8 +47,8 @@ Setup the following env vars directly or run:
         - Test auth and permission logic
         - Test cloud libs
     - Authentication via fastapi middleware infra agnostic solution
+        - Get user data with permissions via api call with username from header or session.
         - Improve DB calls to make more performant
-        - Get user data with permissions via username from header or session
         - Create materialised view or cache in dynamodb for cheap serverless option?
     - versions endpoint if versions enabled
         https://sqlalchemy-continuum.readthedocs.io/en/latest/

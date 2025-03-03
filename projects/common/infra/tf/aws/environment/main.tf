@@ -62,6 +62,7 @@ module "common_api" {
   security_group_ids = [module.common_postgres.db_security_group_id]
   bucket             = module.common_bucket.bucket_name
   jwt_secret         = aws_secretsmanager_secret_version.jwt_secret.secret_string
+  keep_warm_schedule = "* 07-17 * * *"
 
   environment_variables = {
     ENVIRONMENT             = terraform.workspace
@@ -100,7 +101,7 @@ module "common_tasks" {
   lambda_command     = ["src.app.interactor.event.lambda_handler"]
   security_group_ids = [module.common_postgres.db_security_group_id]
   jwt_secret         = aws_secretsmanager_secret_version.jwt_secret.secret_string
-
+  keep_warm_schedule = ""
   environment_variables = {
     ENVIRONMENT             = terraform.workspace
     CLOUD_PROVIDER          = "AWS"

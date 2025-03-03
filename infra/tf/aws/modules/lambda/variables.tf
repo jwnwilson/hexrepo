@@ -44,3 +44,7 @@ variable "bucket" {
 variable "jwt_secret" {
   default = null
 }
+
+variable "keep_warm_schedule" {
+  default = "rate(1 minute)"
+}

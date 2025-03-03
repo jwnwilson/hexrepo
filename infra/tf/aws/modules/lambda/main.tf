@@ -75,9 +75,9 @@ module "lambda" {
 
   environment_variables = merge(
     {
-      ENVIRONMENT = var.environment
-      LOG_JSON    = "true"
-      JWT_SECRET  = var.jwt_secret != null ? var.jwt_secret : uuid()
+      ENVIRONMENT     = var.environment
+      LOG_JSON        = "true"
+      JWT_SECRET      = var.jwt_secret != null ? var.jwt_secret : uuid()
       SESSION_SECRET  = var.jwt_secret != null ? var.jwt_secret : uuid()
       TRACING_ENABLED = "true"
     },
@@ -90,8 +90,30 @@ module "lambda" {
   vpc_security_group_ids = concat(var.security_group_ids, [module.security_group.security_group_id])
 }
 
-# Schedule Lambda 
+resource "aws_cloudwatch_event_rule" "every_one_minute" {
+  count               = var.keep_warm_schedule != "" ? 1 : 0
+  name                = "${var.name}-${var.environment}-every-one-minute"
+  description         = "Fires every one minutes"
+  schedule_expression = var.keep_warm_schedule
+}
 
+resource "aws_cloudwatch_event_target" "check_api_one_minute" {
+  count     = var.keep_warm_schedule != "" ? 1 : 0
+  rule      = aws_cloudwatch_event_rule.every_one_minute[0].name
+  target_id = "lambda"
+  arn       = module.lambda.lambda_function_arn
+}
+
+resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda" {
+  count         = var.keep_warm_schedule != "" ? 1 : 0
+  statement_id  = "AllowExecutionFromCloudWatch"
+  action        = "lambda:InvokeFunction"
+  function_name = module.lambda.lambda_function_arn
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.every_one_minute[0].arn
+}
+
+# Schedule Lambda 
 resource "aws_cloudwatch_event_rule" "schedule_lambda" {
   count               = var.lambda_schedule_expression != null ? 1 : 0
   name                = "${var.name}_${var.environment}_schedule_lambda"
@@ -120,7 +142,7 @@ resource "aws_iam_policy" "lambda-policy" {
   description = "allow lambda access necessary resources"
 
   policy = jsonencode({
-    Version   = "2012-10-17"
+    Version = "2012-10-17"
     Statement = [
       {
         Action   = ["sqs:*"]
@@ -135,7 +157,7 @@ resource "aws_iam_policy" "lambda-policy" {
       {
         Action   = ["dynamodb:*"]
         Effect   = "Allow"
-        Resource = var.dynamodb_arn 
+        Resource = var.dynamodb_arn
       },
       {
         Action   = ["s3:*"]
