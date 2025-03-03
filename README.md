@@ -36,6 +36,7 @@ Setup the following env vars directly or run:
 # To Do
 
 - Setup backend
+    - Skip lambda version update on infra apply
     - Setup better logging
         - Pass correlation id from aws through to logging
         - Make logs readable in AWS
