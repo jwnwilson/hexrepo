@@ -2,12 +2,13 @@ import functools
 import logging
 import os
 from typing import Dict, Optional
-
 import boto3
 
 from .interface import SecretAdaptor
 
 logger = logging.getLogger(__name__)
+
+RUNNING_ON_AWS = os.getenv("AWS_LAMBDA_FUNCTION_NAME") is not None
 
 
 def secret_cache(func):
@@ -16,14 +17,15 @@ def secret_cache(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs) -> Optional[str]:
         secret_name: str = args[1]
-        if secret_name in set(os.listdir("/tmp")):
+        if RUNNING_ON_AWS and secret_name in set(os.listdir("/tmp")):
             logger.info(f"Secret: {secret_name} retrieved from file cache.")
             with open(f"/tmp/{secret_name}", "r") as f:
                 return f.read()
-        secret_value = func(*args, **kwargs)
-        if secret_value:
+        secret_value: str = func(*args, **kwargs)
+        if RUNNING_ON_AWS and secret_value:
             with open(f"/tmp/{secret_name}", "w") as f:
                 f.write(secret_value)
+        return secret_value
     return wrapper
 
 
