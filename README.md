@@ -37,6 +37,7 @@ Setup the following env vars directly or run:
 
 - Setup backend
     - Skip lambda version update on infra apply
+        - tf Apply with last docker image tag
     - Setup better logging
         - Pass correlation id from aws through to logging
         - Make logs readable in AWS

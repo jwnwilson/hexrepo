@@ -5,3 +5,7 @@ output "db_secret_name" {
 output "db_url" {
   value = local.db_url
 }
+
+output "docker_image_tag" {
+  value = module.common_api.lambda_function_image_tag
+}
