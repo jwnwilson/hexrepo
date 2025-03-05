@@ -50,6 +50,11 @@ resource "aws_secretsmanager_secret_version" "jwt_secret" {
   }
 }
 
+data "aws_ecr_image" "latest_image" {
+  repository_name = "hexrepo-${var.project}"
+  most_recent       = true
+}
+
 module "common_api" {
   source = "../../../../../../infra/tf/aws/modules/lambda"
 

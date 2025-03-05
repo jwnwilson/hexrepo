@@ -49,7 +49,6 @@ module "security_group" {
     }
   ]
 }
-
 module "lambda" {
   source = "terraform-aws-modules/lambda/aws"
 

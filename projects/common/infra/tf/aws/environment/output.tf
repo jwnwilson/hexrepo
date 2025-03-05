@@ -7,5 +7,5 @@ output "db_url" {
 }
 
 output "docker_image_tag" {
-  value = module.common_api.lambda_function_image_tag
+  value = data.aws_ecr_image.latest_image.image_uri
 }
