@@ -53,11 +53,24 @@ class PermissionCreateDTO(BaseModel):
 
 
 class CompanyDTO(BaseModel):
+    id: UUID
+    name: str
+    website: str
+
+
+class CompanyCreateDTO(BaseModel):
     name: str
     website: str
 
 
 class FeatureFlagDTO(BaseModel):
+    id: UUID
+    name: str
+    enabled: bool
+    company_id: Optional[UUID] = None
+
+
+class FeatureFlagCreateDTO(BaseModel):
     name: str
     enabled: bool
     company_id: Optional[UUID] = None

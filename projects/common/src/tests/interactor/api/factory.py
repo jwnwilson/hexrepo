@@ -1,11 +1,14 @@
 import uuid
-from typing import Type
+from typing import Optional, Type
 
 from pydantic import BaseModel
+from polyfactory.factories.pydantic_factory import ModelFactory
 
 from app.domain.user import (
     CompanyDTO,
+    CompanyCreateDTO,
     FeatureFlagDTO,
+    FeatureFlagCreateDTO,
     GroupPermissionDTO,
     PermissionDTO,
     UserPermissionCreateDTO,
@@ -13,62 +16,34 @@ from app.domain.user import (
 )
 
 
-def generateFeatureFlag():
-    return FeatureFlagDTO(
-        id=uuid.UUID("12345678-1234-5678-1234-567812345678"),
-        name="test",
-        created_at="2024-08-30T08:06:10.591198",
-        enabled=True,
-    )
+class FeatureFlagFactory(ModelFactory[FeatureFlagDTO]):
+    @classmethod
+    def company_id(cls) -> Optional[uuid.UUID]:
+        return None
 
-
-def generateUserPermissionDTO():
-    return UserPermissionDTO(
-        id=uuid.UUID("12345678-1234-5678-1234-567812345678"),
-        name="test",
-        username="test",
-        email="test@test.com",
-        permissions=[],
-        groups=[],
-        verified=True,
-        company=None,
-    )
-
-
-def generateCompanyDTO():
-    return CompanyDTO(name="test", website="test.com")
-
-
-def generateGroupPermissionDTO():
-    return GroupPermissionDTO(
-        id=uuid.UUID("12345678-1234-5678-1234-567812345678"),
-        name="test",
-        users=[],
-        permissions=[],
-    )
-
-
-def generatePermissionsDTO():
-    return PermissionDTO(
-        id=uuid.UUID("12345678-1234-5678-1234-567812345678"),
-        name="test",
-        users=[],
-        groups=[],
-    )
+class FeatureFlagCreateFactory(ModelFactory[FeatureFlagCreateDTO]): ...
+class UserPermissionFactory(ModelFactory[UserPermissionDTO]): ...
+class CompanyFactory(ModelFactory[CompanyDTO]): ...
+class CompanyCreateFactory(ModelFactory[CompanyCreateDTO]): ...
+class GroupPermissionFactory(ModelFactory[GroupPermissionDTO]): ...
+class PermissionFactory(ModelFactory[PermissionDTO]): ...
+class UserPermissionCreateFactory(ModelFactory[UserPermissionCreateDTO]): ...
 
 
 TEST_DATA_FACTORY = {
-    FeatureFlagDTO: generateFeatureFlag,
-    CompanyDTO: generateCompanyDTO,
-    UserPermissionDTO: generateUserPermissionDTO,
-    UserPermissionCreateDTO: generateUserPermissionDTO,
-    GroupPermissionDTO: generateGroupPermissionDTO,
-    PermissionDTO: generatePermissionsDTO,
+    FeatureFlagDTO: FeatureFlagFactory,
+    FeatureFlagCreateDTO: FeatureFlagCreateFactory,
+    CompanyDTO: CompanyFactory,
+    CompanyCreateDTO: CompanyCreateFactory,
+    UserPermissionDTO: UserPermissionFactory,
+    UserPermissionCreateDTO: UserPermissionCreateFactory,
+    GroupPermissionDTO: GroupPermissionFactory,
+    PermissionDTO: PermissionFactory,
 }
 
 
 def get_test_data(model: Type[BaseModel]) -> BaseModel:
     try:
-        return TEST_DATA_FACTORY[model]()
+        return TEST_DATA_FACTORY[model].build()
     except KeyError:
         raise Exception(f"Test data factory not implemented for {model}")

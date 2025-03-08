@@ -1,6 +1,6 @@
 from hexrepo_api import CrudRouter
 
-from app.domain.user import FeatureFlagDTO
+from app.domain.user import FeatureFlagDTO, FeatureFlagCreateDTO
 
 from ......dependencies import get_superadmin_user, get_uow, get_uow_ro
 
@@ -11,6 +11,6 @@ router_v1 = CrudRouter(
     repository="feature_flag",
     methods=["CREATE", "READ", "UPDATE", "DELETE"],
     response_schema=FeatureFlagDTO,
-    create_schema=FeatureFlagDTO,
+    create_schema=FeatureFlagCreateDTO,
     update_schema=FeatureFlagDTO,
 )

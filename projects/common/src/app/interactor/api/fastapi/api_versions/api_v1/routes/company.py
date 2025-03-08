@@ -1,6 +1,6 @@
 from hexrepo_api import CrudRouter
 
-from app.domain.user import CompanyDTO
+from app.domain.user import CompanyDTO, CompanyCreateDTO
 
 from ......dependencies import get_superadmin_user, get_uow, get_uow_ro
 
@@ -11,6 +11,6 @@ router_v1 = CrudRouter(
     repository="company",
     methods=["CREATE", "READ", "UPDATE", "DELETE"],
     response_schema=CompanyDTO,
-    create_schema=CompanyDTO,
+    create_schema=CompanyCreateDTO,
     update_schema=CompanyDTO,
 )
