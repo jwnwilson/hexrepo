@@ -1,35 +1,20 @@
-from typing import Dict, Type
-import uuid
-from fastapi.testclient import TestClient
-from pydantic import BaseModel
+from typing import Dict
+
 import pytest
+from fastapi.testclient import TestClient
 from hexrepo_api.crud import CrudRouter
 
-from app.domain.user import FeatureFlagDTO
-from app.interactor.api.fastapi.api_versions.api_v1.routes.feature_flags import router_v1 as feature_flags_router
+from app.interactor.api.fastapi.api_versions.api_v1.api import (
+    feature_flags_router,
+    users_router,
+)
 
+from .factory import get_test_data
 
 API_ENDPOINT_TEST_DATA = {
     "feature_flag": feature_flags_router,
+    "user": users_router,
 }
-
-def generateFeatureFlag():
-    return FeatureFlagDTO(
-        id=uuid.UUID("12345678-1234-5678-1234-567812345678"),
-        name="test",
-        created_at="2024-08-30T08:06:10.591198",
-        enabled=True
-    )
-
-TEST_DATA_FACTORY = {
-    FeatureFlagDTO: generateFeatureFlag
-}
-
-def get_test_data(model: Type[BaseModel]) -> BaseModel:
-    try:
-        return TEST_DATA_FACTORY[model]()
-    except KeyError:
-        raise Exception(f"Test data factory not implemented for {model}")
 
 
 @pytest.mark.parametrize("endpoint", API_ENDPOINT_TEST_DATA.keys())
