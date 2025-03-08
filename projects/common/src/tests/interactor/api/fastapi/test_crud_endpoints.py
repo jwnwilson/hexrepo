@@ -9,8 +9,8 @@ from app.interactor.api.fastapi.api_versions.api_v1.api import (
     company_router,
     feature_flags_router,
     groups_router,
+    permissions_router,
     users_router,
-    permissions_router
 )
 
 from ..factory import get_test_data

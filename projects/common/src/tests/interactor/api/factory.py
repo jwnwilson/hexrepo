@@ -3,7 +3,14 @@ from typing import Type
 
 from pydantic import BaseModel
 
-from app.domain.user import CompanyDTO, FeatureFlagDTO, GroupPermissionDTO, PermissionDTO, UserPermissionCreateDTO, UserPermissionDTO
+from app.domain.user import (
+    CompanyDTO,
+    FeatureFlagDTO,
+    GroupPermissionDTO,
+    PermissionDTO,
+    UserPermissionCreateDTO,
+    UserPermissionDTO,
+)
 
 
 def generateFeatureFlag():
