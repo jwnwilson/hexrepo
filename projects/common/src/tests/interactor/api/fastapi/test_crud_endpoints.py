@@ -5,15 +5,15 @@ from fastapi.testclient import TestClient
 from hexrepo_api.crud import CrudRouter
 
 from app.interactor.api.fastapi.api_versions.api_v1.api import (
+    company_router,
     feature_flags_router,
-    users_router,
 )
 
-from .factory import get_test_data
+from ..factory import get_test_data
 
 API_ENDPOINT_TEST_DATA = {
     "feature_flag": feature_flags_router,
-    "user": users_router,
+    "company": company_router,
 }
 
 
@@ -31,9 +31,9 @@ def test_crud_create(client: TestClient, endpoint: Dict):
 @pytest.mark.parametrize("endpoint", API_ENDPOINT_TEST_DATA.keys())
 def test_crud_read_many(client: TestClient, test_data_generator, endpoint: Dict):
     router: CrudRouter = API_ENDPOINT_TEST_DATA[endpoint]
-    response = client.get(f"/api/v1/{endpoint}/")
-    create_dto = get_test_data(router.create_schema)
+    create_dto = get_test_data(router.response_schema)
     test_data = test_data_generator(create_dto)
+    response = client.get(f"/api/v1/{endpoint}/")
     assert response.status_code == 200
     reponse_data = response.json()
-    assert reponse_data["results"] == test_data.model_dump()
+    assert reponse_data["results"][0] == test_data.model_dump()

@@ -3,7 +3,7 @@ from typing import Type
 
 from pydantic import BaseModel
 
-from app.domain.user import FeatureFlagDTO, UserPermissionCreateDTO
+from app.domain.user import CompanyDTO, FeatureFlagDTO, UserPermissionCreateDTO
 
 
 def generateFeatureFlag():
@@ -28,8 +28,13 @@ def generateUserPermissionDTO():
     )
 
 
+def generateCompanyDTO():
+    return CompanyDTO(name="test", website="test.com")
+
+
 TEST_DATA_FACTORY = {
     FeatureFlagDTO: generateFeatureFlag,
+    CompanyDTO: generateCompanyDTO,
     UserPermissionCreateDTO: generateUserPermissionDTO,
 }
 
