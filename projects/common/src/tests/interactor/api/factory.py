@@ -1,5 +1,5 @@
 import uuid
-from typing import Optional, Type
+from typing import Dict, List, Optional, Type
 
 from pydantic import BaseModel
 from polyfactory.factories.pydantic_factory import ModelFactory
@@ -21,13 +21,28 @@ class FeatureFlagFactory(ModelFactory[FeatureFlagDTO]):
     def company_id(cls) -> Optional[uuid.UUID]:
         return None
 
+
 class FeatureFlagCreateFactory(ModelFactory[FeatureFlagCreateDTO]): ...
-class UserPermissionFactory(ModelFactory[UserPermissionDTO]): ...
 class CompanyFactory(ModelFactory[CompanyDTO]): ...
 class CompanyCreateFactory(ModelFactory[CompanyCreateDTO]): ...
-class GroupPermissionFactory(ModelFactory[GroupPermissionDTO]): ...
+class GroupPermissionFactory(ModelFactory[GroupPermissionDTO]):
+    @classmethod
+    def users(cls) -> List[Dict]:
+        return []
+    @classmethod
+    def permissions(cls) -> List[Dict]:
+        return []
+
+
 class PermissionFactory(ModelFactory[PermissionDTO]): ...
-class UserPermissionCreateFactory(ModelFactory[UserPermissionCreateDTO]): ...
+class UserPermissionFactory(ModelFactory[UserPermissionDTO]): ...
+class UserPermissionCreateFactory(ModelFactory[UserPermissionCreateDTO]):
+    @classmethod
+    def permissions(cls) -> List[Dict]:
+        return []
+    @classmethod
+    def groups(cls) -> List[Dict]:
+        return []
 
 
 TEST_DATA_FACTORY = {
