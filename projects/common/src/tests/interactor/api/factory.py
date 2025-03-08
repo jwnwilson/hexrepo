@@ -34,8 +34,24 @@ class GroupPermissionFactory(ModelFactory[GroupPermissionDTO]):
         return []
 
 
-class PermissionFactory(ModelFactory[PermissionDTO]): ...
-class UserPermissionFactory(ModelFactory[UserPermissionDTO]): ...
+class PermissionFactory(ModelFactory[PermissionDTO]):
+    @classmethod
+    def users(cls) -> List[Dict]:
+        return []
+    @classmethod
+    def groups(cls) -> List[Dict]:
+        return []
+    
+
+class UserPermissionFactory(ModelFactory[UserPermissionDTO]):
+    @classmethod
+    def permissions(cls) -> List[Dict]:
+        return []
+    @classmethod
+    def groups(cls) -> List[Dict]:
+        return []
+
+
 class UserPermissionCreateFactory(ModelFactory[UserPermissionCreateDTO]):
     @classmethod
     def permissions(cls) -> List[Dict]:
