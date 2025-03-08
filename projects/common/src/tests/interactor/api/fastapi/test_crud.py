@@ -191,3 +191,4 @@ def test_read_multi_route_with_ordering_desc(client: TestClient):
     data = response.json()
     results = [MockResponseSchema(**d) for d in data["results"]]
     assert results == sorted(mock_responses, key=lambda m: m.name, reverse=True)
+

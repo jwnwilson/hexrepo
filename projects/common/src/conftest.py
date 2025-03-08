@@ -1,6 +1,7 @@
 import os
 from collections.abc import Generator
 
+from app.domain.user import UserPermissionDTO
 import pytest
 from fastapi.testclient import TestClient
 from hexrepo_db import UOW
@@ -66,12 +67,27 @@ def drop_tables(uow: UOW):
 @pytest.fixture
 def client(uow):
     from app.interactor.api.fastapi import app
-    from app.interactor.dependencies import get_uow
+    from app.interactor.dependencies import get_uow, get_superadmin_user
 
     def get_uow_override():
         yield uow
 
+    def get_superadmin_user_override():
+        return UserPermissionDTO(
+            id="12345678-1234-5678-1234-567812345678",
+            name="test",
+            username="test",
+            email="test@test.com",
+            permissions=[{
+                "id": "12345678-1234-5678-1234-567812345678"
+            }],
+            groups=[],
+            verified=True,
+            company=None,
+        )
+
     app.dependency_overrides[get_uow] = get_uow_override
+    app.dependency_overrides[get_superadmin_user] = get_superadmin_user_override
     return TestClient(app)
 
 

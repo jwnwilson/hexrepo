@@ -36,17 +36,17 @@ Setup the following env vars directly or run:
 # To Do
 
 - Setup backend
-    - Skip lambda version update on infra apply
-    - Setup better logging
-        - Pass correlation id from aws through to logging
-        - Make logs readable in AWS
-        - Switch from xray to sentry to keep platform agnostic
     - Tests:
         - Create dynamic CRUD tests
             - User, Group, Permission, Featureflag, Company CRUD
         - Test relationship CRUD logic (check create)
         - Test auth and permission logic
         - Test cloud libs
+        - Test Auth / authorisation
+    - Setup better logging
+        - Pass correlation id from aws through to logging
+        - Make logs readable in AWS
+        - Switch from xray to sentry to keep platform agnostic
     - Authentication via fastapi middleware infra agnostic solution
         - Get user data with permissions via api call with username from header or session.
         - Improve DB calls to make more performant
