@@ -31,8 +31,9 @@ def test_crud_create(client: TestClient, endpoint: Dict):
 @pytest.mark.parametrize("endpoint", API_ENDPOINT_TEST_DATA.keys())
 def test_crud_read_many(client: TestClient, test_data_generator, endpoint: Dict):
     router: CrudRouter = API_ENDPOINT_TEST_DATA[endpoint]
-    record = test_data_generator(payload=router.create_schema)
     response = client.get(f"/api/v1/{endpoint}/")
+    create_dto = get_test_data(router.create_schema)
+    test_data = test_data_generator(create_dto)
     assert response.status_code == 200
     reponse_data = response.json()
-    assert reponse_data["results"] == record.model_dump()
+    assert reponse_data["results"] == test_data.model_dump()
