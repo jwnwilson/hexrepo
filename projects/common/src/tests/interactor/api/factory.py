@@ -3,7 +3,7 @@ from typing import Type
 
 from pydantic import BaseModel
 
-from app.domain.user import CompanyDTO, FeatureFlagDTO, UserPermissionCreateDTO
+from app.domain.user import CompanyDTO, FeatureFlagDTO, GroupPermissionDTO, PermissionDTO, UserPermissionCreateDTO, UserPermissionDTO
 
 
 def generateFeatureFlag():
@@ -16,7 +16,7 @@ def generateFeatureFlag():
 
 
 def generateUserPermissionDTO():
-    return UserPermissionCreateDTO(
+    return UserPermissionDTO(
         id=uuid.UUID("12345678-1234-5678-1234-567812345678"),
         name="test",
         username="test",
@@ -32,10 +32,31 @@ def generateCompanyDTO():
     return CompanyDTO(name="test", website="test.com")
 
 
+def generateGroupPermissionDTO():
+    return GroupPermissionDTO(
+        id=uuid.UUID("12345678-1234-5678-1234-567812345678"),
+        name="test",
+        users=[],
+        permissions=[],
+    )
+
+
+def generatePermissionsDTO():
+    return PermissionDTO(
+        id=uuid.UUID("12345678-1234-5678-1234-567812345678"),
+        name="test",
+        users=[],
+        groups=[],
+    )
+
+
 TEST_DATA_FACTORY = {
     FeatureFlagDTO: generateFeatureFlag,
     CompanyDTO: generateCompanyDTO,
+    UserPermissionDTO: generateUserPermissionDTO,
     UserPermissionCreateDTO: generateUserPermissionDTO,
+    GroupPermissionDTO: generateGroupPermissionDTO,
+    PermissionDTO: generatePermissionsDTO,
 }
 
 
