@@ -22,7 +22,11 @@ class FeatureFlagFactory(ModelFactory[FeatureFlagDTO]):
         return None
 
 
-class FeatureFlagCreateFactory(ModelFactory[FeatureFlagCreateDTO]): ...
+class FeatureFlagCreateFactory(ModelFactory[FeatureFlagCreateDTO]):
+    @classmethod
+    def company_id(cls) -> Optional[uuid.UUID]:
+        return None
+
 class CompanyFactory(ModelFactory[CompanyDTO]): ...
 class CompanyCreateFactory(ModelFactory[CompanyCreateDTO]): ...
 class GroupPermissionFactory(ModelFactory[GroupPermissionDTO]):
@@ -62,6 +66,9 @@ class UserPermissionCreateFactory(ModelFactory[UserPermissionCreateDTO]):
     @classmethod
     def groups(cls) -> List[Dict]:
         return []
+    @classmethod
+    def company_id(cls) -> Optional[uuid.UUID]:
+        return None
 
 
 TEST_DATA_FACTORY = {

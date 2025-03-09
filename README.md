@@ -37,7 +37,6 @@ Setup the following env vars directly or run:
 
 - Setup backend
     - Tests:
-        - Disable auth lib during tests
         - Create dynamic CRUD tests
             - User, Group, Permission, Featureflag, Company CRUD
         - Test relationship CRUD logic (check create)

@@ -1,8 +1,10 @@
 import os
 from collections.abc import Generator
+from unittest.mock import MagicMock
 
 import pytest
 from fastapi.testclient import TestClient
+from hexrepo_cloud.auth.interface import AuthAdapter
 from hexrepo_db import UOW
 
 from app.adaptor.db.sql.uow import SqlUOW
@@ -67,7 +69,10 @@ def drop_tables(uow: UOW):
 @pytest.fixture
 def client(uow):
     from app.interactor.api.fastapi import app
-    from app.interactor.dependencies import get_superadmin_user, get_uow
+    from app.interactor.dependencies import get_superadmin_user, get_uow, get_auth
+
+    def get_auth_override():
+        yield MagicMock(spec=AuthAdapter)
 
     def get_uow_override():
         yield uow
@@ -84,6 +89,7 @@ def client(uow):
             company=None,
         )
 
+    app.dependency_overrides[get_auth] = get_auth_override
     app.dependency_overrides[get_uow] = get_uow_override
     app.dependency_overrides[get_superadmin_user] = get_superadmin_user_override
     return TestClient(app)

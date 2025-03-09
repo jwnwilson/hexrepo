@@ -51,7 +51,7 @@ def test_crud_read_many(client: TestClient, test_data_generator, endpoint: Dict)
 @pytest.mark.parametrize("endpoint", API_ENDPOINT_TEST_DATA.keys())
 def test_crud_read_single(client: TestClient, test_data_generator, endpoint: Dict):
     router: CrudRouter = API_ENDPOINT_TEST_DATA[endpoint]
-    create_dto = get_test_data(router.response_schema)
+    create_dto = get_test_data(router.create_schema)
     test_data = test_data_generator(create_dto)
     response = client.get(f"/api/v1/{endpoint}/{test_data.id}")
     assert response.status_code == 200
@@ -62,12 +62,19 @@ def test_crud_read_single(client: TestClient, test_data_generator, endpoint: Dic
 @pytest.mark.parametrize("endpoint", API_ENDPOINT_TEST_DATA.keys())
 def test_crud_update(client: TestClient, test_data_generator, endpoint: Dict):
     router: CrudRouter = API_ENDPOINT_TEST_DATA[endpoint]
-    create_dto = get_test_data(router.response_schema)
+    # Create a new record
+    create_dto = get_test_data(router.create_schema)
     test_data = test_data_generator(create_dto)
-    response = client.patch(f"/api/v1/{endpoint}/{test_data.id}", json={"name": "updated"})
+    response = client.get(f"/api/v1/{endpoint}/{test_data.id}")
     assert response.status_code == 200
+    # Update the record
+    create_dto = get_test_data(router.update_schema)
+    update_data = test_data_generator(create_dto)
+    response = client.patch(f"/api/v1/{endpoint}/{test_data.id}", json=update_data)
+    assert response.status_code == 200, response.json()
     reponse_data = response.json()
-    assert reponse_data == json.loads(test_data.model_dump_json())
+    for key, value in update_data.items():
+        assert reponse_data[key] == value
 
 
 @pytest.mark.parametrize("endpoint", API_ENDPOINT_TEST_DATA.keys())
