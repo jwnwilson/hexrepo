@@ -23,7 +23,7 @@ class UserPermissionCreateDTO(BaseModel):
     groups: List[Dict[str, Any]]
     cognito_id: Optional[str] = None
     verified: bool
-    company: Optional[Dict[str, Any]]
+    company_id: Optional[UUID] = None
 
 
 class UserPermissionDTO(UserPermissionCreateDTO):

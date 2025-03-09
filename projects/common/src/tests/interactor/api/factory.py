@@ -50,6 +50,9 @@ class UserPermissionFactory(ModelFactory[UserPermissionDTO]):
     @classmethod
     def groups(cls) -> List[Dict]:
         return []
+    @classmethod
+    def company_id(cls) -> Optional[uuid.UUID]:
+        return None
 
 
 class UserPermissionCreateFactory(ModelFactory[UserPermissionCreateDTO]):

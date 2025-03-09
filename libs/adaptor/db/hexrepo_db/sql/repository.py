@@ -83,7 +83,12 @@ class DefaultQuery(Query):
         # if this is a create operation then create new relationships
         for relationship in relationships:
             # If diff, update relationship
-            dto_ids: List[str] = [str(r["id"]) for r in getattr(dto, relationship)]
+            try:
+                dto_ids: List[str] = [str(r["id"]) for r in getattr(dto, relationship)]
+            except KeyError as err:
+                msg: str = f"Invalid relationship data: {relationships}, missing 'id' key"
+                logger.error(msg)
+                raise ValueError(msg)
             # If creating, set empty list
             if create:
                 db_ids: List[str] = []
