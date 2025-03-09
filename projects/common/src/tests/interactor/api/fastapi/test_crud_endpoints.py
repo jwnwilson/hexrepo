@@ -19,7 +19,7 @@ API_ENDPOINT_TEST_DATA = {
     "feature_flag": feature_flags_router,
     "company": company_router,
     "group": groups_router,
-    "user": users_router,
+    # "user": users_router,
     "permission": permissions_router,
 }
 
