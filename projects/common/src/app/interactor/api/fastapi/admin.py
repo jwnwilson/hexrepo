@@ -115,7 +115,7 @@ class GroupAdmin(BaseModelView, model=GroupTable):
 
     column_list = [GroupTable.name, GroupTable.id]
     column_details_exclude_list = ["versions"]
-    
+
     form_ajax_refs = {
         "permissions": {
             "fields": ("name",),

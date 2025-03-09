@@ -36,17 +36,16 @@ Setup the following env vars directly or run:
 # To Do
 
 - Setup backend
-    - Skip lambda version update on infra apply
+    - Tests:
+        - Test relationship CRUD logic (check create)
+        - Test auth and permission logic
+        - Test cloud libs
+        - Test Auth / authorisation
+        - Setup sonarqube
     - Setup better logging
         - Pass correlation id from aws through to logging
         - Make logs readable in AWS
         - Switch from xray to sentry to keep platform agnostic
-    - Tests:
-        - Create dynamic CRUD tests
-            - User, Group, Permission, Featureflag, Company CRUD
-        - Test relationship CRUD logic (check create)
-        - Test auth and permission logic
-        - Test cloud libs
     - Authentication via fastapi middleware infra agnostic solution
         - Get user data with permissions via api call with username from header or session.
         - Improve DB calls to make more performant
@@ -62,7 +61,6 @@ Setup the following env vars directly or run:
         - Re-render template with project settings 
         - Create Diff with changes
         - Add CI job to detect template changes and add a new PR with applied patch to projects
-    - Add ECS option to avoid cold startup
     - Add monitoring dashboard for services
         - Generic change log
         - Potentially use 3rd party service?
@@ -70,6 +68,7 @@ Setup the following env vars directly or run:
         - Latency tracking and visualisation
         - Add log based event tracking
         - Setup BI dashboard
+    - Add ECS option to avoid cold startup
     - Setup simple FE with auth?
         - Rename projects -> backend
         - Create frontend folder

@@ -1,6 +1,6 @@
 from hexrepo_api import CrudRouter
 
-from app.domain.user import FeatureFlagCreateDTO, FeatureFlagDTO
+from app.domain.user import CompanyCreateDTO, CompanyDTO
 
 from ......dependencies import get_superadmin_user, get_uow, get_uow_ro
 
@@ -8,9 +8,9 @@ router_v1 = CrudRouter(
     db_dependency=get_uow,
     db_dependency_ro=get_uow_ro,
     auth_adaptor=get_superadmin_user,
-    repository="feature_flag",
+    repository="company",
     methods=["CREATE", "READ", "UPDATE", "DELETE"],
-    response_schema=FeatureFlagDTO,
-    create_schema=FeatureFlagCreateDTO,
-    update_schema=FeatureFlagDTO,
+    response_schema=CompanyDTO,
+    create_schema=CompanyCreateDTO,
+    update_schema=CompanyDTO,
 )

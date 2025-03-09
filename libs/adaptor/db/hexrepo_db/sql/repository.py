@@ -83,7 +83,12 @@ class DefaultQuery(Query):
         # if this is a create operation then create new relationships
         for relationship in relationships:
             # If diff, update relationship
-            dto_ids: List[str] = [str(r["id"]) for r in getattr(dto, relationship)]
+            try:
+                dto_ids: List[str] = [str(r["id"]) for r in getattr(dto, relationship)]
+            except KeyError as err:
+                msg: str = f"Invalid relationship data: {relationships}, missing 'id' key"
+                logger.error(msg)
+                raise ValueError(msg)
             # If creating, set empty list
             if create:
                 db_ids: List[str] = []
@@ -195,6 +200,8 @@ class SQLRepository(Repository):
         """
         # Merge new data with existing data
         for key, value in obj_in.model_dump(exclude_unset=True).items():
+            if key == "id":
+                continue
             # Avoid updating relationships as they are handled in parse_dto
             if type(getattr(db_obj, key)) is InstrumentedList:
                 continue
