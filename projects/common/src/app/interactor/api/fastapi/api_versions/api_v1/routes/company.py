@@ -1,6 +1,6 @@
 from hexrepo_api import CrudRouter
 
-from app.domain.user import CompanyDTO, CompanyCreateDTO
+from app.domain.user import CompanyCreateDTO, CompanyDTO
 
 from ......dependencies import get_superadmin_user, get_uow, get_uow_ro
 

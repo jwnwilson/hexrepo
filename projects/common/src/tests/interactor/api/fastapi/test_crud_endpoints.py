@@ -60,22 +60,19 @@ def test_crud_read_single(client: TestClient, test_data_generator, endpoint: Dic
 
 
 @pytest.mark.parametrize("endpoint", API_ENDPOINT_TEST_DATA.keys())
-def test_crud_update(client: TestClient, test_data_generator, endpoint: Dict):
+def test_crud_update(uow, client: TestClient, test_data_generator, endpoint: Dict):
     router: CrudRouter = API_ENDPOINT_TEST_DATA[endpoint]
     # Create a new record
-    create_payload = json.loads(get_test_data(router.response_schema).model_dump_json())
-    response = client.post(f"/api/v1/{endpoint}/", json=create_payload)
-    assert response.status_code == 200
-    # Update the record
-    update_data = get_test_data(router.update_schema)
-    update_data = json.loads(test_data_generator(update_data).model_dump_json())
-    update_id = response.json()["id"]
-    if "id" in update_data:
-        update_data["id"] = update_id
-    response = client.patch(f"/api/v1/{endpoint}/{update_id}", json=update_data)
+    create_payload = get_test_data(router.response_schema)
+    create_record = test_data_generator(create_payload)
+    update_id = create_record.id
+    update_payload = get_test_data(router.update_schema)
+    update_payload.id = update_id
+    update_payload_dict: Dict = json.loads(update_payload.model_dump_json())
+    response = client.patch(f"/api/v1/{endpoint}/{update_id}", json=update_payload_dict)
     assert response.status_code == 200, response.json()
     reponse_data = response.json()
-    for key, value in update_data.items():
+    for key, value in update_payload_dict.items():
         assert reponse_data[key] == value
 
 

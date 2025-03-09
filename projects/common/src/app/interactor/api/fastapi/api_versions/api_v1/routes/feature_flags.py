@@ -1,6 +1,6 @@
 from hexrepo_api import CrudRouter
 
-from app.domain.user import FeatureFlagDTO, FeatureFlagCreateDTO
+from app.domain.user import FeatureFlagCreateDTO, FeatureFlagDTO
 
 from ......dependencies import get_superadmin_user, get_uow, get_uow_ro
 

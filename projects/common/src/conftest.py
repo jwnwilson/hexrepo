@@ -69,7 +69,7 @@ def drop_tables(uow: UOW):
 @pytest.fixture
 def client(uow):
     from app.interactor.api.fastapi import app
-    from app.interactor.dependencies import get_superadmin_user, get_uow, get_auth
+    from app.interactor.dependencies import get_auth, get_superadmin_user, get_uow
 
     def get_auth_override():
         yield MagicMock(spec=AuthAdapter)

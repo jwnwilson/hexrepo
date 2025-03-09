@@ -1,14 +1,14 @@
 import uuid
 from typing import Dict, List, Optional, Type
 
-from pydantic import BaseModel
 from polyfactory.factories.pydantic_factory import ModelFactory
+from pydantic import BaseModel
 
 from app.domain.user import (
-    CompanyDTO,
     CompanyCreateDTO,
-    FeatureFlagDTO,
+    CompanyDTO,
     FeatureFlagCreateDTO,
+    FeatureFlagDTO,
     GroupPermissionDTO,
     PermissionDTO,
     UserPermissionCreateDTO,
@@ -27,12 +27,18 @@ class FeatureFlagCreateFactory(ModelFactory[FeatureFlagCreateDTO]):
     def company_id(cls) -> Optional[uuid.UUID]:
         return None
 
+
 class CompanyFactory(ModelFactory[CompanyDTO]): ...
+
+
 class CompanyCreateFactory(ModelFactory[CompanyCreateDTO]): ...
+
+
 class GroupPermissionFactory(ModelFactory[GroupPermissionDTO]):
     @classmethod
     def users(cls) -> List[Dict]:
         return []
+
     @classmethod
     def permissions(cls) -> List[Dict]:
         return []
@@ -42,18 +48,21 @@ class PermissionFactory(ModelFactory[PermissionDTO]):
     @classmethod
     def users(cls) -> List[Dict]:
         return []
+
     @classmethod
     def groups(cls) -> List[Dict]:
         return []
-    
+
 
 class UserPermissionFactory(ModelFactory[UserPermissionDTO]):
     @classmethod
     def permissions(cls) -> List[Dict]:
         return []
+
     @classmethod
     def groups(cls) -> List[Dict]:
         return []
+
     @classmethod
     def company_id(cls) -> Optional[uuid.UUID]:
         return None
@@ -63,9 +72,11 @@ class UserPermissionCreateFactory(ModelFactory[UserPermissionCreateDTO]):
     @classmethod
     def permissions(cls) -> List[Dict]:
         return []
+
     @classmethod
     def groups(cls) -> List[Dict]:
         return []
+
     @classmethod
     def company_id(cls) -> Optional[uuid.UUID]:
         return None
