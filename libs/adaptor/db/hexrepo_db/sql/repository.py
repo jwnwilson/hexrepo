@@ -200,6 +200,8 @@ class SQLRepository(Repository):
         """
         # Merge new data with existing data
         for key, value in obj_in.model_dump(exclude_unset=True).items():
+            if key == "id":
+                continue
             # Avoid updating relationships as they are handled in parse_dto
             if type(getattr(db_obj, key)) is InstrumentedList:
                 continue

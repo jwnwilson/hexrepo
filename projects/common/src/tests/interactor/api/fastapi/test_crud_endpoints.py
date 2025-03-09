@@ -27,7 +27,7 @@ API_ENDPOINT_TEST_DATA = {
 @pytest.mark.parametrize("endpoint", API_ENDPOINT_TEST_DATA.keys())
 def test_crud_create(client: TestClient, endpoint: Dict):
     router: CrudRouter = API_ENDPOINT_TEST_DATA[endpoint]
-    create_payload = json.loads(get_test_data(router.create_schema).model_dump_json())
+    create_payload = json.loads(get_test_data(router.response_schema).model_dump_json())
     response = client.post(f"/api/v1/{endpoint}/", json=create_payload)
     assert response.status_code == 200
     reponse_data = response.json()
@@ -51,7 +51,7 @@ def test_crud_read_many(client: TestClient, test_data_generator, endpoint: Dict)
 @pytest.mark.parametrize("endpoint", API_ENDPOINT_TEST_DATA.keys())
 def test_crud_read_single(client: TestClient, test_data_generator, endpoint: Dict):
     router: CrudRouter = API_ENDPOINT_TEST_DATA[endpoint]
-    create_dto = get_test_data(router.create_schema)
+    create_dto = get_test_data(router.response_schema)
     test_data = test_data_generator(create_dto)
     response = client.get(f"/api/v1/{endpoint}/{test_data.id}")
     assert response.status_code == 200
@@ -63,14 +63,16 @@ def test_crud_read_single(client: TestClient, test_data_generator, endpoint: Dic
 def test_crud_update(client: TestClient, test_data_generator, endpoint: Dict):
     router: CrudRouter = API_ENDPOINT_TEST_DATA[endpoint]
     # Create a new record
-    create_dto = get_test_data(router.create_schema)
-    test_data = test_data_generator(create_dto)
-    response = client.get(f"/api/v1/{endpoint}/{test_data.id}")
+    create_payload = json.loads(get_test_data(router.response_schema).model_dump_json())
+    response = client.post(f"/api/v1/{endpoint}/", json=create_payload)
     assert response.status_code == 200
     # Update the record
-    create_dto = get_test_data(router.update_schema)
-    update_data = test_data_generator(create_dto)
-    response = client.patch(f"/api/v1/{endpoint}/{test_data.id}", json=update_data)
+    update_data = get_test_data(router.update_schema)
+    update_data = json.loads(test_data_generator(update_data).model_dump_json())
+    update_id = response.json()["id"]
+    if "id" in update_data:
+        update_data["id"] = update_id
+    response = client.patch(f"/api/v1/{endpoint}/{update_id}", json=update_data)
     assert response.status_code == 200, response.json()
     reponse_data = response.json()
     for key, value in update_data.items():

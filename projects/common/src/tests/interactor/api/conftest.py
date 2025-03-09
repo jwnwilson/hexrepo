@@ -13,6 +13,7 @@ def test_data_generator(uow: UOW) -> Dict[str, Any]:
                 if isinstance(getattr(uow, attr), Repository):
                     if type(create_dto) is getattr(uow, attr).model_dto:
                         return getattr(uow, attr)
+            raise NotImplementedError(f"Test data generation failed: Repository for {create_dto.__class__.__name__} not found")
 
         repo: Repository = get_repo(create_dto)
         return repo.create(create_dto)
