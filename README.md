@@ -36,22 +36,15 @@ Setup the following env vars directly or run:
 # To Do
 
 - Setup backend
-    - Tests:
-        - Test relationship CRUD logic (check create)
-        - Test auth and permission logic
-        - Test cloud libs
-        - Test Auth / authorisation
-        - Setup sonarqube
-    - Setup better logging
-        - Pass correlation id from aws through to logging
-        - Make logs readable in AWS
-        - Switch from xray to sentry to keep platform agnostic
     - Authentication via fastapi middleware infra agnostic solution
         - Get user data with permissions via api call with username from header or session.
         - Improve DB calls to make more performant
         - Create materialised view or cache in dynamodb for cheap serverless option?
-    - versions endpoint if versions enabled
-        https://sqlalchemy-continuum.readthedocs.io/en/latest/
+    - Setup sonarqube and sentry
+    - Setup better logging
+        - Pass correlation id from aws through to logging
+        - Make logs readable in AWS
+        - Switch from xray to sentry to keep platform agnostic
     - Move monitor / infra optimisation into common
         - Enable disable project via admin
     - Disable example project
@@ -61,6 +54,8 @@ Setup the following env vars directly or run:
         - Re-render template with project settings 
         - Create Diff with changes
         - Add CI job to detect template changes and add a new PR with applied patch to projects
+    - versions endpoint if versions enabled
+        https://sqlalchemy-continuum.readthedocs.io/en/latest/
     - Add monitoring dashboard for services
         - Generic change log
         - Potentially use 3rd party service?
@@ -68,6 +63,10 @@ Setup the following env vars directly or run:
         - Latency tracking and visualisation
         - Add log based event tracking
         - Setup BI dashboard
+    - Tests:
+        - Test auth and permission logic
+        - Test cloud libs
+        - Test Auth / authorisation
     - Add ECS option to avoid cold startup
     - Setup simple FE with auth?
         - Rename projects -> backend
