@@ -9,6 +9,21 @@ import typer
 from .system import run_system_command
 
 
+def find_repo_root() -> str:
+    try:
+        # search this active directory for .hexroot file
+        current_dir = os.getcwd()
+        if os.path.isfile(".hexroot"):
+            return current_dir
+        else:
+            # if not found go up one directory search parent directory
+            os.chdir("..")
+            return find_repo_root()
+    except Exception:
+        typer.echo("Unable to find .hexroot file, aborting.")
+        raise typer.Abort()
+
+
 def scan_folder(folder: str) -> List[str]:
     return [f for f in os.listdir(folder) if os.path.isdir(os.path.join(folder, f))]
 

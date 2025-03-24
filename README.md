@@ -36,6 +36,7 @@ Setup the following env vars directly or run:
 # To Do
 
 - Setup backend
+    - Upgrade cli to find .hexrepo and let commands run from anywhere
     - Authentication via fastapi middleware infra agnostic solution
         - Get user data with permissions via api call with username from header or session.
         - Improve DB calls to make more performant
