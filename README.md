@@ -60,7 +60,7 @@ Setup the following env vars directly or run:
     - versions endpoint if versions enabled
         https://sqlalchemy-continuum.readthedocs.io/en/latest/
     - Add monitoring dashboard for services
-        - Generic change log
+        - Generic change log syncing to tracking metrics
         - Potentially use 3rd party service?
         - Load testing
         - Latency tracking and visualisation
