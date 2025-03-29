@@ -38,7 +38,7 @@ Setup the following env vars directly or run:
 - Setup backend
     - Upgrade cli to find .hexrepo and let commands run from anywhere
         - Refactor to decorator
-    - Update feature flags so they are shared across companies bu default and can be overriden on a per company bases
+    - Update feature flags so they are shared across companies by default and can be overriden on a per company bases
     - Authentication via fastapi middleware infra agnostic solution
         - Get user data with permissions via api call with username from header or session.
         - Improve DB calls to make more performant
@@ -47,6 +47,7 @@ Setup the following env vars directly or run:
     - Setup better logging
         - Pass correlation id from aws through to logging
         - Make logs readable in AWS
+            - Show message by default and expand into other attr
         - Switch from xray to sentry to keep platform agnostic
     - Move monitor / infra optimisation into common
         - Enable disable project via admin
