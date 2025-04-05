@@ -1,4 +1,5 @@
 version = 1
+revision = 1
 requires-python = ">=3.12, <4.0"
 
 [[package]]
@@ -427,7 +428,7 @@ wheels = [
 
 [[package]]
 name = "hexrepo-api"
-version = "0.1.12"
+version = "0.1.13"
 source = { editable = "../../libs/interactor/api" }
 dependencies = [
     { name = "fastapi" },
@@ -459,7 +460,7 @@ dev = [
 
 [[package]]
 name = "hexrepo-cloud"
-version = "0.3.18"
+version = "0.3.19"
 source = { editable = "../../libs/adaptor/cloud" }
 dependencies = [
     { name = "boto3-stubs", extra = ["essential"] },
@@ -474,6 +475,7 @@ requires-dist = [
     { name = "pydantic", specifier = ">=2.9.2,<3.0.0" },
     { name = "pydantic-settings", specifier = ">=2.6.1,<3.0.0" },
 ]
+provides-extras = ["aws"]
 
 [package.metadata.requires-dev]
 dev = [
@@ -489,7 +491,7 @@ dev = [
 
 [[package]]
 name = "hexrepo-db"
-version = "0.1.17"
+version = "0.1.19"
 source = { editable = "../../libs/adaptor/db" }
 dependencies = [
     { name = "boto3" },
@@ -530,7 +532,7 @@ sql = [
 
 [[package]]
 name = "hexrepo-log"
-version = "0.1.3"
+version = "0.1.5"
 source = { editable = "../../libs/adaptor/log" }
 dependencies = [
     { name = "fastapi" },
@@ -558,7 +560,7 @@ dev = [
 
 [[package]]
 name = "hexrepo-task"
-version = "0.1.11"
+version = "0.1.12"
 source = { editable = "../../libs/interactor/task" }
 dependencies = [
     { name = "fastapi" },

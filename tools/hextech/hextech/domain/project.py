@@ -1,3 +1,4 @@
+import functools
 import json
 import os
 import subprocess
@@ -7,6 +8,32 @@ from typing import List, Optional, Set
 import typer
 
 from .system import run_system_command
+
+
+def cli_setup(func):
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        # Check if .hexroot file exists
+        find_repo_root()
+        func(*args, **kwargs)
+        return func(*args, **kwargs)
+
+    return wrapper
+
+
+def find_repo_root() -> str:
+    try:
+        # search this active directory for .hexroot file
+        current_dir = os.getcwd()
+        if os.path.isfile(".hexroot"):
+            return current_dir
+        else:
+            # if not found go up one directory search parent directory
+            os.chdir("..")
+            return find_repo_root()
+    except Exception:
+        typer.echo("Unable to find .hexroot file, aborting.")
+        raise typer.Abort()
 
 
 def scan_folder(folder: str) -> List[str]:

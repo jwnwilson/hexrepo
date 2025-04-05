@@ -27,6 +27,7 @@ from hextech.domain.infra.user import (
     create_user_with_permissions,
 )
 from hextech.domain.project import (
+    cli_setup,
     get_libraries,
     get_library_type,
     get_modified_libraries,
@@ -55,6 +56,7 @@ from hextech.domain.templates.libs import (
 )
 
 
+@cli_setup
 def setup():
     # project config setup
     config: HexrepoConfig
@@ -78,6 +80,7 @@ def setup():
             create_env_infra(config, env)
 
 
+@cli_setup
 def destroy():
     config: HexrepoConfig
     config, _ = get_or_create_config(no_input=True)
@@ -89,6 +92,7 @@ def destroy():
         destroy_shared_infra(config)
 
 
+@cli_setup
 def create_library():
     from cookiecutter.main import cookiecutter
 
@@ -99,6 +103,7 @@ def create_library():
         cookiecutter("../../templates/library")
 
 
+@cli_setup
 def create_project():
     from cookiecutter.main import cookiecutter
 
@@ -117,6 +122,7 @@ def create_project():
                 typer.echo("Initial infrastructure setup complete.")
 
 
+@cli_setup
 def add_library():
     library: str = prompt_library()
     project: str = prompt_project()
@@ -124,30 +130,35 @@ def add_library():
     install_library_in_project(library, project)
 
 
+@cli_setup
 def shared_infra_plan():
     config: HexrepoConfig
     config, _ = get_or_create_config(no_input=True)
     shared_infra_plan_command(config)
 
 
+@cli_setup
 def shared_infra_apply():
     config: HexrepoConfig
     config, _ = get_or_create_config(no_input=True)
     shared_infra_apply_command(config, no_input=True)
 
 
+@cli_setup
 def env_infra_plan(env: str):
     config: HexrepoConfig
     config, _ = get_or_create_config(no_input=True)
     plan_env_infra_command(config, env)
 
 
+@cli_setup
 def env_infra_apply(env: str):
     config: HexrepoConfig
     config, _ = get_or_create_config(no_input=True)
     create_env_infra(config, env, no_input=True)
 
 
+@cli_setup
 def test_projects(run_all: bool = True):
     if run_all:
         projects: List[str] = get_projects()
@@ -163,6 +174,7 @@ def test_projects(run_all: bool = True):
         run_system_command(f"cd projects/{project} && make test")
 
 
+@cli_setup
 def test_libs(libraries: Optional[List[str]] = None):
     libraries: List[str] = validate_libraries(libraries)
 
@@ -174,11 +186,13 @@ def test_libs(libraries: Optional[List[str]] = None):
         run_system_command(f"cd libs/{lib_type}/{lib} && make test")
 
 
+@cli_setup
 def test_tools():
     typer.echo("Running tests for hextech...")
     run_system_command("cd tools/hextech && make test")
 
 
+@cli_setup
 def check_library_bump(library: str):
     validate_libraries([library])
     if library_version_bump_required(library):
@@ -189,6 +203,7 @@ def check_library_bump(library: str):
     typer.echo(f"Library: '{library}' version is valid...")
 
 
+@cli_setup
 def check_library_modified(library: str):
     validate_libraries([library])
     if get_modified_libraries([library]):
@@ -197,6 +212,7 @@ def check_library_modified(library: str):
     typer.echo(f"Library: '{library}' unmodified...")
 
 
+@cli_setup
 def check_project_modified(project: str):
     projects: List[str] = get_projects()
     assert project in projects, "Invalid project name provided"
@@ -206,6 +222,7 @@ def check_project_modified(project: str):
     typer.echo(f"Project: '{project}' unmodified...")
 
 
+@cli_setup
 def bump_librariy_version():
     library: str = prompt_library()
     typer.echo(f"Bumping version for {library} library...")
@@ -220,6 +237,7 @@ def bump_librariy_version():
     )
 
 
+@cli_setup
 def lint():
     typer.echo("Running linting for hextech...")
     run_system_command("cd tools/hextech && make lint")
@@ -236,6 +254,7 @@ def lint():
         run_system_command(f"cd libs/{lib_type}/{lib} && make lint")
 
 
+@cli_setup
 def deploy_libs(
     libraries: Optional[List[str]] = None,
     check_modified: bool = False,
@@ -249,6 +268,7 @@ def deploy_libs(
     publish_libs(config, libraries=libraries, check_modified=check_modified)
 
 
+@cli_setup
 def deploy_projects(
     env: str,
     projects: Optional[List[str]] = None,
@@ -265,18 +285,21 @@ def deploy_projects(
     )
 
 
+@cli_setup
 def start_infra():
     config: HexrepoConfig
     config, _ = get_or_create_config(no_input=True)
     start_infra_command(config)
 
 
+@cli_setup
 def stop_infra():
     config: HexrepoConfig
     config, _ = get_or_create_config(no_input=True)
     stop_infra_command(config)
 
 
+@cli_setup
 def bastion(
     env: Annotated[Optional[str], typer.Argument()] = None,
     project: Annotated[Optional[str], typer.Argument()] = None,
@@ -288,6 +311,7 @@ def bastion(
     bastion_ssh_tunnel(config, env, project)
 
 
+@cli_setup
 def migrate_db(
     env: Annotated[Optional[str], typer.Argument()] = None,
     project: Annotated[Optional[str], typer.Argument()] = None,
@@ -299,6 +323,7 @@ def migrate_db(
     migrate_db_func(config, env, project)
 
 
+@cli_setup
 def create_user(
     env: Annotated[Optional[str], typer.Argument()] = None,
 ):
@@ -309,6 +334,7 @@ def create_user(
     create_user_with_permissions(config, env)
 
 
+@cli_setup
 def create_permissions(
     env: Annotated[Optional[str], typer.Argument()] = None,
 ):
@@ -319,6 +345,7 @@ def create_permissions(
     create_user_permissions(config, env)
 
 
+@cli_setup
 def update_projects_from_template():
     # Not implmented fully, want to investigate copier for this
     # Get list of changes to template/project

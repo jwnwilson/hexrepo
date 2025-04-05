@@ -36,15 +36,19 @@ Setup the following env vars directly or run:
 # To Do
 
 - Setup backend
+    - Setup better logging
+        - Pass correlation id from aws through to logging
+        - Make logs readable in AWS
+            - Show message by default and expand into other attr
+        - Switch from xray to sentry to keep platform agnostic
+    - Update feature flags so they are shared across companies by default and can be overriden on a per company bases
+        - Add env to feature flags
+        - Add company link to feature flag to override
     - Authentication via fastapi middleware infra agnostic solution
         - Get user data with permissions via api call with username from header or session.
         - Improve DB calls to make more performant
         - Create materialised view or cache in dynamodb for cheap serverless option?
     - Setup sonarqube and sentry
-    - Setup better logging
-        - Pass correlation id from aws through to logging
-        - Make logs readable in AWS
-        - Switch from xray to sentry to keep platform agnostic
     - Move monitor / infra optimisation into common
         - Enable disable project via admin
     - Disable example project
@@ -57,7 +61,7 @@ Setup the following env vars directly or run:
     - versions endpoint if versions enabled
         https://sqlalchemy-continuum.readthedocs.io/en/latest/
     - Add monitoring dashboard for services
-        - Generic change log
+        - Generic change log syncing to tracking metrics
         - Potentially use 3rd party service?
         - Load testing
         - Latency tracking and visualisation

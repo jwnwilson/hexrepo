@@ -5,6 +5,7 @@ import typer
 from hexrepo_cloud.config import AWSConfig
 from pydantic_settings import BaseSettings
 
+from hextech.domain.project import find_repo_root
 from hextech.domain.prompts.common import prompt_cloud_provider
 from hextech.domain.prompts.config import prompt_config_setup, prompt_environments
 from hextech.domain.system import set_env_var
@@ -35,8 +36,9 @@ class HexrepoConfig(BaseSettings):
 
     @classmethod
     def load_config(cls) -> Optional["HexrepoConfig"]:
+        project_root: str = find_repo_root()
         try:
-            with open("config.json", "r") as f:
+            with open(f"{project_root}/config.json", "r") as f:
                 config = json.loads(f.read())
             return HexrepoConfig(**config)
         except Exception:

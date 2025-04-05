@@ -1,7 +1,8 @@
 import functools
 import logging
 import os
-from typing import Dict, Optional
+from typing import Callable, Dict, Optional
+
 import boto3
 
 from .interface import SecretAdaptor
@@ -11,7 +12,7 @@ logger = logging.getLogger(__name__)
 RUNNING_ON_AWS = os.getenv("AWS_LAMBDA_FUNCTION_NAME") is not None
 
 
-def secret_cache(func):
+def secret_cache(func: Callable) -> Callable:
     # Check if the secret is cached in /tmp as fetching secrets can be slow
     # This is the cheapest and quickest method for caching in aws lambdas
     @functools.wraps(func)
@@ -26,6 +27,7 @@ def secret_cache(func):
             with open(f"/tmp/{secret_name}", "w") as f:
                 f.write(secret_value)
         return secret_value
+
     return wrapper
 
 
@@ -46,4 +48,3 @@ class AWSSecretAdaptor(SecretAdaptor):
             msg = f"The requested secret {secret_name} was not found."
             logger.exception(msg)
             raise
-        
