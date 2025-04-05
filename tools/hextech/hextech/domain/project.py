@@ -1,3 +1,4 @@
+import functools
 import json
 import os
 import subprocess
@@ -7,6 +8,17 @@ from typing import List, Optional, Set
 import typer
 
 from .system import run_system_command
+
+
+def cli_setup(func):
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        # Check if .hexroot file exists
+        find_repo_root()
+        func(*args, **kwargs)
+        return func(*args, **kwargs)
+
+    return wrapper
 
 
 def find_repo_root() -> str:

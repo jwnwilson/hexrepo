@@ -85,8 +85,10 @@ class DefaultQuery(Query):
             # If diff, update relationship
             try:
                 dto_ids: List[str] = [str(r["id"]) for r in getattr(dto, relationship)]
-            except KeyError as err:
-                msg: str = f"Invalid relationship data: {relationships}, missing 'id' key"
+            except KeyError:
+                msg: str = (
+                    f"Invalid relationship data: {relationships}, missing 'id' key"
+                )
                 logger.error(msg)
                 raise ValueError(msg)
             # If creating, set empty list

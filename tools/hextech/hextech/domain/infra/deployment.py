@@ -9,13 +9,13 @@ from hextech.config import HexrepoConfig
 from hextech.domain.infra.bastion import db_exists, managed_bastion_ssh
 from hextech.domain.infra.code_repo import authenticate_lib_repo
 from hextech.domain.project import (
+    find_repo_root,
     get_libraries,
     get_library_type,
     get_modified_libraries,
     get_modified_projects,
     get_projects,
     get_projects_usings_libraries,
-    find_repo_root,
 )
 from hextech.domain.system import run_system_command, run_system_command_with_output
 
@@ -23,7 +23,7 @@ from hextech.domain.system import run_system_command, run_system_command_with_ou
 def create_shared_infra(config: HexrepoConfig) -> None:
     typer.echo("Creating initial hexrepo infrastructure...")
     project_root: str = find_repo_root()
-    
+
     # Placeholder for library infra setup
     with chdir(project_root):
         with chdir("infra"):
@@ -92,7 +92,9 @@ def deploy_projects(
         if check_modified:
             libraries = get_modified_libraries()
             projects_with_modified_libs = get_projects_usings_libraries(libraries)
-            projects = set(projects_with_modified_libs + get_modified_projects(projects))
+            projects = set(
+                projects_with_modified_libs + get_modified_projects(projects)
+            )
 
         if not projects:
             typer.echo("No modified files found, skipping deploy.")

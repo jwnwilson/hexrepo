@@ -2,6 +2,7 @@ import functools
 import logging
 import os
 from typing import Dict, Optional
+
 import boto3
 
 from .interface import SecretAdaptor
@@ -26,6 +27,7 @@ def secret_cache(func):
             with open(f"/tmp/{secret_name}", "w") as f:
                 f.write(secret_value)
         return secret_value
+
     return wrapper
 
 
@@ -46,4 +48,3 @@ class AWSSecretAdaptor(SecretAdaptor):
             msg = f"The requested secret {secret_name} was not found."
             logger.exception(msg)
             raise
-        

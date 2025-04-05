@@ -1,15 +1,15 @@
 import json
-import os
 from typing import List, Optional, Tuple, Union
 
-from domain.project import find_repo_root
 import typer
 from hexrepo_cloud.config import AWSConfig
 from pydantic_settings import BaseSettings
 
+from hextech.domain.project import find_repo_root
 from hextech.domain.prompts.common import prompt_cloud_provider
 from hextech.domain.prompts.config import prompt_config_setup, prompt_environments
 from hextech.domain.system import set_env_var
+
 
 class HexrepoConfig(BaseSettings):
     project_name: str = "hexrepo"

@@ -17,11 +17,11 @@ done
 
 
 if [[ -z "${check}" ]]; then
-    uv run ruff check --select I --fix ${TARGET_DIRS}
-    uv run ruff check --fix ${TARGET_DIRS}
-    uv run ruff format ${TARGET_DIRS}
+    uv run --no-active ruff check --select I --fix ${TARGET_DIRS}
+    uv run --no-active ruff check --fix ${TARGET_DIRS}
+    uv run --no-active ruff format ${TARGET_DIRS}
 else
-    uv run ruff check --select I ${TARGET_DIRS}
-    uv run ruff check ${TARGET_DIRS}
+    uv run --no-active ruff check --select I ${TARGET_DIRS}
+    uv run --no-active ruff check ${TARGET_DIRS}
     mypy ${TARGET_DIRS}
 fi
