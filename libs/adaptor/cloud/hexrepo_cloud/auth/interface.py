@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Dict, Optional
+from typing import Any, Dict, Optional
 
 from fastapi import Request
 from hexrepo_db.interface import UOW, Repository
@@ -35,7 +35,7 @@ class UserLogin(BaseModel):
 
 class AuthAdapter(ABC):
     @abstractmethod
-    def login(self, user: UserLogin) -> Dict:
+    def login(self, user: UserLogin) -> Dict[str, Any]:
         pass
 
     @abstractmethod
