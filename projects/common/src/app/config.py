@@ -10,7 +10,7 @@ logger = logging.getLogger()
 # Silence noisy logs from faker
 logging.getLogger("faker.factory").setLevel(logging.ERROR)
 
-ENV = os.environ["ENVIRONMENT"]
+ENV = os.environ("ENVIRONMENT", "local")
 load_dotenv(os.environ.get("ENV_FILE", f"./env/{ENV}.env"))
 
 
@@ -33,7 +33,7 @@ class Config(BaseSettings):
     JWT_SECRET: str = os.environ.get("JWT_SECRET", "")
     SESSION_SECRET: str = os.environ["SESSION_SECRET"]
     # This needs to come from cognito
-    CLIENT_ID: str = os.environ["CLIENT_ID"]
+    CLIENT_ID: str = os.environ["COGNITO_CLIENT_ID"]
     USER_POOL_ID: str = os.environ["USER_POOL_ID"]
 
     # Database settings
