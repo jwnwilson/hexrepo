@@ -4,7 +4,7 @@ authors = [
 ]
 requires-python = "<4.0,>=3.12"
 name = "hexrepo_db"
-version = "0.1.24"
+version = "0.1.25"
 description = "A short description of the project"
 readme = "README.md"
 dependencies = [
@@ -21,7 +21,7 @@ hexrepo-cloud = { path = "../cloud", editable = true }
 
 [dependency-groups]
 sql = [
-    "psycopg2-binary<3.0.0,>=2.9.10",
+    "psycopg[binary]==3.2.6",
     "sqlalchemy<3.0.0,>=2.0.36",
     "alembic<2.0.0,>=1.14.0",
 ]

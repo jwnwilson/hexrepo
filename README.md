@@ -37,6 +37,7 @@ Setup the following env vars directly or run:
 
 - Setup backend
     - Setup sentry to be platform agnostic
+        - Need a way to store per env vars
     - Update feature flags so they are shared across companies by default and can be overriden on a per company bases
         - Add env to feature flags
         - Add company link to feature flag to override
@@ -79,8 +80,7 @@ Setup the following env vars directly or run:
         - Investigate better fire and forget task setup like run 1 off ECS / GCP job with task status update?
         - 1 task table per hexrepo
         - Setup ECS for long running async orchestrator on fargate
-            - Could move to celery here as celery doesn't work well with lambda as need to start worker to manage tasks
-            - Could wrap celery in task adapter to give it a better interface
+            - Schedule this to turn off when not in use
         - Setup workflow orchestration
         - Setup Idempotent re-run
         - Dectorator based workflow setup e.g.:

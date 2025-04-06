@@ -17,8 +17,8 @@ data "aws_region" "current" {}
 locals {
   account_id    = data.aws_caller_identity.current.account_id
   region        = data.aws_region.current.name
-  db_url        = "postgresql+psycopg2://postgres:{password}@${module.common_postgres.db_instance_endpoint}/${var.project}"
-  db_ro_url     = module.common_postgres.db_instance_ro_endpoint != null ? "postgresql+psycopg2://postgres:{password}@${module.common_postgres.db_instance_ro_endpoint}/${var.project}" : "postgresql+psycopg2://postgres:{password}@${module.common_postgres.db_instance_endpoint}/${var.project}"
+  db_url        = "postgresql+psycopg://postgres:{password}@${module.common_postgres.db_instance_endpoint}/${var.project}"
+  db_ro_url     = module.common_postgres.db_instance_ro_endpoint != null ? "postgresql+psycopg://postgres:{password}@${module.common_postgres.db_instance_ro_endpoint}/${var.project}" : "postgresql+psycopg://postgres:{password}@${module.common_postgres.db_instance_endpoint}/${var.project}"
   api_subdomain = "common-${terraform.workspace}"
   app_url       = "https://${local.api_subdomain}.${var.domain}"
 }
@@ -38,18 +38,6 @@ data "aws_ecr_repository" "ecr_repo" {
   name = "hexrepo-${var.project}"
 }
 
-resource "aws_secretsmanager_secret" "jwt_secret" {
-  name = "${var.project}-${terraform.workspace}-jwt-secret"
-}
-
-resource "aws_secretsmanager_secret_version" "jwt_secret" {
-  secret_id     = aws_secretsmanager_secret.jwt_secret.id
-  secret_string = uuid()
-  lifecycle {
-    ignore_changes = [secret_string]
-  }
-}
-
 module "common_api" {
   source = "../../../../../../infra/tf/aws/modules/lambda"
 
@@ -61,7 +49,6 @@ module "common_api" {
   lambda_command     = ["src.app.interactor.api.lambda_handler"]
   security_group_ids = [module.common_postgres.db_security_group_id]
   bucket             = module.common_bucket.bucket_name
-  jwt_secret         = aws_secretsmanager_secret_version.jwt_secret.secret_string
   keep_warm_schedule = "cron(* 09-17 * * ? *)"
 
   environment_variables = {
@@ -100,7 +87,6 @@ module "common_tasks" {
   vpc_id             = data.aws_vpc.hexrepo.id
   lambda_command     = ["src.app.interactor.event.lambda_handler"]
   security_group_ids = [module.common_postgres.db_security_group_id]
-  jwt_secret         = aws_secretsmanager_secret_version.jwt_secret.secret_string
   keep_warm_schedule = ""
   environment_variables = {
     ENVIRONMENT             = terraform.workspace

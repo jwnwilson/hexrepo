@@ -16,7 +16,7 @@ dependencies = [
     "pydantic-settings<3.0.0,>=2.6.0",
     "alembic<2.0.0,>=1.13.3",
     "gevent<25.0.0,>=24.10.3",
-    "psycopg2-binary<3.0.0,>=2.9.10",
+    "psycopg[binary]==3.2.6",
     "boto3<2.0.0,>=1.35.66",
     "boto3-stubs[essential]<2.0.0,>=1.35.86",
     "aws-xray-sdk>=2.14.0",

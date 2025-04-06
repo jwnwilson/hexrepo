@@ -1,6 +1,7 @@
 import logging
 import os
 import sys
+from typing import Optional
 
 from dotenv import load_dotenv
 from pydantic_settings import BaseSettings
@@ -9,7 +10,8 @@ logger = logging.getLogger()
 # Silence noisy logs from faker
 logging.getLogger("faker.factory").setLevel(logging.ERROR)
 
-load_dotenv(os.environ.get("ENV_FILE", "./env/local.env"))
+ENV = os.environ.get("ENVIRONMENT", "local")
+load_dotenv(os.environ.get("ENV_FILE", f"./env/{ENV}.env"))
 
 
 class Config(BaseSettings):
@@ -25,12 +27,13 @@ class Config(BaseSettings):
     CLOUD_PROVIDER: str = os.environ.get("CLOUD_PROVIDER", "local")
     ENVIRONMENT: str = os.environ.get("ENVIRONMENT", "dev")
     REGION: str = os.environ.get("REGION", "eu-west-1")
+    SENTRY_DSN: Optional[str] = os.environ.get("SENTRY_DSN")
 
     # Auth settings
     JWT_SECRET: str = os.environ.get("JWT_SECRET", "")
     SESSION_SECRET: str = os.environ["SESSION_SECRET"]
     # This needs to come from cognito
-    CLIENT_ID: str = os.environ["CLIENT_ID"]
+    CLIENT_ID: str = os.environ["COGNITO_CLIENT_ID"]
     USER_POOL_ID: str = os.environ["USER_POOL_ID"]
 
     # Database settings

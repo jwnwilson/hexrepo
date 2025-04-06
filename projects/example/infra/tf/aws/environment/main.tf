@@ -13,7 +13,7 @@ terraform {
 }
 
 locals {
-  db_url = "postgresql+psycopg2://postgres:{password}@${module.example_postgres.db_instance_endpoint}/${var.project}"
+  db_url = "postgresql+psycopg://postgres:{password}@${module.example_postgres.db_instance_endpoint}/${var.project}"
 }
 
 provider "aws" {

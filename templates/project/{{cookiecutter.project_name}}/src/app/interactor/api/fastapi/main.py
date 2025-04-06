@@ -1,5 +1,7 @@
 import os
 
+import sentry_sdk
+
 from hexrepo_log import LogMiddleware, setup_logger
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -14,6 +16,14 @@ ENVIRONMENT = os.environ.get("ENVIRONMENT", "")
 setup_logger()
 
 root_prefix = f""
+
+if config.SENTRY_DSN:
+    sentry_sdk.init(
+        dsn=config.SENTRY_DSN,
+        # Add data like request headers and IP for users,
+        # see https://docs.sentry.io/platforms/python/data-management/data-collected/ for more info
+        send_default_pii=True,
+    )
 
 app = FastAPI(
     title="{{cookiecutter.project_slug}} Service",
