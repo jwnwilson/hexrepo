@@ -44,10 +44,8 @@ Setup the following env vars directly or run:
         - Get user data with permissions via api call with username from header or session.
         - Improve DB calls to make more performant
         - Create materialised view or cache in dynamodb for cheap serverless option?
-    - Move monitor / infra optimisation into common
-        - Enable disable project via admin
-    - Setup sonarqube
     - Disable example project
+    - Move monitor / infra optimisation into common
     - Add ECS option to avoid cold startup and avoid aws lockin
         - blue green deployments
         - prod image that is fast to deploy on all envs
@@ -57,6 +55,8 @@ Setup the following env vars directly or run:
         - Re-render template with project settings 
         - Create Diff with changes
         - Add CI job to detect template changes and add a new PR with applied patch to projects
+        - Enable disable project via admin
+    - Setup sonarqube
     - versions endpoint if versions enabled
         https://sqlalchemy-continuum.readthedocs.io/en/latest/
     - Add API lib to call projects and pass request-id-header
