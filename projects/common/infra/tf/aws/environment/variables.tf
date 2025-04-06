@@ -30,7 +30,3 @@ variable "api_repo" {
   description = "Name of container image repository"
   default     = "common_api"
 }
-
-variable "sentry_dsn" {
-  description = "sentry dsn value"
-}
