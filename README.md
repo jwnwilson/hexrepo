@@ -50,6 +50,7 @@ Setup the following env vars directly or run:
         - Enable disable project via admin
     - Setup sonarqube
     - Disable example project
+    - Add ECS option to avoid cold startup and avoid aws lockin
     - Implement template -> project update:
         - Copier https://copier.readthedocs.io/en/stable/
         - Look at cruft again
@@ -58,7 +59,6 @@ Setup the following env vars directly or run:
         - Add CI job to detect template changes and add a new PR with applied patch to projects
     - versions endpoint if versions enabled
         https://sqlalchemy-continuum.readthedocs.io/en/latest/
-    - Add ECS option to avoid cold startup and avoid aws lockin
     - Add API lib to call projects and pass request-id-header
     - Add monitoring dashboard for services
         - Generic change log syncing to tracking metrics
