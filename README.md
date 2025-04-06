@@ -38,7 +38,8 @@ Setup the following env vars directly or run:
 - Setup backend
     - Setup better logging
         - Pass correlation id from aws through to logging
-        - Switch from xray to sentry to keep platform agnostic
+    - Setup sentry to be platform agnostic
+    - blue gren deployments
     - Update feature flags so they are shared across companies by default and can be overriden on a per company bases
         - Add env to feature flags
         - Add company link to feature flag to override

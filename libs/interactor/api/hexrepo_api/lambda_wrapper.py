@@ -7,33 +7,6 @@ from mangum import Mangum
 from .config import config
 
 
-class ScheduledEventHandler:
-    # Dummy handler to gracefully handle keep warm events
-    @classmethod
-    def infer(cls, event, context, config) -> bool:
-        return "detail-type" in event and event["detail-type"] == "Scheduled Event"
-
-    def __init__(self, event, context, config) -> None:
-        self.event = event
-        self.context = context
-        self.config = config
-
-    @property
-    def body(self) -> bytes:
-        return {}
-
-    @property
-    def scope(self):
-        return {}
-
-    def __call__(self, response) -> dict[str, Any]:
-        return {
-            "status": 200,
-            "body": "Scheduled event processed"
-        }
-
-
-
 def create_lambda_handler(app):
     if config.TRACING_ENABLED:
         patch_all()
@@ -44,13 +17,19 @@ def create_lambda_handler(app):
 
     @xray_recorder.capture("fastapi_request")
     def handler(event, context):
-        print("Received event: %s", event)
-        print("Received context: %s", context)
+        if "headers" not in event:
+            event["headers"] = {}
+        if "X-Request-ID" not in event["headers"]:
+            event["headers"]["X-Request-ID"] = context.aws_request_id
         
-        request_id: str = context.aws_request_id
-        event["headers"]["X-Request-ID"] = request_id
+        # Handle scheduled events
+        if "detail-type" in event and event["detail-type"] == "Scheduled Event":
+            return {
+                "statusCode": 200,
+                "body": "Scheduled event processed"
+            }
 
-        asgi_handler = Mangum(app, lifespan="off", custom_handlers=[ScheduledEventHandler])
+        asgi_handler = Mangum(app, lifespan="off")
         response = asgi_handler(
             event, context
         )  # Call the instance with the event arguments
