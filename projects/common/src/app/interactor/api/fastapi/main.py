@@ -3,6 +3,7 @@ import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
+import sentry_sdk
 from hexrepo_log import LogMiddleware, setup_logger
 from starlette.middleware.sessions import SessionMiddleware
 
@@ -16,6 +17,14 @@ ENVIRONMENT = os.environ.get("ENVIRONMENT", "")
 setup_logger()
 
 root_prefix = ""
+
+if config.SENTRY_DSN:
+    sentry_sdk.init(
+        dsn=config.SENTRY_DSN,
+        # Add data like request headers and IP for users,
+        # see https://docs.sentry.io/platforms/python/data-management/data-collected/ for more info
+        send_default_pii=True,
+    )
 
 app: FastAPI = FastAPI(
     title="Hexrepo Service",

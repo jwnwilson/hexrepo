@@ -37,6 +37,7 @@ Setup the following env vars directly or run:
 
 - Setup backend
     - Setup sentry to be platform agnostic
+        - Need a way to store per env vars
     - Update feature flags so they are shared across companies by default and can be overriden on a per company bases
         - Add env to feature flags
         - Add company link to feature flag to override

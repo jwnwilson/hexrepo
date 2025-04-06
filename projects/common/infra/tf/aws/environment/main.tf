@@ -74,6 +74,7 @@ module "common_api" {
     TASK_QUEUE              = "${var.project}_${terraform.workspace}_tasks"
     CLIENT_ID               = module.common_auth.client_id
     USER_POOL_ID            = module.common_auth.user_pool_id
+    SENTRY_DSN              = var.sentry_dsn
   }
 }
 
@@ -112,6 +113,7 @@ module "common_tasks" {
     TASK_QUEUE              = "${var.project}_${terraform.workspace}_tasks"
     CLIENT_ID               = module.common_auth.client_id
     USER_POOL_ID            = module.common_auth.user_pool_id
+    SENTRY_DSN              = var.sentry_dsn
   }
 }
 

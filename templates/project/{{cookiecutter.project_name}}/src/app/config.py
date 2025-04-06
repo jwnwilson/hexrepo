@@ -1,6 +1,7 @@
 import os
 import logging
 import sys
+from typing import Optional
 from dotenv import load_dotenv
 from pydantic_settings import BaseSettings
 
@@ -23,6 +24,7 @@ class Config(BaseSettings):
     CLOUD_PROVIDER: str = os.environ.get("CLOUD_PROVIDER", "local")
     ENVIRONMENT: str = os.environ.get("ENVIRONMENT", "dev")
     REGION: str = os.environ.get("REGION", "eu-west-1")
+    SENTRY_DSN: Optional[str] = os.environ.get("SENTRY_DSN")
 
     # Auth settings
     JWT_SECRET: str = os.environ.get("JWT_SECRET", "")
