@@ -40,18 +40,6 @@ data "aws_ecr_repository" "ecr_repo" {
   name                 = "hexrepo-${var.project}"
 }
 
-resource "aws_secretsmanager_secret" "jwt_secret" {
-  name = "${var.project}-${terraform.workspace}-jwt-secret"
-}
-
-resource "aws_secretsmanager_secret_version" "jwt_secret" {
-  secret_id = aws_secretsmanager_secret.jwt_secret.id
-  secret_string = uuid()
-  lifecycle {
-    ignore_changes = [secret_string]
-  }
-}
-
 {% if cookiecutter.use_db == "n" or (cookiecutter.use_db == "y" and cookiecutter.use_db_logic == "nosql") %}
 data "aws_security_group" "default_sg" {
   tags = {
@@ -68,7 +56,6 @@ module "{{cookiecutter.project_slug}}_api" {
   ecr_url           = data.aws_ecr_repository.ecr_repo.repository_url
   docker_tag        = var.docker_tag
   vpc_id            = data.aws_vpc.hexrepo.id
-  jwt_secret        = aws_secretsmanager_secret_version.jwt_secret.secret_string 
   {% if (cookiecutter.cloud_provider == "aws" and cookiecutter.use_api == "y") %}
   lambda_command    = ["src.app.interactor.api.lambda_handler"]
   {% elif cookiecutter.cloud_provider == "aws" %}
@@ -133,7 +120,6 @@ module "example_tasks" {
   vpc_id             = data.aws_vpc.hexrepo.id
   lambda_command     = ["src.app.interactor.event.lambda_handler"]
   security_group_ids = [module.example_postgres.db_security_group_id]
-  jwt_secret         = aws_secretsmanager_secret_version.jwt_secret.secret_string 
 
   environment_variables = {
     ENVIRONMENT             = terraform.workspace

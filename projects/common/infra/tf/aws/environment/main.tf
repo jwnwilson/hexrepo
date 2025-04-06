@@ -38,18 +38,6 @@ data "aws_ecr_repository" "ecr_repo" {
   name = "hexrepo-${var.project}"
 }
 
-resource "aws_secretsmanager_secret" "jwt_secret" {
-  name = "${var.project}-${terraform.workspace}-jwt-secret"
-}
-
-resource "aws_secretsmanager_secret_version" "jwt_secret" {
-  secret_id     = aws_secretsmanager_secret.jwt_secret.id
-  secret_string = uuid()
-  lifecycle {
-    ignore_changes = [secret_string]
-  }
-}
-
 module "common_api" {
   source = "../../../../../../infra/tf/aws/modules/lambda"
 
@@ -61,7 +49,6 @@ module "common_api" {
   lambda_command     = ["src.app.interactor.api.lambda_handler"]
   security_group_ids = [module.common_postgres.db_security_group_id]
   bucket             = module.common_bucket.bucket_name
-  jwt_secret         = aws_secretsmanager_secret_version.jwt_secret.secret_string
   keep_warm_schedule = "cron(* 09-17 * * ? *)"
 
   environment_variables = {
@@ -74,7 +61,6 @@ module "common_api" {
     TASK_QUEUE              = "${var.project}_${terraform.workspace}_tasks"
     CLIENT_ID               = module.common_auth.client_id
     USER_POOL_ID            = module.common_auth.user_pool_id
-    SENTRY_DSN              = var.sentry_dsn
   }
 }
 
@@ -101,7 +87,6 @@ module "common_tasks" {
   vpc_id             = data.aws_vpc.hexrepo.id
   lambda_command     = ["src.app.interactor.event.lambda_handler"]
   security_group_ids = [module.common_postgres.db_security_group_id]
-  jwt_secret         = aws_secretsmanager_secret_version.jwt_secret.secret_string
   keep_warm_schedule = ""
   environment_variables = {
     ENVIRONMENT             = terraform.workspace
@@ -113,7 +98,6 @@ module "common_tasks" {
     TASK_QUEUE              = "${var.project}_${terraform.workspace}_tasks"
     CLIENT_ID               = module.common_auth.client_id
     USER_POOL_ID            = module.common_auth.user_pool_id
-    SENTRY_DSN              = var.sentry_dsn
   }
 }
 
