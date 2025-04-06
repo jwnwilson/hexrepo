@@ -270,7 +270,7 @@ wheels = [
 
 [[package]]
 name = "hexrepo-api"
-version = "0.1.15"
+version = "0.1.16"
 source = { editable = "." }
 dependencies = [
     { name = "fastapi" },
@@ -317,7 +317,7 @@ dev = [
 
 [[package]]
 name = "hexrepo-cloud"
-version = "0.3.19"
+version = "0.3.20"
 source = { editable = "../../adaptor/cloud" }
 dependencies = [
     { name = "boto3-stubs", extra = ["essential"] },
@@ -348,7 +348,7 @@ dev = [
 
 [[package]]
 name = "hexrepo-db"
-version = "0.1.24"
+version = "0.1.25"
 source = { editable = "../../adaptor/db" }
 dependencies = [
     { name = "boto3" },
@@ -389,7 +389,7 @@ sql = [
 
 [[package]]
 name = "hexrepo-log"
-version = "0.1.6"
+version = "0.1.7"
 source = { editable = "../../adaptor/log" }
 dependencies = [
     { name = "fastapi" },

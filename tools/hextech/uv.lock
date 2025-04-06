@@ -265,7 +265,7 @@ wheels = [
 
 [[package]]
 name = "hexrepo-cloud"
-version = "0.3.19"
+version = "0.3.20"
 source = { editable = "../../libs/adaptor/cloud" }
 dependencies = [
     { name = "boto3-stubs", extra = ["essential"] },

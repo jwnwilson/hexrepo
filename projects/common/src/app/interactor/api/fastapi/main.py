@@ -1,9 +1,9 @@
 import os
 
+import sentry_sdk
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
-import sentry_sdk
 from hexrepo_log import LogMiddleware, setup_logger
 from starlette.middleware.sessions import SessionMiddleware
 
