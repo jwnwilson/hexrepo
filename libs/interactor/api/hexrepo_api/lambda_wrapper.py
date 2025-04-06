@@ -19,7 +19,7 @@ def create_lambda_handler(app):
         if event.get("some-key"):
             # Do something or return, etc.
             return
-        
+
         request_id: str = context.aws_request_id
         event["X-Request-ID"] = request_id
 
@@ -29,4 +29,5 @@ def create_lambda_handler(app):
         )  # Call the instance with the event arguments
 
         return response
+
     return handler
