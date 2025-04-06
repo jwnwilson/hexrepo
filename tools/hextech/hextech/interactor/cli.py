@@ -115,10 +115,9 @@ def check_project_modified(project: str):
 
 
 @app.command()
-def bump_librariy_version():
-    from .commands import bump_librariy_version
-
-    bump_librariy_version()
+def bump_library_version():
+    from .commands import bump_library_version
+    bump_library_version()
 
 
 @app.command()

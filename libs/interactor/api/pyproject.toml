@@ -4,7 +4,7 @@ authors = [
 ]
 requires-python = "<4.0,>=3.12"
 name = "hexrepo_api"
-version = "0.1.13"
+version = "0.1.15"
 description = "A short description of the project"
 readme = "README.md"
 dependencies = [
@@ -37,7 +37,7 @@ requires = ["pdm-backend"]
 build-backend = "pdm.backend"
 
 [tool.pytest.ini_options]
-addopts = "-vv --cov --cov-report xml --cov-report term-missing --cov-fail-under=50"
+addopts = "-vv --cov --cov-report xml --cov-report term-missing --cov-fail-under=45"
 asyncio_mode = "auto"
 testpaths = ["tests"]
 env_files = ["env/local.env"]

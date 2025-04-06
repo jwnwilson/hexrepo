@@ -15,7 +15,6 @@ def cli_setup(func):
     def wrapper(*args, **kwargs):
         # Check if .hexroot file exists
         find_repo_root()
-        func(*args, **kwargs)
         return func(*args, **kwargs)
 
     return wrapper

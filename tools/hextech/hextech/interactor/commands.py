@@ -223,7 +223,7 @@ def check_project_modified(project: str):
 
 
 @cli_setup
-def bump_librariy_version():
+def bump_library_version():
     library: str = prompt_library()
     typer.echo(f"Bumping version for {library} library...")
     lib_type: str = get_library_type(library)
