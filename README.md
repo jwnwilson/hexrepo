@@ -38,8 +38,6 @@ Setup the following env vars directly or run:
 - Setup backend
     - Setup better logging
         - Pass correlation id from aws through to logging
-        - Make logs readable in AWS
-            - Show message by default and expand into other attr
         - Switch from xray to sentry to keep platform agnostic
     - Update feature flags so they are shared across companies by default and can be overriden on a per company bases
         - Add env to feature flags
@@ -48,9 +46,9 @@ Setup the following env vars directly or run:
         - Get user data with permissions via api call with username from header or session.
         - Improve DB calls to make more performant
         - Create materialised view or cache in dynamodb for cheap serverless option?
-    - Setup sonarqube and sentry
     - Move monitor / infra optimisation into common
         - Enable disable project via admin
+    - Setup sonarqube
     - Disable example project
     - Implement template -> project update:
         - Copier https://copier.readthedocs.io/en/stable/
@@ -60,6 +58,8 @@ Setup the following env vars directly or run:
         - Add CI job to detect template changes and add a new PR with applied patch to projects
     - versions endpoint if versions enabled
         https://sqlalchemy-continuum.readthedocs.io/en/latest/
+    - Add ECS option to avoid cold startup and avoid aws lockin
+    - Add API lib to call projects and pass request-id-header
     - Add monitoring dashboard for services
         - Generic change log syncing to tracking metrics
         - Potentially use 3rd party service?
@@ -71,7 +71,6 @@ Setup the following env vars directly or run:
         - Test auth and permission logic
         - Test cloud libs
         - Test Auth / authorisation
-    - Add ECS option to avoid cold startup
     - Setup simple FE with auth?
         - Rename projects -> backend
         - Create frontend folder

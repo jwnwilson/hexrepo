@@ -15,6 +15,7 @@ class Config(BaseSettings):
     """
 
     environment: str = os.environ.get("environment", "dev")
+    TRACING_ENABLED: bool = os.environ.get("TRACING_ENABLED", "false") == "true"
 
 
 config: Config = Config()
