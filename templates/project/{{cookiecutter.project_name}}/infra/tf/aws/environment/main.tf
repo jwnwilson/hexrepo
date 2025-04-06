@@ -21,7 +21,7 @@ locals {
 
 {% if cookiecutter.use_db == "y" and cookiecutter.use_db_logic == "sql" %}
 locals {
-  db_url = "postgresql+psycopg2://postgres:{password}@${module.{{cookiecutter.project_slug}}_postgres.db_instance_endpoint}/${var.project}"
+  db_url = "postgresql+psycopg://postgres:{password}@${module.{{cookiecutter.project_slug}}_postgres.db_instance_endpoint}/${var.project}"
 }
 {% endif %}
 

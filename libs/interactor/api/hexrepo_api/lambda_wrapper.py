@@ -1,5 +1,4 @@
 import logging
-from typing import Any
 
 from aws_xray_sdk.core import patch_all, xray_recorder
 from mangum import Mangum
@@ -21,13 +20,10 @@ def create_lambda_handler(app):
             event["headers"] = {}
         if "X-Request-ID" not in event["headers"]:
             event["headers"]["X-Request-ID"] = context.aws_request_id
-        
+
         # Handle scheduled events
         if "detail-type" in event and event["detail-type"] == "Scheduled Event":
-            return {
-                "statusCode": 200,
-                "body": "Scheduled event processed"
-            }
+            return {"statusCode": 200, "body": "Scheduled event processed"}
 
         asgi_handler = Mangum(app, lifespan="off")
         response = asgi_handler(

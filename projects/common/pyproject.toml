@@ -19,10 +19,8 @@ dependencies = [
     "python-dotenv<2.0.0,>=1.0.1",
     "pydantic-settings<3.0.0,>=2.6.0",
     "alembic<2.0.0,>=1.13.3",
-    "psycopg2-binary<3.0.0,>=2.9.10",
-    "boto3<2.0.0,>=1.35.66",
-    "boto3-stubs[essential]<2.0.0,>=1.35.86",
-    "aws-xray-sdk>=2.14.0",
+    "psycopg[binary]==3.2.6",
+    "sentry-sdk[fastapi]>=2.25.1",
     "hexrepo-cloud",
     "hexrepo-db",
     "hexrepo-api",
@@ -33,6 +31,9 @@ dependencies = [
 [dependency-groups]
 aws = [
     "mangum<1.0.0,>=0.19.0",
+    "aws-xray-sdk>=2.14.0",
+    "boto3<2.0.0,>=1.35.66",
+    "boto3-stubs[essential]<2.0.0,>=1.35.86",
 ]
 dev = [
     "pytest<9.0.0,>=8.3.3",

@@ -225,7 +225,7 @@ def migrate_db(config: HexrepoConfig, env: str, project: str):
                     tf_output: Dict[str, str] = get_terrform_output(env, project)
                     secret_name = tf_output["db_secret_name"]["value"]
                     db_url = (
-                        "postgresql+psycopg2://postgres:{password}@127.0.0.1:5432/"
+                        "postgresql+psycopg://postgres:{password}@127.0.0.1:5432/"
                         + project
                     )
 

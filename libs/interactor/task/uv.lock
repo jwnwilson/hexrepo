@@ -232,7 +232,7 @@ dev = [
 
 [[package]]
 name = "hexrepo-db"
-version = "0.1.19"
+version = "0.1.24"
 source = { editable = "../../adaptor/db" }
 dependencies = [
     { name = "boto3" },
@@ -267,7 +267,7 @@ dev = [
 mongo = [{ name = "pymongo", specifier = ">=4.10.1" }]
 sql = [
     { name = "alembic", specifier = ">=1.14.0,<2.0.0" },
-    { name = "psycopg2-binary", specifier = ">=2.9.10,<3.0.0" },
+    { name = "psycopg", extras = ["binary"], specifier = "==3.2.6" },
     { name = "sqlalchemy", specifier = ">=2.0.36,<3.0.0" },
 ]
 

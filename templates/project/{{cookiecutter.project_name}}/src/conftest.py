@@ -39,7 +39,7 @@ def reset_db(uow: UOW, drop_only: bool = False):
 @pytest.fixture
 def SQLALCHEMY_DATABASE_URL():
     return os.getenv(
-        "TEST_DB_URL", "postgresql+psycopg2://postgres:password@localhost:5432/test_db"
+        "TEST_DB_URL", "postgresql+psycopg://postgres:password@localhost:5432/test_db"
     )
 
 

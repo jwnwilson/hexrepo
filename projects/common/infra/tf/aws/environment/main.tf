@@ -17,8 +17,8 @@ data "aws_region" "current" {}
 locals {
   account_id    = data.aws_caller_identity.current.account_id
   region        = data.aws_region.current.name
-  db_url        = "postgresql+psycopg2://postgres:{password}@${module.common_postgres.db_instance_endpoint}/${var.project}"
-  db_ro_url     = module.common_postgres.db_instance_ro_endpoint != null ? "postgresql+psycopg2://postgres:{password}@${module.common_postgres.db_instance_ro_endpoint}/${var.project}" : "postgresql+psycopg2://postgres:{password}@${module.common_postgres.db_instance_endpoint}/${var.project}"
+  db_url        = "postgresql+psycopg://postgres:{password}@${module.common_postgres.db_instance_endpoint}/${var.project}"
+  db_ro_url     = module.common_postgres.db_instance_ro_endpoint != null ? "postgresql+psycopg://postgres:{password}@${module.common_postgres.db_instance_ro_endpoint}/${var.project}" : "postgresql+psycopg://postgres:{password}@${module.common_postgres.db_instance_endpoint}/${var.project}"
   api_subdomain = "common-${terraform.workspace}"
   app_url       = "https://${local.api_subdomain}.${var.domain}"
 }
