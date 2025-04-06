@@ -9,7 +9,7 @@ logger = logging.getLogger()
 # Silence noisy logs from faker
 logging.getLogger("faker.factory").setLevel(logging.ERROR)
 
-ENV = os.environ("ENVIRONMENT", "local")
+ENV = os.environ.get("ENVIRONMENT", "local")
 load_dotenv(os.environ.get("ENV_FILE", "./env/{ENV}.env"))
 
 
