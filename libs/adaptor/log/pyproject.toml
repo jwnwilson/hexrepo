@@ -4,7 +4,7 @@ authors = [
 ]
 requires-python = "<4.0,>=3.12"
 name = "hexrepo_log"
-version = "0.1.5"
+version = "0.1.6"
 description = "standard logging"
 readme = "README.md"
 dependencies = [
