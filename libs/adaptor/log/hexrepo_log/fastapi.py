@@ -15,7 +15,7 @@ class LogMiddleware:
         if scope["type"] == "lifespan":
             return await self.app(scope, receive, send)
         headers: Dict = dict(scope["headers"])
-        logger.info(f"Headers: {headers}")
-        correlation_id: str = headers.get(self.header_name.lower(), None) or str(uuid.uuid4())
+        correlation_id_bytes: bytes = headers.get(str.encode(self.header_name.lower()), None) or str(uuid.uuid4())
+        correlation_id: str = correlation_id_bytes.decode("utf-8")
         with log_manager(correlation_id=correlation_id):
             await self.app(scope, receive, send)
