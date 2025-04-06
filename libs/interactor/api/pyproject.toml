@@ -12,10 +12,12 @@ dependencies = [
     "pydantic-settings<3.0.0,>=2.6.1",
     "fastapi<1.0.0,>=0.115.4",
     "hexrepo-db",
+    "hexrepo-log",
 ]
 
 [tool.uv.sources]
 hexrepo-db = { path = "../../adaptor/db", editable = true }
+hexrepo-log = { path = "../../adaptor/log", editable = true }
 
 [dependency-groups]
 dev = [
