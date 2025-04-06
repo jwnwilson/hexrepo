@@ -36,10 +36,7 @@ Setup the following env vars directly or run:
 # To Do
 
 - Setup backend
-    - Setup better logging
-        - Pass correlation id from aws through to logging
     - Setup sentry to be platform agnostic
-    - blue gren deployments
     - Update feature flags so they are shared across companies by default and can be overriden on a per company bases
         - Add env to feature flags
         - Add company link to feature flag to override
@@ -52,6 +49,8 @@ Setup the following env vars directly or run:
     - Setup sonarqube
     - Disable example project
     - Add ECS option to avoid cold startup and avoid aws lockin
+        - blue green deployments
+        - prod image that is fast to deploy on all envs
     - Implement template -> project update:
         - Copier https://copier.readthedocs.io/en/stable/
         - Look at cruft again
