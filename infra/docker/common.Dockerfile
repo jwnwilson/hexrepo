@@ -16,4 +16,5 @@ RUN uv sync --frozen --no-group dev
 
 COPY ./projects/${PROJECT}/src ./src
 COPY ./projects/${PROJECT}/alembic.ini ./
+COPY ./projects/${PROJECT}/env ./env
 CMD ["uvicorn", "app.interactor.api.fastapi.main:app", "--host", "0.0.0.0", "--port", "8000"]

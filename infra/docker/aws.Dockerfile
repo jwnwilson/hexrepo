@@ -15,6 +15,7 @@ RUN uv export --group aws > requirements.txt && uv pip install -r requirements.t
 
 COPY ./projects/${PROJECT}/src ./src
 COPY ./projects/${PROJECT}/alembic.ini ./
+COPY ./projects/${PROJECT}/env ./env
 
 ENV PYTHONPATH ${LAMBDA_TASK_ROOT}/src
 CMD ["src.app.interactor.api.lambda_handler"]
