@@ -66,14 +66,16 @@ class CompanyCreateDTO(BaseModel):
 class FeatureFlagDTO(BaseModel):
     id: UUID
     name: str
+    env: str
     enabled: bool
-    company_id: Optional[UUID] = None
+    company_id: UUID | None = None
+    user_id: UUID | None = None
 
 
 class FeatureFlagCreateDTO(BaseModel):
     name: str
     enabled: bool
-    company_id: Optional[UUID] = None
+    env: str
 
 
 class UserCreateDTO(BaseModel):

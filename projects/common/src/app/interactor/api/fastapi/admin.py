@@ -160,15 +160,7 @@ class FeatureFlagAdmin(BaseModelView, model=FeatureFlagTable):
     column_list = [
         FeatureFlagTable.name,
         FeatureFlagTable.id,
-        FeatureFlagTable.company_id,
     ]
-
-    form_ajax_refs = {
-        "company": {
-            "fields": ("name",),
-            "order_by": "created_at",
-        }
-    }
 
 
 class CompanyAdmin(BaseModelView, model=CompanyTable):
