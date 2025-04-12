@@ -68,10 +68,8 @@ def get_current_user(
 
 
 def get_superadmin_user(
-    credentials: JWTAuthorizationCredentials = Depends(get_jwt_token),
-    uow: SqlUOW = Depends(get_uow_ro),
+    user: UserPermissionDTO = Depends(get_current_user),
 ) -> UserPermissionDTO:
-    user: UserPermissionDTO = get_current_user(credentials, uow)
     if not user.is_superuser():
         raise HTTPException(
             status_code=HTTP_403_FORBIDDEN, detail="Admin access required"

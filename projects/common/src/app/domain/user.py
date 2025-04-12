@@ -63,6 +63,15 @@ class CompanyCreateDTO(BaseModel):
     website: str
 
 
+class FeatureFlagBaseDTO(BaseModel):
+    id: UUID
+    name: str
+
+
+class FeatureFlagBaseCreateDTO(BaseModel):
+    name: str
+
+
 class FeatureFlagDTO(BaseModel):
     id: UUID
     name: str

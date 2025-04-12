@@ -6,7 +6,7 @@ from hexrepo_db.sql.repository import DefaultQuery, SQLRepository
 from sqlalchemy import UUID, Boolean, ForeignKey, Select, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.domain.user import FeatureFlagCreateDTO, FeatureFlagDTO
+from app.domain.user import FeatureFlagBaseCreateDTO, FeatureFlagBaseDTO, FeatureFlagCreateDTO, FeatureFlagDTO
 
 if TYPE_CHECKING:
     from .company import CompanyTable
@@ -64,9 +64,18 @@ class FeatureFlagRepository(SQLRepository):
     query_logic: Type[Query] = FeatureQueryLogic
 
     def create(self, obj_in: FeatureFlagCreateDTO) -> FeatureFlagDTO:
+        # Get of Create feature flag record
         breakpoint()
-        # Create feature flag record
-        feature_flag = super().create(obj_in)
+        feature_flag: FeatureFlagBaseDTO
+        existing_feature_flag = self.read_multi(filters=dict(name=obj_in.name))
+        if not existing_feature_flag.results:
+            breakpoint()
+            feature_flag_base_obj = FeatureFlagBaseCreateDTO(
+                name=obj_in.name
+            )
+            feature_flag = super().create(feature_flag_base_obj)
+        else:
+            feature_flag = existing_feature_flag.results[0]
 
         # Create env feature flag record if it doesn't exist
         feature_env = FeatureFlagEnvTable(
