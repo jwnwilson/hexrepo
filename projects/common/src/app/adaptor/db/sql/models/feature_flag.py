@@ -1,22 +1,25 @@
-from typing import TYPE_CHECKING, Any, Type
+from typing import TYPE_CHECKING, Any, List, Type
+
+from app.adaptor.db.sql.models.environment import EnvironmentTable
 
 from hexrepo_db.sql.interface import Query
 from hexrepo_db.sql.models.base_model import Base
 from hexrepo_db.sql.repository import DefaultQuery, SQLRepository
-from sqlalchemy import UUID, Boolean, ForeignKey, Select, String
+from sqlalchemy import JSON, UUID, Boolean, ForeignKey, Select, String, UniqueConstraint, select
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.domain.user import FeatureFlagBaseCreateDTO, FeatureFlagBaseDTO, FeatureFlagCreateDTO, FeatureFlagDTO
-
-if TYPE_CHECKING:
-    from .company import CompanyTable
-    from .user import UserTable
+from app.domain.user import FeatureFlagBaseCreateDTO, FeatureFlagBaseDTO, FeatureFlagCreateDTO, FeatureFlagDTO, FeatureFlagEnvDTO
 
 
 class FeatureFlagTable(Base):
     __tablename__ = "feature_flag"
 
-    name: Mapped[str] = mapped_column(String)
+    name: Mapped[str] = mapped_column(String, unique=True)
+    environments: Mapped[List["FeatureFlagEnvTable"]] = relationship(
+        "FeatureFlagEnvTable",
+        back_populates="feature_flag",
+        cascade="all, delete-orphan",
+    )
 
     def __str__(self) -> str:
         return f"{self.name} | {self.id}"
@@ -28,25 +31,17 @@ class FeatureFlagEnvTable(Base):
     feature_flag_id: Mapped[UUID] = mapped_column(
         UUID, ForeignKey("feature_flag.id")
     )
+    overrides: Mapped[str] = mapped_column(JSON)
     env: Mapped[str] = mapped_column(String)
     enabled: Mapped[bool] = mapped_column(Boolean, default=False)
 
-
-class FeatureFlagOverride(Base):
-    __tablename__ = "feature_flag_override"
-
-    company_id: Mapped[UUID] = mapped_column(
-        UUID, ForeignKey("company.id"), nullable=True
+    __table_args__ = (
+        UniqueConstraint(
+            "feature_flag_id",
+            "env",
+            name="uq_feature_flag_env",
+        ),
     )
-    user_id:Mapped[UUID] = mapped_column(
-        UUID, ForeignKey("user.id"), nullable=True
-    )
-    feature_flag_env_id: Mapped[UUID] = mapped_column(
-        UUID, ForeignKey("feature_flag_env.id")
-    )
-    feature_flag_env: Mapped[FeatureFlagEnvTable] = relationship("FeatureFlagEnvTable")
-    company: Mapped["CompanyTable"] = relationship("CompanyTable")
-    user: Mapped["UserTable"] = relationship("UserTable")
 
 
 class FeatureQueryLogic(DefaultQuery):
@@ -54,7 +49,6 @@ class FeatureQueryLogic(DefaultQuery):
         return (
             Select(self.model)
             .outerjoin(FeatureFlagEnvTable)
-            .outerjoin(FeatureFlagOverride)
         )
 
 
@@ -65,30 +59,49 @@ class FeatureFlagRepository(SQLRepository):
 
     def create(self, obj_in: FeatureFlagCreateDTO) -> FeatureFlagDTO:
         # Get of Create feature flag record
-        breakpoint()
         feature_flag: FeatureFlagBaseDTO
-        existing_feature_flag = self.read_multi(filters=dict(name=obj_in.name))
-        if not existing_feature_flag.results:
-            breakpoint()
-            feature_flag_base_obj = FeatureFlagBaseCreateDTO(
-                name=obj_in.name
-            )
-            feature_flag = super().create(feature_flag_base_obj)
-        else:
-            feature_flag = existing_feature_flag.results[0]
+        feature_flag_base_obj = FeatureFlagBaseCreateDTO(
+            name=obj_in.name,
+        )
+        feature_flag = self.query.parse_dto(feature_flag_base_obj)
+        self.session.add(feature_flag)
+        self.session.flush()
 
         # Create env feature flag record if it doesn't exist
-        feature_env = FeatureFlagEnvTable(
-            env=obj_in.env,
-            enabled=obj_in.enabled,
-            feature_flag_id=feature_flag.id,
-        )
-        self.session.add(feature_env)
+        env_list = select(EnvironmentTable).all()
+        for env in env_list:
+            feature_env = FeatureFlagEnvTable(
+                env=env.name,
+                enabled=obj_in.enabled,
+                feature_flag_id=feature_flag.id,
+            )
+            self.session.add(feature_env)
         self.session.flush()
+        self.session.refresh(feature_flag)
         return FeatureFlagDTO(
             id=feature_flag.id,
             name=feature_flag.name,
-            env=obj_in.env,
-            enabled=obj_in.enabled,
+            environments=[
+                FeatureFlagDTO(
+                    id=env.id,
+                    env=env.env,
+                    enabled=env.enabled,
+                )
+                for env in feature_flag.environments
+            ],
         )
-    
+
+
+class FeatureEnvQueryLogic(DefaultQuery):
+    def query_select(self) -> Select[Any]:
+        return (
+            Select(self.model)
+            .outerjoin(FeatureFlagTable)
+        )
+
+class FeatureFlagEnvRepository(SQLRepository):
+    model = FeatureFlagEnvTable
+    model_dto = FeatureFlagEnvDTO
+    query_logic: Type[Query] = FeatureEnvQueryLogic
+
+

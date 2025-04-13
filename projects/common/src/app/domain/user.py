@@ -15,6 +15,12 @@ class Token(BaseModel):
     token_type: str
 
 
+class EnvironmentDTO(BaseModel):
+    id: UUID
+    name: str
+    env: str
+
+
 class UserPermissionCreateDTO(BaseModel):
     username: str
     name: str
@@ -72,6 +78,11 @@ class FeatureFlagBaseCreateDTO(BaseModel):
     name: str
 
 
+class FeatureFlagCreateDTO(BaseModel):
+    name: str
+    enabled: bool
+
+
 class FeatureFlagDTO(BaseModel):
     id: UUID
     name: str
@@ -81,10 +92,18 @@ class FeatureFlagDTO(BaseModel):
     user_id: UUID | None = None
 
 
-class FeatureFlagCreateDTO(BaseModel):
-    name: str
-    enabled: bool
+class FeatureFlagEnvCreateDTO(BaseModel):
     env: str
+    enabled: bool
+    overrides: Dict[str, Any] | None = None
+
+
+class FeatureFlagEnvDTO(BaseModel):
+    id: UUID
+    name: str
+    env: str
+    enabled: bool
+    overrides: Dict[str, Any] | None = None
 
 
 class UserCreateDTO(BaseModel):
