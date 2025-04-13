@@ -63,6 +63,7 @@ class FeatureFlagRepository(SQLRepository):
 
     def create(self, obj_in: FeatureFlagCreateDTO) -> FeatureFlagDTO:
         # Get of Create feature flag record
+        breakpoint()
         feature_flag: FeatureFlagBaseDTO
         feature_flag_base_obj = FeatureFlagBaseCreateDTO(
             name=obj_in.name,
@@ -72,7 +73,10 @@ class FeatureFlagRepository(SQLRepository):
         self.session.flush()
 
         # Create env feature flag record if it doesn't exist
-        env_list = select(EnvironmentTable).all()
+        env_list = self.session.execute(select(EnvironmentTable)).all()
+        if not env_list:
+            raise ValueError("No environments found in the database, please create environments for feature flags")
+        
         for env in env_list:
             feature_env = FeatureFlagEnvTable(
                 env=env.name,
