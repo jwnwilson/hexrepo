@@ -34,6 +34,10 @@ class FeatureFlagEnvTable(Base):
     overrides: Mapped[str] = mapped_column(JSON)
     env: Mapped[str] = mapped_column(String)
     enabled: Mapped[bool] = mapped_column(Boolean, default=False)
+    feature_flag: Mapped[FeatureFlagTable] = relationship(
+        "FeatureFlagTable",
+        back_populates="environments",
+    )
 
     __table_args__ = (
         UniqueConstraint(
