@@ -2,6 +2,7 @@ from fastapi import APIRouter
 
 from .routes.auth import router_v1 as auth_router
 from .routes.company import router_v1 as company_router
+from .routes.environments import router_v1 as environments_router
 from .routes.feature_flags import router_v1 as feature_flags_router
 from .routes.groups import router_v1 as groups_router
 from .routes.healthcheck import router_v1 as healthcheck_router
@@ -50,4 +51,10 @@ api_router_v1.include_router(
     auth_router,
     tags=["Auth"],
     prefix="/auth",
+)
+
+api_router_v1.include_router(
+    environments_router,
+    tags=["Environments"],
+    prefix="/environment",
 )

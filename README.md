@@ -37,14 +37,13 @@ Setup the following env vars directly or run:
 
 - Setup backend
     - Update feature flags so they are shared across companies by default and can be overriden on a per company bases
-        - Add env to feature flags
-        - Add company link to feature flag to override
+        - Add setup data command to add envs with config
+        - Add company and user overrides to feature flags
     - Authentication via fastapi middleware infra agnostic solution
         - Get user data with permissions via api call with username from header or session.
         - Improve DB calls to make more performant
         - Create materialised view or cache in dynamodb for cheap serverless option?
     - Disable example project
-    - Move monitor / infra optimisation into common
     - Add ECS option to avoid cold startup and avoid aws lockin
         - blue green deployments
         - prod image that is fast to deploy on all envs
@@ -61,10 +60,11 @@ Setup the following env vars directly or run:
     - Add API lib to call projects and pass request-id-header
     - Add monitoring dashboard for services
         - Generic change log syncing to tracking metrics
+        - Add log based event tracking
+        - Change data capture streaming to data warehouse
         - Potentially use 3rd party service?
         - Load testing
         - Latency tracking and visualisation
-        - Add log based event tracking
         - Setup BI dashboard
     - Tests:
         - Test auth and permission logic
