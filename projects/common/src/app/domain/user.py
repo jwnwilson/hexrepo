@@ -83,7 +83,6 @@ class FeatureFlagBaseCreateDTO(BaseModel):
     name: str
 
 
-
 class FeatureFlagEnvCreateDTO(BaseModel):
     env: str
     enabled: bool
@@ -99,7 +98,12 @@ class FeatureFlagEnvDTO(BaseModel):
 
 class FeatureFlagCreateDTO(BaseModel):
     name: str
-    enabled: bool
+    enabled: bool = False
+
+
+class FeatureFlagUpdateDTO(BaseModel):
+    id: UUID
+    name: str
 
 
 class FeatureFlagDTO(BaseModel):

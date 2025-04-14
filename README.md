@@ -37,8 +37,8 @@ Setup the following env vars directly or run:
 
 - Setup backend
     - Update feature flags so they are shared across companies by default and can be overriden on a per company bases
-        - Add company and user overrides to feature flags
         - Add setup data command to add envs with config
+        - Add company and user overrides to feature flags
     - Authentication via fastapi middleware infra agnostic solution
         - Get user data with permissions via api call with username from header or session.
         - Improve DB calls to make more performant

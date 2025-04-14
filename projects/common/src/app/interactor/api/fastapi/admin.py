@@ -2,7 +2,6 @@ import json
 from datetime import datetime
 from typing import Any
 
-from app.adaptor.db.sql.models.environment import EnvironmentTable
 import wtforms
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.responses import JSONResponse
@@ -15,6 +14,7 @@ from sqladmin.authentication import AuthenticationBackend
 from starlette.requests import Request
 
 from app.adaptor.db.sql.models.company import CompanyTable
+from app.adaptor.db.sql.models.environment import EnvironmentTable
 from app.adaptor.db.sql.models.feature_flag import FeatureFlagEnvTable, FeatureFlagTable
 from app.adaptor.db.sql.models.group import GroupTable
 from app.adaptor.db.sql.models.permission import PermissionTable
@@ -182,7 +182,7 @@ class FeatureFlagEnvAdmin(BaseModelView, model=FeatureFlagEnvTable):
         FeatureFlagEnvTable.env,
         FeatureFlagEnvTable.id,
         "feature_flag.name",
-        FeatureFlagEnvTable.enabled
+        FeatureFlagEnvTable.enabled,
     ]
 
     form_ajax_refs = {

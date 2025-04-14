@@ -119,6 +119,8 @@ class SQLRepository(Repository):
     model: Any = BaseSQLModel
     model_dto: ModelDTOType = BaseModel
     query_logic: Type[Query] = DefaultQuery
+    # Apply .unique() to queries with eager loading to avoid duplicates
+    unique_query: bool = False
 
     def __init__(
         self,
@@ -138,7 +140,10 @@ class SQLRepository(Repository):
     def _query_single(self, id: UUID) -> Any:
         try:
             query: Select[Any] = self.query.query_single(id)
-            results = self.session.execute(query).one_or_none()
+            query_exec = self.session.execute(query)
+            if self.unique_query:
+                query_exec = query_exec.unique()
+            results = query_exec.one_or_none()
         # Should this be logged here, or allowed to bomb out the request with a 500?
         except MultipleResultsFound:
             logger.warning(
@@ -159,6 +164,8 @@ class SQLRepository(Repository):
 
     def _query_to_dto(self, query: Select[Any]) -> List[BaseModel]:
         query_result = self.session.execute(query)
+        if self.unique_query:
+            query_result = query_result.unique()
         return [self._model_to_dto(row) for row in query_result.scalars()]
 
     def _model_to_dto(self, row: Union[BaseSQLModel, Row[Any]]) -> BaseModel:

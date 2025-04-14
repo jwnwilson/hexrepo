@@ -1,15 +1,30 @@
-from typing import TYPE_CHECKING, Any, List, Type, Union
-
-from app.adaptor.db.sql.models.environment import EnvironmentTable
-from pydantic import BaseModel
+from typing import Any, List, Type, Union
 
 from hexrepo_db.sql.interface import BaseSQLModel, Query
 from hexrepo_db.sql.models.base_model import Base
 from hexrepo_db.sql.repository import DefaultQuery, SQLRepository
-from sqlalchemy import JSON, UUID, Boolean, ForeignKey, Row, Select, String, UniqueConstraint, select
+from pydantic import BaseModel
+from sqlalchemy import (
+    JSON,
+    UUID,
+    Boolean,
+    ForeignKey,
+    Row,
+    Select,
+    String,
+    UniqueConstraint,
+    select,
+)
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.domain.user import FeatureFlagBaseCreateDTO, FeatureFlagBaseDTO, FeatureFlagCreateDTO, FeatureFlagDTO, FeatureFlagEnvDTO
+from app.adaptor.db.sql.models.environment import EnvironmentTable
+from app.domain.user import (
+    FeatureFlagBaseCreateDTO,
+    FeatureFlagBaseDTO,
+    FeatureFlagCreateDTO,
+    FeatureFlagDTO,
+    FeatureFlagEnvDTO,
+)
 
 
 class FeatureFlagTable(Base):
@@ -20,26 +35,24 @@ class FeatureFlagTable(Base):
         "FeatureFlagEnvTable",
         back_populates="feature_flag",
         cascade="all, delete-orphan",
-        lazy='joined'
+        lazy="joined",
     )
 
     def __str__(self) -> str:
         return f"{self.name} | {self.id}"
-    
+
     __table_args__ = (
         UniqueConstraint(
             "name",
             name="uq_feature_flag_name",
         ),
     )
-    
+
 
 class FeatureFlagEnvTable(Base):
     __tablename__ = "feature_flag_env"
 
-    feature_flag_id: Mapped[UUID] = mapped_column(
-        UUID, ForeignKey("feature_flag.id")
-    )
+    feature_flag_id: Mapped[UUID] = mapped_column(UUID, ForeignKey("feature_flag.id"))
     overrides: Mapped[str] = mapped_column(JSON, nullable=True)
     env: Mapped[str] = mapped_column(String)
     enabled: Mapped[bool] = mapped_column(Boolean, default=False)
@@ -60,26 +73,24 @@ class FeatureFlagEnvTable(Base):
     )
 
 
-class FeatureQueryLogic(DefaultQuery):
-    def query_select(self) -> Select[Any]:
-        return (
-            Select(self.model, FeatureFlagEnvTable)
-            .outerjoin(FeatureFlagEnvTable)
-        )
+# class FeatureQueryLogic(DefaultQuery):
+#     def query_select(self) -> Select[Any]:
+#         return (
+#             Select(self.model, FeatureFlagEnvTable)
+#         )
 
 
 class FeatureFlagRepository(SQLRepository):
     model = FeatureFlagTable
     model_dto = FeatureFlagDTO
-    query_logic: Type[Query] = FeatureQueryLogic
-
-    def _query_to_dto(self, query: Select[Any]) -> List[BaseModel]:
-        query_result = self.session.execute(query).unique()
-        return [self._model_to_dto(row) for row in query_result.scalars()]
+    # query_logic: Type[Query] = FeatureQueryLogic
+    unique_query: bool = True
 
     def _model_to_dto(self, row: Union[BaseSQLModel, Row[Any]]) -> BaseModel:
         flag_data: dict = row.__dict__
-        flag_data["environments"] = [FeatureFlagEnvDTO(**env.__dict__) for env in row.environments]
+        flag_data["environments"] = [
+            FeatureFlagEnvDTO(**env.__dict__) for env in row.environments
+        ]
         return self.model_dto(**flag_data)
 
     def create(self, obj_in: FeatureFlagCreateDTO) -> FeatureFlagDTO:
@@ -95,8 +106,10 @@ class FeatureFlagRepository(SQLRepository):
         # Create env feature flag record if it doesn't exist
         env_list = self.session.execute(select(EnvironmentTable)).all()
         if not env_list:
-            raise ValueError("No environments found in the database, please create environments for feature flags")
-        
+            raise ValueError(
+                "No environments found in the database, please create environments for feature flags"
+            )
+
         for env in env_list:
             feature_env = FeatureFlagEnvTable(
                 env=env[0].name,
@@ -122,14 +135,10 @@ class FeatureFlagRepository(SQLRepository):
 
 class FeatureEnvQueryLogic(DefaultQuery):
     def query_select(self) -> Select[Any]:
-        return (
-            Select(self.model)
-            .outerjoin(FeatureFlagTable)
-        )
+        return Select(self.model).outerjoin(FeatureFlagTable)
+
 
 class FeatureFlagEnvRepository(SQLRepository):
     model = FeatureFlagEnvTable
     model_dto = FeatureFlagEnvDTO
     query_logic: Type[Query] = FeatureEnvQueryLogic
-
-

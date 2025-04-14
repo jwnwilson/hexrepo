@@ -6,11 +6,11 @@ from sqlalchemy_continuum import make_versioned
 make_versioned(user_cls=None)
 
 from .models.company import CompanyRepository  # noqa: E402
+from .models.environment import EnvironmentRepository  # noqa: E402
 from .models.feature_flag import FeatureFlagRepository  # noqa: E402
 from .models.group import GroupRepository  # noqa: E402
 from .models.permission import PermissionRepository  # noqa: E402
 from .models.user import UserRepository  # noqa: E402
-from .models.environment import EnvironmentRepository # noqa: E402
 
 # This nees to be done after model definition for versioning to work
 configure_mappers()
@@ -36,7 +36,7 @@ class SqlUOW(BaseSqlUOW):
     @property
     def company(self) -> CompanyRepository:
         return CompanyRepository(self.session)
-    
+
     @property
     def environment(self) -> CompanyRepository:
         return EnvironmentRepository(self.session)

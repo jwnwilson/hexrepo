@@ -9,6 +9,8 @@ from app.domain.user import (
     CompanyDTO,
     FeatureFlagCreateDTO,
     FeatureFlagDTO,
+    FeatureFlagEnvDTO,
+    FeatureFlagUpdateDTO,
     GroupPermissionDTO,
     PermissionDTO,
     UserPermissionCreateDTO,
@@ -18,14 +20,14 @@ from app.domain.user import (
 
 class FeatureFlagFactory(ModelFactory[FeatureFlagDTO]):
     @classmethod
-    def company_id(cls) -> Optional[uuid.UUID]:
-        return None
+    def environments(cls) -> list[FeatureFlagEnvDTO]:
+        return []
 
 
-class FeatureFlagCreateFactory(ModelFactory[FeatureFlagCreateDTO]):
-    @classmethod
-    def company_id(cls) -> Optional[uuid.UUID]:
-        return None
+class FeatureFlagCreateFactory(ModelFactory[FeatureFlagCreateDTO]): ...
+
+
+class FeatureFlagUpdateFactory(ModelFactory[FeatureFlagUpdateDTO]): ...
 
 
 class CompanyFactory(ModelFactory[CompanyDTO]): ...
@@ -85,6 +87,7 @@ class UserPermissionCreateFactory(ModelFactory[UserPermissionCreateDTO]):
 TEST_DATA_FACTORY = {
     FeatureFlagDTO: FeatureFlagFactory,
     FeatureFlagCreateDTO: FeatureFlagCreateFactory,
+    FeatureFlagUpdateDTO: FeatureFlagUpdateFactory,
     CompanyDTO: CompanyFactory,
     CompanyCreateDTO: CompanyCreateFactory,
     UserPermissionDTO: UserPermissionFactory,
