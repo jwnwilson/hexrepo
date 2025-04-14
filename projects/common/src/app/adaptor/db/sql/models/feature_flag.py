@@ -1,12 +1,12 @@
-from typing import TYPE_CHECKING, Any, List, Type
+from typing import TYPE_CHECKING, Any, List, Type, Union
 
 from app.adaptor.db.sql.models.environment import EnvironmentTable
 from pydantic import BaseModel
 
-from hexrepo_db.sql.interface import Query
+from hexrepo_db.sql.interface import BaseSQLModel, Query
 from hexrepo_db.sql.models.base_model import Base
 from hexrepo_db.sql.repository import DefaultQuery, SQLRepository
-from sqlalchemy import JSON, UUID, Boolean, ForeignKey, Select, String, UniqueConstraint, select
+from sqlalchemy import JSON, UUID, Boolean, ForeignKey, Row, Select, String, UniqueConstraint, select
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.domain.user import FeatureFlagBaseCreateDTO, FeatureFlagBaseDTO, FeatureFlagCreateDTO, FeatureFlagDTO, FeatureFlagEnvDTO
@@ -20,6 +20,7 @@ class FeatureFlagTable(Base):
         "FeatureFlagEnvTable",
         back_populates="feature_flag",
         cascade="all, delete-orphan",
+        lazy='joined'
     )
 
     def __str__(self) -> str:
@@ -70,23 +71,13 @@ class FeatureFlagRepository(SQLRepository):
     query_logic: Type[Query] = FeatureQueryLogic
 
     def _query_to_dto(self, query: Select[Any]) -> List[BaseModel]:
-        query_result = self.session.execute(query)
-        return [self._model_to_dto(row) for row in query_result.all()]
+        query_result = self.session.execute(query).unique()
+        return [self._model_to_dto(row) for row in query_result.scalars()]
 
-    def _model_to_dto(self, row: Any) -> FeatureFlagDTO:
-        feature_flag = row[0]
-        return FeatureFlagDTO(
-            id=feature_flag.id,
-            name=feature_flag.name,
-            environments=[
-                FeatureFlagEnvDTO(
-                    id=env.id,
-                    env=env.env,
-                    enabled=env.enabled,
-                )
-                for env in feature_flag.environments
-            ],
-        )
+    def _model_to_dto(self, row: Union[BaseSQLModel, Row[Any]]) -> BaseModel:
+        flag_data: dict = row.__dict__
+        flag_data["environments"] = [FeatureFlagEnvDTO(**env.__dict__) for env in row.environments]
+        return self.model_dto(**flag_data)
 
     def create(self, obj_in: FeatureFlagCreateDTO) -> FeatureFlagDTO:
         # Get of Create feature flag record

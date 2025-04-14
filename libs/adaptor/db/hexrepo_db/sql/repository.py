@@ -144,6 +144,7 @@ class SQLRepository(Repository):
             logger.warning(
                 f"Model: {self.model.__name__}, ID: {id}, multiple records found"
             )
+            results = None
         if not results:
             raise RecordNotFound(
                 f"Model: {self.model.__name__}, Record: {id}, not found"
