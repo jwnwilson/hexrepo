@@ -21,6 +21,11 @@ class EnvironmentDTO(BaseModel):
     env: str
 
 
+class EnvironmentCreateDTO(BaseModel):
+    name: str
+    env: str
+
+
 class UserPermissionCreateDTO(BaseModel):
     username: str
     name: str
