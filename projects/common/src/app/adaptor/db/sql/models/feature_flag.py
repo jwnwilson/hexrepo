@@ -48,6 +48,9 @@ class FeatureFlagEnvTable(Base):
         back_populates="environments",
     )
 
+    def __str__(self) -> str:
+        return f"{self.env}"
+
     __table_args__ = (
         UniqueConstraint(
             "feature_flag_id",

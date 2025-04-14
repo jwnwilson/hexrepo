@@ -2,6 +2,7 @@ import json
 from datetime import datetime
 from typing import Any
 
+from app.adaptor.db.sql.models.environment import EnvironmentTable
 import wtforms
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.responses import JSONResponse
@@ -14,7 +15,7 @@ from sqladmin.authentication import AuthenticationBackend
 from starlette.requests import Request
 
 from app.adaptor.db.sql.models.company import CompanyTable
-from app.adaptor.db.sql.models.feature_flag import FeatureFlagTable
+from app.adaptor.db.sql.models.feature_flag import FeatureFlagEnvTable, FeatureFlagTable
 from app.adaptor.db.sql.models.group import GroupTable
 from app.adaptor.db.sql.models.permission import PermissionTable
 from app.adaptor.db.sql.models.user import UserTable
@@ -162,6 +163,35 @@ class FeatureFlagAdmin(BaseModelView, model=FeatureFlagTable):
         FeatureFlagTable.id,
     ]
 
+    form_ajax_refs = {
+        "environments": {
+            "fields": ("env",),
+            "order_by": "created_at",
+        }
+    }
+
+
+class FeatureFlagEnvAdmin(BaseModelView, model=FeatureFlagEnvTable):
+    name = "Feature Flag Environment"
+    name_plural = "Feature Flag Environments"
+    icon = "fa-solid fa-flag"
+
+    column_searchable_list = [FeatureFlagEnvTable.env, "feature_flag.name"]
+
+    column_list = [
+        FeatureFlagEnvTable.env,
+        FeatureFlagEnvTable.id,
+        "feature_flag.name",
+        FeatureFlagEnvTable.enabled
+    ]
+
+    form_ajax_refs = {
+        "feature_flag": {
+            "fields": ("name",),
+            "order_by": "created_at",
+        }
+    }
+
 
 class CompanyAdmin(BaseModelView, model=CompanyTable):
     name = "Company"
@@ -173,6 +203,19 @@ class CompanyAdmin(BaseModelView, model=CompanyTable):
     column_list = [
         CompanyTable.name,
         CompanyTable.id,
+    ]
+
+
+class Environment(BaseModelView, model=EnvironmentTable):
+    name = "Environment"
+    name_plural = "Environments"
+    icon = "fa-solid fa-cloud"
+
+    column_searchable_list = [EnvironmentTable.name]
+
+    column_list = [
+        EnvironmentTable.name,
+        EnvironmentTable.id,
     ]
 
 
@@ -247,4 +290,6 @@ def setup_admin(app: FastAPI):
     admin.add_view(GroupAdmin)
     admin.add_view(PermissionAdmin)
     admin.add_view(FeatureFlagAdmin)
+    admin.add_view(FeatureFlagEnvAdmin)
     admin.add_view(CompanyAdmin)
+    admin.add_view(Environment)
