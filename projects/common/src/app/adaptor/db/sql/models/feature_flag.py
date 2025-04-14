@@ -1,6 +1,7 @@
 from typing import TYPE_CHECKING, Any, List, Type
 
 from app.adaptor.db.sql.models.environment import EnvironmentTable
+from pydantic import BaseModel
 
 from hexrepo_db.sql.interface import Query
 from hexrepo_db.sql.models.base_model import Base
@@ -24,6 +25,13 @@ class FeatureFlagTable(Base):
     def __str__(self) -> str:
         return f"{self.name} | {self.id}"
     
+    __table_args__ = (
+        UniqueConstraint(
+            "name",
+            name="uq_feature_flag_name",
+        ),
+    )
+    
 
 class FeatureFlagEnvTable(Base):
     __tablename__ = "feature_flag_env"
@@ -31,7 +39,7 @@ class FeatureFlagEnvTable(Base):
     feature_flag_id: Mapped[UUID] = mapped_column(
         UUID, ForeignKey("feature_flag.id")
     )
-    overrides: Mapped[str] = mapped_column(JSON)
+    overrides: Mapped[str] = mapped_column(JSON, nullable=True)
     env: Mapped[str] = mapped_column(String)
     enabled: Mapped[bool] = mapped_column(Boolean, default=False)
     feature_flag: Mapped[FeatureFlagTable] = relationship(
@@ -51,7 +59,7 @@ class FeatureFlagEnvTable(Base):
 class FeatureQueryLogic(DefaultQuery):
     def query_select(self) -> Select[Any]:
         return (
-            Select(self.model)
+            Select(self.model, FeatureFlagEnvTable)
             .outerjoin(FeatureFlagEnvTable)
         )
 
@@ -61,9 +69,27 @@ class FeatureFlagRepository(SQLRepository):
     model_dto = FeatureFlagDTO
     query_logic: Type[Query] = FeatureQueryLogic
 
+    def _query_to_dto(self, query: Select[Any]) -> List[BaseModel]:
+        query_result = self.session.execute(query)
+        return [self._model_to_dto(row) for row in query_result.all()]
+
+    def _model_to_dto(self, row: Any) -> FeatureFlagDTO:
+        feature_flag = row[0]
+        return FeatureFlagDTO(
+            id=feature_flag.id,
+            name=feature_flag.name,
+            environments=[
+                FeatureFlagEnvDTO(
+                    id=env.id,
+                    env=env.env,
+                    enabled=env.enabled,
+                )
+                for env in feature_flag.environments
+            ],
+        )
+
     def create(self, obj_in: FeatureFlagCreateDTO) -> FeatureFlagDTO:
         # Get of Create feature flag record
-        breakpoint()
         feature_flag: FeatureFlagBaseDTO
         feature_flag_base_obj = FeatureFlagBaseCreateDTO(
             name=obj_in.name,
@@ -79,7 +105,7 @@ class FeatureFlagRepository(SQLRepository):
         
         for env in env_list:
             feature_env = FeatureFlagEnvTable(
-                env=env.name,
+                env=env[0].name,
                 enabled=obj_in.enabled,
                 feature_flag_id=feature_flag.id,
             )
@@ -90,7 +116,7 @@ class FeatureFlagRepository(SQLRepository):
             id=feature_flag.id,
             name=feature_flag.name,
             environments=[
-                FeatureFlagDTO(
+                FeatureFlagEnvDTO(
                     id=env.id,
                     env=env.env,
                     enabled=env.enabled,
