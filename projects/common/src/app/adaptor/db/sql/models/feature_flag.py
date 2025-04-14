@@ -59,6 +59,7 @@ class FeatureFlagEnvTable(Base):
     feature_flag: Mapped[FeatureFlagTable] = relationship(
         "FeatureFlagTable",
         back_populates="environments",
+        lazy="joined"
     )
 
     def __str__(self) -> str:
@@ -73,17 +74,9 @@ class FeatureFlagEnvTable(Base):
     )
 
 
-# class FeatureQueryLogic(DefaultQuery):
-#     def query_select(self) -> Select[Any]:
-#         return (
-#             Select(self.model, FeatureFlagEnvTable)
-#         )
-
-
 class FeatureFlagRepository(SQLRepository):
     model = FeatureFlagTable
     model_dto = FeatureFlagDTO
-    # query_logic: Type[Query] = FeatureQueryLogic
     unique_query: bool = True
 
     def _model_to_dto(self, row: Union[BaseSQLModel, Row[Any]]) -> BaseModel:
@@ -133,12 +126,6 @@ class FeatureFlagRepository(SQLRepository):
         )
 
 
-class FeatureEnvQueryLogic(DefaultQuery):
-    def query_select(self) -> Select[Any]:
-        return Select(self.model).outerjoin(FeatureFlagTable)
-
-
 class FeatureFlagEnvRepository(SQLRepository):
     model = FeatureFlagEnvTable
     model_dto = FeatureFlagEnvDTO
-    query_logic: Type[Query] = FeatureEnvQueryLogic
