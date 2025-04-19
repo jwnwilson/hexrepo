@@ -10,7 +10,9 @@ logger = logging.getLogger()
 logging.getLogger("faker.factory").setLevel(logging.ERROR)
 
 ENV = os.environ.get("ENVIRONMENT", "local")
-load_dotenv(os.environ.get("ENV_FILE", "./env/{ENV}.env"))
+env_file: str = os.environ.get("ENV_FILE", f"./env/{ENV}.env")
+logger.info(f"Loading environment variables from : {env_file}")
+load_dotenv(env_file)
 
 
 class Config(BaseSettings):
