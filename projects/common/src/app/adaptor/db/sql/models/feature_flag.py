@@ -1,8 +1,8 @@
-from typing import Any, List, Type, Union
+from typing import Any, List, Union
 
-from hexrepo_db.sql.interface import BaseSQLModel, Query
+from hexrepo_db.sql.interface import BaseSQLModel
 from hexrepo_db.sql.models.base_model import Base
-from hexrepo_db.sql.repository import DefaultQuery, SQLRepository
+from hexrepo_db.sql.repository import SQLRepository
 from pydantic import BaseModel
 from sqlalchemy import (
     JSON,
@@ -10,7 +10,6 @@ from sqlalchemy import (
     Boolean,
     ForeignKey,
     Row,
-    Select,
     String,
     UniqueConstraint,
     select,
@@ -57,9 +56,7 @@ class FeatureFlagEnvTable(Base):
     env: Mapped[str] = mapped_column(String)
     enabled: Mapped[bool] = mapped_column(Boolean, default=False)
     feature_flag: Mapped[FeatureFlagTable] = relationship(
-        "FeatureFlagTable",
-        back_populates="environments",
-        lazy="joined"
+        "FeatureFlagTable", back_populates="environments", lazy="joined"
     )
 
     def __str__(self) -> str:

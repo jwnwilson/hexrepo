@@ -2,6 +2,7 @@ import json
 from datetime import datetime
 from typing import Any
 
+import anyio
 import wtforms
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.responses import JSONResponse
@@ -10,6 +11,7 @@ from hexrepo_cloud.auth.interface import AuthAdapter, UserLogin
 from hexrepo_db.sql.config import get_sql_db_url
 from hexrepo_task.interactor.event.app import resolve_dependencies
 from sqladmin import Admin, ModelView
+from sqladmin._queries import Query
 from sqladmin.authentication import AuthenticationBackend
 from starlette.requests import Request
 
@@ -151,6 +153,19 @@ class PermissionAdmin(BaseModelView, model=PermissionTable):
     }
 
 
+class PatchedQuery(Query):
+    # Patching bug in delete method on eager joins
+    def _delete_sync(self, pk, request):
+        with self.model_view.session_maker() as session:
+            obj = (
+                session.execute(self._get_delete_stmt(pk)).unique().scalar_one_or_none()
+            )
+            anyio.from_thread.run(self.model_view.on_model_delete, obj, request)
+            session.delete(obj)
+            session.commit()
+            anyio.from_thread.run(self.model_view.after_model_delete, obj, request)
+
+
 class FeatureFlagAdmin(BaseModelView, model=FeatureFlagTable):
     name = "Feature Flag"
     name_plural = "Feature Flags"
@@ -169,6 +184,9 @@ class FeatureFlagAdmin(BaseModelView, model=FeatureFlagTable):
             "order_by": "created_at",
         }
     }
+
+    async def delete_model(self, request: Request, pk: Any) -> None:
+        await PatchedQuery(self).delete(pk, request)
 
 
 class FeatureFlagEnvAdmin(BaseModelView, model=FeatureFlagEnvTable):

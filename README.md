@@ -36,8 +36,8 @@ Setup the following env vars directly or run:
 # To Do
 
 - Setup backend
-    - Fix broken api
     - Update feature flags so they are shared across companies by default and can be overriden on a per company bases
+        - Fix delete feature flag bug
         - Add company and user overrides to feature flags
         - Add setup data command to add envs with config
     - Authentication via fastapi middleware infra agnostic solution
