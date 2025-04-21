@@ -3,6 +3,7 @@ from datetime import datetime
 from typing import Any
 
 import anyio
+from sqlalchemy import select
 import wtforms
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.responses import JSONResponse
@@ -187,6 +188,25 @@ class FeatureFlagAdmin(BaseModelView, model=FeatureFlagTable):
 
     async def delete_model(self, request: Request, pk: Any) -> None:
         await PatchedQuery(self).delete(pk, request)
+
+    async def after_model_change(self, data, model, is_created, request):
+        if is_created:
+            with self.session_maker() as session:
+                # Get the feature flag object
+                env_list = session.execute(select(EnvironmentTable)).all()
+                if not env_list:
+                    raise ValueError(
+                        "No environments found in the database, please create environments for feature flags"
+                    )
+                # Create the feature flag env objects
+                for env in env_list:
+                    feature_flag_env = FeatureFlagEnvTable(
+                        env=env[0].name,
+                        enabled=False,
+                        feature_flag_id=model.id,
+                    )
+                    session.add(feature_flag_env)
+                session.commit()
 
 
 class FeatureFlagEnvAdmin(BaseModelView, model=FeatureFlagEnvTable):

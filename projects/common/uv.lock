@@ -677,7 +677,7 @@ dev = [
 
 [[package]]
 name = "hexrepo-db"
-version = "0.1.27"
+version = "0.1.28"
 source = { editable = "../../libs/adaptor/db" }
 dependencies = [
     { name = "boto3" },
