@@ -17,7 +17,7 @@ from sqlalchemy import (
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.adaptor.db.sql.models.environment import EnvironmentTable
-from app.domain.user import (
+from app.domain.feature_flags import (
     FeatureFlagBaseCreateDTO,
     FeatureFlagBaseDTO,
     FeatureFlagCreateDTO,

@@ -74,44 +74,6 @@ class CompanyCreateDTO(BaseModel):
     website: str
 
 
-class FeatureFlagBaseDTO(BaseModel):
-    id: UUID
-    name: str
-
-
-class FeatureFlagBaseCreateDTO(BaseModel):
-    name: str
-
-
-class FeatureFlagEnvCreateDTO(BaseModel):
-    env: str
-    enabled: bool
-    overrides: Dict[str, Any] | None = None
-
-
-class FeatureFlagEnvDTO(BaseModel):
-    id: UUID
-    env: str
-    enabled: bool
-    overrides: Dict[str, Any] | None = None
-
-
-class FeatureFlagCreateDTO(BaseModel):
-    name: str
-    enabled: bool = False
-
-
-class FeatureFlagUpdateDTO(BaseModel):
-    id: UUID
-    name: str
-
-
-class FeatureFlagDTO(BaseModel):
-    id: UUID
-    name: str
-    environments: List[FeatureFlagEnvDTO] = []
-
-
 class UserCreateDTO(BaseModel):
     username: str
     password: str

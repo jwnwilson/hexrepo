@@ -36,16 +36,18 @@ Setup the following env vars directly or run:
 # To Do
 
 - Setup backend
-    - Update feature flags so they are shared across companies by default and can be overriden on a per company bases
-        - Fix delete feature flag bug
-        - Add company and user overrides to feature flags
-        - Add setup data command to add envs with config
+    - Tests:
+        - Try using cursor to speed up writing tests
+        - Test feature flags
+        - Test auth and permission logic
+        - Test cloud libs
+        - Test Auth / authorisation
     - Authentication via fastapi middleware infra agnostic solution
         - Get user data with permissions via api call with username from header or session.
         - Improve DB calls to make more performant
         - Create materialised view or cache in dynamodb for cheap serverless option?
     - Disable example project
-    - Add ECS option to avoid cold startup and avoid aws lockin
+    - Add ECS option (make default) to avoid cold startup and avoid aws lockin
         - blue green deployments
         - prod image that is fast to deploy on all envs
     - Implement template -> project update:
@@ -55,9 +57,6 @@ Setup the following env vars directly or run:
         - Create Diff with changes
         - Add CI job to detect template changes and add a new PR with applied patch to projects
         - Enable disable project via admin
-    - Setup sonarqube
-    - versions endpoint if versions enabled
-        https://sqlalchemy-continuum.readthedocs.io/en/latest/
     - Add API lib to call projects and pass request-id-header
     - Add monitoring dashboard for services
         - Generic change log syncing to tracking metrics
@@ -67,10 +66,12 @@ Setup the following env vars directly or run:
         - Load testing
         - Latency tracking and visualisation
         - Setup BI dashboard
-    - Tests:
-        - Test auth and permission logic
-        - Test cloud libs
-        - Test Auth / authorisation
+        - Setup sonarqube
+    - versions endpoint if versions enabled
+        https://sqlalchemy-continuum.readthedocs.io/en/latest/
+    - Improve feature flags
+        - Add setup data command to add envs with config
+        - Optimise feature flag endpoint with a db view caching or something
     - Setup simple FE with auth?
         - Rename projects -> backend
         - Create frontend folder

@@ -180,6 +180,45 @@ class SQLRepository(Repository):
             if key.endswith("__in"):
                 model_attr = getattr(self.model, key.split("__")[0])
                 query = query.filter(model_attr.in_(filters[key]))
+            elif "." in key:
+                # Handle nested filters
+                model_attr = getattr(self.model, key.split(".")[0])
+                attr_name = key.split(".")[1]
+                filter_kwargs = {attr_name: filters[key]}
+                query = query.filter(model_attr.any(**filter_kwargs) )
+            elif key.endswith("__like"):
+                model_attr = getattr(self.model, key.split("__")[0])
+                query = query.where(model_attr.ilike(f"%{filters[key]}%"))
+            elif key.endswith("__isnull"):
+                model_attr = getattr(self.model, key.split("__")[0])
+                if filters[key]:
+                    query = query.where(model_attr.is_(None))
+                else:
+                    query = query.where(model_attr.isnot(None))
+            elif key.endswith("__notnull"):
+                model_attr = getattr(self.model, key.split("__")[0])
+                if filters[key]:
+                    query = query.where(model_attr.isnot(None))
+                else:
+                    query = query.where(model_attr.is_(None))
+            elif key.endswith("__gt"):
+                model_attr = getattr(self.model, key.split("__")[0])
+                query = query.where(model_attr > filters[key])
+            elif key.endswith("__gte"):
+                # Greater than or equal to
+                model_attr = getattr(self.model, key.split("__")[0])
+                query = query.where(model_attr >= filters[key])
+            elif key.endswith("__lt"):
+                model_attr = getattr(self.model, key.split("__")[0])
+                query = query.where(model_attr < filters[key])
+            elif key.endswith("__lte"):
+                # Less than or equal to
+                model_attr = getattr(self.model, key.split("__")[0])
+                query = query.where(model_attr <= filters[key])
+            elif key.endswith("__ne"):
+                # Not equal
+                model_attr = getattr(self.model, key.split("__")[0])
+                query = query.where(model_attr != filters[key])
             else:
                 query = query.where(getattr(self.model, key) == filters[key])
 
