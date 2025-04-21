@@ -7,14 +7,16 @@ from pydantic import BaseModel
 from app.domain.user import (
     CompanyCreateDTO,
     CompanyDTO,
-    FeatureFlagCreateDTO,
-    FeatureFlagDTO,
-    FeatureFlagEnvDTO,
-    FeatureFlagUpdateDTO,
     GroupPermissionDTO,
     PermissionDTO,
     UserPermissionCreateDTO,
     UserPermissionDTO,
+)
+from app.domain.feature_flags import (
+    FeatureFlagCreateDTO,
+    FeatureFlagDTO,
+    FeatureFlagEnvDTO,
+    FeatureFlagUpdateDTO
 )
 
 
