@@ -7,7 +7,10 @@ make_versioned(user_cls=None)
 
 from .models.company import CompanyRepository  # noqa: E402
 from .models.environment import EnvironmentRepository  # noqa: E402
-from .models.feature_flag import FeatureFlagRepository  # noqa: E402
+from .models.feature_flag import (  # noqa: E402
+    FeatureFlagEnvRepository,
+    FeatureFlagRepository,
+)
 from .models.group import GroupRepository  # noqa: E402
 from .models.permission import PermissionRepository  # noqa: E402
 from .models.user import UserRepository  # noqa: E402
@@ -32,6 +35,10 @@ class SqlUOW(BaseSqlUOW):
     @property
     def feature_flag(self) -> FeatureFlagRepository:
         return FeatureFlagRepository(self.session)
+
+    @property
+    def feature_flag_env(self) -> FeatureFlagEnvRepository:
+        return FeatureFlagEnvRepository(self.session)
 
     @property
     def company(self) -> CompanyRepository:

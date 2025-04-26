@@ -69,7 +69,12 @@ def drop_tables(uow: UOW):
 @pytest.fixture
 def client(uow):
     from app.interactor.api.fastapi import app
-    from app.interactor.dependencies import get_auth, get_superadmin_user, get_uow
+    from app.interactor.dependencies import (
+        get_auth,
+        get_current_user,
+        get_superadmin_user,
+        get_uow,
+    )
 
     def get_auth_override():
         yield MagicMock(spec=AuthAdapter)
@@ -89,9 +94,22 @@ def client(uow):
             company=None,
         )
 
+    def get_current_user_override():
+        return UserPermissionDTO(
+            id="12345678-1234-5678-1234-567812345678",
+            name="test",
+            username="test",
+            email="test@test.com",
+            permissions=[{"id": "12345678-1234-5678-1234-567812345678"}],
+            groups=[],
+            verified=True,
+            company=None,
+        )
+
     app.dependency_overrides[get_auth] = get_auth_override
     app.dependency_overrides[get_uow] = get_uow_override
     app.dependency_overrides[get_superadmin_user] = get_superadmin_user_override
+    app.dependency_overrides[get_current_user] = get_current_user_override
     return TestClient(app)
 
 

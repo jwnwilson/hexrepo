@@ -4,6 +4,12 @@ from typing import Dict, List, Optional, Type
 from polyfactory.factories.pydantic_factory import ModelFactory
 from pydantic import BaseModel
 
+from app.domain.feature_flags import (
+    FeatureFlagCreateDTO,
+    FeatureFlagDTO,
+    FeatureFlagEnvDTO,
+    FeatureFlagUpdateDTO,
+)
 from app.domain.user import (
     CompanyCreateDTO,
     CompanyDTO,
@@ -11,12 +17,6 @@ from app.domain.user import (
     PermissionDTO,
     UserPermissionCreateDTO,
     UserPermissionDTO,
-)
-from app.domain.feature_flags import (
-    FeatureFlagCreateDTO,
-    FeatureFlagDTO,
-    FeatureFlagEnvDTO,
-    FeatureFlagUpdateDTO
 )
 
 

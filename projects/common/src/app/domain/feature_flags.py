@@ -1,10 +1,10 @@
 from typing import Any, Dict, List
 from uuid import UUID
-from app.domain.user import UserPermissionDTO
-from pydantic import BaseModel
-from app.adaptor.db.interface import UOW
 
 from hexrepo_db.interface import PaginatedData
+from pydantic import BaseModel, Field
+
+from app.adaptor.db.interface import UOW
 
 
 class FeatureFlagBaseDTO(BaseModel):
@@ -29,8 +29,13 @@ class FeatureFlagEnvDTO(BaseModel):
     overrides: Dict[str, Any] | None = None
 
 
+class FeatureFlagEnvUpdateDTO(BaseModel):
+    enabled: bool
+    overrides: Dict[str, Any] | None = None
+
+
 class FeatureFlagCreateDTO(BaseModel):
-    name: str
+    name: str = Field(min_length=3)
     enabled: bool = False
 
 
@@ -83,7 +88,7 @@ def get_feature_flag_data(uow: UOW, flag_args: FlagsArgs) -> list[FeatureFlagGet
                     env.overrides
                     for env in flag.environments
                     if env.env == flag_args.env
-                )
+                ),
             )
         )
     return feature_flag_get_dto

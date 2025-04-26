@@ -3,8 +3,8 @@ from typing import Any, Dict
 import pytest
 
 from app.adaptor.db.interface import UOW, Repository
-from app.domain.user import EnvironmentCreateDTO
 from app.domain.feature_flags import FeatureFlagCreateDTO
+from app.domain.user import EnvironmentCreateDTO
 
 DTO_REPO_MAP = {
     FeatureFlagCreateDTO: "feature_flag",
