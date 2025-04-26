@@ -38,7 +38,6 @@ Setup the following env vars directly or run:
 - Setup backend
     - Tests:
         - Try using cursor to speed up writing tests
-        - Test feature flags
         - Test auth and permission logic
         - Test cloud libs
         - Test Auth / authorisation
