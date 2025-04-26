@@ -126,3 +126,4 @@ class FeatureFlagRepository(SQLRepository):
 class FeatureFlagEnvRepository(SQLRepository):
     model = FeatureFlagEnvTable
     model_dto = FeatureFlagEnvDTO
+    unique_query: bool = True

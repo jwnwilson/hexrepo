@@ -3,7 +3,6 @@ from datetime import datetime
 from typing import Any
 
 import anyio
-from sqlalchemy import select
 import wtforms
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.responses import JSONResponse
@@ -14,6 +13,7 @@ from hexrepo_task.interactor.event.app import resolve_dependencies
 from sqladmin import Admin, ModelView
 from sqladmin._queries import Query
 from sqladmin.authentication import AuthenticationBackend
+from sqlalchemy import select
 from starlette.requests import Request
 
 from app.adaptor.db.sql.models.company import CompanyTable
