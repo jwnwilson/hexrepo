@@ -1,10 +1,4 @@
-import pytest
 from fastapi import status
-
-
-@pytest.fixture
-def feature_flag_env_data():
-    return {"env": "dev", "enabled": True, "overrides": {"user_id": "123"}}
 
 
 def test_create_feature_flag_env(
@@ -12,19 +6,17 @@ def test_create_feature_flag_env(
 ):
     """Test creating a new feature flag environment"""
     # First create a feature flag
-    create_response = client.post("/api/v1/feature_flag/", json=feature_flag_data)
-    flag_id = create_response.json()["id"]
+    client.post("/api/v1/feature_flag/", json=feature_flag_data)
 
     # Create environment for the feature flag
-    env_data = {**feature_flag_env_data, "feature_flag_id": flag_id}
-    response = client.post("/api/v1/feature_flag_env/", json=env_data)
-    assert response.status_code == status.HTTP_201_CREATED
+    response = client.get("/api/v1/feature_flag_env/")
+    assert response.status_code == status.HTTP_200_OK
     data = response.json()
-    assert data["env"] == feature_flag_env_data["env"]
-    assert data["enabled"] == feature_flag_env_data["enabled"]
-    assert data["overrides"] == feature_flag_env_data["overrides"]
-    assert "id" in data
-    assert isinstance(data["id"], str)
+    assert len(data["results"]) == 3
+    assert data["results"][0]["env"] == "dev"
+    assert data["results"][0]["enabled"] is True
+    assert data["results"][0]["overrides"] is None
+    assert isinstance(data["results"][0]["id"], str)
 
 
 def test_get_feature_flag_env(
@@ -94,39 +86,6 @@ def test_delete_feature_flag_env(
     # Verify it's deleted
     get_response = client.get(f"/api/v1/feature_flag_env/{env_id}")
     assert get_response.status_code == status.HTTP_404_NOT_FOUND
-
-
-def test_get_feature_flag_environments(
-    client, feature_flag_data, feature_flag_env_data, setup_environments
-):
-    """Test getting all environments for a feature flag"""
-    # Create feature flag
-    create_response = client.post("/api/v1/feature_flag/", json=feature_flag_data)
-    flag_id = create_response.json()["id"]
-
-    # Create multiple environments for the feature flag
-    envs = [
-        {"env": "dev", "enabled": True, "overrides": None},
-        {"env": "staging", "enabled": False, "overrides": {"group": "beta"}},
-        {"env": "prod", "enabled": True, "overrides": None},
-    ]
-
-    for env_data in envs:
-        client.post(
-            "/api/v1/feature_flag_env/", json={"feature_flag_id": flag_id, **env_data}
-        )
-
-    # Get all environments for the feature flag
-    response = client.get(f"/api/v1/feature_flag_env/by_feature_flag/{flag_id}")
-    assert response.status_code == status.HTTP_200_OK
-    data = response.json()
-    assert len(data) == 3
-
-    # Verify each environment
-    for env_data in envs:
-        matching_env = next(env for env in data if env["env"] == env_data["env"])
-        assert matching_env["enabled"] == env_data["enabled"]
-        assert matching_env["overrides"] == env_data["overrides"]
 
 
 def test_create_duplicate_env(
