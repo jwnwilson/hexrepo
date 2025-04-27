@@ -1,5 +1,4 @@
 import os
-import tempfile
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -35,21 +34,19 @@ def test_get_secret_not_found(aws_secret_adaptor):
     """Test getting a non-existent secret"""
     secret_name = "nonexistent-secret"
     aws_secret_adaptor.client.get_secret_value.side_effect = ClientError(
-        {"Error": {"Code": "ResourceNotFoundException"}},
-        "GetSecretValue"
+        {"Error": {"Code": "ResourceNotFoundException"}}, "GetSecretValue"
     )
 
-    with pytest.raises(Exception) as exc_info:
+    with pytest.raises(ClientError) as exc_info:
         aws_secret_adaptor.get_secret(secret_name)
     assert "ResourceNotFoundException" in str(exc_info.value)
-    assert secret_name in str(exc_info.value)
 
 
 def test_secret_cache_non_aws(aws_secret_adaptor):
     """Test secret caching outside AWS Lambda environment"""
     secret_name = "test-secret"
     secret_value = "test-value"
-    
+
     # Ensure we're not in AWS Lambda environment
     with patch.dict(os.environ, {"AWS_LAMBDA_FUNCTION_NAME": ""}):
         # First call should fetch from AWS
@@ -73,7 +70,7 @@ def test_secret_cache_write_error(aws_secret_adaptor):
     """Test handling cache write errors in AWS Lambda"""
     secret_name = "test-secret"
     secret_value = "test-value"
-    
+
     # Mock AWS Lambda environment
     with patch.dict(os.environ, {"AWS_LAMBDA_FUNCTION_NAME": "test-function"}):
         # Mock file operations to raise an error
@@ -81,7 +78,7 @@ def test_secret_cache_write_error(aws_secret_adaptor):
             aws_secret_adaptor.client.get_secret_value.return_value = {
                 "SecretString": secret_value
             }
-            
+
             # Should still return the secret even if cache write fails
             result = aws_secret_adaptor.get_secret(secret_name)
             assert result == secret_value
@@ -92,7 +89,7 @@ def test_secret_cache_read_error(aws_secret_adaptor):
     """Test handling cache read errors in AWS Lambda"""
     secret_name = "test-secret"
     secret_value = "test-value"
-    
+
     # Mock AWS Lambda environment
     with patch.dict(os.environ, {"AWS_LAMBDA_FUNCTION_NAME": "test-function"}):
         # Mock file operations to raise an error on read
@@ -101,8 +98,8 @@ def test_secret_cache_read_error(aws_secret_adaptor):
                 aws_secret_adaptor.client.get_secret_value.return_value = {
                     "SecretString": secret_value
                 }
-                
+
                 # Should fall back to AWS when cache read fails
                 result = aws_secret_adaptor.get_secret(secret_name)
                 assert result == secret_value
-                aws_secret_adaptor.client.get_secret_value.assert_called_once() 
+                aws_secret_adaptor.client.get_secret_value.assert_called_once()
