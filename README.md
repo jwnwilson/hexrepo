@@ -38,7 +38,6 @@ Setup the following env vars directly or run:
 - Setup backend
     - Tests:
         - Try using cursor to speed up writing tests
-        - Test auth and permission logic
         - Test cloud libs
         - Test Auth / authorisation
     - Authentication via fastapi middleware infra agnostic solution
@@ -51,7 +50,6 @@ Setup the following env vars directly or run:
         - prod image that is fast to deploy on all envs
     - Implement template -> project update:
         - Copier https://copier.readthedocs.io/en/stable/
-        - Look at cruft again
         - Re-render template with project settings 
         - Create Diff with changes
         - Add CI job to detect template changes and add a new PR with applied patch to projects
