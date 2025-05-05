@@ -36,15 +36,16 @@ Setup the following env vars directly or run:
 # To Do
 
 - Setup backend
+    - Implement template -> project update:
+        - Copier https://copier.readthedocs.io/en/stable/
+        - Create git template hex_project repo and submodule
+        - Setup copier + update logic
+        - Update ci commands
+        - Add conditional logic
+        - Add hooks to delete unneeded code 
     - Add ECS option (make default) to avoid cold startup and avoid aws lockin
         - blue green deployments
         - prod image that is fast to deploy on all envs
-    - Implement template -> project update:
-        - Copier https://copier.readthedocs.io/en/stable/
-        - Re-render template with project settings 
-        - Create Diff with changes
-        - Add CI job to detect template changes and add a new PR with applied patch to projects
-        - Enable disable project via admin
     - Create orchestrator / workflow project 
         - Investigate better fire and forget task setup like run 1 off ECS / GCP job with task status update?
         - 1 task table per hexrepo
@@ -65,6 +66,7 @@ Setup the following env vars directly or run:
         - Setup BI dashboard
         - Setup sonarqube
     - Setup multienv
+        - Enable disable project via admin
         - Create staging and prod envs
         - Simplify feature flags to be for one env
         - feature flag env -> company flag env
