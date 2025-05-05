@@ -12,8 +12,8 @@
         "nosql"
     ],
     "__conditions__": {
-        "use_db_logic": "{{ cookiecutter.use_db != 'n' }}",
-        "api_domain": "{{ cookiecutter.use_api != 'n' }}"
+        "use_db_logic": "{{ use_db != 'n' }}",
+        "api_domain": "{{ use_api != 'n' }}"
     },
     "__prompts__": {
         "use_api": "Do you want fastapi?",

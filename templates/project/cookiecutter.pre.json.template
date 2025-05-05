@@ -12,8 +12,8 @@
         "nosql"
     ],
     "__conditions__": {
-        "use_db_logic": "{% raw %}{{ cookiecutter.use_db != 'n' }}{% endraw %}",
-        "api_domain": "{% raw %}{{ cookiecutter.use_api != 'n' }}{% endraw %}"
+        "use_db_logic": "{% raw %}{{ use_db != 'n' }}{% endraw %}",
+        "api_domain": "{% raw %}{{ use_api != 'n' }}{% endraw %}"
     },
     "__prompts__": {
         "use_api": "Do you want fastapi?",

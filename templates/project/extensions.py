@@ -7,7 +7,7 @@ class StemKeysExtension(Extension):
         environment.filters['stem_keys'] = self.stem_keys
 
     def stem_keys(self, cookiecutter):
-        for key in list(cookiecutter.keys()):
+        for key in list(keys()):
             if key.startswith('_pre_prompt_'):
-                cookiecutter[key[len('_pre_prompt_'):]] = cookiecutter.pop(key)
+                cookiecutter[key[len('_pre_prompt_'):]] = pop(key)
         return cookiecutter

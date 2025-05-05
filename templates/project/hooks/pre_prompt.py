@@ -5,8 +5,8 @@ import json
 import functools
 from importlib import import_module
 
-from cookiecutter.generate import generate_context
-from cookiecutter.prompt import prompt_for_config, render_variable
+from generate import generate_context
+from prompt import prompt_for_config, render_variable
 
 
 class SingletonMeta(type):
@@ -63,22 +63,22 @@ class PromptProcess(metaclass=SingletonMeta):
 
         return decorator
 
-    @wraps('cookiecutter.prompt.render_variable')
+    @wraps('prompt.render_variable')
     def render_variable(self, func, env, raw, cookiecutter_dict):
         """Initialize the `env` & `cookiecutter` attrs."""
         self.env = env
         self.cookiecutter = cookiecutter_dict
         return func(env, raw, cookiecutter_dict)
 
-    @wraps('cookiecutter.prompt.read_user_choice')
+    @wraps('prompt.read_user_choice')
     def read_user_choice(self, func, *args, **kwargs):
         return self.apply_read_user_func(func, *args, **kwargs)
 
-    @wraps('cookiecutter.prompt.read_user_yes_no')
+    @wraps('prompt.read_user_yes_no')
     def read_user_yes_no(self, func, *args, **kwargs):
         return self.apply_read_user_func(func, *args, **kwargs)
 
-    @wraps('cookiecutter.prompt.read_user_variable')
+    @wraps('prompt.read_user_variable')
     def read_user_variable(self, func, *args, **kwargs):
         return self.apply_read_user_func(func, *args, **kwargs)
 
@@ -106,20 +106,20 @@ class PromptProcess(metaclass=SingletonMeta):
 
 def copy_pyproject_template():
     # Work around to avoid breaking github actions
-    shutil.copyfile(r"./{{cookiecutter.project_name}}/pyproject_template.toml", r"./{{cookiecutter.project_name}}/pyproject.toml")
-    os.remove(r"./{{cookiecutter.project_name}}/pyproject_template.toml")
+    shutil.copyfile(r"./{{project_name}}/pyproject_template.toml", r"./{{project_name}}/pyproject.toml")
+    os.remove(r"./{{project_name}}/pyproject_template.toml")
 
 
 def main():
     copy_pyproject_template()
     initial = generate_context()
-    context = generate_context(context_file='cookiecutter.pre.json')
+    context = generate_context(context_file='pre.json')
     testing: bool = bool(os.getenv("TESTING", False))
     prompt_process = PromptProcess(context, no_input=testing)
     initial['cookiecutter'].update(prompt_process.prompt_user())
 
-    # Write the updated context back to cookiecutter.json
-    with open('cookiecutter.json', 'w') as f:
+    # Write the updated context back to json
+    with open('json', 'w') as f:
         json.dump(initial['cookiecutter'], f, indent=2)
 
 
