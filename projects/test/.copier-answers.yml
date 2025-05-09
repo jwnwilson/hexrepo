@@ -1,5 +1,6 @@
 # Changes here will be overwritten by Copier; NEVER EDIT MANUALLY
-_src_path: ../../templates/project
+_src_path: gh:jwnwilson/hexrepo_project_template.git
+_commit: f317fb42bca6572dc45b5a958f180c77bac51a07
 description: ''
 email: you@example.com
 full_name: ''
