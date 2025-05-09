@@ -1,0 +1,3 @@
+[submodule "templates/project"]
+	path = templates/project
+	url = git@github.com:jwnwilson/hexrepo_project_template.git

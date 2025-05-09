@@ -1,0 +1,12 @@
+# Changes here will be overwritten by Copier; NEVER EDIT MANUALLY
+_src_path: .
+description: ''
+email: you@example.com
+full_name: ''
+project_name: test
+project_slug: test
+use_api: n
+use_db: n
+use_storage: n
+use_task: n
+version: 0.1.0
