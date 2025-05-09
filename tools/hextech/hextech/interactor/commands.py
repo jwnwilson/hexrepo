@@ -2,7 +2,7 @@ import contextlib
 import os
 from contextlib import chdir
 from typing import List, Optional
-
+import copier
 import typer
 from typing_extensions import Annotated
 
@@ -105,17 +105,15 @@ def create_library():
 
 @cli_setup
 def create_project():
-    from cookiecutter.main import cookiecutter
-
+    project_name: str = typer.prompt("Please Enter project folder name")
     # rm template .venv folder to speed up cookectter
     os.system("rm -r templates/project/.venv 2> /dev/null || echo > /dev/null")
     # CD to projects folder
     with chdir("projects"):
         # Run cookie cutter command to copy template
-        cookiecutter("../templates/project")
+        copier.run_copy("git@github.com:jwnwilson/hexrepo_project_template.git", f"./{project_name}")
         # Setup infra for service
         if prompt_setup_project_infra():
-            project_name: str = typer.prompt("Please Re-Enter project name")
             with chdir(project_name):
                 typer.echo("Setting up initial infrastructure...")
                 run_system_command("make tf_setup ENVIROMENT=default")
@@ -347,12 +345,5 @@ def create_permissions(
 
 @cli_setup
 def update_projects_from_template():
-    # Not implmented fully, want to investigate copier for this
-    # Get list of changes to template/project
-    with contextlib.chdir("templates/project/{{cookiecutter.project_name}}"):
-        os.system("git format-patch --relative main --stdout > ../../../patch")
-
-    for project in get_projects():
-        os.system(f"git apply --3way --directory projects/{project}/ ./patch")
-
-    os.system("rm patch")
+    project_name: str = typer.prompt("Please Enter project name")
+    os.system(f"cd projects/{project_name} && copier update")

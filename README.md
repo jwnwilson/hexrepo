@@ -38,7 +38,6 @@ Setup the following env vars directly or run:
 - Setup backend
     - Implement template -> project update:
         - Copier https://copier.readthedocs.io/en/stable/
-        - Create git template hex_project repo and submodule
         - Setup copier + update logic
         - Update ci commands
         - Add conditional logic
