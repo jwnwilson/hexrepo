@@ -1,0 +1,26 @@
+project_name:
+    type: str
+    help: Name of the project
+
+project_slug:
+    type: str
+    help: Project slug (automatically generated from project name)
+    default: "{{ project_name.lower()|replace(' ', '_')|replace('-', '_')|replace('.', '_')|trim() }}"
+
+description:
+    type: str
+    help: A short description of the project
+
+full_name:
+    type: str
+    help: Your name
+
+email:
+    type: str
+    help: Your email address
+    default: you@example.com
+
+version:
+    type: str
+    help: Project version
+    default: 0.1.0
