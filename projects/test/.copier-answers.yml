@@ -1,5 +1,5 @@
 # Changes here will be overwritten by Copier; NEVER EDIT MANUALLY
-_src_path: .
+_src_path: ../../templates/project
 description: ''
 email: you@example.com
 full_name: ''
