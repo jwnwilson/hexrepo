@@ -94,23 +94,21 @@ def destroy():
 
 @cli_setup
 def create_library():
-    from cookiecutter.main import cookiecutter
-
     library_type = prompt_library_type()
     # CD to libs/adaptor or libs/interactor folder
     with chdir(f"libs/{library_type}"):
-        # Run cookie cutter command to copy template
-        cookiecutter("../../templates/library")
+        # Run copier command to copy template
+        lib_name: str = typer.prompt("Please Enter project folder name")
+        copier.run_copy("../../templates/library", f"./{lib_name}")
 
 
 @cli_setup
 def create_project():
     project_name: str = typer.prompt("Please Enter project folder name")
-    # rm template .venv folder to speed up cookectter
     os.system("rm -r templates/project/.venv 2> /dev/null || echo > /dev/null")
     # CD to projects folder
     with chdir("projects"):
-        # Run cookie cutter command to copy template
+        # Run copier command to copy template
         copier.run_copy("git@github.com:jwnwilson/hexrepo_project_template.git", f"./{project_name}")
         # Setup infra for service
         if prompt_setup_project_infra():
