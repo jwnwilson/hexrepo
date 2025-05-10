@@ -36,12 +36,6 @@ Setup the following env vars directly or run:
 # To Do
 
 - Setup backend
-    - Implement template -> project update:
-        - Copier https://copier.readthedocs.io/en/stable/
-        - Setup copier + update logic
-        - Update ci commands
-        - Add conditional logic
-        - Add hooks to delete unneeded code 
     - Add ECS option (make default) to avoid cold startup and avoid aws lockin
         - blue green deployments
         - prod image that is fast to deploy on all envs
@@ -70,6 +64,9 @@ Setup the following env vars directly or run:
         - Simplify feature flags to be for one env
         - feature flag env -> company flag env
     - Disable example project
+    - Copier
+        - Support no db and uncomment test
+        - Support nosql db and uncomment test
     - Add API lib to call projects and pass request-id-header
     - versions endpoint if versions enabled
         https://sqlalchemy-continuum.readthedocs.io/en/latest/
