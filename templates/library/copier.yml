@@ -24,3 +24,9 @@ version:
     type: str
     help: Project version
     default: 0.1.0
+
+_templates_suffix: ""
+# Jinja2 environment configuration
+_jinja2_env_vars:
+    lstrip_blocks: true
+    trim_blocks: true 
