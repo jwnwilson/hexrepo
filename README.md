@@ -36,6 +36,9 @@ Setup the following env vars directly or run:
 # To Do
 
 - Setup backend
+    - Fix copier test error on github
+        - Need to move from tmp to use github folder
+        - https://nesin.io/blog/temp-directory-path-github-actions
     - Add ECS option (make default) to avoid cold startup and avoid aws lockin
         - blue green deployments
         - prod image that is fast to deploy on all envs
