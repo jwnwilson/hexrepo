@@ -1,7 +1,7 @@
 import os
 
 
-def test_bake_library(cookies, update_path_libs, monkey_patch_cookiecutter_hooks):
+def test_bake_library(cookies, update_path_libs):
     """Test for 'cookiecutter-template'."""
     result = cookies.bake(template="../../templates/library", extra_context={"project_name": "test_library"})
 
@@ -12,7 +12,7 @@ def test_bake_library(cookies, update_path_libs, monkey_patch_cookiecutter_hooks
     assert result.project_path.is_dir()
 
 
-def test_bake_then_run_libs_tests(cookies, update_path_libs, monkey_patch_cookiecutter_hooks):
+def test_bake_then_run_libs_tests(cookies, update_path_libs):
     """Test for 'cookiecutter-template'."""
     result = cookies.bake(template="../../templates/library", extra_context={"project_name": "test_library"})
 
