@@ -66,7 +66,7 @@ check_library_bump: hextech
 
 bump_library_version: hextech
 	@echo "Bumping version..."
-	hextech bump-librariy-version
+	hextech bump-library-version
 
 test_tools: hextech
 	@echo "Testing tools..."
