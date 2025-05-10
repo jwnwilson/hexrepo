@@ -3,7 +3,6 @@ import shutil
 from pathlib import Path
 import pytest
 from copier import run_copy
-from copier.main import Worker
 
 from .utils import copy_project_dependencies
 
@@ -27,7 +26,7 @@ def tmp_project_path(tmp_path):
 def test_copy_project(template_path, tmp_project_path):
     """Test basic project generation."""
     # Run copier copy
-    worker = Worker(
+    result = run_copy(
         src_path=str(template_path),
         dst_path=str(tmp_project_path),
         data={
@@ -37,7 +36,6 @@ def test_copy_project(template_path, tmp_project_path):
         },
         defaults=True
     )
-    worker.run_copy()
 
     # Verify the project was created
     assert tmp_project_path.exists()
@@ -48,7 +46,7 @@ def test_copy_project(template_path, tmp_project_path):
 def test_copy_then_run_project_tests(template_path, tmp_project_path):
     """Test project generation and running tests."""
     # Run copier copy
-    worker = Worker(
+    run_copy(
         src_path=str(template_path),
         dst_path=str(tmp_project_path),
         data={
@@ -58,7 +56,6 @@ def test_copy_then_run_project_tests(template_path, tmp_project_path):
         },
         defaults=True
     )
-    worker.run_copy()
 
     # Copy required tools and libs efficiently
     copy_project_dependencies(template_path.parent.parent, tmp_project_path)
@@ -72,7 +69,7 @@ def test_copy_then_run_project_tests(template_path, tmp_project_path):
 # def test_project_nosql(template_path, tmp_project_path):
 #     """Test project generation with NoSQL database."""
 #     # Run copier copy
-#     worker = Worker(
+#     run_copy(
 #         src_path=str(template_path),
 #         dst_path=str(tmp_project_path),
 #         data={
@@ -84,7 +81,6 @@ def test_copy_then_run_project_tests(template_path, tmp_project_path):
 #         },
 #         defaults=True
 #     )
-#     worker.run_copy()
 
 #     # Copy required tools and libs efficiently
 #     copy_project_dependencies(template_path.parent.parent, tmp_project_path)
@@ -97,7 +93,7 @@ def test_copy_then_run_project_tests(template_path, tmp_project_path):
 # def test_project_no_db(template_path, tmp_project_path):
 #     """Test project generation without database."""
 #     # Run copier copy
-#     worker = Worker(
+#     run_copy(
 #         src_path=str(template_path),
 #         dst_path=str(tmp_project_path),
 #         data={
@@ -108,7 +104,6 @@ def test_copy_then_run_project_tests(template_path, tmp_project_path):
 #         },
 #         defaults=True
 #     )
-#     worker.run_copy()
 
 #     # Copy required tools and libs efficiently
 #     copy_project_dependencies(template_path.parent.parent, tmp_project_path)
@@ -121,7 +116,7 @@ def test_copy_then_run_project_tests(template_path, tmp_project_path):
 def test_project_no_api(template_path, tmp_project_path):
     """Test project generation without API."""
     # Run copier copy
-    worker = Worker(
+    run_copy(
         src_path=str(template_path),
         dst_path=str(tmp_project_path),
         data={
@@ -132,7 +127,6 @@ def test_project_no_api(template_path, tmp_project_path):
         },
         defaults=True
     )
-    worker.run_copy()
 
     # Verify API files are not present
     api_path = tmp_project_path / "src" / "app" / "interactor" / "api"

@@ -33,6 +33,7 @@ jobs:
     - name: Test Templates
       working-directory: ${{ matrix.template }}
       run: |
+        git submodule update --init --recursive
         make lint
         make test
   

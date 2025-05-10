@@ -3,7 +3,7 @@ import shutil
 from pathlib import Path
 import pytest
 
-from copier.main import Worker
+from copier import run_copy
 
 from .utils import copy_project_dependencies
 
@@ -27,7 +27,7 @@ def tmp_library_path(tmp_path):
 def test_copy_library(template_path, tmp_library_path):
     """Test basic library generation."""
     # Run copier copy
-    worker = Worker(
+    run_copy(
         src_path=str(template_path),
         dst_path=str(tmp_library_path),
         data={
@@ -37,7 +37,6 @@ def test_copy_library(template_path, tmp_library_path):
         },
         defaults=True
     )
-    worker.run_copy()
 
     # Verify the library was created
     assert tmp_library_path.exists()
@@ -48,7 +47,7 @@ def test_copy_library(template_path, tmp_library_path):
 def test_copy_then_run_library_tests(template_path, tmp_library_path):
     """Test library generation and running tests."""
     # Run copier copy
-    worker = Worker(
+    run_copy(
         src_path=str(template_path),
         dst_path=str(tmp_library_path),
         data={
@@ -58,7 +57,6 @@ def test_copy_then_run_library_tests(template_path, tmp_library_path):
         },
         defaults=True
     )
-    worker.run_copy()
 
     # Copy required tools efficiently
     copy_project_dependencies(template_path.parent.parent, tmp_library_path, components=['tools'], lib=True)
