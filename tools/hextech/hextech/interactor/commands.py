@@ -1,8 +1,8 @@
-import contextlib
 import os
 from contextlib import chdir
 from typing import List, Optional
 
+import copier
 import typer
 from typing_extensions import Annotated
 
@@ -50,10 +50,6 @@ from hextech.domain.prompts.infra import (
     prompt_setup_tf,
 )
 from hextech.domain.system import run_system_command
-from hextech.domain.templates.libs import (
-    generate_libs_makefile,
-    generate_project_makefile,
-)
 
 
 @cli_setup
@@ -62,12 +58,6 @@ def setup():
     config: HexrepoConfig
     created_config: bool
     config, created_config = get_or_create_config()
-
-    # Copy libs makefile to libs
-    # Move these to cookie cutter pre-gen hooks
-    if created_config:
-        generate_libs_makefile(config)
-    generate_project_makefile(config)
 
     # Create initial terraform state infra
     if prompt_setup_tf():
@@ -94,28 +84,26 @@ def destroy():
 
 @cli_setup
 def create_library():
-    from cookiecutter.main import cookiecutter
-
     library_type = prompt_library_type()
     # CD to libs/adaptor or libs/interactor folder
     with chdir(f"libs/{library_type}"):
-        # Run cookie cutter command to copy template
-        cookiecutter("../../templates/library")
+        # Run copier command to copy template
+        lib_name: str = typer.prompt("Please Enter project folder name")
+        copier.run_copy("../../templates/library", f"./{lib_name}")
 
 
 @cli_setup
 def create_project():
-    from cookiecutter.main import cookiecutter
-
-    # rm template .venv folder to speed up cookectter
+    project_name: str = typer.prompt("Please Enter project folder name")
     os.system("rm -r templates/project/.venv 2> /dev/null || echo > /dev/null")
     # CD to projects folder
     with chdir("projects"):
-        # Run cookie cutter command to copy template
-        cookiecutter("../templates/project")
+        # Run copier command to copy template
+        copier.run_copy(
+            "git@github.com:jwnwilson/hexrepo_project_template.git", f"./{project_name}"
+        )
         # Setup infra for service
         if prompt_setup_project_infra():
-            project_name: str = typer.prompt("Please Re-Enter project name")
             with chdir(project_name):
                 typer.echo("Setting up initial infrastructure...")
                 run_system_command("make tf_setup ENVIROMENT=default")
@@ -347,12 +335,5 @@ def create_permissions(
 
 @cli_setup
 def update_projects_from_template():
-    # Not implmented fully, want to investigate copier for this
-    # Get list of changes to template/project
-    with contextlib.chdir("templates/project/{{cookiecutter.project_name}}"):
-        os.system("git format-patch --relative main --stdout > ../../../patch")
-
-    for project in get_projects():
-        os.system(f"git apply --3way --directory projects/{project}/ ./patch")
-
-    os.system("rm patch")
+    project_name: str = typer.prompt("Please Enter project name")
+    os.system(f"cd projects/{project_name} && copier update")

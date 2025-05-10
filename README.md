@@ -36,25 +36,19 @@ Setup the following env vars directly or run:
 # To Do
 
 - Setup backend
-    - Tests:
-        - Try using cursor to speed up writing tests
-        - Test cloud libs
-        - Test Auth / authorisation
-    - Authentication via fastapi middleware infra agnostic solution
-        - Get user data with permissions via api call with username from header or session.
-        - Improve DB calls to make more performant
-        - Create materialised view or cache in dynamodb for cheap serverless option?
-    - Disable example project
     - Add ECS option (make default) to avoid cold startup and avoid aws lockin
         - blue green deployments
         - prod image that is fast to deploy on all envs
-    - Implement template -> project update:
-        - Copier https://copier.readthedocs.io/en/stable/
-        - Re-render template with project settings 
-        - Create Diff with changes
-        - Add CI job to detect template changes and add a new PR with applied patch to projects
-        - Enable disable project via admin
-    - Add API lib to call projects and pass request-id-header
+    - Create orchestrator / workflow project 
+        - Investigate better fire and forget task setup like run 1 off ECS / GCP job with task status update?
+        - 1 orchestrator task table per hexrepo
+        - Setup ECS for long running async orchestrator on fargate
+            - Schedule this to turn off when not in use
+        - Setup workflow orchestration
+        - FE for management
+        - Setup Idempotent re-run
+        - Dectorator based workflow setup e.g.:
+            https://github.com/aws/chalice/blob/master/chalice/app.py#L719 
     - Add monitoring dashboard for services
         - Generic change log syncing to tracking metrics
         - Add log based event tracking
@@ -64,24 +58,24 @@ Setup the following env vars directly or run:
         - Latency tracking and visualisation
         - Setup BI dashboard
         - Setup sonarqube
+    - Setup multienv
+        - Enable disable project via admin
+        - Create staging and prod envs
+        - Simplify feature flags to be for one env
+        - feature flag env -> company flag env
+    - Disable example project
+    - Copier
+        - Support no db and uncomment test
+        - Support nosql db and uncomment test
+    - Add API lib to call projects and pass request-id-header
     - versions endpoint if versions enabled
         https://sqlalchemy-continuum.readthedocs.io/en/latest/
     - Improve feature flags
         - Add setup data command to add envs with config
         - Optimise feature flag endpoint with a db view caching or something
     - Setup simple FE with auth?
-        - Rename projects -> backend
-        - Create frontend folder
+        - Create apps folder for FE
         - Add turborepo with auth
-    - Create orchestrator / workflow project 
-        - Investigate better fire and forget task setup like run 1 off ECS / GCP job with task status update?
-        - 1 task table per hexrepo
-        - Setup ECS for long running async orchestrator on fargate
-            - Schedule this to turn off when not in use
-        - Setup workflow orchestration
-        - Setup Idempotent re-run
-        - Dectorator based workflow setup e.g.:
-            https://github.com/aws/chalice/blob/master/chalice/app.py#L719 
     - Enforce architecture rules:
         - Remove lib type
         - tach: https://github.com/gauge-sh/tach

@@ -185,7 +185,7 @@ class SQLRepository(Repository):
                 model_attr = getattr(self.model, key.split(".")[0])
                 attr_name = key.split(".")[1]
                 filter_kwargs = {attr_name: filters[key]}
-                query = query.filter(model_attr.any(**filter_kwargs) )
+                query = query.filter(model_attr.any(**filter_kwargs))
             elif key.endswith("__like"):
                 model_attr = getattr(self.model, key.split("__")[0])
                 query = query.where(model_attr.ilike(f"%{filters[key]}%"))

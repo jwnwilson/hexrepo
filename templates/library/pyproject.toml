@@ -1,15 +1,16 @@
 [project]
 authors = [
-    {name = "Noel Wilson", email = "jwnwilson@hotmail.co.uk"},
+    {name = "{{full_name}}", email = "{{email}}"},
 ]
 requires-python = "<4.0,>=3.12"
-name = "hexrepo_log"
-version = "0.1.10"
-description = "standard logging"
+name = "{{project_slug}}"
+version = "{{version}}"
+description = "{{description}}"
 readme = "README.md"
 dependencies = [
-    "fastapi>=0.115.6",
-    "loguru>=0.7.3",
+    "pydantic<3.0.0,>=2.9.2",
+    "pydantic-settings<3.0.0,>=2.6.1",
+    "fastapi<1.0.0,>=0.115.4",
 ]
 
 [dependency-groups]
@@ -43,6 +44,6 @@ python_version = "3.12"
 strict = true
 
 [tool.coverage.run]
-concurrency = ["gevent"]
+concurrency = ["thread"]
 omit = ["tests/*"]
-source = ["hexrepo_log"]
+source = ["{{project_slug}}"]

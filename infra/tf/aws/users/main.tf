@@ -2,7 +2,6 @@ terraform {
   backend "s3" {
     region = "eu-west-1"
     bucket = "hexrepo-jwn"
-    key = "{{cookiecutter.project_slug}}-users.tfstate"
   }
   required_providers {
     aws = {
