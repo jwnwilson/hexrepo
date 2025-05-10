@@ -1,7 +1,7 @@
-import contextlib
 import os
 from contextlib import chdir
 from typing import List, Optional
+
 import copier
 import typer
 from typing_extensions import Annotated
@@ -50,10 +50,6 @@ from hextech.domain.prompts.infra import (
     prompt_setup_tf,
 )
 from hextech.domain.system import run_system_command
-from hextech.domain.templates.libs import (
-    generate_libs_makefile,
-    generate_project_makefile,
-)
 
 
 @cli_setup
@@ -62,12 +58,6 @@ def setup():
     config: HexrepoConfig
     created_config: bool
     config, created_config = get_or_create_config()
-
-    # Copy libs makefile to libs
-    # Move these to cookie cutter pre-gen hooks
-    if created_config:
-        generate_libs_makefile(config)
-    generate_project_makefile(config)
 
     # Create initial terraform state infra
     if prompt_setup_tf():
@@ -109,7 +99,9 @@ def create_project():
     # CD to projects folder
     with chdir("projects"):
         # Run copier command to copy template
-        copier.run_copy("git@github.com:jwnwilson/hexrepo_project_template.git", f"./{project_name}")
+        copier.run_copy(
+            "git@github.com:jwnwilson/hexrepo_project_template.git", f"./{project_name}"
+        )
         # Setup infra for service
         if prompt_setup_project_infra():
             with chdir(project_name):

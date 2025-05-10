@@ -646,7 +646,7 @@ dev = [
 
 [[package]]
 name = "hexrepo-cloud"
-version = "0.3.22"
+version = "0.3.23"
 source = { editable = "../../libs/adaptor/cloud" }
 dependencies = [
     { name = "boto3-stubs", extra = ["essential"] },

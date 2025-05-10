@@ -44,6 +44,6 @@ python_version = "3.12"
 strict = true
 
 [tool.coverage.run]
-concurrency = ["gevent"]
+concurrency = ["thread"]
 omit = ["tests/*"]
 source = ["{{project_slug}}"]

@@ -346,7 +346,6 @@ source = { editable = "." }
 dependencies = [
     { name = "boto3" },
     { name = "boto3-stubs", extra = ["essential"] },
-    { name = "cookiecutter" },
     { name = "copier" },
     { name = "hexrepo-cloud" },
     { name = "pydantic-settings" },
@@ -370,7 +369,6 @@ dev = [
 requires-dist = [
     { name = "boto3", specifier = ">=1.35.58,<2.0.0" },
     { name = "boto3-stubs", extras = ["essential"], specifier = ">=1.35.86,<2.0.0" },
-    { name = "cookiecutter", specifier = ">=2.6.0,<3.0.0" },
     { name = "copier", specifier = ">=9.7.1" },
     { name = "hexrepo-cloud", editable = "../../libs/adaptor/cloud" },
     { name = "pydantic-settings", specifier = ">=2.6.1,<3.0.0" },
