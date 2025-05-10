@@ -1,2 +1,2 @@
-# {{cookiecutter.project_name}} Library
+# {{project_name}} Library
 
