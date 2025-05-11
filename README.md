@@ -62,6 +62,7 @@ Setup the following env vars directly or run:
         - Create staging and prod envs
         - Simplify feature flags to be for one env
         - feature flag env -> company flag env
+    - Improve pipeline yaml, update cli commands to update yaml to add and remove projects
     - Disable example project
     - Copier
         - Support no db and uncomment test

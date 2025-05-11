@@ -34,34 +34,84 @@ data "aws_vpc" "hexrepo" {
   }
 }
 
+data "aws_subnets" "private" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.hexrepo.id]
+  }
+
+  filter {
+    name   = "tag:Name"
+    values = ["*private*"]
+  }
+}
+
+data "aws_subnets" "public" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.hexrepo.id]
+  }
+
+  filter {
+    name   = "tag:Name"
+    values = ["*public*"]
+  }
+}
+
 data "aws_ecr_repository" "ecr_repo" {
   name = "hexrepo-${var.project}"
 }
 
-module "common_api" {
-  source = "../../../../../../infra/tf/aws/modules/lambda"
+data "aws_route53_zone" "main" {
+  name = var.domain
+}
 
-  environment        = terraform.workspace
-  name               = "${var.project}_api"
-  ecr_url            = data.aws_ecr_repository.ecr_repo.repository_url
-  docker_tag         = var.docker_tag
-  vpc_id             = data.aws_vpc.hexrepo.id
-  lambda_command     = ["src.app.interactor.api.lambda_handler"]
-  security_group_ids = [module.common_postgres.db_security_group_id]
-  bucket             = module.common_bucket.bucket_name
-  keep_warm_schedule = "cron(* 09-17 * * ? *)"
+data "aws_acm_certificate" "main" {
+  domain      = var.domain
+  statuses    = ["ISSUED"]
+  most_recent = true
+}
+
+module "common_ecs_api" {
+  source = "../../../../../../infra/tf/aws/modules/ecs"
+
+  project     = var.project
+  environment = terraform.workspace
+  aws_region  = var.aws_region
+  vpc_id      = data.aws_vpc.hexrepo.id
+  private_subnet_ids = data.aws_subnets.private.ids
+  public_subnet_ids  = data.aws_subnets.public.ids
+  vpc_cidr_blocks    = [data.aws_vpc.hexrepo.cidr_block]
+
+  ecr_url    = data.aws_ecr_repository.ecr_repo.repository_url
+  docker_tag = var.docker_tag
+
+  container_command = ["src.app.interactor.api.app:app"]
+  container_port    = 8000
 
   environment_variables = {
     ENVIRONMENT             = terraform.workspace
     CLOUD_PROVIDER          = "AWS"
     DB_URL                  = local.db_url
-    DB_RO_URL               = local.db_ro_url
+    DB_RO_URL              = local.db_ro_url
     READ_REPLICA_ENABLED    = "false"
     DB_PASSWORD_SECRET_NAME = data.aws_secretsmanager_secret.db_secret.name
-    TASK_QUEUE              = "${var.project}_${terraform.workspace}_tasks"
-    CLIENT_ID               = module.common_auth.client_id
-    USER_POOL_ID            = module.common_auth.user_pool_id
+    TASK_QUEUE             = "${var.project}_${terraform.workspace}_tasks"
+    CLIENT_ID              = module.common_auth.client_id
+    USER_POOL_ID           = module.common_auth.user_pool_id
   }
+
+  secrets = {
+    DB_PASSWORD = data.aws_secretsmanager_secret.db_secret.arn
+  }
+
+  desired_count = 1
+  task_cpu      = 512
+  task_memory   = 1024
+
+  gateway_load_balancer_enabled = true
+  api_gateway_id               = module.common_api_gateway.api_id
+  api_gateway_security_group_ids = [module.common_api_gateway.security_group_id]
 }
 
 module "queue" {
@@ -70,35 +120,6 @@ module "queue" {
   project     = var.project
   name        = "${var.project}-${terraform.workspace}"
   environment = terraform.workspace
-}
-
-resource "aws_lambda_event_source_mapping" "queue_lambda_mapping" {
-  event_source_arn = module.queue.queue_arn
-  function_name    = module.common_tasks.lambda_function_name
-}
-
-module "common_tasks" {
-  source = "../../../../../../infra/tf/aws/modules/lambda"
-
-  environment        = terraform.workspace
-  name               = "${var.project}_tasks"
-  ecr_url            = data.aws_ecr_repository.ecr_repo.repository_url
-  docker_tag         = var.docker_tag
-  vpc_id             = data.aws_vpc.hexrepo.id
-  lambda_command     = ["src.app.interactor.event.lambda_handler"]
-  security_group_ids = [module.common_postgres.db_security_group_id]
-  keep_warm_schedule = ""
-  environment_variables = {
-    ENVIRONMENT             = terraform.workspace
-    CLOUD_PROVIDER          = "AWS"
-    DB_URL                  = local.db_url
-    DB_RO_URL               = local.db_ro_url
-    READ_REPLICA_ENABLED    = "false"
-    DB_PASSWORD_SECRET_NAME = data.aws_secretsmanager_secret.db_secret.name
-    TASK_QUEUE              = "${var.project}_${terraform.workspace}_tasks"
-    CLIENT_ID               = module.common_auth.client_id
-    USER_POOL_ID            = module.common_auth.user_pool_id
-  }
 }
 
 module "common_auth" {
@@ -114,12 +135,14 @@ module "common_api_gateway" {
   source = "../../../../../../infra/tf/aws/modules/apigateway"
 
   environment           = terraform.workspace
-  lambda_invoke_arn     = module.common_api.lambda_function_invoke_arn
-  lambda_name           = module.common_api.lambda_function_name
   domain                = var.domain
   api_subdomain         = local.api_subdomain
   project               = "common"
   cognito_user_pool_arn = module.common_auth.user_pool_arn
+  vpc_id               = data.aws_vpc.hexrepo.id
+  vpc_link_id          = module.common_ecs.vpc_link_id
+  certificate_arn      = data.aws_acm_certificate.main.arn
+  zone_id              = data.aws_route53_zone.main.zone_id
   # Auth handled in api middleware
   auth_enabled = false
 }
