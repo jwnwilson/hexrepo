@@ -8,10 +8,12 @@ on:
     branches: [ main ]
     paths:
       - templates/**
+      - tools/hextech/**
   pull_request:
     branches: [ main ]
     paths:
       - templates/**
+      - tools/hextech/**
 
 permissions:
   contents: read
@@ -33,6 +35,7 @@ jobs:
     - name: Test Templates
       working-directory: ${{ matrix.template }}
       run: |
+        git submodule update --init --recursive
         make lint
         make test
   
