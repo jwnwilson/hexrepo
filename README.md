@@ -39,16 +39,15 @@ Setup the following env vars directly or run:
     - Add ECS option (make default) to avoid cold startup and avoid aws lockin
         - blue green deployments
         - prod image that is fast to deploy on all envs
-    - Create orchestrator / workflow project 
+    - Create orchestrator logic
         - Investigate better fire and forget task setup like run 1 off ECS / GCP job with task status update?
-        - 1 orchestrator task table per hexrepo
+        - Standard async tasks with celery + SQS + container
+        - Setup task tracking debugging UI
+            - Flower? 
+            - Airflow?
         - Setup ECS for long running async orchestrator on fargate
             - Schedule this to turn off when not in use
-        - Setup workflow orchestration
-        - FE for management
         - Setup Idempotent re-run
-        - Dectorator based workflow setup e.g.:
-            https://github.com/aws/chalice/blob/master/chalice/app.py#L719 
     - Add monitoring dashboard for services
         - Generic change log syncing to tracking metrics
         - Add log based event tracking
