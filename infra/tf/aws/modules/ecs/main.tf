@@ -30,7 +30,7 @@ resource "aws_ecs_cluster" "main" {
 resource "aws_lb" "gateway" {
   name               = "${local.name}-gwlb"
   internal           = true
-  load_balancer_type = "gateway"
+  load_balancer_type = "application"
   subnets            = var.private_subnet_ids
 
   tags = {
