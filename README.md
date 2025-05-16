@@ -37,7 +37,7 @@ Setup the following env vars directly or run:
 
 - Setup backend
     - Add ECS option (make default) to avoid cold startup and avoid aws lockin
-        - Keep lmabda gateway option / run both in parallel for the lols and compare
+        - Keep lambda gateway option / run both in parallel for the lols and compare
         - blue green deployments
         - prod image that is fast to deploy on all envs
     - Create orchestrator logic
@@ -61,7 +61,6 @@ Setup the following env vars directly or run:
         - Simplify feature flags to be for one env
         - feature flag env -> company flag env
     - Improve pipeline yaml, update cli commands to update yaml to add and remove projects
-    - Disable example project
     - Copier
         - Support no db and uncomment test
         - Support nosql db and uncomment test
@@ -73,6 +72,7 @@ Setup the following env vars directly or run:
         - Optimise feature flag endpoint with a db view caching or something
     - Setup simple FE with auth?
         - Create apps folder for FE
+        - User Event tracking
         - Add turborepo with auth
     - Enforce architecture rules:
         - Remove lib type
@@ -85,7 +85,7 @@ Setup the following env vars directly or run:
         - Store data in graph format and visualise it
         - Categorise PLP pages
         - Fan out and crawl web page PDP page contents
-    - Add ability to disable / destroy projects
+    - Add ability to disable / turn off / turn onn projects
     - Improve docker container builds
         - Reduce image size
             https://github.com/astral-sh/uv/issues/8935

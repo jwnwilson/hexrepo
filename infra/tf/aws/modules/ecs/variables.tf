@@ -133,3 +133,19 @@ variable "min_capacity" {
   type        = number
   default     = 1
 } 
+
+variable "aws_cognito_user_pool_id" {
+  description = "ID of the Cognito user pool"
+  type        = string
+}
+
+variable "aws_cognito_user_pool_client_id" {
+  description = "ID of the Cognito user pool client"
+  type        = string
+}
+
+variable "domain_name" {
+  description = "Domain name for the API Gateway"
+  type        = string
+  default     = "jwnwilson.co.uk"
+}
