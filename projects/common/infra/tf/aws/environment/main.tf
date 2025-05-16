@@ -73,7 +73,7 @@ data "aws_acm_certificate" "main" {
 }
 
 module "common_ecs_api" {
-  source = "../../../../../../infra/tf/aws/modules/ecs-blue-green"
+  source = "../../../../../../infra/tf/aws/modules/ecs"
 
   project     = var.project
   environment = terraform.workspace
@@ -88,7 +88,6 @@ module "common_ecs_api" {
 
   container_command = ["src.app.interactor.api.app:app"]
   container_port    = 8000
-  container_name    = "api"
 
   environment_variables = {
     ENVIRONMENT             = terraform.workspace
@@ -113,7 +112,6 @@ module "common_ecs_api" {
   gateway_load_balancer_enabled = true
   api_gateway_id               = module.common_api_gateway.api_id
   api_gateway_security_group_ids = [module.common_api_gateway.security_group_id]
-  listener_arn                 = module.common_api_gateway.listener_arn
 }
 
 module "queue" {
