@@ -66,12 +66,6 @@ data "aws_route53_zone" "main" {
   name = var.domain
 }
 
-data "aws_acm_certificate" "main" {
-  domain      = var.domain
-  statuses    = ["ISSUED"]
-  most_recent = true
-}
-
 module "common_ecs_api" {
   source = "../../../../../../infra/tf/aws/modules/ecs"
 
@@ -132,19 +126,15 @@ module "common_auth" {
 }
 
 module "common_api_gateway" {
-  source = "../../../../../../infra/tf/aws/modules/apigateway"
+  source = "../../../../../../infra/tf/aws/modules/apigateway_ecs"
 
   environment           = terraform.workspace
   domain                = var.domain
   api_subdomain         = local.api_subdomain
   project               = "common"
-  cognito_user_pool_arn = module.common_auth.user_pool_arn
   vpc_id               = data.aws_vpc.hexrepo.id
-  vpc_link_id          = module.common_ecs.vpc_link_id
-  certificate_arn      = data.aws_acm_certificate.main.arn
+  vpc_link_id          = module.common_ecs_api.vpc_link_id
   zone_id              = data.aws_route53_zone.main.zone_id
-  # Auth handled in api middleware
-  auth_enabled = false
 }
 
 module "common_postgres" {

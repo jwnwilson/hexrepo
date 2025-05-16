@@ -82,7 +82,7 @@ resource "aws_lb_listener" "gateway" {
 
 # API Gateway VPC Link
 resource "aws_api_gateway_vpc_link" "main" {
-  count = var.gateway_load_balancer_enabled && var.api_gateway_id != null ? 1 : 0
+  count = var.gateway_load_balancer_enabled != null ? 1 : 0
 
   name        = "${local.name}-vpc-link"
   description = "VPC Link for API Gateway to ECS"

@@ -37,17 +37,15 @@ Setup the following env vars directly or run:
 
 - Setup backend
     - Add ECS option (make default) to avoid cold startup and avoid aws lockin
+        - Keep lmabda gateway option / run both in parallel for the lols and compare
         - blue green deployments
         - prod image that is fast to deploy on all envs
     - Create orchestrator logic
-        - Investigate better fire and forget task setup like run 1 off ECS / GCP job with task status update?
         - Standard async tasks with celery + SQS + container
+        - Setup airflow / prefect on ECS / EC2
         - Setup task tracking debugging UI
             - Flower? 
             - Airflow?
-        - Setup ECS for long running async orchestrator on fargate
-            - Schedule this to turn off when not in use
-        - Setup Idempotent re-run
     - Add monitoring dashboard for services
         - Generic change log syncing to tracking metrics
         - Add log based event tracking

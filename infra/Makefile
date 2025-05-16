@@ -10,7 +10,7 @@ TF_STATE_BUCKET=${AWS_TF_STATE_BUCKET}
 TF_STATE_REGION=${AWS_DEFAULT_REGION}
 
 tf_shared_init:
-	@cd tf/aws/shared  && terraform init -input=false
+	@cd tf/aws/shared  && terraform init -input=false -upgrade -upgrade
 
 tf_shared_plan:
 	@cd tf/aws/shared  && terraform plan -out tfapply
@@ -34,7 +34,7 @@ tf_workspace:
 	terraform workspace select $(ENVIRONMENT) 
 
 tf_env_init:
-	@cd tf/aws/environment  && terraform init -input=false
+	@cd tf/aws/environment  && terraform init -input=false -upgrade -upgrade
 
 tf_env_plan:
 	@cd tf/aws/environment  && terraform plan -out tfapply
