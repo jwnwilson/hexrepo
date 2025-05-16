@@ -70,6 +70,22 @@ resource "aws_lb_target_group" "lb" {
   }
 }
 
+data "aws_route53_zone" "api_zone" {
+  name = var.domain_name
+}
+
+resource "aws_route53_record" "ecs" {
+  name    = aws_api_gateway_domain_name.main.domain_name
+  type    = "A"
+  zone_id = data.aws_route53_zone.api_zone.id
+
+  alias {
+    evaluate_target_health = true
+    name                   = aws_api_gateway_domain_name.main.cloudfront_domain_name
+    zone_id                = aws_api_gateway_domain_name.main.cloudfront_zone_id
+  }
+}
+
 # ACM Certificate
 resource "aws_acm_certificate" "main" {
   provider          = aws.us-east-1
@@ -294,6 +310,13 @@ resource "aws_iam_role" "ecs_task_execution_role" {
         Principal = {
           Service = "ecs-tasks.amazonaws.com"
         }
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "ecr:*",
+        ]
+        Resource = "*"
       }
     ]
   })
@@ -323,7 +346,8 @@ resource "aws_iam_role_policy" "ecs_task_execution_secrets" {
       {
         Effect = "Allow"
         Action = [
-          "ecr:GetAuthorizationToken",
+          "ecr:*",
+          "logs:*"
         ]
         Resource = "*"
       }
@@ -476,7 +500,7 @@ resource "aws_api_gateway_method_settings" "main" {
 
 # API Gateway Domain Name
 resource "aws_api_gateway_domain_name" "main" {
-  domain_name     = "api.${var.domain_name}"
+  domain_name     = "${var.subdomain_name}.${var.domain_name}"
   certificate_arn = aws_acm_certificate.main.arn
 }
 

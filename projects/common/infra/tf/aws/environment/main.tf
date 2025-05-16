@@ -136,6 +136,7 @@ module "common_ecs_api" {
   aws_cognito_user_pool_id        = module.common_auth.user_pool_id
   aws_cognito_user_pool_client_id = module.common_auth.client_id
   domain_name                     = var.domain
+  subdomain_name                  = local.api_subdomain_ecs
 }
 
 module "queue" {

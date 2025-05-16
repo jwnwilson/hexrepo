@@ -149,3 +149,9 @@ variable "domain_name" {
   type        = string
   default     = "jwnwilson.co.uk"
 }
+
+variable "subdomain_name" {
+  description = "Subdomain name for the API Gateway"
+  type        = string
+  default     = "ecs"
+}
