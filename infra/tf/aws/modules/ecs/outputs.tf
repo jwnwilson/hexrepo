@@ -40,5 +40,5 @@ output "log_group_name" {
 
 output "vpc_link_id" {
   description = "The ID of the VPC link"
-  value       = aws_api_gateway_vpc_link.main[0].id
+  value       = aws_api_gateway_vpc_link.main.id
 }

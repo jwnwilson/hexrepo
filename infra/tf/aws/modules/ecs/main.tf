@@ -7,7 +7,7 @@ terraform {
 }
 
 locals {
-  name = "${var.project}-${var.environment}"
+  name = "${var.project}-ecs-${var.environment}"
 }
 
 # ECS Cluster
@@ -28,8 +28,6 @@ resource "aws_ecs_cluster" "main" {
 
 # Gateway Load Balancer
 resource "aws_lb" "gateway" {
-  count = var.gateway_load_balancer_enabled ? 1 : 0
-
   name               = "${local.name}-gwlb"
   internal           = true
   load_balancer_type = "gateway"
@@ -44,13 +42,11 @@ resource "aws_lb" "gateway" {
 
 # Gateway Load Balancer Target Group
 resource "aws_lb_target_group" "gateway" {
-  count = var.gateway_load_balancer_enabled ? 1 : 0
-
   name        = "${local.name}-gwlb-tg"
   port        = var.container_port
-  protocol    = "GENEVE"
   vpc_id      = var.vpc_id
   target_type = "ip"
+  protocol    = "TCP"
 
   health_check {
     enabled             = true
@@ -71,22 +67,18 @@ resource "aws_lb_target_group" "gateway" {
 
 # Gateway Load Balancer Listener
 resource "aws_lb_listener" "gateway" {
-  count = var.gateway_load_balancer_enabled ? 1 : 0
-
-  load_balancer_arn = aws_lb.gateway[0].arn
+  load_balancer_arn = aws_lb.gateway.arn
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.gateway[0].arn
+    target_group_arn = aws_lb_target_group.gateway.arn
   }
 }
 
 # API Gateway VPC Link
 resource "aws_api_gateway_vpc_link" "main" {
-  count = var.gateway_load_balancer_enabled != null ? 1 : 0
-
   name        = "${local.name}-vpc-link"
   description = "VPC Link for API Gateway to ECS"
-  target_arns = [aws_lb.gateway[0].arn]
+  target_arns = [aws_lb.gateway.arn]
 
   tags = {
     Name        = "${local.name}-vpc-link"
@@ -160,19 +152,16 @@ resource "aws_ecs_service" "main" {
   desired_count   = var.desired_count
   launch_type     = "FARGATE"
 
+  load_balancer {
+    target_group_arn = aws_lb_target_group.gateway.arn
+    container_name   = local.name
+    container_port   = var.container_port
+  }
+
   network_configuration {
     subnets          = var.private_subnet_ids
     security_groups  = [aws_security_group.ecs_tasks.id]
     assign_public_ip = false
-  }
-
-  dynamic "load_balancer" {
-    for_each = var.gateway_load_balancer_enabled ? [1] : []
-    content {
-      target_group_arn = aws_lb_target_group.gateway[0].arn
-      container_name   = local.name
-      container_port   = var.container_port
-    }
   }
 
   tags = {
@@ -204,7 +193,7 @@ resource "aws_security_group" "ecs_tasks" {
     protocol        = "tcp"
     from_port       = var.container_port
     to_port         = var.container_port
-    security_groups = var.gateway_load_balancer_enabled ? [aws_security_group.gateway[0].id] : []
+    security_groups = [aws_security_group.gateway.id]
   }
 
   egress {
@@ -223,8 +212,6 @@ resource "aws_security_group" "ecs_tasks" {
 
 # Security Group for Gateway Load Balancer
 resource "aws_security_group" "gateway" {
-  count = var.gateway_load_balancer_enabled ? 1 : 0
-
   name        = "${local.name}-gwlb-sg"
   description = "Security group for Gateway Load Balancer"
   vpc_id      = var.vpc_id

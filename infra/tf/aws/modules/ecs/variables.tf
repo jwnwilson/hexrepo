@@ -86,19 +86,6 @@ variable "desired_count" {
   type        = number
   default     = 1
 }
-
-variable "load_balancer_enabled" {
-  description = "Whether to create a load balancer"
-  type        = bool
-  default     = false
-}
-
-variable "gateway_load_balancer_enabled" {
-  description = "Whether to create a Gateway Load Balancer for API Gateway integration"
-  type        = bool
-  default     = false
-}
-
 variable "api_gateway_id" {
   description = "ID of the API Gateway to integrate with"
   type        = string

@@ -129,10 +129,6 @@ resource "aws_lambda_permission" "apigw" {
   source_arn = "${aws_api_gateway_rest_api.apiLambda.execution_arn}/*/*"
 }
 
-output "base_url" {
-  value = aws_api_gateway_deployment.apideploy.invoke_url
-}
-
 resource "aws_api_gateway_resource" "proxy" {
   rest_api_id = aws_api_gateway_rest_api.apiLambda.id
   parent_id   = aws_api_gateway_rest_api.apiLambda.root_resource_id
