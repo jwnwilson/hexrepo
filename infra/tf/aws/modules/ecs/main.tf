@@ -108,6 +108,10 @@ resource "aws_acm_certificate_validation" "main" {
   provider                = aws.us-east-1
   certificate_arn         = aws_acm_certificate.main.arn
   validation_record_fqdns = [for record in aws_acm_certificate.main.domain_validation_options : record.resource_record_name]
+
+  depends_on = [
+    aws_route53_record.ecs
+  ]
 }
 
 
@@ -310,13 +314,6 @@ resource "aws_iam_role" "ecs_task_execution_role" {
         Principal = {
           Service = "ecs-tasks.amazonaws.com"
         }
-      },
-      {
-        Effect = "Allow"
-        Action = [
-          "ecr:*",
-        ]
-        Resource = "*"
       }
     ]
   })
