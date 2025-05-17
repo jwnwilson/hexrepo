@@ -13,6 +13,7 @@ dependencies = [
     "fastapi<1.0.0,>=0.115.4",
     "hexrepo-db",
     "hexrepo-log",
+    "aws-xray-sdk>=2.14.0",
 ]
 
 [tool.uv.sources]

@@ -88,7 +88,6 @@ resource "aws_route53_record" "ecs" {
 
 # ACM Certificate
 resource "aws_acm_certificate" "main" {
-  provider          = aws.us-east-1
   domain_name       = "common-default-ecs.jwnwilson.co.uk"
   validation_method = "DNS"
 
@@ -105,7 +104,6 @@ resource "aws_acm_certificate" "main" {
 
 # Certificate Validation
 resource "aws_acm_certificate_validation" "main" {
-  provider                = aws.us-east-1
   certificate_arn         = aws_acm_certificate.main.arn
   validation_record_fqdns = [for record in aws_acm_certificate.main.domain_validation_options : record.resource_record_name]
 

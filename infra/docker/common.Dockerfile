@@ -1,18 +1,20 @@
 FROM python:3.12-alpine
 
 ARG PROJECT
-WORKDIR /code
-ENV PYTHONPATH=/code/src
+WORKDIR /code/project
+ENV PYTHONPATH=/code/project/src
 
 # Download the latest installer
 ADD https://astral.sh/uv/install.sh /uv-installer.sh
 # Run the installer then remove it
 RUN sh /uv-installer.sh && rm /uv-installer.sh
+ENV PATH="/root/.local/bin/:$PATH"
 
-COPY ./projects/${PROJECT}/pyproject.toml ./projects/${PROJECT}/uv.lock ./
+COPY ./projects/${PROJECT}/pyproject.toml ./projects/${PROJECT}/README.md ./projects/${PROJECT}/uv.lock ./
 COPY ./libs /libs
 
-RUN uv sync --frozen --no-group dev
+RUN uv sync --frozen --no-group dev --compile-bytecode 
+ENV PATH="/code/project/.venv/bin/:$PATH"
 
 COPY ./projects/${PROJECT}/src ./src
 COPY ./projects/${PROJECT}/alembic.ini ./

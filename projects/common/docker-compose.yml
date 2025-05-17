@@ -13,9 +13,9 @@ services:
     image: "common"
     build: 
       context: ../../
-      dockerfile: infra/docker/lambda.Dockerfile
+      dockerfile: infra/docker/common.Dockerfile
       args:
-          PROJECT: common
+        PROJECT: common
     # Run this contain as if it's in the terminal, useful for debugging
     tty: true
     # Mount local files into the container so we can update files inside the container
@@ -28,8 +28,6 @@ services:
       - 0.0.0.0:8000:8000
     depends_on:
       - db
-    # Override lambda entry point to revert to default docker behaviour
-    entrypoint: ""
     command: "uvicorn app.interactor.api.fastapi.main:app --host 0.0.0.0 --port 8000 --reload"
 
   db:

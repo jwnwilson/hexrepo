@@ -33,10 +33,10 @@ db_migrate_local:
 	bash -c "env $$(cat env/local.env|xargs) uv run alembic upgrade head"
 
 db_migrate_docker:
-	docker compose run api bash -c "alembic upgrade head"
+	docker compose run api sh -c "alembic upgrade head"
 
 db_delete_data:
-	docker compose run db bash -c "rm -rf /var/lib/postgresql/data/*"
+	docker compose run db sh -c "rm -rf /var/lib/postgresql/data/*"
 
 db_downgrade:
 	bash -c "uv run alembic downgrade -1"
