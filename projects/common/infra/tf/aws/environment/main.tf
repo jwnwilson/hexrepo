@@ -93,13 +93,6 @@ module "common_api" {
   }
 }
 
-# module "common_ecs2_api" {
-#   source = "../../../../../../infra/tf/aws/modules/ecs2"
-
-#   vpc_id = data.aws_vpc.hexrepo.id
-#   private_subnets = data.aws_subnets.private.ids
-# }
-
 module "common_ecs_api" {
   source = "../../../../../../infra/tf/aws/modules/ecs"
 
@@ -203,19 +196,6 @@ module "common_api_gateway" {
   # Auth handled in api middleware
   auth_enabled = false
 }
-
-# module "common_api_gateway_ecs" {
-#   source = "../../../../../../infra/tf/aws/modules/apigateway_ecs"
-
-#   environment   = terraform.workspace
-#   domain        = var.domain
-#   api_subdomain = local.api_subdomain_ecs
-#   project       = "common"
-#   vpc_id        = data.aws_vpc.hexrepo.id
-#   vpc_link_id   = module.common_ecs_api.vpc_link_id
-#   zone_id       = data.aws_route53_zone.main.zone_id
-#   aws_lb_listener_arn = module.common_ecs_api.aws_lb_listener_arn
-# }
 
 module "common_postgres" {
   source = "../../../../../../infra/tf/aws/modules/rds"
