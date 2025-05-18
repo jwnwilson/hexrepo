@@ -3,6 +3,7 @@ FROM python:3.12-alpine
 ARG PROJECT
 WORKDIR /code/project
 ENV PYTHONPATH=/code/project/src
+EXPOSE 8000
 
 # Download the latest installer
 ADD https://astral.sh/uv/install.sh /uv-installer.sh

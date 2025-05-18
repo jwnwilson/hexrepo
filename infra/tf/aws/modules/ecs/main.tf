@@ -32,19 +32,18 @@ resource "aws_ecs_cluster" "main" {
 }
 
 # Gateway Load Balancer
-resource "aws_lb" "gateway" {
+resource "aws_lb" "main" {
   name               = "${local.name}-gwlb"
-  internal           = false
+  internal           = true
   load_balancer_type = "network"
   subnets            = var.private_subnet_ids
-
+  security_groups    = [aws_security_group.lb.id]
   tags = {
     Name        = "${local.name}-gwlb"
     Environment = var.environment
     Project     = var.project
   }
 }
-
 # Load Balancer Target Group
 resource "aws_lb_target_group" "lb" {
   name        = "${local.name}-gwlb-tg"
@@ -57,7 +56,7 @@ resource "aws_lb_target_group" "lb" {
     enabled             = true
     healthy_threshold   = 3
     interval            = 30
-    protocol            = "HTTP"
+    protocol            = "TCP"
     port                = "traffic-port"
     timeout             = 5
     unhealthy_threshold = 3
@@ -75,7 +74,8 @@ data "aws_route53_zone" "api_zone" {
 }
 
 resource "aws_route53_record" "ecs" {
-  name    = aws_api_gateway_domain_name.main.domain_name
+  provider = aws.us-east-1
+  name    = "${var.subdomain_name}.${var.domain_name}"
   type    = "A"
   zone_id = data.aws_route53_zone.api_zone.id
 
@@ -88,7 +88,8 @@ resource "aws_route53_record" "ecs" {
 
 # ACM Certificate
 resource "aws_acm_certificate" "main" {
-  domain_name       = "common-default-ecs.jwnwilson.co.uk"
+  provider = aws.us-east-1
+  domain_name       = "${var.subdomain_name}.${var.domain_name}"
   validation_method = "DNS"
 
   lifecycle {
@@ -104,6 +105,7 @@ resource "aws_acm_certificate" "main" {
 
 # Certificate Validation
 resource "aws_acm_certificate_validation" "main" {
+  provider = aws.us-east-1
   certificate_arn         = aws_acm_certificate.main.arn
   validation_record_fqdns = [for record in aws_acm_certificate.main.domain_validation_options : record.resource_record_name]
 
@@ -111,7 +113,6 @@ resource "aws_acm_certificate_validation" "main" {
     aws_route53_record.ecs
   ]
 }
-
 
 data "aws_cognito_user_pool" "main" {
   user_pool_id = var.aws_cognito_user_pool_id
@@ -123,12 +124,12 @@ data "aws_cognito_user_pool_client" "main" {
 }
 
 # Update the listener to use the new certificate
-resource "aws_lb_listener" "gateway" {
-  load_balancer_arn = aws_lb.gateway.arn
-  port              = 443
-  protocol          = "TLS"
-  ssl_policy        = "ELBSecurityPolicy-2016-08"
-  certificate_arn   = aws_acm_certificate.main.arn  # Use the new certificate
+resource "aws_lb_listener" "main" {
+  load_balancer_arn = aws_lb.main.arn
+  port              = 80
+  protocol          = "TCP"
+  # ssl_policy        = "ELBSecurityPolicy-2016-08"
+  # certificate_arn   = aws_acm_certificate.main.arn  # Use the new certificate
 
   # default_action {
   #   type = "authenticate-cognito"
@@ -143,6 +144,22 @@ resource "aws_lb_listener" "gateway" {
     target_group_arn = aws_lb_target_group.lb.arn
   }
 }
+
+# resource "aws_lb_listener" "front_end" {
+#   load_balancer_arn = aws_lb.main.arn
+#   port              = "80"
+#   protocol          = "TCP"
+
+#   default_action {
+#     type = "redirect"
+
+#     redirect {
+#       port        = "443"
+#       protocol    = "HTTPS"
+#       status_code = "HTTP_301"
+#     }
+#   }
+# }
 
 # Task Definition
 resource "aws_ecs_task_definition" "main" {
@@ -227,9 +244,9 @@ resource "aws_ecs_service" "main" {
   }
 
   depends_on = [
-    aws_lb.gateway,
+    aws_lb.main,
     aws_lb_target_group.lb,
-    aws_lb_listener.gateway
+    aws_lb_listener.main
   ]
 }
 
@@ -255,7 +272,8 @@ resource "aws_security_group" "ecs_tasks" {
     protocol        = "tcp"
     from_port       = var.container_port
     to_port         = var.container_port
-    security_groups = [aws_security_group.gateway.id]
+    cidr_blocks      = ["0.0.0.0/0"]
+    # security_groups = [aws_security_group.lb.id]
   }
 
   egress {
@@ -273,16 +291,42 @@ resource "aws_security_group" "ecs_tasks" {
 }
 
 # Security Group for Gateway Load Balancer
-resource "aws_security_group" "gateway" {
+resource "aws_security_group" "lb" {
   name        = "${local.name}-gwlb-sg"
   description = "Security group for Gateway Load Balancer"
   vpc_id      = var.vpc_id
 
   ingress {
-    protocol        = "tcp"
-    from_port       = var.container_port
-    to_port         = var.container_port
-    security_groups = var.api_gateway_security_group_ids
+    protocol    = "tcp"
+    from_port   = 80
+    to_port     = 80
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    protocol    = "-1"
+    from_port   = 0
+    to_port     = 0
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name        = "${local.name}-gwlb-sg"
+    Environment = var.environment
+    Project     = var.project
+  }
+}
+
+resource "aws_security_group" "ecs" {
+  name        = "${local.name}-ecs-sg"
+  description = "Security group for Gateway Load Balancer"
+  vpc_id      = var.vpc_id
+
+  ingress {
+    protocol    = "tcp"
+    from_port   = var.container_port
+    to_port     = var.container_port
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   egress {
@@ -371,6 +415,30 @@ resource "aws_iam_role" "ecs_task_role" {
   })
 }
 
+resource "aws_iam_role_policy" "ecs_task_secrets" {
+  name = "${local.name}-task-secrets"
+  role = aws_iam_role.ecs_task_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "secretsmanager:GetSecretValue",
+          "ssm:GetParameters",
+          "ssm:GetParameter",
+          "ssm:GetParametersByPath",
+        ]
+        Resource = [
+          "arn:aws:secretsmanager:${var.aws_region}:${data.aws_caller_identity.current.account_id}:secret:*",
+          "arn:aws:ssm:${var.aws_region}:${data.aws_caller_identity.current.account_id}:parameter/*"
+        ]
+      }
+    ]
+  })
+}
+
 # Auto Scaling
 resource "aws_appautoscaling_target" "ecs_target" {
   max_capacity       = var.max_capacity
@@ -399,7 +467,7 @@ resource "aws_appautoscaling_policy" "ecs_policy" {
 resource "aws_api_gateway_vpc_link" "main" {
   name        = "${local.name}-vpc-link"
   description = "VPC Link for API Gateway to ECS"
-  target_arns = [aws_lb.gateway.arn]
+  target_arns = [aws_lb.main.arn]
   tags = {
     Name        = "${local.name}-vpc-link"
     Environment = var.environment
@@ -433,6 +501,17 @@ resource "aws_api_gateway_method" "proxy" {
   resource_id   = aws_api_gateway_resource.proxy.id
   http_method   = "ANY"
   authorization = "NONE"
+
+  request_parameters = {
+    "method.request.path.proxy" = true
+  }
+}
+
+resource "aws_api_gateway_method" "root" {
+  rest_api_id   = aws_api_gateway_rest_api.main.id
+  resource_id   = aws_api_gateway_rest_api.main.root_resource_id
+  http_method   = "ANY"
+  authorization = "NONE"
 }
 
 # API Gateway Integration
@@ -443,9 +522,26 @@ resource "aws_api_gateway_integration" "proxy" {
 
   type                    = "HTTP_PROXY"
   integration_http_method = "ANY"
+  uri                     = "http://${aws_lb.main.dns_name}/{proxy}"
   connection_type         = "VPC_LINK"
   connection_id           = aws_api_gateway_vpc_link.main.id
-  uri                     = "http://${aws_lb.gateway.dns_name}/{proxy}"
+
+  cache_key_parameters = ["method.request.path.proxy"]
+  request_parameters = {
+    "integration.request.path.proxy" = "method.request.path.proxy"
+  }
+}
+
+resource "aws_api_gateway_integration" "root" {
+  rest_api_id = aws_api_gateway_rest_api.main.id
+  resource_id = aws_api_gateway_rest_api.main.root_resource_id
+  http_method = aws_api_gateway_method.root.http_method
+
+  type                    = "HTTP_PROXY"
+  integration_http_method = "ANY"
+  uri                     = "http://${aws_lb.main.dns_name}/"
+  connection_type         = "VPC_LINK"
+  connection_id           = aws_api_gateway_vpc_link.main.id
 }
 
 # API Gateway Deployment
@@ -471,6 +567,20 @@ resource "aws_api_gateway_stage" "main" {
   rest_api_id   = aws_api_gateway_rest_api.main.id
   stage_name    = var.environment
 
+  access_log_settings {
+    destination_arn = aws_cloudwatch_log_group.api_gateway.arn
+    format = jsonencode({
+      requestId = "$context.requestId"
+      ip = "$context.identity.sourceIp"
+      requestTime = "$context.requestTime"
+      httpMethod = "$context.httpMethod"
+      path = "$context.path"
+      status = "$context.status"
+      responseLength = "$context.responseLength"
+      integrationLatency = "$context.integration.latency"
+      error = "$context.error.message"
+    })
+  }
   tags = {
     Name        = "${local.name}-stage"
     Environment = var.environment
@@ -483,23 +593,89 @@ resource "aws_api_gateway_method_settings" "main" {
   rest_api_id = aws_api_gateway_rest_api.main.id
   stage_name  = aws_api_gateway_stage.main.stage_name
   method_path = "*/*"
+  
 
   settings {
     metrics_enabled        = true
-    logging_level         = "OFF"
-    data_trace_enabled    = false
-    throttling_rate_limit = 10000
-    throttling_burst_limit = 5000
+    logging_level         = "INFO"
+    data_trace_enabled    = true
+    # throttling_rate_limit = 10000
+    # throttling_burst_limit = 5000
+  }
+
+  depends_on = [
+    aws_cloudwatch_log_group.api_gateway,
+    aws_iam_role.api_gateway_cloudwatch
+  ]
+}
+
+# CloudWatch Log Group for API Gateway
+resource "aws_cloudwatch_log_group" "api_gateway" {
+  name              = "/aws/apigateway/${local.name}"
+  retention_in_days = 30
+
+  tags = {
+    Name        = "${local.name}-api-gateway-logs"
+    Environment = var.environment
+    Project     = var.project
   }
 }
 
-# API Gateway Domain Name
+# IAM Role for API Gateway Logging
+resource "aws_iam_role" "api_gateway_cloudwatch" {
+  name = "${local.name}-api-gateway-cloudwatch"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "apigateway.amazonaws.com"
+        }
+      }
+    ]
+  })
+}
+
+# IAM Policy for API Gateway Logging
+resource "aws_iam_role_policy" "api_gateway_cloudwatch" {
+  name = "${local.name}-api-gateway-cloudwatch"
+  role = aws_iam_role.api_gateway_cloudwatch.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:DescribeLogGroups",
+          "logs:DescribeLogStreams",
+          "logs:PutLogEvents",
+          "logs:GetLogEvents",
+          "logs:FilterLogEvents"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+# Enable API Gateway CloudWatch logging
+resource "aws_api_gateway_account" "main" {
+  cloudwatch_role_arn = aws_iam_role.api_gateway_cloudwatch.arn
+}
+
+# # # API Gateway Domain Name
 resource "aws_api_gateway_domain_name" "main" {
   domain_name     = "${var.subdomain_name}.${var.domain_name}"
   certificate_arn = aws_acm_certificate.main.arn
 }
 
-# API Gateway Base Path Mapping
+# # # # API Gateway Base Path Mapping
 resource "aws_api_gateway_base_path_mapping" "main" {
   api_id      = aws_api_gateway_rest_api.main.id
   stage_name  = aws_api_gateway_stage.main.stage_name

@@ -38,12 +38,12 @@ output "log_group_name" {
   value       = aws_cloudwatch_log_group.main.name
 } 
 
-output "vpc_link_id" {
-  description = "The ID of the VPC link"
-  value       = aws_api_gateway_vpc_link.main.id
-}
+# output "vpc_link_id" {
+#   description = "The ID of the VPC link"
+#   value       = aws_api_gateway_vpc_link.main.id
+# }
 
 output "aws_lb_listener_arn" {
   description = "The ARN of the AWS Load Balancer Listener"
-  value       = aws_lb_listener.gateway.arn
+  value       = aws_lb_listener.main.arn
 }

@@ -93,6 +93,13 @@ module "common_api" {
   }
 }
 
+# module "common_ecs2_api" {
+#   source = "../../../../../../infra/tf/aws/modules/ecs2"
+
+#   vpc_id = data.aws_vpc.hexrepo.id
+#   private_subnets = data.aws_subnets.private.ids
+# }
+
 module "common_ecs_api" {
   source = "../../../../../../infra/tf/aws/modules/ecs"
 
@@ -106,8 +113,6 @@ module "common_ecs_api" {
 
   ecr_url    = data.aws_ecr_repository.ecr_repo.repository_url
   docker_tag = var.docker_tag
-
-  container_command = ["src.app.interactor.api.app:app"]
   container_port    = 8000
 
   environment_variables = {
