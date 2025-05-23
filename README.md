@@ -42,7 +42,6 @@ Setup the following env vars directly or run:
             - Parameterise deploy.sh to allow both deployments
             - Fix CORS in ECS server
             - Fix logging on ECS to be easily readable
-        - blue green deployments via load balancer
     - Create orchestrator logic
         - Standard async tasks with celery + SQS + container
             - Keep serverless tasks as option
@@ -51,6 +50,7 @@ Setup the following env vars directly or run:
             - Flower? 
             - Airflow?
     - Add monitoring dashboard for services
+        - Look at graphana?
         - Generic change log syncing to tracking metrics
         - Add log based event tracking
         - Change data capture streaming to data warehouse
@@ -59,6 +59,13 @@ Setup the following env vars directly or run:
         - Latency tracking and visualisation
         - Setup BI dashboard
         - Setup sonarqube
+    - monolith / multiteam setup
+        - team folders
+        - Remove lib type
+        - tach: https://github.com/gauge-sh/tach
+        - https://roman.pt/posts/python-architecture-linter/
+        - restricting adaptors imports to a dependencies module
+    - blue green deployments via load balancer
     - Setup multienv
         - Enable disable project via admin
         - Create staging and prod envs
@@ -78,11 +85,6 @@ Setup the following env vars directly or run:
         - Create apps folder for FE
         - User Event tracking
         - Add turborepo with auth
-    - Enforce architecture rules:
-        - Remove lib type
-        - tach: https://github.com/gauge-sh/tach
-        - https://roman.pt/posts/python-architecture-linter/
-        - restricting adaptors imports to a dependencies module
     - Play with AI crawler project 
         - Setup crawl spider for PLP pages
         - Cache all page data to avoid recrawls

@@ -63,6 +63,10 @@ data "aws_ecr_repository" "ecr_repo" {
   name = "hexrepo-${var.project}"
 }
 
+data "aws_ecr_repository" "ecr_lambda" {
+  name = "hexrepo-${var.project}-lambda"
+}
+
 data "aws_route53_zone" "main" {
   name = var.domain
 }
@@ -72,7 +76,7 @@ module "common_api" {
 
   environment        = terraform.workspace
   name               = "${var.project}_api"
-  ecr_url            = data.aws_ecr_repository.ecr_repo.repository_url
+  ecr_url            = data.aws_ecr_repository.ecr_lambda.repository_url
   docker_tag         = var.docker_tag
   vpc_id             = data.aws_vpc.hexrepo.id
   lambda_command     = ["src.app.interactor.api.lambda_handler"]
@@ -118,8 +122,8 @@ module "common_ecs_api" {
     TASK_QUEUE              = "${var.project}_${terraform.workspace}_tasks"
     CLIENT_ID               = module.common_auth.client_id
     USER_POOL_ID            = module.common_auth.user_pool_id
+    ALLOWED_ORIGINS         = "*"
   }
-
   secrets = {
     DB_PASSWORD = data.aws_secretsmanager_secret.db_secret.arn
   }
@@ -155,7 +159,7 @@ module "common_tasks" {
 
   environment        = terraform.workspace
   name               = "${var.project}_tasks"
-  ecr_url            = data.aws_ecr_repository.ecr_repo.repository_url
+  ecr_url            = data.aws_ecr_repository.ecr_lambda.repository_url
   docker_tag         = var.docker_tag
   vpc_id             = data.aws_vpc.hexrepo.id
   lambda_command     = ["src.app.interactor.event.lambda_handler"]

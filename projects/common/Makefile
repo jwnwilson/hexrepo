@@ -111,7 +111,8 @@ tf_plan:
 tf_apply:
 	@echo "Applying Terraform infra"
 	cd infra/tf/aws/shared && terraform apply
-	cd infra/tf/aws/environment  && terraform apply
+	cd infra/tf/aws/environment && terraform apply
+	
 
 tf_apply_no_input:
 	@echo "Applying Terraform infra"
@@ -130,7 +131,9 @@ tf_output: tf_workspace
 	@cd infra/tf/aws/environment && terraform output -json
 
 deploy: build tf_workspace
-	PROJECT=common NO_INPUT=$(NO_INPUT) ENVIRONMENT=$(ENVIRONMENT) ../../tools/bash_scripts/deploy.sh 
+	PROJECT=common NO_INPUT=$(NO_INPUT) ENVIRONMENT=$(ENVIRONMENT) ../../tools/bash_scripts/deploy.sh
+	PROJECT=common-lambda NO_INPUT=$(NO_INPUT) ENVIRONMENT=$(ENVIRONMENT) ../../tools/bash_scripts/deploy.sh
+	make tf_apply_no_input
 
 bastion: venv
 	@echo "Activating bastion port forwarding..."
