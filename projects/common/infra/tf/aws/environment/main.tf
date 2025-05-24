@@ -97,52 +97,52 @@ module "common_api" {
   }
 }
 
-module "common_ecs_api" {
-  source = "../../../../../../infra/tf/aws/modules/ecs"
+# module "common_ecs_gateway_nlb_api" {
+#   source = "../../../../../../infra/tf/aws/modules/ecs_gateway_nlb"
 
-  project            = var.project
-  environment        = terraform.workspace
-  aws_region         = var.aws_region
-  vpc_id             = data.aws_vpc.hexrepo.id
-  private_subnet_ids = data.aws_subnets.private.ids
-  public_subnet_ids  = data.aws_subnets.public.ids
-  vpc_cidr_blocks    = [data.aws_vpc.hexrepo.cidr_block]
-  security_group_ids = [module.common_postgres.db_security_group_id]
+#   project            = var.project
+#   environment        = terraform.workspace
+#   aws_region         = var.aws_region
+#   vpc_id             = data.aws_vpc.hexrepo.id
+#   private_subnet_ids = data.aws_subnets.private.ids
+#   public_subnet_ids  = data.aws_subnets.public.ids
+#   vpc_cidr_blocks    = [data.aws_vpc.hexrepo.cidr_block]
+#   security_group_ids = [module.common_postgres.db_security_group_id]
 
-  ecr_url    = data.aws_ecr_repository.ecr_repo.repository_url
-  docker_tag = var.docker_tag
-  container_port    = 8000
+#   ecr_url    = data.aws_ecr_repository.ecr_repo.repository_url
+#   docker_tag = var.docker_tag
+#   container_port    = 8000
 
-  environment_variables = {
-    ENVIRONMENT             = terraform.workspace
-    CLOUD_PROVIDER          = "AWS"
-    DB_URL                  = local.db_url
-    DB_RO_URL               = local.db_ro_url
-    READ_REPLICA_ENABLED    = "false"
-    DB_PASSWORD_SECRET_NAME = data.aws_secretsmanager_secret.db_secret.name
-    TASK_QUEUE              = "${var.project}_${terraform.workspace}_tasks"
-    CLIENT_ID               = module.common_auth.client_id
-    USER_POOL_ID            = module.common_auth.user_pool_id
-    ALLOWED_ORIGINS         = "*"
-    LOG_JSON                = "true" 
-    ORIGIN_URL              = "https://${local.api_subdomain_ecs}.${var.domain}"
-  }
-  secrets = {
-    DB_PASSWORD = data.aws_secretsmanager_secret.db_secret.arn
-  }
+#   environment_variables = {
+#     ENVIRONMENT             = terraform.workspace
+#     CLOUD_PROVIDER          = "AWS"
+#     DB_URL                  = local.db_url
+#     DB_RO_URL               = local.db_ro_url
+#     READ_REPLICA_ENABLED    = "false"
+#     DB_PASSWORD_SECRET_NAME = data.aws_secretsmanager_secret.db_secret.name
+#     TASK_QUEUE              = "${var.project}_${terraform.workspace}_tasks"
+#     CLIENT_ID               = module.common_auth.client_id
+#     USER_POOL_ID            = module.common_auth.user_pool_id
+#     ALLOWED_ORIGINS         = "*"
+#     LOG_JSON                = "true" 
+#     ORIGIN_URL              = "https://${local.api_subdomain_ecs}.${var.domain}"
+#   }
+#   secrets = {
+#     DB_PASSWORD = data.aws_secretsmanager_secret.db_secret.arn
+#   }
 
-  desired_count = 1
-  task_cpu      = 512
-  task_memory   = 1024
+#   desired_count = 1
+#   task_cpu      = 512
+#   task_memory   = 1024
 
-  # api_gateway_id                  = module.common_api_gateway_ecs.api_id
-  # api_gateway_security_group_ids  = [module.common_api_gateway_ecs.security_group_id]
-  # certificate_arn                 = module.common_api_gateway_ecs.certificate_arn
-  aws_cognito_user_pool_id        = module.common_auth.user_pool_id
-  aws_cognito_user_pool_client_id = module.common_auth.client_id
-  domain_name                     = var.domain
-  subdomain_name                  = local.api_subdomain_ecs
-}
+#   # api_gateway_id                  = module.common_api_gateway_ecs.api_id
+#   # api_gateway_security_group_ids  = [module.common_api_gateway_ecs.security_group_id]
+#   # certificate_arn                 = module.common_api_gateway_ecs.certificate_arn
+#   aws_cognito_user_pool_id        = module.common_auth.user_pool_id
+#   aws_cognito_user_pool_client_id = module.common_auth.client_id
+#   domain_name                     = var.domain
+#   subdomain_name                  = local.api_subdomain_ecs
+# }
 
 module "queue" {
   source = "../../../../../../infra/tf/aws/modules/sqs"

@@ -121,8 +121,7 @@ tf_apply_no_input:
 
 tf_destroy:
 	@echo "Destroying Terraform infra"
-	cd infra/tf/aws/environment  && terraform destroy
-	cd infra/tf/aws/shared  && terraform destroy
+	cd infra/tf/aws/environment  && terraform destroy -target=module.common_ecs_api
 
 tf_refresh: tf_workspace
 	@cd infra/tf/aws/environment && terraform refresh
