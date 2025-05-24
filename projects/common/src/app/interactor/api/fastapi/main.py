@@ -6,6 +6,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from hexrepo_log import LogMiddleware, setup_logger
 from starlette.middleware.sessions import SessionMiddleware
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.responses import Response
+from starlette.types import ASGIApp
 
 from app.config import config
 
@@ -15,6 +18,19 @@ from .api_versions.api_v1.api import api_router_v1
 ENVIRONMENT = os.environ.get("ENVIRONMENT", "")
 
 setup_logger()
+
+
+class RedirectMiddleware(BaseHTTPMiddleware):
+    def __init__(self, app: ASGIApp):
+        super().__init__(app)
+
+    async def dispatch(self, request, call_next):
+        response = await call_next(request)
+        if config.ORIGIN_URL and response.status_code in (301, 302, 303, 307, 308):
+            # Workaround for AWS NLB redirecting to private DNS
+            response.headers["location"] = config.ORIGIN_URL
+        return response
+
 
 root_prefix = ""
 
@@ -33,8 +49,10 @@ app: FastAPI = FastAPI(
     root_path=root_prefix,
 )
 
+
 app.add_middleware(LogMiddleware)
 app.add_middleware(GZipMiddleware, minimum_size=1000)
+app.add_middleware(RedirectMiddleware)
 # Sets all CORS enabled origins
 app.add_middleware(
     CORSMiddleware,

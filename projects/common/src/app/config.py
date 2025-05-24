@@ -62,6 +62,7 @@ class Config(BaseSettings):
     TRACING_ENABLED: bool = os.environ.get("TRACING_ENABLED", "false") == "true"
 
     ALLOWED_ORIGINS: str = os.environ.get("ALLOWED_ORIGINS", "localhost")
+    ORIGIN_URL: str = os.environ.get("ORIGIN_URL", "")
     TESTING: bool = "pytest" in sys.argv[0]
 
 

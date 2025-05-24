@@ -107,6 +107,7 @@ module "common_ecs_api" {
   private_subnet_ids = data.aws_subnets.private.ids
   public_subnet_ids  = data.aws_subnets.public.ids
   vpc_cidr_blocks    = [data.aws_vpc.hexrepo.cidr_block]
+  security_group_ids = [module.common_postgres.db_security_group_id]
 
   ecr_url    = data.aws_ecr_repository.ecr_repo.repository_url
   docker_tag = var.docker_tag
@@ -124,6 +125,7 @@ module "common_ecs_api" {
     USER_POOL_ID            = module.common_auth.user_pool_id
     ALLOWED_ORIGINS         = "*"
     LOG_JSON                = "true" 
+    ORIGIN_URL              = "https://${local.api_subdomain}.${var.domain}"
   }
   secrets = {
     DB_PASSWORD = data.aws_secretsmanager_secret.db_secret.arn
