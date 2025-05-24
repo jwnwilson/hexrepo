@@ -125,7 +125,7 @@ module "common_ecs_api" {
     USER_POOL_ID            = module.common_auth.user_pool_id
     ALLOWED_ORIGINS         = "*"
     LOG_JSON                = "true" 
-    ORIGIN_URL              = "https://${local.api_subdomain}.${var.domain}"
+    ORIGIN_URL              = "https://${local.api_subdomain_ecs}.${var.domain}"
   }
   secrets = {
     DB_PASSWORD = data.aws_secretsmanager_secret.db_secret.arn
