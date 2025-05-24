@@ -132,7 +132,8 @@ tf_output: tf_workspace
 
 deploy: build tf_workspace
 	PROJECT=common NO_INPUT=$(NO_INPUT) ENVIRONMENT=$(ENVIRONMENT) ../../tools/bash_scripts/deploy.sh
-	# PROJECT=common-lambda NO_INPUT=$(NO_INPUT) ENVIRONMENT=$(ENVIRONMENT) ../../tools/bash_scripts/deploy.sh
+	PROJECT=common-lambda NO_INPUT=$(NO_INPUT) ENVIRONMENT=$(ENVIRONMENT) ../../tools/bash_scripts/deploy.sh
+	make tf_apply_no_input
 
 bastion: venv
 	@echo "Activating bastion port forwarding..."

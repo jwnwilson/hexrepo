@@ -40,7 +40,7 @@ Setup the following env vars directly or run:
         - Debug why the api gateway breaks on deploy
             - Docker tag not being passed to the tf apply
             - keep making changes to api deployment which isn't needed
-        - Simplify to ALB -> ECS & keep more complex setup for record
+        - Simplify to ALB -> ECS & keep more complex setup on a branch for record
         - Move to GCP fuck AWS
         - Keep lambda gateway option / run both in parallel for the lols and compare
     - Create orchestrator logic
