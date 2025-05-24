@@ -37,11 +37,12 @@ Setup the following env vars directly or run:
 
 - Setup backend
     - Add ECS option (make default) to avoid cold startup and avoid aws lockin
-        - Debug why the api gateway breaks on deploy
-            - Docker tag not being passed to the tf apply
-            - keep making changes to api deployment which isn't needed
-        - Simplify to ALB -> ECS & keep more complex setup on a branch for record
-        - Move to GCP fuck AWS
+        - delete ECS infra
+            - rename current ecs setup
+            - remove blue green module
+        - Simplify to ALB -> ECS
+            - create new infra setup module
+        - Docker tag not being passed to the tf apply
         - Keep lambda gateway option / run both in parallel for the lols and compare
     - Create orchestrator logic
         - Standard async tasks with celery + SQS + container
