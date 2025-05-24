@@ -155,3 +155,9 @@ variable "subdomain_name" {
   type        = string
   default     = "ecs"
 }
+
+variable "security_group_ids" {
+  description = "List of security group IDs for the ECS tasks"
+  type        = list(string)
+  default     = []
+}

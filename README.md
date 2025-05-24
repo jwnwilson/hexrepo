@@ -37,11 +37,11 @@ Setup the following env vars directly or run:
 
 - Setup backend
     - Add ECS option (make default) to avoid cold startup and avoid aws lockin
+        - Fix CORS in ECS server
+        - Fix logging on ECS to be easily readable
         - Keep lambda gateway option / run both in parallel for the lols and compare
             - Create serverless ECR + container ECR
             - Parameterise deploy.sh to allow both deployments
-            - Fix CORS in ECS server
-            - Fix logging on ECS to be easily readable
     - Create orchestrator logic
         - Standard async tasks with celery + SQS + container
             - Keep serverless tasks as option

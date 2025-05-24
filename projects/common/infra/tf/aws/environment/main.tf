@@ -123,6 +123,7 @@ module "common_ecs_api" {
     CLIENT_ID               = module.common_auth.client_id
     USER_POOL_ID            = module.common_auth.user_pool_id
     ALLOWED_ORIGINS         = "*"
+    LOG_JSON                = "true" 
   }
   secrets = {
     DB_PASSWORD = data.aws_secretsmanager_secret.db_secret.arn

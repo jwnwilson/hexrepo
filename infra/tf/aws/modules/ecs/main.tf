@@ -233,7 +233,7 @@ resource "aws_ecs_service" "main" {
   }
   network_configuration {
     subnets          = var.private_subnet_ids
-    security_groups  = [aws_security_group.ecs_tasks.id]
+    security_groups  = concat([aws_security_group.ecs_tasks.id], var.security_group_ids)
     assign_public_ip = false
   }
 
