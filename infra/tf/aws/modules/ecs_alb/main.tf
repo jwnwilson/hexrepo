@@ -115,7 +115,7 @@ resource "aws_acm_certificate_validation" "main" {
   validation_record_fqdns = [for record in aws_acm_certificate.main.domain_validation_options : record.resource_record_name]
 
   depends_on = [
-    aws_route53_record.ecs
+    aws_route53_record.ecs_cname
   ]
 }
 

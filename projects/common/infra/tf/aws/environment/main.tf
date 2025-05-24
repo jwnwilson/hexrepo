@@ -144,6 +144,47 @@ module "common_api" {
 #   subdomain_name                  = local.api_subdomain_ecs
 # }
 
+module "common_ecs_alb" {
+  source = "../../../../../../infra/tf/aws/modules/ecs_alb"
+  project            = var.project
+  environment        = terraform.workspace
+  aws_region         = var.aws_region
+  vpc_id             = data.aws_vpc.hexrepo.id
+  private_subnet_ids = data.aws_subnets.private.ids
+  public_subnet_ids  = data.aws_subnets.public.ids
+  vpc_cidr_blocks    = [data.aws_vpc.hexrepo.cidr_block]
+  security_group_ids = [module.common_postgres.db_security_group_id]
+
+  ecr_url    = data.aws_ecr_repository.ecr_repo.repository_url
+  docker_tag = var.docker_tag
+  container_port    = 8000
+
+  environment_variables = {
+    ENVIRONMENT             = terraform.workspace
+    CLOUD_PROVIDER          = "AWS"
+    DB_URL                  = local.db_url
+    DB_RO_URL               = local.db_ro_url
+    READ_REPLICA_ENABLED    = "false"
+    DB_PASSWORD_SECRET_NAME = data.aws_secretsmanager_secret.db_secret.name
+    TASK_QUEUE              = "${var.project}_${terraform.workspace}_tasks"
+    CLIENT_ID               = module.common_auth.client_id
+    USER_POOL_ID            = module.common_auth.user_pool_id
+    ALLOWED_ORIGINS         = "*"
+    LOG_JSON                = "true" 
+    ORIGIN_URL              = "https://${local.api_subdomain_ecs}.${var.domain}"
+  }
+  secrets = {
+    DB_PASSWORD = data.aws_secretsmanager_secret.db_secret.arn
+  }
+
+  desired_count = 1
+  task_cpu      = 512
+  task_memory   = 1024
+
+  domain_name                     = var.domain
+  subdomain_name                  = local.api_subdomain_ecs
+}
+
 module "queue" {
   source = "../../../../../../infra/tf/aws/modules/sqs"
 
