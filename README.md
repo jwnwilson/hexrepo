@@ -37,11 +37,12 @@ Setup the following env vars directly or run:
 
 - Setup backend
     - Add ECS option (make default) to avoid cold startup and avoid aws lockin
-        - Fix CORS in ECS server
-        - Fix logging on ECS to be easily readable
+        - Debug why the api gateway breaks on deploy
+            - Docker tag not being passed to the tf apply
+            - keep making changes to api deployment which isn't needed
+        - Simplify to ALB -> ECS & keep more complex setup for record
+        - Move to GCP fuck AWS
         - Keep lambda gateway option / run both in parallel for the lols and compare
-            - Create serverless ECR + container ECR
-            - Parameterise deploy.sh to allow both deployments
     - Create orchestrator logic
         - Standard async tasks with celery + SQS + container
             - Keep serverless tasks as option

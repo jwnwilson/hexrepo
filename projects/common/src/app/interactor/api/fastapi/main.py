@@ -28,7 +28,11 @@ class RedirectMiddleware(BaseHTTPMiddleware):
         response = await call_next(request)
         if config.ORIGIN_URL and response.status_code in (301, 302, 303, 307, 308):
             # Workaround for AWS NLB redirecting to private DNS
-            response.headers["location"] = config.ORIGIN_URL
+            if response.headers.get("location"):
+                url_path = response.headers["location"].split(request.url.netloc)[1]
+                response.headers["location"] = config.ORIGIN_URL + url_path
+            else:
+                response.headers["location"] = config.ORIGIN_URL
         return response
 
 
