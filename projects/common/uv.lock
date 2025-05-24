@@ -274,7 +274,6 @@ dependencies = [
     { name = "alembic" },
     { name = "aws-xray-sdk" },
     { name = "boto3" },
-    { name = "boto3-stubs", extra = ["essential"] },
     { name = "fastapi" },
     { name = "gevent" },
     { name = "hexrepo-api" },
@@ -297,6 +296,7 @@ dependencies = [
 
 [package.dev-dependencies]
 dev = [
+    { name = "boto3-stubs", extra = ["essential"] },
     { name = "httpx" },
     { name = "locust" },
     { name = "mypy" },
@@ -314,7 +314,6 @@ requires-dist = [
     { name = "alembic", specifier = ">=1.13.3,<2.0.0" },
     { name = "aws-xray-sdk", specifier = ">=2.14.0" },
     { name = "boto3", specifier = ">=1.35.66,<2.0.0" },
-    { name = "boto3-stubs", extras = ["essential"], specifier = ">=1.35.86,<2.0.0" },
     { name = "fastapi", specifier = ">=0.115.8" },
     { name = "gevent", specifier = ">=24.10.3,<25.0.0" },
     { name = "hexrepo-api", editable = "../../libs/interactor/api" },
@@ -337,6 +336,7 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 dev = [
+    { name = "boto3-stubs", extras = ["essential"], specifier = ">=1.35.86,<2.0.0" },
     { name = "httpx", specifier = ">=0.27.2,<1.0.0" },
     { name = "locust", specifier = ">=2.32.8" },
     { name = "mypy", specifier = ">=1.13.0,<2.0.0" },

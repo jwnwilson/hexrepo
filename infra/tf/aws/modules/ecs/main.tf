@@ -522,7 +522,7 @@ resource "aws_api_gateway_integration" "proxy" {
 
   type                    = "HTTP_PROXY"
   integration_http_method = "ANY"
-  uri                     = "http://${aws_lb.main.dns_name}/{proxy}"
+  uri                     = "http://${aws_lb.main.dns_name}/{proxy}/"
   connection_type         = "VPC_LINK"
   connection_id           = aws_api_gateway_vpc_link.main.id
 
