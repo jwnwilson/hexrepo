@@ -19,6 +19,29 @@ resource "aws_s3_bucket" "lb_logs" {
   bucket = "${local.name}-alb-logs"
 }
 
+resource "aws_s3_bucket_policy" "lb_logs" {
+  bucket = aws_s3_bucket.lb_logs.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          AWS = "arn:aws:iam::${data.aws_elb_service_account.main.id}:root"
+        }
+        Action = [
+          "s3:PutObject"
+        ]
+        Resource = "${aws_s3_bucket.lb_logs.arn}/*"
+      }
+    ]
+  })
+}
+
+# Get the ELB account ID for the current region
+data "aws_elb_service_account" "main" {}
+
 # Appliacation Load Balancer
 resource "aws_lb" "main" {
   name               = "${local.name}-alb"
@@ -45,8 +68,18 @@ resource "aws_lb_target_group" "lb" {
   name        = "${local.name}-alb-tg"
   port        = var.container_port
   vpc_id      = var.vpc_id
+  target_type = "ip"
   protocol    = "HTTP"
 
+  health_check {
+    enabled             = true
+    healthy_threshold   = 3
+    interval            = 30
+    protocol            = "HTTP"
+    port                = "traffic-port"
+    timeout             = 5
+    unhealthy_threshold = 3
+  }
   tags = {
     Name        = "${local.name}-alb-tg"
     Environment = var.environment
@@ -55,18 +88,22 @@ resource "aws_lb_target_group" "lb" {
 }
 
 # Update the listener to use the new certificate
-resource "aws_lb_listener" "main" {
+resource "aws_lb_listener" "http" {
   load_balancer_arn = aws_lb.main.arn
   port              = 80
   protocol          = "HTTP"
 
   default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.lb.arn
+    type = "redirect"
+    redirect {
+      port        = "443"
+      protocol    = "HTTPS"
+      status_code = "HTTP_301"
+    }
   }
 }
 
-resource "aws_lb_listener" "front_end" {
+resource "aws_lb_listener" "https" {
   load_balancer_arn = aws_lb.main.arn
   port              = "443"
   protocol          = "HTTPS"
@@ -77,6 +114,11 @@ resource "aws_lb_listener" "front_end" {
     type             = "forward"
     target_group_arn = aws_lb_target_group.lb.arn
   }
+
+  depends_on = [
+    aws_acm_certificate_validation.main,
+    aws_lb.main
+  ]
 }
 
 data "aws_route53_zone" "api_zone" {
@@ -93,7 +135,7 @@ resource "aws_route53_record" "ecs_cname" {
 
 # ACM Certificate
 resource "aws_acm_certificate" "main" {
-  provider = aws.us-east-1
+  # provider = aws.us-east-1
   domain_name       = "${var.subdomain_name}.${var.domain_name}"
   validation_method = "DNS"
 
@@ -110,7 +152,7 @@ resource "aws_acm_certificate" "main" {
 
 # Certificate Validation
 resource "aws_acm_certificate_validation" "main" {
-  provider = aws.us-east-1
+  # provider = aws.us-east-1
   certificate_arn         = aws_acm_certificate.main.arn
   validation_record_fqdns = [for record in aws_acm_certificate.main.domain_validation_options : record.resource_record_name]
 
@@ -206,7 +248,7 @@ resource "aws_ecs_service" "main" {
     container_port   = var.container_port
   }
   network_configuration {
-    subnets          = var.public_subnet_ids
+    subnets          = var.private_subnet_ids
     security_groups  = concat([aws_security_group.ecs_tasks.id], var.security_group_ids)
     assign_public_ip = false
   }
@@ -220,7 +262,8 @@ resource "aws_ecs_service" "main" {
   depends_on = [
     aws_lb.main,
     aws_lb_target_group.lb,
-    aws_lb_listener.main
+    aws_lb_listener.http,
+    # aws_lb_listener.https
   ]
 }
 
@@ -274,6 +317,13 @@ resource "aws_security_group" "lb" {
     protocol    = "tcp"
     from_port   = 80
     to_port     = 80
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    protocol    = "tcp"
+    from_port   = 443
+    to_port     = 443
     cidr_blocks = ["0.0.0.0/0"]
   }
 

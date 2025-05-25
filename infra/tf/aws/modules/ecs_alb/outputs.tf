@@ -38,7 +38,12 @@ output "log_group_name" {
   value       = aws_cloudwatch_log_group.main.name
 } 
 
-output "aws_lb_listener_arn" {
+output "aws_lb_http_listener_arn" {
   description = "The ARN of the AWS Load Balancer Listener"
-  value       = aws_lb_listener.main.arn
+  value       = aws_lb_listener.http.arn
 }
+
+# output "aws_lb_https_listener_arn" {
+#   description = "The ARN of the AWS Load Balancer Listener"
+#   value       = aws_lb_listener.https.arn
+# }
