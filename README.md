@@ -37,9 +37,6 @@ Setup the following env vars directly or run:
 
 - Setup backend
     - Add ECS option (make default) to avoid cold startup and avoid aws lockin
-        - Fix http instead of https static resources from /admin
-            - log headers in request ensure they are passed through
-            - validate they are used correctly
         - Docker tag not being passed to the tf apply
             - Move to hextech
         - Keep lambda gateway option / run both in parallel
