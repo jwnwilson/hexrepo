@@ -37,11 +37,10 @@ Setup the following env vars directly or run:
 
 - Setup backend
     - Add ECS option (make default) to avoid cold startup and avoid aws lockin
-        - Simplify to ALB -> ECS
-            - create new infra setup module
+        - Fix http instead of https static resources from /admin
         - Docker tag not being passed to the tf apply
             - Move to hextech
-        - Keep lambda gateway option / run both in parallel for the lols and compare
+        - Keep lambda gateway option / run both in parallel
     - Create orchestrator logic
         - Standard async tasks with celery + SQS + container
             - Keep serverless tasks as option
