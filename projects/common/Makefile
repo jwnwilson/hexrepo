@@ -130,9 +130,12 @@ tf_output: tf_workspace
 	@cd infra/tf/aws/environment && terraform output -json
 
 deploy: build tf_workspace
-	PROJECT=common NO_INPUT=$(NO_INPUT) ENVIRONMENT=$(ENVIRONMENT) ../../tools/bash_scripts/deploy.sh
-	PROJECT=common-lambda NO_INPUT=$(NO_INPUT) ENVIRONMENT=$(ENVIRONMENT) ../../tools/bash_scripts/deploy.sh
-	make tf_apply_no_input
+	hextech deploy-projects $(ENVIRONMENT) --no-input --projects=common
+	PROJECT=common NO_INPUT=$(NO_INPUT) ENVIRONMENT=$(ENVIRONMENT) ../../tools/bash_scripts/build_push.sh
+	PROJECT=common-lambda NO_INPUT=$(NO_INPUT) ENVIRONMENT=$(ENVIRONMENT) ../../tools/bash_scripts/build_push.sh
+	make tf_apply_no_input TARGET=module.common_ecs_api
+	make tf_apply_no_input TARGET=module.common_api
+	make tf_apply_no_input TARGET=module.common_tasks
 
 bastion: venv
 	@echo "Activating bastion port forwarding..."

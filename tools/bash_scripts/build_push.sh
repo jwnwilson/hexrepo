@@ -21,8 +21,3 @@ docker tag "${latest_image}" "${aws_ecr}/${ecr_repo_name}:${docker_tag}"
 docker push "${aws_ecr}/${ecr_repo_name}:latest"
 docker push "${aws_ecr}/${ecr_repo_name}:${docker_tag}"
 
-if [ "${NO_INPUT}" == "True" ]; then
-    make tf_apply_no_input TF_VAR_docker_tag=${docker_tag} TARGET=${TARGET}
-else
-    make tf_apply TF_VAR_docker_tag=${docker_tag} TARGET=${TARGET}
-fi
