@@ -12,6 +12,7 @@ TF_VAR_aws_region=${AWS_DEFAULT_REGION}
 VENV := .venv
 MKFILE_DIR := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 VENV_DIR = $(MKFILE_DIR)$(VENV)
+TARGETS := ${TARGETS}
 
 # Setup commands
 venv:
@@ -105,23 +106,23 @@ tf_setup: tf_init
 
 tf_plan:
 	@echo "Planning Terraform infra"
-	cd infra/tf/aws/shared  && terraform plan
-	cd infra/tf/aws/environment && terraform plan
+	cd infra/tf/aws/shared  && terraform plan $(TARGETS)
+	cd infra/tf/aws/environment && terraform plan $(TARGETS)
 
 tf_apply:
 	@echo "Applying Terraform infra"
-	cd infra/tf/aws/shared && terraform apply
-	cd infra/tf/aws/environment && terraform apply
+	cd infra/tf/aws/shared && terraform apply $(TARGETS) 
+	cd infra/tf/aws/environment && terraform apply $(TARGETS)
 	
 
 tf_apply_no_input:
 	@echo "Applying Terraform infra"
-	cd infra/tf/aws/shared && terraform apply -auto-approve
-	cd infra/tf/aws/environment && terraform apply -auto-approve
+	cd infra/tf/aws/shared && terraform apply -auto-approve $(TARGETS)
+	cd infra/tf/aws/environment && terraform apply -auto-approve $(TARGETS)
 
 tf_destroy:
 	@echo "Destroying Terraform infra"
-	cd infra/tf/aws/environment  && terraform destroy -target=module.common_ecs_alb.aws_ecs_task_definition.main
+	cd infra/tf/aws/environment  && terraform destroy $(TARGETS)
 
 tf_refresh: tf_workspace
 	@cd infra/tf/aws/environment && terraform refresh
@@ -129,13 +130,13 @@ tf_refresh: tf_workspace
 tf_output: tf_workspace
 	@cd infra/tf/aws/environment && terraform output -json
 
-deploy: build tf_workspace
-	hextech deploy-projects $(ENVIRONMENT) --no-input --projects=common
-	PROJECT=common NO_INPUT=$(NO_INPUT) ENVIRONMENT=$(ENVIRONMENT) ../../tools/bash_scripts/build_push.sh
-	PROJECT=common-lambda NO_INPUT=$(NO_INPUT) ENVIRONMENT=$(ENVIRONMENT) ../../tools/bash_scripts/build_push.sh
-	make tf_apply_no_input TARGET=module.common_ecs_api
-	make tf_apply_no_input TARGET=module.common_api
-	make tf_apply_no_input TARGET=module.common_tasks
+# deploy: build tf_workspace
+# 	hextech deploy-projects $(ENVIRONMENT) --no-input --projects=common
+# 	PROJECT=common NO_INPUT=$(NO_INPUT) ENVIRONMENT=$(ENVIRONMENT) ../../tools/bash_scripts/build_push.sh
+# 	PROJECT=common-lambda NO_INPUT=$(NO_INPUT) ENVIRONMENT=$(ENVIRONMENT) ../../tools/bash_scripts/build_push.sh
+# 	make tf_apply_no_input TARGET=module.common_ecs_api
+# 	make tf_apply_no_input TARGET=module.common_api
+# 	make tf_apply_no_input TARGET=module.common_tasks
 
 bastion: venv
 	@echo "Activating bastion port forwarding..."

@@ -16,6 +16,7 @@ from hextech.domain.project import (
     get_modified_projects,
     get_projects,
     get_projects_usings_libraries,
+    build_push_deploy
 )
 from hextech.domain.system import run_system_command, run_system_command_with_output
 
@@ -104,10 +105,9 @@ def deploy_projects(
             with chdir(f"projects/{proj}"):
                 typer.echo(f"Deploying project {proj}...")
                 run_system_command("make tf_init")
-                # Build and push images
-                # Deploy api / tasks
-                # Get list of deployables from project
-                run_system_command(f"make deploy ENVIRONMENT={env} NO_INPUT={no_input}")
+                # Build, push images and deploy
+                build_push_deploy()
+
     # Placeholder for publishing libraries to repo
     typer.echo("Projects deployed successfully.")
 

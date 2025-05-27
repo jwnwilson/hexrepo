@@ -6,7 +6,7 @@ from contextlib import chdir
 from typing import List, Optional, Set
 
 import typer
-
+import yaml
 from .system import run_system_command
 
 
@@ -152,3 +152,27 @@ def install_library_in_project(library: str, project: str):
     with chdir(f"projects/{project}"):
         run_system_command(f"uv add --editable ../../libs/{library_type}/{library}")
     typer.echo(f"Library {library} installed in project {project}")
+
+
+def build_push_deploy():
+    # Load project config
+    with open("hexproject.yaml") as f:
+        project_config = yaml.safe_load(f)
+
+    run_system_command(f"make build")
+
+    docker_tag: str = subprocess.getoutput("git log -n1 --pretty='format:%cd' --date=format:'%Y%m%d%H%M%S'")
+
+    # Get build and push images
+    for deployment in project_config["deployments"]:
+        container_image = deployment["container_image"]
+        typer.echo(f"Building and pushing image {container_image}:{docker_tag}")
+        run_system_command(f"IMAGE={container_image} DOCKER_TAG={docker_tag} NO_INPUT=$(NO_INPUT) ../../tools/bash_scripts/build_push.sh")
+    
+    # Deploy images
+    for deployment in project_config["deployments"]:
+        container_image = deployment["container_image"]
+        targets: list[str] = deployment["targets"]
+        targets_command: list[str] = " ".join([f"--target={target}" for target in targets])
+        typer.echo(f"Deploying image {container_image}:{docker_tag}")
+        run_system_command(f"DOCKER_TAG={docker_tag} TARGETS={targets_command} NO_INPUT=$(NO_INPUT) ../../tools/bash_scripts/deploy.sh")
