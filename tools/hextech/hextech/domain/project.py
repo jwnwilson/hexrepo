@@ -159,15 +159,16 @@ def build_push_deploy():
     with open("hexproject.yaml") as f:
         project_config = yaml.safe_load(f)
 
+    # Build images
     run_system_command(f"make build")
 
     docker_tag: str = subprocess.getoutput("git log -n1 --pretty='format:%cd' --date=format:'%Y%m%d%H%M%S'")
 
-    # Get build and push images
+    # Push images
     for deployment in project_config["deployments"]:
         container_image = deployment["container_image"]
         typer.echo(f"Building and pushing image {container_image}:{docker_tag}")
-        run_system_command(f"IMAGE={container_image} DOCKER_TAG={docker_tag} NO_INPUT=$(NO_INPUT) ../../tools/bash_scripts/build_push.sh")
+        run_system_command(f"IMAGE={container_image} DOCKER_TAG={docker_tag} ../../tools/bash_scripts/push_image.sh")
     
     # Deploy images
     for deployment in project_config["deployments"]:
@@ -175,4 +176,4 @@ def build_push_deploy():
         targets: list[str] = deployment["targets"]
         targets_command: list[str] = " ".join([f"--target={target}" for target in targets])
         typer.echo(f"Deploying image {container_image}:{docker_tag}")
-        run_system_command(f"DOCKER_TAG={docker_tag} TARGETS={targets_command} NO_INPUT=$(NO_INPUT) ../../tools/bash_scripts/deploy.sh")
+        run_system_command(f"DOCKER_TAG={docker_tag} TARGETS='{targets_command}' NO_INPUT=True ../../tools/bash_scripts/deploy.sh")

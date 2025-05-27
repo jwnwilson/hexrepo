@@ -84,7 +84,7 @@ def deploy_projects(
     check_modified: bool = False,
     no_input: bool = False,
 ) -> None:
-    typer.echo("Publishing projects to repo...")
+    typer.echo(f"Publishing projects: {projects}...")
     project_root: str = find_repo_root()
     with chdir(project_root):
         # Publish all libraries if none specified

@@ -16,8 +16,6 @@ fi
 # Docker login
 aws ecr get-login-password --region eu-west-1 | docker login --username AWS --password-stdin 675468650888.dkr.ecr.eu-west-1.amazonaws.com
 
-docker compose build
-
 region="eu-west-1"
 aws_ecr="675468650888.dkr.ecr.eu-west-1.amazonaws.com"
 ecr_repo_name="hexrepo-${IMAGE}"
