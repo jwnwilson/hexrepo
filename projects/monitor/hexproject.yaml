@@ -1,0 +1,6 @@
+deployments:
+  - hextech-monitor-lambda:
+    container_image: monitor-lambda
+    targets:
+      - module.monitor_api
+      - module.monitor_tasks

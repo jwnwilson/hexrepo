@@ -1,0 +1,6 @@
+deployments:
+  - hextech-example-lambda:
+    container_image: example-lambda
+    targets:
+      - module.example_api
+      - module.example_tasks

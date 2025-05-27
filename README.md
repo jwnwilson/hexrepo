@@ -37,13 +37,8 @@ Setup the following env vars directly or run:
 
 - Setup backend
     - Add ECS option (make default) to avoid cold startup and avoid aws lockin
-        - Docker tag not being passed to the tf apply
-            - Move to hextech
-            - Add project config file to use during deployments
-            - Break up build and push images to deploy command
-                - Seperate tf vars for different docker image types
+        - Avoid ECS latest image deploy during infra apply
         - Add esc exec cli command
-        - Keep lambda gateway option / run both in parallel
     - Create orchestrator logic
         - Standard async tasks with celery + SQS + container
             - Keep serverless tasks as option
@@ -93,7 +88,7 @@ Setup the following env vars directly or run:
         - Store data in graph format and visualise it
         - Categorise PLP pages
         - Fan out and crawl web page PDP page contents
-    - Add ability to disable / turn off / turn onn projects
+    - Add ability to disable / turn off / turn on projects
     - Improve docker container builds
         - Reduce image size
             https://github.com/astral-sh/uv/issues/8935
