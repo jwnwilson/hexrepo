@@ -39,8 +39,9 @@ Setup the following env vars directly or run:
     - Add ECS option (make default) to avoid cold startup and avoid aws lockin
         - Docker tag not being passed to the tf apply
             - Move to hextech
-            - Add project config env vars to use during deployments
+            - Add project config file to use during deployments
             - Break up build and push images to deploy command
+                - Seperate tf vars for different docker image types
         - Add esc exec cli command
         - Keep lambda gateway option / run both in parallel
     - Create orchestrator logic
