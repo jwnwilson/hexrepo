@@ -4,7 +4,7 @@ authors = [
 ]
 requires-python = "<4.0,>=3.12"
 name = "hexrepo_api"
-version = "0.1.19"
+version = "0.1.20"
 description = "A short description of the project"
 readme = "README.md"
 dependencies = [
@@ -13,6 +13,7 @@ dependencies = [
     "fastapi<1.0.0,>=0.115.4",
     "hexrepo-db",
     "hexrepo-log",
+    "aws-xray-sdk>=2.14.0",
 ]
 
 [tool.uv.sources]

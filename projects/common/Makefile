@@ -12,6 +12,7 @@ TF_VAR_aws_region=${AWS_DEFAULT_REGION}
 VENV := .venv
 MKFILE_DIR := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 VENV_DIR = $(MKFILE_DIR)$(VENV)
+TARGETS := ${TARGETS}
 
 # Setup commands
 venv:
@@ -33,10 +34,10 @@ db_migrate_local:
 	bash -c "env $$(cat env/local.env|xargs) uv run alembic upgrade head"
 
 db_migrate_docker:
-	docker compose run api bash -c "alembic upgrade head"
+	docker compose run api sh -c "alembic upgrade head"
 
 db_delete_data:
-	docker compose run db bash -c "rm -rf /var/lib/postgresql/data/*"
+	docker compose run db sh -c "rm -rf /var/lib/postgresql/data/*"
 
 db_downgrade:
 	bash -c "uv run alembic downgrade -1"
@@ -95,8 +96,8 @@ tf_init:
 	@echo "Initializing Terraform infra"
 	@rm -rf ./infra/tf/aws/shared/.terraform
 	@rm -rf ./infra/tf/aws/environment/.terraform
-	cd infra/tf/aws/shared  && terraform init -input=false
-	cd infra/tf/aws/environment  && terraform init -input=false
+	cd infra/tf/aws/shared  && terraform init -input=false -upgrade
+	cd infra/tf/aws/environment  && terraform init -input=false -upgrade
 
 tf_setup: tf_init
 	@echo "Applying Inital project Terraform infra"
@@ -106,22 +107,21 @@ tf_setup: tf_init
 tf_plan:
 	@echo "Planning Terraform infra"
 	cd infra/tf/aws/shared  && terraform plan
-	cd infra/tf/aws/environment && terraform plan
+	cd infra/tf/aws/environment && terraform plan $(TARGETS)
 
 tf_apply:
 	@echo "Applying Terraform infra"
 	cd infra/tf/aws/shared && terraform apply
-	cd infra/tf/aws/environment  && terraform apply
+	cd infra/tf/aws/environment && terraform apply $(TARGETS)
 
 tf_apply_no_input:
 	@echo "Applying Terraform infra"
-	cd infra/tf/aws/shared && terraform apply -auto-approve
-	cd infra/tf/aws/environment && terraform apply -auto-approve
+	cd infra/tf/aws/shared && terraform apply -auto-approve 
+	cd infra/tf/aws/environment && terraform apply -auto-approve $(TARGETS)
 
 tf_destroy:
 	@echo "Destroying Terraform infra"
-	cd infra/tf/aws/environment  && terraform destroy
-	cd infra/tf/aws/shared  && terraform destroy
+	cd infra/tf/aws/environment  && terraform destroy $(TARGETS)
 
 tf_refresh: tf_workspace
 	@cd infra/tf/aws/environment && terraform refresh
@@ -129,8 +129,8 @@ tf_refresh: tf_workspace
 tf_output: tf_workspace
 	@cd infra/tf/aws/environment && terraform output -json
 
-deploy: build tf_workspace
-	PROJECT=common NO_INPUT=$(NO_INPUT) ENVIRONMENT=$(ENVIRONMENT) ../../tools/bash_scripts/deploy.sh 
+deploy:
+	hextech deploy-projects $(ENVIRONMENT) --no-input --projects=common
 
 bastion: venv
 	@echo "Activating bastion port forwarding..."

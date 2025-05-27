@@ -20,28 +20,9 @@ venv:
 build:
 	docker compose build
 
-# DB management
-db_migrate:
-	bash -c "source $(VENV_DIR)/bin/activate && alembic upgrade head" ;\
-	EXIT_CODE=$$?;\
-    exit $$EXIT_CODE
-
-db_migrate_docker:
-	docker compose run api bash -c "alembic upgrade head"
-
-db_delete_data: down
-	docker compose run postgres_db bash -c "rm -rf /var/lib/postgresql/data/*"
-
-db_upgrade: db_migrate down
-
-db_downgrade: down
-	bash -c "source $(VENV_DIR)/bin/activate && alembic downgrade -1"
-
-db_create_migration: down
-	bash -c "source $(VENV_DIR)/bin/activate && alembic revision --autogenerate -m \"DB migration\""
-
 db:
-	docker compose run --service-ports -d postgres_db 
+	echo "DB not needed in monitor project"
+	# docker compose run --service-ports -d postgres_db 
 
 down:
 	docker compose down
@@ -90,8 +71,8 @@ tf_init:
 	@echo "Initializing Terraform infra"
 	@rm -rf ./infra/tf/aws/shared/.terraform
 	@rm -rf ./infra/tf/aws/environment/.terraform
-	cd infra/tf/aws/shared  && terraform init -input=false
-	cd infra/tf/aws/environment  && terraform init -input=false
+	cd infra/tf/aws/shared  && terraform init -input=false -upgrade
+	cd infra/tf/aws/environment  && terraform init -input=false -upgrade
 
 tf_setup: tf_init
 	@echo "Applying Inital project Terraform infra"

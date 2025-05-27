@@ -9,6 +9,7 @@ from hextech.config import HexrepoConfig
 from hextech.domain.infra.bastion import db_exists, managed_bastion_ssh
 from hextech.domain.infra.code_repo import authenticate_lib_repo
 from hextech.domain.project import (
+    build_push_deploy,
     find_repo_root,
     get_libraries,
     get_library_type,
@@ -83,7 +84,7 @@ def deploy_projects(
     check_modified: bool = False,
     no_input: bool = False,
 ) -> None:
-    typer.echo("Publishing projects to repo...")
+    typer.echo(f"Publishing projects: {projects}...")
     project_root: str = find_repo_root()
     with chdir(project_root):
         # Publish all libraries if none specified
@@ -104,7 +105,9 @@ def deploy_projects(
             with chdir(f"projects/{proj}"):
                 typer.echo(f"Deploying project {proj}...")
                 run_system_command("make tf_init")
-                run_system_command(f"make deploy ENVIRONMENT={env} NO_INPUT={no_input}")
+                # Build, push images and deploy
+                build_push_deploy()
+
     # Placeholder for publishing libraries to repo
     typer.echo("Projects deployed successfully.")
 

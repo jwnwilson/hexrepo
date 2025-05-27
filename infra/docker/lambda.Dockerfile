@@ -11,7 +11,7 @@ COPY ./libs /libs
 COPY ./projects/${PROJECT}/pyproject.toml ./projects/${PROJECT}/uv.lock* ./projects/${PROJECT}/README.md ${LAMBDA_TASK_ROOT}/
 
 # Allow installing dev dependencies to run tests
-RUN uv export --group aws > requirements.txt && uv pip install -r requirements.txt --system
+RUN uv export > requirements.txt && uv pip install -r requirements.txt --system
 
 COPY ./projects/${PROJECT}/src ./src
 COPY ./projects/${PROJECT}/alembic.ini ./

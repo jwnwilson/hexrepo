@@ -15,9 +15,14 @@ provider "aws" {
   region  = var.aws_region
 }
 
-module "example_ecr" {
+module "common_ecr_container" {
   source = "../../../../../../infra/tf/aws/modules/ecr"
   project           = "hexrepo-${var.project}"
+}
+
+module "common_ecr_lambda" {
+  source = "../../../../../../infra/tf/aws/modules/ecr"
+  project           = "hexrepo-${var.project}-lambda"
 }
 
 # Add url domain infra here 

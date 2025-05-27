@@ -37,18 +37,22 @@ Setup the following env vars directly or run:
 
 - Setup backend
     - Add ECS option (make default) to avoid cold startup and avoid aws lockin
-        - blue green deployments
-        - prod image that is fast to deploy on all envs
+        - Docker tag not being passed to the tf apply
+            - Move to hextech
+            - Add project config file to use during deployments
+            - Break up build and push images to deploy command
+                - Seperate tf vars for different docker image types
+        - Add esc exec cli command
+        - Keep lambda gateway option / run both in parallel
     - Create orchestrator logic
-        - Investigate better fire and forget task setup like run 1 off ECS / GCP job with task status update?
         - Standard async tasks with celery + SQS + container
+            - Keep serverless tasks as option
+        - Setup airflow / prefect on ECS / EC2
         - Setup task tracking debugging UI
             - Flower? 
             - Airflow?
-        - Setup ECS for long running async orchestrator on fargate
-            - Schedule this to turn off when not in use
-        - Setup Idempotent re-run
     - Add monitoring dashboard for services
+        - Look at graphana?
         - Generic change log syncing to tracking metrics
         - Add log based event tracking
         - Change data capture streaming to data warehouse
@@ -57,12 +61,19 @@ Setup the following env vars directly or run:
         - Latency tracking and visualisation
         - Setup BI dashboard
         - Setup sonarqube
+    - monolith / multiteam setup
+        - team folders
+        - Remove lib type
+        - tach: https://github.com/gauge-sh/tach
+        - https://roman.pt/posts/python-architecture-linter/
+        - restricting adaptors imports to a dependencies module
+    - blue green deployments via load balancer
     - Setup multienv
         - Enable disable project via admin
         - Create staging and prod envs
         - Simplify feature flags to be for one env
         - feature flag env -> company flag env
-    - Disable example project
+    - Improve pipeline yaml, update cli commands to update yaml to add and remove projects
     - Copier
         - Support no db and uncomment test
         - Support nosql db and uncomment test
@@ -74,19 +85,15 @@ Setup the following env vars directly or run:
         - Optimise feature flag endpoint with a db view caching or something
     - Setup simple FE with auth?
         - Create apps folder for FE
+        - User Event tracking
         - Add turborepo with auth
-    - Enforce architecture rules:
-        - Remove lib type
-        - tach: https://github.com/gauge-sh/tach
-        - https://roman.pt/posts/python-architecture-linter/
-        - restricting adaptors imports to a dependencies module
     - Play with AI crawler project 
         - Setup crawl spider for PLP pages
         - Cache all page data to avoid recrawls
         - Store data in graph format and visualise it
         - Categorise PLP pages
         - Fan out and crawl web page PDP page contents
-    - Add ability to disable / destroy projects
+    - Add ability to disable / turn off / turn onn projects
     - Improve docker container builds
         - Reduce image size
             https://github.com/astral-sh/uv/issues/8935

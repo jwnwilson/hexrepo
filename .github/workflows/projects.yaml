@@ -28,7 +28,7 @@ jobs:
     strategy:
       matrix:
         project:
-        - "projects/example"
+        # - "projects/example"
         - "projects/monitor"
         - "projects/common"
     runs-on: ubuntu-latest
@@ -57,7 +57,7 @@ jobs:
             echo "skip=true" >> $GITHUB_OUTPUT
         fi
     - name: Start Test DB
-      if: matrix.project == 'projects/example' && steps.check_modified.outputs.skip == 'false'
+      if: steps.check_modified.outputs.skip == 'false'
       working-directory: ${{ matrix.project }}
       run: |
         make db
@@ -72,7 +72,7 @@ jobs:
     strategy:
       matrix:
         project:
-        - "projects/example"
+        # - "projects/example"
         - "projects/monitor"
         - "projects/common"
     runs-on: ubuntu-latest
@@ -129,7 +129,7 @@ jobs:
       fail-fast: false
       matrix:
         project:
-          - "projects/example"
+          # - "projects/example"
           - "projects/monitor"
           - "projects/common"
         env:
