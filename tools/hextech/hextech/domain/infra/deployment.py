@@ -9,6 +9,7 @@ from hextech.config import HexrepoConfig
 from hextech.domain.infra.bastion import db_exists, managed_bastion_ssh
 from hextech.domain.infra.code_repo import authenticate_lib_repo
 from hextech.domain.project import (
+    build_push_deploy,
     find_repo_root,
     get_libraries,
     get_library_type,
@@ -16,7 +17,6 @@ from hextech.domain.project import (
     get_modified_projects,
     get_projects,
     get_projects_usings_libraries,
-    build_push_deploy
 )
 from hextech.domain.system import run_system_command, run_system_command_with_output
 
