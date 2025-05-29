@@ -43,9 +43,9 @@ Setup the following env vars directly or run:
     - Create orchestrator logic
         - Standard async tasks with celery + SQS + container
             - Keep serverless tasks as option
+        - Setup Flower 
         - Setup airflow / prefect on ECS / EC2
         - Setup task tracking debugging UI
-            - Flower? 
             - Airflow?
     - Lambda keep warm events are probably using event free quota
     - Move to GCP for cost reasons
