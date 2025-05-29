@@ -37,7 +37,8 @@ Setup the following env vars directly or run:
 
 - Setup backend
     - Add ECS option (make default) to avoid cold startup and avoid aws lockin
-        - Avoid ECS latest image deploy during infra apply
+        - Avoid double ECS deploy, latest image deploy during infra apply
+            - Store the latest docker tags in a file in a bucket?
         - Add esc exec cli command
     - Create orchestrator logic
         - Standard async tasks with celery + SQS + container
@@ -46,6 +47,9 @@ Setup the following env vars directly or run:
         - Setup task tracking debugging UI
             - Flower? 
             - Airflow?
+    - Lambda keep warm events are probably using event free quota
+    - Move to GCP for cost reasons
+        - Use 3rd party auth provider to avoid vender locking?
     - Add monitoring dashboard for services
         - Look at graphana?
         - Generic change log syncing to tracking metrics

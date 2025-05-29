@@ -22,6 +22,7 @@ locals {
   api_subdomain     = "common-${terraform.workspace}"
   api_subdomain_ecs = "common-${terraform.workspace}-ecs"
   app_url           = "https://${local.api_subdomain}.${var.domain}"
+  lambda_docker_tag = var.docker_tag != "" ? var.docker_tag : module.common_api.docker_tag
 }
 
 provider "aws" {
@@ -178,8 +179,8 @@ module "common_ecs_alb" {
   }
 
   desired_count = 1
-  task_cpu      = 512
-  task_memory   = 1024
+  task_cpu      = 0.25
+  task_memory   = 512
 
   domain_name                     = var.domain
   subdomain_name                  = local.api_subdomain_ecs

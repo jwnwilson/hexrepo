@@ -241,6 +241,7 @@ resource "aws_ecs_service" "main" {
   task_definition = aws_ecs_task_definition.main.arn
   desired_count   = var.desired_count
   launch_type     = "FARGATE"
+  enable_execute_command = true
 
   load_balancer {
     target_group_arn = aws_lb_target_group.lb.arn
@@ -393,6 +394,16 @@ resource "aws_iam_role_policy" "ecs_task_execution_secrets" {
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "ssmmessages:CreateControlChannel",
+          "ssmmessages:CreateDataChannel",                
+          "ssmmessages:OpenControlChannel",                 
+          "ssmmessages:OpenDataChannel"
+        ]
+        Resource = "*"
+      }
       {
         Effect = "Allow"
         Action = [
