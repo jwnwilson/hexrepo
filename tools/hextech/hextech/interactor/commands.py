@@ -9,11 +9,13 @@ from typing_extensions import Annotated
 from hextech.config import HexrepoConfig, get_or_create_config
 from hextech.domain.infra.bastion import bastion_ssh_tunnel
 from hextech.domain.infra.deployment import (
-    create_env_infra,
+    apply_env_infra,
     create_shared_infra,
     destroy_env_infra,
     destroy_shared_infra,
     plan_env_infra_command,
+    project_infra_apply,
+    project_infra_plan,
     publish_libs,
     shared_infra_apply_command,
     shared_infra_plan_command,
@@ -67,7 +69,7 @@ def setup():
     if prompt_setup_shared_infra():
         create_shared_infra(config)
         for env in config.environments:
-            create_env_infra(config, env)
+            apply_env_infra(config, env)
 
 
 @cli_setup
@@ -140,10 +142,10 @@ def env_infra_plan(env: str):
 
 
 @cli_setup
-def env_infra_apply(env: str):
+def env_infra_apply(env: str, no_input: bool = True):
     config: HexrepoConfig
-    config, _ = get_or_create_config(no_input=True)
-    create_env_infra(config, env, no_input=True)
+    config, _ = get_or_create_config(no_input=no_input)
+    apply_env_infra(config, env, no_input=no_input)
 
 
 @cli_setup
@@ -210,12 +212,7 @@ def check_project_modified(project: str):
     typer.echo(f"Project: '{project}' unmodified...")
 
 
-@cli_setup
-def bump_library_version():
-    library: str = prompt_library()
-    typer.echo(f"Bumping version for {library} library...")
-    lib_type: str = get_library_type(library)
-    # Work around to bump uv version until uv version managment function is added
+def _bump_library_version(library: str, lib_type: str):
     run_system_command(
         f"""cd libs/{lib_type}/{library} && \\
         VERSION=$(uvx --from=toml-cli toml get --toml-path=pyproject.toml project.version) && \\
@@ -223,6 +220,24 @@ def bump_library_version():
         uvx --from=toml-cli toml set --toml-path=pyproject.toml project.version $VERSION
         """
     )
+
+@cli_setup
+def bump_library_version():
+    library: str = prompt_library()
+    typer.echo(f"Bumping version for {library} library...")
+    lib_type: str = get_library_type(library)
+    # Work around to bump uv version until uv version managment function is added
+    _bump_library_version(library, lib_type)
+
+
+@cli_setup
+def bump_all_library_versions():
+    all_libraries: List[str] = get_libraries()
+    for library in all_libraries:
+        typer.echo(f"Bumping version for {library} library...")
+        lib_type: str = get_library_type(library)
+        # Work around to bump uv version until uv version managment function is added
+        _bump_library_version(library, lib_type)
 
 
 @cli_setup
@@ -254,6 +269,20 @@ def deploy_libs(
         libraries = libraries.remove("")
 
     publish_libs(config, libraries=libraries, check_modified=check_modified)
+
+
+@cli_setup
+def infra_plan_project(env: str, project: str):
+    config: HexrepoConfig
+    config, _ = get_or_create_config(no_input=True)
+    project_infra_plan(config, env, project)
+
+
+@cli_setup
+def infra_apply_project(env: str, project: str, no_input: bool = False):
+    config: HexrepoConfig
+    config, _ = get_or_create_config(no_input=True)
+    project_infra_apply(config, env, project)
 
 
 @cli_setup

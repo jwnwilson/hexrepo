@@ -11,6 +11,7 @@ from hextech.domain.infra.code_repo import authenticate_lib_repo
 from hextech.domain.project import (
     build_push_deploy,
     find_repo_root,
+    get_docker_tags,
     get_libraries,
     get_library_type,
     get_modified_libraries,
@@ -77,6 +78,37 @@ def publish_libs(
     typer.echo("Libraries published successfully.")
 
 
+def project_infra_plan(config: HexrepoConfig, env: str, project: str) -> None:
+    project_root: str = find_repo_root()
+    # Get existing docker tags
+    docker_tags: dict[str, str] = get_docker_tags(env)
+    with chdir(project_root):
+        with chdir(f"projects/{project}"):
+            run_system_command("make tf_init")
+            run_system_command(
+                f"make tf_plan TF_VAR_docker_tag_container={docker_tags['container']} TF_VAR_docker_tag_serverless={docker_tags['serverless']}"
+            )
+
+
+def project_infra_apply(
+    config: HexrepoConfig, env: str, project: str, no_input: bool = False
+) -> None:
+    project_root: str = find_repo_root()
+    # Get existing docker tags
+    docker_tags: dict[str, str] = get_docker_tags(env)
+    with chdir(project_root):
+        with chdir(f"projects/{project}"):
+            run_system_command("make tf_init")
+            if no_input:
+                run_system_command(
+                    f"make tf_apply_no_input TF_VAR_docker_tag_container={docker_tags['container']} TF_VAR_docker_tag_serverless={docker_tags['serverless']}"
+                )
+            else:
+                run_system_command(
+                    f"make tf_apply TF_VAR_docker_tag_container={docker_tags['container']} TF_VAR_docker_tag_serverless={docker_tags['serverless']}"
+                )
+
+
 def deploy_projects(
     env: str,
     config: HexrepoConfig,
@@ -106,7 +138,7 @@ def deploy_projects(
                 typer.echo(f"Deploying project {proj}...")
                 run_system_command("make tf_init")
                 # Build, push images and deploy
-                build_push_deploy()
+                build_push_deploy(env)
 
     # Placeholder for publishing libraries to repo
     typer.echo("Projects deployed successfully.")
@@ -166,8 +198,8 @@ def plan_env_infra_command(config: HexrepoConfig, env: str) -> None:
     typer.echo("Shared infrastructure plan complete.")
 
 
-def create_env_infra(config: HexrepoConfig, env: str, no_input: bool = False) -> None:
-    typer.echo("Applying shared infrastructure...")
+def apply_env_infra(config: HexrepoConfig, env: str, no_input: bool = False) -> None:
+    typer.echo("Applying shared env infrastructure...")
     project_root: str = find_repo_root()
     with chdir(project_root):
         with chdir("infra"):

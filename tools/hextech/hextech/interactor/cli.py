@@ -121,11 +121,41 @@ def bump_library_version():
     bump_library_version()
 
 
+
+@app.command()
+def bump_all_library_versions():
+    from .commands import bump_all_library_versions
+
+    bump_all_library_versions()
+
+
 @app.command()
 def lint():
     from .commands import lint
 
     lint()
+
+
+@app.command()
+def infra_apply_project(
+    env: str,
+    project: str,
+    no_input: bool = False,
+):
+    from .commands import infra_apply_project
+
+    infra_apply_project(env, project, no_input)
+
+
+@app.command()
+def infra_plan_project(
+    env: str,
+    project: str,
+    no_input: bool = False,
+):
+    from .commands import infra_plan_project
+
+    infra_plan_project(env, project, no_input)
 
 
 @app.command()

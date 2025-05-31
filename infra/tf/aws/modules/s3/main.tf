@@ -1,7 +1,7 @@
 module "s3_bucket" {
   source = "terraform-aws-modules/s3-bucket/aws"
 
-  bucket = "${var.project}-${terraform.workspace}-${var.name}"
+  bucket = var.name
   acl    = "private"
 
   control_object_ownership = true

@@ -25,4 +25,10 @@ module "common_ecr_lambda" {
   project           = "hexrepo-${var.project}-lambda"
 }
 
+module "common_s3" {
+  source = "../../../../../../infra/tf/aws/modules/s3"
+  project           = var.project
+  name              ="hexrepo-infra"
+}
+
 # Add url domain infra here 

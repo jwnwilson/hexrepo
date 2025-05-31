@@ -37,20 +37,20 @@ Setup the following env vars directly or run:
 
 - Setup backend
     - Add ECS option (make default) to avoid cold startup and avoid aws lockin
-        - Docker tag not being passed to the tf apply
-            - Move to hextech
-            - Add project config file to use during deployments
-            - Break up build and push images to deploy command
-                - Seperate tf vars for different docker image types
+        - Avoid double ECS deploy, latest image deploy during infra apply
+            - Store the latest docker tags in a file in a bucket?
         - Add esc exec cli command
-        - Keep lambda gateway option / run both in parallel
     - Create orchestrator logic
         - Standard async tasks with celery + SQS + container
             - Keep serverless tasks as option
+        - Setup Flower 
         - Setup airflow / prefect on ECS / EC2
         - Setup task tracking debugging UI
-            - Flower? 
             - Airflow?
+    - Lambda keep warm events are probably using event free quota
+        - Disable lambda keep warm events
+    - Move to GCP for cost reasons
+        - Use 3rd party auth provider to avoid vender locking?
     - Add monitoring dashboard for services
         - Look at graphana?
         - Generic change log syncing to tracking metrics
@@ -67,6 +67,7 @@ Setup the following env vars directly or run:
         - tach: https://github.com/gauge-sh/tach
         - https://roman.pt/posts/python-architecture-linter/
         - restricting adaptors imports to a dependencies module
+    - branch deploys
     - blue green deployments via load balancer
     - Setup multienv
         - Enable disable project via admin
@@ -93,7 +94,7 @@ Setup the following env vars directly or run:
         - Store data in graph format and visualise it
         - Categorise PLP pages
         - Fan out and crawl web page PDP page contents
-    - Add ability to disable / turn off / turn onn projects
+    - Add ability to disable / turn off / turn on projects
     - Improve docker container builds
         - Reduce image size
             https://github.com/astral-sh/uv/issues/8935

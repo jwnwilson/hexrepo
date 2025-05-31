@@ -4,7 +4,7 @@ authors = [
 ]
 requires-python = "<4.0,>=3.12"
 name = "hexrepo_db"
-version = "0.1.30"
+version = "0.1.31"
 description = "A short description of the project"
 readme = "README.md"
 dependencies = [
