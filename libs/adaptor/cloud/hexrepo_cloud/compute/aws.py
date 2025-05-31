@@ -10,11 +10,22 @@ from hexrepo_cloud.config import AWSConfig
 logger = logging.getLogger()
 
 
-class AWSComputeManager:
+class AWSEcsManager:
+    def __init__(self, instance: InstanceTypeDef):
+        self.instance: InstanceTypeDef = instance
+
+    def get_instances(self) -> List[InstanceTypeDef]:
+        return self.instance["Instances"]
+
+    def get_instance_id(self) -> str:
+        return self.instance["InstanceId"]
+
+
+class AWSEc2Manager:
     def __init__(self, config: AWSConfig):
         self.config: AWSConfig = config
         self.client: EC2Client = boto3.client("ec2", region_name=self.config.AWS_REGION)
-
+    
     def get_instances(
         self, state: Optional[str] = None, tags: Optional[Dict[str, Any]] = None
     ) -> List[InstanceTypeDef]:

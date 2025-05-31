@@ -71,11 +71,12 @@ module "monitor_lambda" {
   environment                = terraform.workspace
   name                       = "monitor"
   ecr_url                    = data.aws_ecr_repository.ecr_repo.repository_url
-  docker_tag                 = var.docker_tag
+  docker_tag                 = var.docker_tag_serverless
   vpc_id                     = data.aws_vpc.hexrepo.id
   lambda_command             = ["src.app.interactor.event.aws.handler"]
   security_group_ids         = [data.aws_security_group.default_sg.id]
   lambda_schedule_expression = "cron(5 * * * ? *)"
+  keep_warm_schedule         = ""
 
   environment_variables = {
     ENVIRONMENT         = terraform.workspace

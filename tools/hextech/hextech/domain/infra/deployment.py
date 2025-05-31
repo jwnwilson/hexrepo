@@ -81,7 +81,7 @@ def publish_libs(
 def project_infra_plan(config: HexrepoConfig, env: str, project: str) -> None:
     project_root: str = find_repo_root()
     # Get existing docker tags
-    docker_tags: dict[str, str] = get_docker_tags(env)
+    docker_tags: dict[str, str] = get_docker_tags(env, project)
     with chdir(project_root):
         with chdir(f"projects/{project}"):
             run_system_command("make tf_init")
@@ -95,7 +95,7 @@ def project_infra_apply(
 ) -> None:
     project_root: str = find_repo_root()
     # Get existing docker tags
-    docker_tags: dict[str, str] = get_docker_tags(env)
+    docker_tags: dict[str, str] = get_docker_tags(env, project)
     with chdir(project_root):
         with chdir(f"projects/{project}"):
             run_system_command("make tf_init")
@@ -138,7 +138,7 @@ def deploy_projects(
                 typer.echo(f"Deploying project {proj}...")
                 run_system_command("make tf_init")
                 # Build, push images and deploy
-                build_push_deploy(env)
+                build_push_deploy(env, proj)
 
     # Placeholder for publishing libraries to repo
     typer.echo("Projects deployed successfully.")

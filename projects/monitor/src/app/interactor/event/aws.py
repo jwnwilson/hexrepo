@@ -2,7 +2,7 @@ import datetime
 import logging
 from typing import Any, Dict, List, Tuple
 
-from hexrepo_cloud.compute import AWSComputeManager
+from hexrepo_cloud.compute import AWSEc2Manager
 from hexrepo_cloud.config import AWSConfig, load_aws_config
 from hexrepo_cloud.db import AWSRDSManager
 
@@ -16,8 +16,8 @@ def current_time() -> datetime.datetime:
     return datetime.datetime.now()
 
 
-def get_compute_manager(aws_config: AWSConfig) -> AWSComputeManager:
-    return AWSComputeManager(config=aws_config)
+def get_compute_manager(aws_config: AWSConfig) -> AWSEc2Manager:
+    return AWSEc2Manager(config=aws_config)
 
 
 def get_db_manager(aws_config: AWSRDSManager) -> AWSRDSManager:
@@ -49,7 +49,7 @@ def should_start_compute_instance(instance: Dict[str, Any]) -> bool:
     stop_time: datetime.datetime
     try:
         start_time, stop_time = instance_tag_to_datetime(
-            AWSComputeManager.instance_tags_to_dict(instance)
+            AWSEc2Manager.instance_tags_to_dict(instance)
         )
     except Exception as e:
         logger.info(f"Invalid StartTime / StopTime tags: {e}")
@@ -90,7 +90,7 @@ def should_stop_compute_instance(instance: Any) -> bool:
     start_time: datetime.datetime
     stop_time: datetime.datetime
     start_time, stop_time = instance_tag_to_datetime(
-        AWSComputeManager.instance_tags_to_dict(instance)
+        AWSEc2Manager.instance_tags_to_dict(instance)
     )
 
     if now < start_time or stop_time < now:
@@ -122,7 +122,7 @@ def should_stop_db_instance(instance: Dict[str, Any]) -> bool:
 
 def handler(event, context):
     aws_config: AWSConfig = load_aws_config()
-    compute_manager: AWSComputeManager = get_compute_manager(aws_config=aws_config)
+    compute_manager: AWSEc2Manager = get_compute_manager(aws_config=aws_config)
     rds_manager: AWSRDSManager = get_db_manager(aws_config=aws_config)
     compute_instances: List[Any] = compute_manager.get_instances(
         tags={"Type": "bastion"}

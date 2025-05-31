@@ -16,7 +16,7 @@ def mock_current_time():
 
 @pytest.fixture
 def compute_manager():
-    from hexrepo_cloud.compute import AWSComputeManager
+    from hexrepo_cloud.compute import AWSEc2Manager
     from hexrepo_cloud.config import AWSConfig, load_aws_config
 
     aws_config: AWSConfig = load_aws_config()
@@ -28,7 +28,7 @@ def compute_manager():
     with mock.patch(
         "app.interactor.event.aws.get_compute_manager"
     ) as mock_get_compute_manager:
-        manager: AWSComputeManager = AWSComputeManager(config=aws_config)
+        manager: AWSEc2Manager = AWSEc2Manager(config=aws_config)
         manager.client = mock.MagicMock()
         manager.client.describe_instances.return_value = mock_compute_data
         mock_get_compute_manager.return_value = manager

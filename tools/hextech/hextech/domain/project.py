@@ -158,7 +158,7 @@ def install_library_in_project(library: str, project: str):
     typer.echo(f"Library {library} installed in project {project}")
 
 
-def build_push_deploy(env: str):
+def build_push_deploy(env: str, project: str):
     # Load project config
     with open("hexproject.yaml") as f:
         project_config = yaml.safe_load(f)
@@ -198,17 +198,17 @@ def build_push_deploy(env: str):
 
     # Save docker tags to S3
     typer.echo(f"Saving docker tags to S3: {docker_tag}")
-    save_docker_tags(env, docker_tag)
+    save_docker_tags(env, project, docker_tag)
 
 
-def get_docker_tags(env: str) -> dict[str, str]:
+def get_docker_tags(env: str, project: str) -> dict[str, str]:
     from hexrepo_cloud.config import AWSConfig, load_aws_config
     from hexrepo_cloud.storage.aws import S3Adaptor, StorageConfig
 
     # get docker tags from S3 file
     try:
         aws_config: AWSConfig = load_aws_config()
-        s3_file: str = f"{env}/docker_tags.json"
+        s3_file: str = f"{project}/{env}/docker_tags.json"
         storage_adaptor = S3Adaptor(
             StorageConfig(aws_bucket="hexrepo-infra", aws_region=aws_config.AWS_REGION)
         )
@@ -221,13 +221,13 @@ def get_docker_tags(env: str) -> dict[str, str]:
     return docker_tags
 
 
-def save_docker_tags(env: str, docker_tag: str):
+def save_docker_tags(env: str, project: str, docker_tag: str):
     from hexrepo_cloud.config import AWSConfig, load_aws_config
     from hexrepo_cloud.storage.aws import S3Adaptor, StorageConfig
 
     try:
         aws_config: AWSConfig = load_aws_config()
-        s3_file: str = f"{env}/docker_tags.json"
+        s3_file: str = f"{project}/{env}/docker_tags.json"
         storage_adaptor = S3Adaptor(
             StorageConfig(aws_bucket="hexrepo-infra", aws_region=aws_config.AWS_REGION)
         )

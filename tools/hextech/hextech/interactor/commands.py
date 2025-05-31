@@ -329,6 +329,17 @@ def bastion(
 
 
 @cli_setup
+def ecs_exec(
+    env: Annotated[Optional[str], typer.Argument()] = None,
+    project: Annotated[Optional[str], typer.Argument()] = None,
+):
+    config: HexrepoConfig
+    config, _ = get_or_create_config(no_input=True)
+    env: str = env or prompt_environment()
+    project: str = project or prompt_project()
+
+
+@cli_setup
 def migrate_db(
     env: Annotated[Optional[str], typer.Argument()] = None,
     project: Annotated[Optional[str], typer.Argument()] = None,

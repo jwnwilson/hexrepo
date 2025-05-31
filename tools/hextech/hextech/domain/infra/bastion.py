@@ -5,7 +5,7 @@ from contextlib import contextmanager
 from typing import Any, List, Optional
 
 import typer
-from hexrepo_cloud.compute import AWSComputeManager
+from hexrepo_cloud.compute import AWSEc2Manager
 from hexrepo_cloud.db import AWSRDSManager
 
 from hextech.config import HexrepoConfig
@@ -13,11 +13,26 @@ from hextech.config import HexrepoConfig
 from ..system import run_system_command
 
 
+def ecs_exec_func(
+    config: HexrepoConfig,
+    env: str,
+    project: str,
+    command: str,
+):
+    compute_manager: AWSEc2Manager = AWSEc2Manager(
+        config.cloud_provider_config
+    )
+    instance_ids: List[str] = compute_manager.get_instances_ids(
+        state="running", tags={"Type": "bastion", "Environment": env}
+    )
+    
+
+
 def bastion_ssh_tunnel(
     config: HexrepoConfig, env: str, project: str, background_task: bool = False
 ) -> Optional[Any]:
     if config.cloud_provider == "aws":
-        compute_manager: AWSComputeManager = AWSComputeManager(
+        compute_manager: AWSEc2Manager = AWSEc2Manager(
             config.cloud_provider_config
         )
         rds_manageer: AWSRDSManager = AWSRDSManager(config.cloud_provider_config)
