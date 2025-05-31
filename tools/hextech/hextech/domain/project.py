@@ -1,6 +1,6 @@
 import functools
-import logging
 import json
+import logging
 import os
 import subprocess
 from contextlib import chdir
@@ -195,45 +195,43 @@ def build_push_deploy(env: str):
             run_system_command(
                 f"DOCKER_TAG_SERVERLESS={docker_tag} TARGETS='{targets_command}' NO_INPUT=True ../../tools/bash_scripts/deploy.sh"
             )
-    
+
     # Save docker tags to S3
     typer.echo(f"Saving docker tags to S3: {docker_tag}")
     save_docker_tags(env, docker_tag)
 
 
 def get_docker_tags(env: str) -> dict[str, str]:
+    from hexrepo_cloud.config import AWSConfig, load_aws_config
     from hexrepo_cloud.storage.aws import S3Adaptor, StorageConfig
-    from hexrepo_cloud.config import load_aws_config
-    from hexrepo_cloud.config import AWSConfig
 
     # get docker tags from S3 file
     try:
         aws_config: AWSConfig = load_aws_config()
         s3_file: str = f"{env}/docker_tags.json"
-        storage_adaptor = S3Adaptor(StorageConfig(aws_bucket="hexrepo-infra", aws_region=aws_config.AWS_REGION))
+        storage_adaptor = S3Adaptor(
+            StorageConfig(aws_bucket="hexrepo-infra", aws_region=aws_config.AWS_REGION)
+        )
         docker_tags: dict[str, str] = json.loads(storage_adaptor.read(s3_file))
     except Exception as err:
-        logger.error(f"Error reading docker tags from S3, defaulting to latest tags: {err}")
-        return {
-            "container": "latest",
-            "serverless": "latest"
-        }
+        logger.error(
+            f"Error reading docker tags from S3, defaulting to latest tags: {err}"
+        )
+        return {"container": "latest", "serverless": "latest"}
     return docker_tags
 
 
 def save_docker_tags(env: str, docker_tag: str):
+    from hexrepo_cloud.config import AWSConfig, load_aws_config
     from hexrepo_cloud.storage.aws import S3Adaptor, StorageConfig
-    from hexrepo_cloud.config import load_aws_config
-    from hexrepo_cloud.config import AWSConfig
-    
+
     try:
         aws_config: AWSConfig = load_aws_config()
         s3_file: str = f"{env}/docker_tags.json"
-        storage_adaptor = S3Adaptor(StorageConfig(aws_bucket="hexrepo-infra", aws_region=aws_config.AWS_REGION))
-        tags: dict[str, str] = {
-            "container": docker_tag,
-            "serverless": docker_tag
-        }
+        storage_adaptor = S3Adaptor(
+            StorageConfig(aws_bucket="hexrepo-infra", aws_region=aws_config.AWS_REGION)
+        )
+        tags: dict[str, str] = {"container": docker_tag, "serverless": docker_tag}
         storage_adaptor.write(s3_file, json.dumps(tags))
         typer.echo(f"Docker tags saved to S3: {s3_file}")
     except Exception as err:

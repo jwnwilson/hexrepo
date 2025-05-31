@@ -266,7 +266,7 @@ wheels = [
 
 [[package]]
 name = "hexrepo-cloud"
-version = "0.3.24"
+version = "0.3.25"
 source = { editable = "../cloud" }
 dependencies = [
     { name = "boto3-stubs", extra = ["essential"] },
@@ -297,7 +297,7 @@ dev = [
 
 [[package]]
 name = "hexrepo-db"
-version = "0.1.29"
+version = "0.1.30"
 source = { editable = "." }
 dependencies = [
     { name = "boto3" },

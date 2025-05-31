@@ -129,14 +129,22 @@ def lint():
 
 
 @app.command()
-def infra_apply_project(env: str, project: str, no_input: bool = False,):
+def infra_apply_project(
+    env: str,
+    project: str,
+    no_input: bool = False,
+):
     from .commands import infra_apply_project
 
     infra_apply_project(env, project, no_input)
 
 
 @app.command()
-def infra_plan_project(env: str, project: str, no_input: bool = False,):
+def infra_plan_project(
+    env: str,
+    project: str,
+    no_input: bool = False,
+):
     from .commands import infra_plan_project
 
     infra_plan_project(env, project, no_input)

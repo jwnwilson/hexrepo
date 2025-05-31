@@ -37,10 +37,10 @@ class StorageAdaptor(ABC):
 
     def load(self, source_file_path: str, target_file_path: str) -> StorageData:
         raise NotImplementedError
-    
+
     def read(self, path: str) -> str:
         raise NotImplementedError
-    
+
     def write(self, path: str, data: str) -> None:
         raise NotImplementedError
 
