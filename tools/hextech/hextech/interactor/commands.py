@@ -212,12 +212,7 @@ def check_project_modified(project: str):
     typer.echo(f"Project: '{project}' unmodified...")
 
 
-@cli_setup
-def bump_library_version():
-    library: str = prompt_library()
-    typer.echo(f"Bumping version for {library} library...")
-    lib_type: str = get_library_type(library)
-    # Work around to bump uv version until uv version managment function is added
+def _bump_library_version(library: str, lib_type: str):
     run_system_command(
         f"""cd libs/{lib_type}/{library} && \\
         VERSION=$(uvx --from=toml-cli toml get --toml-path=pyproject.toml project.version) && \\
@@ -225,6 +220,24 @@ def bump_library_version():
         uvx --from=toml-cli toml set --toml-path=pyproject.toml project.version $VERSION
         """
     )
+
+@cli_setup
+def bump_library_version():
+    library: str = prompt_library()
+    typer.echo(f"Bumping version for {library} library...")
+    lib_type: str = get_library_type(library)
+    # Work around to bump uv version until uv version managment function is added
+    _bump_library_version(library, lib_type)
+
+
+@cli_setup
+def bump_all_library_versions():
+    all_libraries: List[str] = get_libraries()
+    for library in all_libraries:
+        typer.echo(f"Bumping version for {library} library...")
+        lib_type: str = get_library_type(library)
+        # Work around to bump uv version until uv version managment function is added
+        _bump_library_version(library, lib_type)
 
 
 @cli_setup

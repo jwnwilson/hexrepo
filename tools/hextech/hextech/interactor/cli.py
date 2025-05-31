@@ -121,6 +121,14 @@ def bump_library_version():
     bump_library_version()
 
 
+
+@app.command()
+def bump_all_library_versions():
+    from .commands import bump_all_library_versions
+
+    bump_all_library_versions()
+
+
 @app.command()
 def lint():
     from .commands import lint

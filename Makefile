@@ -68,6 +68,10 @@ bump_library_version: hextech
 	@echo "Bumping version..."
 	hextech bump-library-version
 
+bump_all_library_versions: hextech
+	@echo "Bumping all library versions..."
+	hextech bump-all-library-versions
+
 test_tools: hextech
 	@echo "Testing tools..."
 	hextech test-tools
