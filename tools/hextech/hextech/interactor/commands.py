@@ -221,6 +221,7 @@ def _bump_library_version(library: str, lib_type: str):
         """
     )
 
+
 @cli_setup
 def bump_library_version():
     library: str = prompt_library()
@@ -339,6 +340,7 @@ def ecs_exec(
     env: str = env or prompt_environment()
     project: str = project or prompt_project()
     ecs_exec_cli(config, env, project, command)
+
 
 @cli_setup
 def migrate_db(

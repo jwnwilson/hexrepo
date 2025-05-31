@@ -5,7 +5,7 @@ from contextlib import contextmanager
 from typing import Any, List, Optional
 
 import typer
-from hexrepo_cloud.compute import AWSEcsManager, AWSEc2Manager
+from hexrepo_cloud.compute import AWSEc2Manager, AWSEcsManager
 from hexrepo_cloud.db import AWSRDSManager
 
 from hextech.config import HexrepoConfig
@@ -19,13 +19,11 @@ def ecs_exec_cli(
     project: str,
     command: str,
 ):
-    compute_manager: AWSEcsManager = AWSEcsManager(
-        config.cloud_provider_config
-    )
-    
+    compute_manager: AWSEcsManager = AWSEcsManager(config.cloud_provider_config)
+
     cluster_name = f"{project}-ecs-{env}"
     service_name = cluster_name  # Service name is the same as cluster name in our setup
-    
+
     try:
         task_id = compute_manager.get_task_id(cluster_name, service_name)
         compute_manager.execute_command(cluster_name, task_id, command)
@@ -42,9 +40,7 @@ def bastion_ssh_tunnel(
 ) -> Optional[Any]:
     breakpoint()
     if config.cloud_provider == "aws":
-        compute_manager: AWSEc2Manager = AWSEc2Manager(
-            config.cloud_provider_config
-        )
+        compute_manager: AWSEc2Manager = AWSEc2Manager(config.cloud_provider_config)
         rds_manageer: AWSRDSManager = AWSRDSManager(config.cloud_provider_config)
         instance_ids: List[str] = compute_manager.get_instances_ids(
             state="running", tags={"Type": "bastion", "Environment": env}

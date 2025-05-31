@@ -2,8 +2,9 @@ import logging
 from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
 import boto3
-from hexrepo_cloud.config import AWSConfig
 from mypy_boto3_ec2.type_defs import InstanceTypeDef
+
+from hexrepo_cloud.config import AWSConfig
 
 if TYPE_CHECKING:
     from mypy_boto3_ec2.client import EC2Client
@@ -27,9 +28,7 @@ class AWSEcsManager:
     def get_task_id(self, cluster_name: str, service_name: str) -> str:
         """Get the task ID for a given service in a cluster."""
         response = self.client.list_tasks(
-            cluster=cluster_name,
-            serviceName=service_name,
-            desiredStatus="RUNNING"
+            cluster=cluster_name, serviceName=service_name, desiredStatus="RUNNING"
         )
         if not response["taskArns"]:
             raise ValueError(f"No running tasks found for service {service_name}")
@@ -38,10 +37,7 @@ class AWSEcsManager:
     def execute_command(self, cluster_name: str, task_id: str, command: str) -> None:
         """Execute a command on an ECS task."""
         self.client.execute_command(
-            cluster=cluster_name,
-            task=task_id,
-            command=command,
-            interactive=True
+            cluster=cluster_name, task=task_id, command=command, interactive=True
         )
 
 
@@ -49,7 +45,7 @@ class AWSEc2Manager:
     def __init__(self, config: AWSConfig):
         self.config: AWSConfig = config
         self.client: EC2Client = boto3.client("ec2", region_name=self.config.AWS_REGION)
-    
+
     def get_instances(
         self, state: Optional[str] = None, tags: Optional[Dict[str, Any]] = None
     ) -> List[InstanceTypeDef]:
