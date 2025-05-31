@@ -173,10 +173,16 @@ def build_push_deploy(env: str, project: str):
     # Push images
     for deployment in project_config["deployments"]:
         container_image = deployment["container_image"]
+        image_type = deployment["image_type"]
         typer.echo(f"Building and pushing image {container_image}:{docker_tag}")
-        run_system_command(
-            f"IMAGE={container_image} DOCKER_TAG={docker_tag} ../../tools/bash_scripts/push_image.sh"
-        )
+        if image_type == "container":
+            run_system_command(
+                f"IMAGE={container_image} DOCKER_TAG_CONTAINER={docker_tag} ../../tools/bash_scripts/push_image.sh"
+            )
+        elif image_type == "serverless":
+            run_system_command(
+                f"IMAGE={container_image} DOCKER_TAG_SERVERLESS={docker_tag} ../../tools/bash_scripts/push_image.sh"
+            )
 
     # Deploy images
     for deployment in project_config["deployments"]:
