@@ -37,8 +37,6 @@ Setup the following env vars directly or run:
 
 - Setup backend
     - Add ECS option (make default) to avoid cold startup and avoid aws lockin
-        - Avoid double ECS deploy, latest image deploy during infra apply
-            - Store the latest docker tags in a file in a bucket?
         - Add esc exec cli command
     - Create orchestrator logic
         - Standard async tasks with celery + SQS + container

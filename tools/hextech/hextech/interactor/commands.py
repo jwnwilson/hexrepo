@@ -7,7 +7,7 @@ import typer
 from typing_extensions import Annotated
 
 from hextech.config import HexrepoConfig, get_or_create_config
-from hextech.domain.infra.bastion import bastion_ssh_tunnel
+from hextech.domain.infra.bastion import bastion_ssh_tunnel, ecs_exec_cli
 from hextech.domain.infra.deployment import (
     apply_env_infra,
     create_shared_infra,
@@ -221,6 +221,7 @@ def _bump_library_version(library: str, lib_type: str):
         """
     )
 
+
 @cli_setup
 def bump_library_version():
     library: str = prompt_library()
@@ -326,6 +327,19 @@ def bastion(
     env: str = env or prompt_environment()
     project: str = project or prompt_project()
     bastion_ssh_tunnel(config, env, project)
+
+
+@cli_setup
+def ecs_exec(
+    env: Annotated[Optional[str], typer.Argument()] = None,
+    project: Annotated[Optional[str], typer.Argument()] = None,
+    command: Annotated[Optional[str], typer.Argument()] = None,
+):
+    config: HexrepoConfig
+    config, _ = get_or_create_config(no_input=True)
+    env: str = env or prompt_environment()
+    project: str = project or prompt_project()
+    ecs_exec_cli(config, env, project, command)
 
 
 @cli_setup

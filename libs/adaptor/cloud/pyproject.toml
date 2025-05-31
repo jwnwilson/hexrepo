@@ -4,7 +4,7 @@ authors = [
 ]
 requires-python = "<4.0,>=3.12"
 name = "hexrepo-cloud"
-version = "0.3.26"
+version = "0.3.27"
 description = ""
 readme = "README.md"
 dependencies = [

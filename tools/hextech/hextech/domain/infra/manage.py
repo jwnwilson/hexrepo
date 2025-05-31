@@ -2,7 +2,7 @@ import logging
 from typing import List
 
 import typer
-from hexrepo_cloud.compute import AWSComputeManager
+from hexrepo_cloud.compute import AWSEc2Manager
 from hexrepo_cloud.db import AWSRDSManager
 
 from hextech.config import HexrepoConfig
@@ -12,7 +12,7 @@ logger = logging.getLogger()
 
 def start_infra_command(config: HexrepoConfig):
     if config.cloud_provider == "aws":
-        aws_compute_manager = AWSComputeManager(config.cloud_provider_config)
+        aws_compute_manager = AWSEc2Manager(config.cloud_provider_config)
         aws_rds_manager = AWSRDSManager(config.cloud_provider_config)
         # start bastion instances that are not running
         stopped_instances: List[str] = aws_compute_manager.get_instances_ids(
@@ -31,7 +31,7 @@ def start_infra_command(config: HexrepoConfig):
 
 def stop_infra_command(config: HexrepoConfig):
     if config.cloud_provider == "aws":
-        aws_compute_manager = AWSComputeManager(config.cloud_provider_config)
+        aws_compute_manager = AWSEc2Manager(config.cloud_provider_config)
         aws_rds_manager = AWSRDSManager(config.cloud_provider_config)
         # start bastion instances that are not running
         running_instances: List[str] = aws_compute_manager.get_instances_ids(
