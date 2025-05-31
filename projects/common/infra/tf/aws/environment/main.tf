@@ -22,7 +22,6 @@ locals {
   api_subdomain     = "common-${terraform.workspace}"
   api_subdomain_ecs = "common-${terraform.workspace}-ecs"
   app_url           = "https://${local.api_subdomain}.${var.domain}"
-  lambda_docker_tag = var.docker_tag != "" ? var.docker_tag : module.common_api.docker_tag
 }
 
 provider "aws" {
@@ -78,7 +77,7 @@ module "common_api" {
   environment        = terraform.workspace
   name               = "${var.project}_api"
   ecr_url            = data.aws_ecr_repository.ecr_lambda.repository_url
-  docker_tag         = var.docker_tag
+  docker_tag         = var.docker_tag_serverless
   vpc_id             = data.aws_vpc.hexrepo.id
   lambda_command     = ["src.app.interactor.api.lambda_handler"]
   security_group_ids = [module.common_postgres.db_security_group_id]
@@ -111,7 +110,7 @@ module "common_api" {
 #   security_group_ids = [module.common_postgres.db_security_group_id]
 
 #   ecr_url    = data.aws_ecr_repository.ecr_repo.repository_url
-#   docker_tag = var.docker_tag
+#   docker_tag = var.docker_tag_serverless
 #   container_port    = 8000
 
 #   environment_variables = {
@@ -157,7 +156,7 @@ module "common_ecs_alb" {
   security_group_ids = [module.common_postgres.db_security_group_id]
 
   ecr_url    = data.aws_ecr_repository.ecr_repo.repository_url
-  docker_tag = var.docker_tag
+  docker_tag = var.docker_tag_container
   container_port    = 8000
 
   environment_variables = {
@@ -205,7 +204,7 @@ module "common_tasks" {
   environment        = terraform.workspace
   name               = "${var.project}_tasks"
   ecr_url            = data.aws_ecr_repository.ecr_lambda.repository_url
-  docker_tag         = var.docker_tag
+  docker_tag         = var.docker_tag_serverless
   vpc_id             = data.aws_vpc.hexrepo.id
   lambda_command     = ["src.app.interactor.event.lambda_handler"]
   security_group_ids = [module.common_postgres.db_security_group_id]
@@ -266,5 +265,5 @@ module "common_bucket" {
   source = "../../../../../../infra/tf/aws/modules/s3"
 
   project = "common"
-  name    = "example"
+  name    = "${var.project}-${terraform.workspace}-example"
 }

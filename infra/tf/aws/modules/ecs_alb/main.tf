@@ -400,10 +400,10 @@ resource "aws_iam_role_policy" "ecs_task_execution_secrets" {
           "ssmmessages:CreateControlChannel",
           "ssmmessages:CreateDataChannel",                
           "ssmmessages:OpenControlChannel",                 
-          "ssmmessages:OpenDataChannel"
+          "ssmmessages:OpenDataChannel",
         ]
         Resource = "*"
-      }
+      },
       {
         Effect = "Allow"
         Action = [

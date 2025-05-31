@@ -171,10 +171,10 @@ jobs:
           terraform_wrapper: false
     - name: Infra Apply
       if: steps.check_modified.outputs.skip == 'false'
-      working-directory: ${{ matrix.project }}
+      shell: bash
       run: |
-        make tf_init
-        make tf_apply_no_input
+        export PROJ=`basename "${{ matrix.project }}"`
+        make infra_apply_project PROJECT=${PROJ} ENV=${{ matrix.env }}
     - name: DB migration
       if: steps.check_modified.outputs.skip == 'false'
       shell: bash

@@ -1,10 +1,12 @@
 deployments:
   - hextech-common:
     container_image: common
+    image_type: container
     targets:
       - module.common_ecs_alb
   - hextech-common-lambda:
     container_image: common-lambda
+    image_type: serverless
     targets:
       - module.common_api
       - module.common_tasks

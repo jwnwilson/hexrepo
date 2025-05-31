@@ -25,11 +25,11 @@ shared_infra_apply: hextech
 	hextech shared-infra-apply
 
 env_infra_plan: hextech
-	@echo "Planning env infra..."
+	@echo "Planning shared env infra..."
 	hextech env-infra-plan $(ENV)
 
 env_infra_apply: hextech
-	@echo "Applying env infra..."
+	@echo "Applying shared env infra..."
 	hextech env-infra-apply $(ENV)
 
 create_project: hextech
@@ -75,6 +75,10 @@ test_tools: hextech
 lint: hextech
 	@echo "Linting hextech repo..."
 	hextech lint
+
+infra_apply_project: hextech
+	@echo "Applying infra..."
+	hextech infra-apply-project $(ENV) $(PROJECT) --no-input
 
 deploy_projects: hextech
 	@echo "Deploying projects..."

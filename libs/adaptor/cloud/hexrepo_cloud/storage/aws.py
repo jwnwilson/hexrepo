@@ -98,6 +98,10 @@ class S3Adaptor(StorageAdaptor):
         os.makedirs(target_dir, exist_ok=True)
         self.client.download_file(self.bucket_name, source_path, target_path)
         return StorageData(path=target_path)
+    
+    def read(self, path: str) -> str:
+        logger.info(f"Reading file: {path} from s3 bucket: {self.bucket_name}")
+        return self.client.get_object(Bucket=self.bucket_name, Key=path)["Body"].read()
 
     def delete(self, path: str) -> None:
         self.client.delete_object(Bucket=self.bucket_name, Key=path)
