@@ -1,24 +1,48 @@
 import logging
-from typing import Any, Dict, List, Optional
+from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
 import boto3
-from mypy_boto3_ec2.client import EC2Client
+from hexrepo_cloud.config import AWSConfig
 from mypy_boto3_ec2.type_defs import InstanceTypeDef
 
-from hexrepo_cloud.config import AWSConfig
+if TYPE_CHECKING:
+    from mypy_boto3_ec2.client import EC2Client
+    from mypy_boto3_ecs.client import ECSClient
 
 logger = logging.getLogger()
 
 
 class AWSEcsManager:
-    def __init__(self, instance: InstanceTypeDef):
-        self.instance: InstanceTypeDef = instance
+    def __init__(self, config: AWSConfig):
+        self.config: AWSConfig = config
+        self.client: ECSClient = boto3.client("ecs", region_name=self.config.AWS_REGION)
 
-    def get_instances(self) -> List[InstanceTypeDef]:
-        return self.instance["Instances"]
+    def get_cluster_id(self, cluster_name: str) -> str:
+        """Get the cluster ID for a given cluster name."""
+        response = self.client.describe_clusters(clusters=[cluster_name])
+        if not response["clusters"]:
+            raise ValueError(f"Cluster {cluster_name} not found")
+        return response["clusters"][0]["clusterArn"]
 
-    def get_instance_id(self) -> str:
-        return self.instance["InstanceId"]
+    def get_task_id(self, cluster_name: str, service_name: str) -> str:
+        """Get the task ID for a given service in a cluster."""
+        response = self.client.list_tasks(
+            cluster=cluster_name,
+            serviceName=service_name,
+            desiredStatus="RUNNING"
+        )
+        if not response["taskArns"]:
+            raise ValueError(f"No running tasks found for service {service_name}")
+        return response["taskArns"][0].split("/")[-1]
+
+    def execute_command(self, cluster_name: str, task_id: str, command: str) -> None:
+        """Execute a command on an ECS task."""
+        self.client.execute_command(
+            cluster=cluster_name,
+            task=task_id,
+            command=command,
+            interactive=True
+        )
 
 
 class AWSEc2Manager:

@@ -5,7 +5,7 @@ from contextlib import contextmanager
 from typing import Any, List, Optional
 
 import typer
-from hexrepo_cloud.compute import AWSEc2Manager
+from hexrepo_cloud.compute import AWSEcsManager, AWSEc2Manager
 from hexrepo_cloud.db import AWSRDSManager
 
 from hextech.config import HexrepoConfig
@@ -13,24 +13,34 @@ from hextech.config import HexrepoConfig
 from ..system import run_system_command
 
 
-def ecs_exec_func(
+def ecs_exec_cli(
     config: HexrepoConfig,
     env: str,
     project: str,
     command: str,
 ):
-    compute_manager: AWSEc2Manager = AWSEc2Manager(
+    compute_manager: AWSEcsManager = AWSEcsManager(
         config.cloud_provider_config
     )
-    instance_ids: List[str] = compute_manager.get_instances_ids(
-        state="running", tags={"Type": "bastion", "Environment": env}
-    )
     
+    cluster_name = f"{project}-ecs-{env}"
+    service_name = cluster_name  # Service name is the same as cluster name in our setup
+    
+    try:
+        task_id = compute_manager.get_task_id(cluster_name, service_name)
+        compute_manager.execute_command(cluster_name, task_id, command)
+    except ValueError as e:
+        typer.echo(f"Failed to execute command: {str(e)}")
+        raise typer.Abort(str(e))
+    except Exception as e:
+        typer.echo(f"Failed to execute command: {str(e)}")
+        raise typer.Abort(f"Failed to execute command: {str(e)}")
 
 
 def bastion_ssh_tunnel(
     config: HexrepoConfig, env: str, project: str, background_task: bool = False
 ) -> Optional[Any]:
+    breakpoint()
     if config.cloud_provider == "aws":
         compute_manager: AWSEc2Manager = AWSEc2Manager(
             config.cloud_provider_config
@@ -49,8 +59,10 @@ def bastion_ssh_tunnel(
         )
 
         if not instance_ids:
+            typer.echo("No bastion instance found")
             raise typer.Abort("No bastion instance found")
         if len(instance_ids) > 1:
+            typer.echo("Multiple bastion instances found")
             raise typer.Abort("Multiple bastion instances found")
 
         bastion_command: str = f"""

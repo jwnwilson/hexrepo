@@ -121,7 +121,6 @@ def bump_library_version():
     bump_library_version()
 
 
-
 @app.command()
 def bump_all_library_versions():
     from .commands import bump_all_library_versions
@@ -193,6 +192,17 @@ def stop_infra():
     from .commands import stop_infra
 
     stop_infra()
+
+
+@app.command()
+def ecs_exec(
+    env: Annotated[Optional[str], typer.Argument()] = None,
+    project: Annotated[Optional[str], typer.Argument()] = None,
+    command: Annotated[Optional[str], typer.Argument()] = None,
+):
+    from .commands import ecs_exec
+
+    ecs_exec(env, project, command)
 
 
 @app.command()
