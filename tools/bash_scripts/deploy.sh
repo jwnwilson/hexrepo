@@ -3,12 +3,12 @@
 set -e
 
 # check if DOCKER_TAG_CONTAINER is set
-if [ -z "$DOCKER_TAG_CONTAINER" ] || [ -z "$DOCKER_TAG_SERVERLESS" ]; then
+if [ -z "$DOCKER_TAG_CONTAINER" ] && [ -z "$DOCKER_TAG_SERVERLESS" ]; then
     echo "DOCKER_TAG_CONTAINER or DOCKER_TAG_SERVERLESS env var is not set"
     exit 1
 fi
 
-# check if TARGETS is set
+# check if TARGETS is seta
 if [ -z "$TARGETS" ]; then
     echo "TARGETS env var is not set"
     exit 1

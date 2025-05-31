@@ -209,7 +209,7 @@ def get_docker_tags(env: str) -> dict[str, str]:
     # get docker tags from S3 file
     try:
         aws_config: AWSConfig = load_aws_config()
-        s3_file: str = f"s3://hexrepo-infra/{env}/docker_tags.json"
+        s3_file: str = f"{env}/docker_tags.json"
         storage_adaptor = S3Adaptor(StorageConfig(aws_bucket="hexrepo-infra", aws_region=aws_config.AWS_REGION))
         docker_tags: dict[str, str] = json.loads(storage_adaptor.read(s3_file))
     except Exception as err:
@@ -234,7 +234,7 @@ def save_docker_tags(env: str, docker_tag: str):
             "container": docker_tag,
             "serverless": docker_tag
         }
-        storage_adaptor.save(s3_file, json.dumps(tags))
+        storage_adaptor.write(s3_file, json.dumps(tags))
         typer.echo(f"Docker tags saved to S3: {s3_file}")
     except Exception as err:
         logger.error(f"Error saving docker tags to S3: {err}")

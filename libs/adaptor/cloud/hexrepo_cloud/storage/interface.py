@@ -40,6 +40,9 @@ class StorageAdaptor(ABC):
     
     def read(self, path: str) -> str:
         raise NotImplementedError
+    
+    def write(self, path: str, data: str) -> None:
+        raise NotImplementedError
 
     def delete(self, path: str) -> None:
         raise NotImplementedError

@@ -48,6 +48,7 @@ Setup the following env vars directly or run:
         - Setup task tracking debugging UI
             - Airflow?
     - Lambda keep warm events are probably using event free quota
+        - Disable lambda keep warm events
     - Move to GCP for cost reasons
         - Use 3rd party auth provider to avoid vender locking?
     - Add monitoring dashboard for services
@@ -66,6 +67,7 @@ Setup the following env vars directly or run:
         - tach: https://github.com/gauge-sh/tach
         - https://roman.pt/posts/python-architecture-linter/
         - restricting adaptors imports to a dependencies module
+    - branch deploys
     - blue green deployments via load balancer
     - Setup multienv
         - Enable disable project via admin

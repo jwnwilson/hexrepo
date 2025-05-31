@@ -178,7 +178,7 @@ module "common_ecs_alb" {
   }
 
   desired_count = 1
-  task_cpu      = 0.25
+  task_cpu      = 256
   task_memory   = 512
 
   domain_name                     = var.domain
