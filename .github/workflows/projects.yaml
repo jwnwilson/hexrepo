@@ -31,6 +31,8 @@ jobs:
         # - "projects/example"
         - "projects/monitor"
         - "projects/common"
+        env:
+          - "default"
     runs-on: ubuntu-latest
     outputs:
       skip: ${{ steps.check_modified.outputs.skip }}
@@ -68,6 +70,7 @@ jobs:
         make lint
         make test
   plan_infra:
+    environment: production
     needs: test_projects
     strategy:
       matrix:
@@ -75,6 +78,8 @@ jobs:
         # - "projects/example"
         - "projects/monitor"
         - "projects/common"
+        env:
+          - "default"
     runs-on: ubuntu-latest
     outputs:
       skip: ${{ steps.check_modified.outputs.skip }}
