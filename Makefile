@@ -98,11 +98,11 @@ deploy_projects_check_modified: hextech
 
 deploy_libs: hextech
 	@echo "Deploying libraries..."
-	hextech deploy-libs --no-input
+	hextech deploy-libs --no-input --libraries=$(LIBRARY)
 
 deploy_libs_check_modified: hextech
 	@echo "Deploying libraries..."
-	hextech deploy-libs --check-modified --no-input
+	hextech deploy-libs --check-modified --no-input --libraries=$(LIBRARY)
 
 stop_infra: hextech
 	@echo "Stopping infra..."
