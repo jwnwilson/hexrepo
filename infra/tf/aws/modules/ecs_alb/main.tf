@@ -397,16 +397,6 @@ resource "aws_iam_role_policy" "ecs_task_execution_secrets" {
       {
         Effect = "Allow"
         Action = [
-          "ssmmessages:CreateControlChannel",
-          "ssmmessages:CreateDataChannel",                
-          "ssmmessages:OpenControlChannel",                 
-          "ssmmessages:OpenDataChannel",
-        ]
-        Resource = "*"
-      },
-      {
-        Effect = "Allow"
-        Action = [
           "secretsmanager:GetSecretValue",
           "ssm:GetParameters",
           "ssm:GetParameter",
@@ -469,7 +459,17 @@ resource "aws_iam_role_policy" "ecs_task_secrets" {
           "arn:aws:secretsmanager:${var.aws_region}:${data.aws_caller_identity.current.account_id}:secret:*",
           "arn:aws:ssm:${var.aws_region}:${data.aws_caller_identity.current.account_id}:parameter/*"
         ]
-      }
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "ssmmessages:CreateControlChannel",
+          "ssmmessages:CreateDataChannel",                
+          "ssmmessages:OpenControlChannel",                 
+          "ssmmessages:OpenDataChannel",
+        ]
+        Resource = "*"
+      },
     ]
   })
 }
