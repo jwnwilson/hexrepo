@@ -1,4 +1,5 @@
 import logging
+import os
 from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
 import boto3
@@ -11,6 +12,13 @@ if TYPE_CHECKING:
     from mypy_boto3_ecs.client import ECSClient
 
 logger = logging.getLogger()
+
+
+def run_system_command(command: str) -> None:
+    return_code = os.system(command)
+    if return_code != 0:
+        logger.error(f"System command failed: {command}")
+        raise RuntimeError(f"System command failed: {command}")
 
 
 class AWSEcsManager:
@@ -34,11 +42,16 @@ class AWSEcsManager:
             raise ValueError(f"No running tasks found for service {service_name}")
         return response["taskArns"][0].split("/")[-1]
 
-    def execute_command(self, cluster_name: str, task_id: str, command: str) -> None:
+    def execute_command(self, cluster_name: str, task_id: str, command: str, interactive: bool = True) -> None:
         """Execute a command on an ECS task."""
-        self.client.execute_command(
-            cluster=cluster_name, task=task_id, command=command, interactive=True
-        )
+        if interactive:
+            run_system_command(
+                f"aws ecs execute-command --cluster {cluster_name} --task {task_id} --command {command} --interactive"
+            )
+        else:
+            run_system_command(
+                f"aws ecs execute-command --cluster {cluster_name} --task {task_id} --command {command}"
+            )
 
 
 class AWSEc2Manager:

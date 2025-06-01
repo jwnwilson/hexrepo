@@ -139,7 +139,7 @@ bastion: venv
 
 ecs_exec: venv
 	@echo "Executing command on ECS task..."
-	hextech ecs-exec $(ENVIRONMENT) common "shell" 
+	hextech ecs-exec $(ENVIRONMENT) common "/bin/sh" 
 
 create_user:
 	PYTHONPATH=src ENVIRONMENT=$(ENVIRONMENT) uv run python src/app/interactor/cli/create_superuser.py

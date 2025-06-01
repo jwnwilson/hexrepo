@@ -479,6 +479,13 @@ resource "aws_iam_role_policy" "ecs_task_secrets" {
         ]
         Resource = "*"
       },
+      {
+        Effect = "Allow"
+        Action = [
+          "logs:*"
+        ]
+        Resource = "*"
+      }
     ]
   })
 }

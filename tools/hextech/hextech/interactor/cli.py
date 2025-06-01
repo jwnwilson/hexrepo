@@ -196,9 +196,9 @@ def stop_infra():
 
 @app.command()
 def ecs_exec(
-    env: Annotated[Optional[str], typer.Argument()] = None,
-    project: Annotated[Optional[str], typer.Argument()] = None,
-    command: Annotated[Optional[str], typer.Argument()] = None,
+    env: str,
+    project: str,
+    command: str,
 ):
     from .commands import ecs_exec
 
@@ -207,8 +207,8 @@ def ecs_exec(
 
 @app.command()
 def bastion(
-    env: Annotated[Optional[str], typer.Argument()] = None,
-    project: Annotated[Optional[str], typer.Argument()] = None,
+    env: str,
+    project: str,
 ):
     from .commands import bastion
 
