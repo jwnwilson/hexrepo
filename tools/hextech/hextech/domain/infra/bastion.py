@@ -38,7 +38,6 @@ def ecs_exec_cli(
 def bastion_ssh_tunnel(
     config: HexrepoConfig, env: str, project: str, background_task: bool = False
 ) -> Optional[Any]:
-    breakpoint()
     if config.cloud_provider == "aws":
         compute_manager: AWSEc2Manager = AWSEc2Manager(config.cloud_provider_config)
         rds_manageer: AWSRDSManager = AWSRDSManager(config.cloud_provider_config)
