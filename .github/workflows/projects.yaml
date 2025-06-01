@@ -115,10 +115,9 @@ jobs:
           terraform_wrapper: false
     - name: Infra plan
       if: steps.check_modified.outputs.skip == 'false'
-      working-directory: ${{ matrix.project }}
       run: |
-        make tf_init
-        make tf_plan
+        export PROJ=`basename "${{ matrix.project }}"`
+        make infra_plan_project PROJECT=${PROJ} ENV=${{ matrix.env }}
   deploy_projects:
     environment: production
     needs: plan_infra

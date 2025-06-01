@@ -154,7 +154,7 @@ def infra_plan_project(
 ):
     from .commands import infra_plan_project
 
-    infra_plan_project(env, project, no_input)
+    infra_plan_project(env, project)
 
 
 @app.command()

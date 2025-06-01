@@ -80,6 +80,10 @@ lint: hextech
 	@echo "Linting hextech repo..."
 	hextech lint
 
+infra_plan_project: hextech
+	@echo "Planning infra..."
+	hextech infra-plan-project $(ENV) $(PROJECT)
+
 infra_apply_project: hextech
 	@echo "Applying infra..."
 	hextech infra-apply-project $(ENV) $(PROJECT) --no-input
