@@ -38,6 +38,8 @@ Setup the following env vars directly or run:
 - Setup backend
     - Add ECS option (make default) to avoid cold startup and avoid aws lockin
         - Fix deployments
+            - Deploy-libs is deploying all libs limit it to one lib at a time
+            - Validate no double docker image deployment
         - Add esc exec cli command
     - Create orchestrator logic
         - Standard async tasks with celery + SQS + container

@@ -283,7 +283,7 @@ def infra_plan_project(env: str, project: str):
 def infra_apply_project(env: str, project: str, no_input: bool = False):
     config: HexrepoConfig
     config, _ = get_or_create_config(no_input=True)
-    project_infra_apply(config, env, project)
+    project_infra_apply(config, env, project, no_input=no_input)
 
 
 @cli_setup
