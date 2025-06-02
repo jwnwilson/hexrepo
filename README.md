@@ -36,16 +36,15 @@ Setup the following env vars directly or run:
 # To Do
 
 - Setup backend
-    - Add ECS option (make default) to avoid cold startup and avoid aws lockin
-        - Fix deployments
-            - Validate lib deployment
     - Create orchestrator logic
         - Standard async tasks with celery + SQS + container
             - Keep serverless tasks as option
         - Setup Flower 
         - Setup airflow / prefect on ECS / EC2
+            - Look at prefect as less effort to implement
         - Setup task tracking debugging UI
             - Airflow?
+                - This will likely require EC2 / kubernetes due to number of containers
     - Add esc exec cli command
         https://aws.plainenglish.io/aws-ecs-exec-feature-with-fargate-terraform-implementation-and-testing-584fd00116c8
     - Lambda keep warm events are probably using event free quota
