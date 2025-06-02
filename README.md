@@ -39,7 +39,6 @@ Setup the following env vars directly or run:
     - Add ECS option (make default) to avoid cold startup and avoid aws lockin
         - Fix deployments
             - Validate lib deployment
-            - Validate no double docker image deployment
     - Create orchestrator logic
         - Standard async tasks with celery + SQS + container
             - Keep serverless tasks as option
