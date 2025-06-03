@@ -1,10 +1,10 @@
-from enum import Enum
 import inspect
 import json
 import logging
 import types
 from asyncio import sleep
 from contextlib import contextmanager
+from enum import Enum
 from functools import wraps
 from inspect import signature
 from typing import Any, Callable, Dict, Generator, List, Optional, cast
@@ -27,6 +27,7 @@ TaskFunc = Callable[..., Any]
 GetQueue = Callable[[], QueueAdaptor]
 GetUOW = Callable[[], UOW]
 
+
 class TaskMode(Enum):
     LAMBDA = "lambda"
     CELERY = "celery"
@@ -38,7 +39,11 @@ class TaskApp:
     _dependency_overrides: Dict[Callable, Callable] = {}
 
     def __init__(
-        self, mode: TaskMode, get_queue: GetQueue, get_uow: GetUOW, config: Optional[TaskConfig] = None
+        self,
+        mode: TaskMode,
+        get_queue: GetQueue,
+        get_uow: GetUOW,
+        config: Optional[TaskConfig] = None,
     ):
         self._get_queue: GetQueue = get_queue
         self._get_uow: GetUOW = get_uow
@@ -80,7 +85,9 @@ class TaskApp:
             raise DuplicateTaskName(
                 f"Duplicate functions with name: {func_name} please rename: {func}"
             )
-        wrapped_func = TaskFuncWrapper(func, self, dependency_overrides=self.dependency_overrides)
+        wrapped_func = TaskFuncWrapper(
+            func, self, dependency_overrides=self.dependency_overrides
+        )
         self.task_registry[func_name] = wrapped_func
         return wrapped_func
 
@@ -105,16 +112,14 @@ class TaskApp:
                 )
                 raise
 
-    def queue_task(
-        self, func: "TaskFuncWrapper", params: Dict
-    ) -> "TaskPromise":
+    def queue_task(self, func: "TaskFuncWrapper", params: Dict) -> "TaskPromise":
         """Queue task from app initialising deodependencies"""
         if isinstance(func, TaskFuncWrapper):
             func = func.func
         # Check name is right even with wrapper
         func_name = func if isinstance(func, str) else func.__name__
         # Validate params
-        self._validate_params(func.func, params)
+        self._validate_params(func, params)
         with self.get_queue() as queue, self.get_uow() as uow:
             try:
                 task_adaptor: TaskAdaptor = self._get_task_adaptor(uow, queue)
@@ -193,9 +198,9 @@ class TaskAdaptor:
             for k, v in params.items()
         }
 
-    def queue(self, func: "TaskFuncWrapper", params: Dict[str, Any]) -> "TaskPromise":
+    def queue(self, func: TaskFunc, params: Dict[str, Any]) -> "TaskPromise":
         # Send task to queue
-        func_name: str = func.func.__name__
+        func_name: str = func.__name__
         task_data: TaskCreateDTO = TaskCreateDTO(
             name=func_name, params=self._serialize_params(params)
         )
@@ -391,4 +396,4 @@ class TaskFuncWrapper:
         return resolved_func(*args, **kwargs)
 
     def queue_task(self, **kwargs) -> TaskPromise:
-        return self.app.queue_task(self, kwargs)
+        return self.app.queue_task(self.func, kwargs)
