@@ -52,8 +52,6 @@ Setup the following env vars directly or run:
             - Airflow?
                 - This will likely require EC2 / kubernetes due to number of containers
                 - https://github.com/jwnwilson/airflow-kubernetes/tree/main
-    - Add esc exec cli command
-        https://aws.plainenglish.io/aws-ecs-exec-feature-with-fargate-terraform-implementation-and-testing-584fd00116c8
     - Lambda keep warm events are probably using event free quota
         - Disable lambda keep warm events
     - Add monitoring dashboard for services
