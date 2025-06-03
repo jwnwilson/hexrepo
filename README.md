@@ -37,12 +37,11 @@ Setup the following env vars directly or run:
 
 - Setup backend
     - Create orchestrator logic
-        - Standard async tasks with celery + SQS + container
-            - Keep serverless tasks as option
-                - Add task app "mode"
-                    - lambda
-                    - celery
+        - Standard async tasks with celery + SQS + container                
             - task app return celery task with decorated task logic with dependency resolving
+                - Get vanilla celery tasks working
+                - Attempt to apply resolve dependencies in a celery task
+                - Combine this into the task app class
             - task dependency call function and queue it
             - look at celery + pydantic\;
                 https://benninger.ca/posts/celery-serializer-pydantic/

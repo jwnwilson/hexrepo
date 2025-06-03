@@ -1,3 +1,4 @@
+from enum import Enum
 import inspect
 import json
 import logging
@@ -26,18 +27,23 @@ TaskFunc = Callable[..., Any]
 GetQueue = Callable[[], QueueAdaptor]
 GetUOW = Callable[[], UOW]
 
+class TaskMode(Enum):
+    LAMBDA = "lambda"
+    CELERY = "celery"
+
 
 class TaskApp:
     # Initialise task app to configure how tasks are run
-    task_registry: Dict[str, Callable] = {}
+    task_registry: Dict[str, "TaskFuncWrapper"] = {}
     _dependency_overrides: Dict[Callable, Callable] = {}
 
     def __init__(
-        self, get_queue: GetQueue, get_uow: GetUOW, config: Optional[TaskConfig] = None
+        self, mode: TaskMode, get_queue: GetQueue, get_uow: GetUOW, config: Optional[TaskConfig] = None
     ):
         self._get_queue: GetQueue = get_queue
         self._get_uow: GetUOW = get_uow
         self.config: TaskConfig = config or default_config
+        self.mode: TaskMode = mode
 
     @property
     def dependency_overrides(self) -> Dict[Callable, Callable]:
@@ -65,7 +71,7 @@ class TaskApp:
         else:
             yield uow
 
-    def add_task_func(self, func: TaskFunc):
+    def _add_task_func(self, func: TaskFunc) -> "TaskFuncWrapper":
         func_name = func.__name__
         if (
             self.task_registry.get(func_name)
@@ -74,14 +80,13 @@ class TaskApp:
             raise DuplicateTaskName(
                 f"Duplicate functions with name: {func_name} please rename: {func}"
             )
-        self.task_registry[func_name] = func
+        wrapped_func = TaskFuncWrapper(func, self, dependency_overrides=self.dependency_overrides)
+        self.task_registry[func_name] = wrapped_func
+        return wrapped_func
 
     def task(self, func: TaskFunc, **config) -> "TaskFuncWrapper":
         """Task decorator to register task functions"""
-        self.add_task_func(func)
-        return TaskFuncWrapper(
-            func, self, dependency_overrides=self.dependency_overrides
-        )
+        return self._add_task_func(func)
 
     def handle(self, event: Dict | TaskDTO) -> Any:
         """Handle event and run task"""
@@ -101,7 +106,7 @@ class TaskApp:
                 raise
 
     def queue_task(
-        self, func: TaskFunc | "TaskFuncWrapper", params: Dict
+        self, func: "TaskFuncWrapper", params: Dict
     ) -> "TaskPromise":
         """Queue task from app initialising deodependencies"""
         if isinstance(func, TaskFuncWrapper):
@@ -109,7 +114,7 @@ class TaskApp:
         # Check name is right even with wrapper
         func_name = func if isinstance(func, str) else func.__name__
         # Validate params
-        self._validate_params(func, params)
+        self._validate_params(func.func, params)
         with self.get_queue() as queue, self.get_uow() as uow:
             try:
                 task_adaptor: TaskAdaptor = self._get_task_adaptor(uow, queue)
@@ -188,9 +193,9 @@ class TaskAdaptor:
             for k, v in params.items()
         }
 
-    def queue(self, func: TaskFunc, params: Dict[str, Any]) -> "TaskPromise":
+    def queue(self, func: "TaskFuncWrapper", params: Dict[str, Any]) -> "TaskPromise":
         # Send task to queue
-        func_name: str = func.__name__
+        func_name: str = func.func.__name__
         task_data: TaskCreateDTO = TaskCreateDTO(
             name=func_name, params=self._serialize_params(params)
         )
@@ -218,10 +223,7 @@ class TaskAdaptor:
         func: TaskFunc = self._app.task_registry[task.name]
         try:
             logger.info(f"Running task: {task.name}, id: {task.id}")
-            task_wrapper: TaskFuncWrapper = TaskFuncWrapper(
-                func, self, dependency_overrides=self._app.dependency_overrides
-            )
-            result: Any = task_wrapper(**task.params)
+            result: Any = func(**task.params)
         except Exception as e:
             logger.error(f"Error running task: {task.name}, id: {task.id}, error: {e}")
             self.update(task.id, TaskUpdateDTO(status="error", error=str(e)))
@@ -289,7 +291,7 @@ def resolve_dependencies(
     func: Callable | Dependency,
     overrides: Optional[Dict[Callable, Callable]] = None,
 ) -> Callable:
-    """Run functions with dependencies and resolve them.
+    """Run functions with dependencies and resolve them. Compatible with fastapi dependency classes.
     E.G.:
     overrides: Used to replace dependencies during testing
 
@@ -389,4 +391,4 @@ class TaskFuncWrapper:
         return resolved_func(*args, **kwargs)
 
     def queue_task(self, **kwargs) -> TaskPromise:
-        return self.app.queue_task(self.func, kwargs)
+        return self.app.queue_task(self, kwargs)
