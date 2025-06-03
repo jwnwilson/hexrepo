@@ -39,12 +39,20 @@ Setup the following env vars directly or run:
     - Create orchestrator logic
         - Standard async tasks with celery + SQS + container
             - Keep serverless tasks as option
+                - Add task app "mode"
+                    - lambda
+                    - celery
+            - task app return celery task with decorated task logic with dependency resolving
+            - task dependency call function and queue it
+            - look at celery + pydantic\;
+                https://benninger.ca/posts/celery-serializer-pydantic/
         - Setup Flower 
         - Setup airflow / prefect on ECS / EC2
             - Look at prefect as less effort to implement
         - Setup task tracking debugging UI
             - Airflow?
                 - This will likely require EC2 / kubernetes due to number of containers
+                - https://github.com/jwnwilson/airflow-kubernetes/tree/main
     - Add esc exec cli command
         https://aws.plainenglish.io/aws-ecs-exec-feature-with-fargate-terraform-implementation-and-testing-584fd00116c8
     - Lambda keep warm events are probably using event free quota
