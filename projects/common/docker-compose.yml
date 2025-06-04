@@ -84,6 +84,7 @@ services:
       - "0.0.0.0:5432:5432"
     expose:
       - "5432"
+
   localstack:
     container_name: "common-localstack"
     image: localstack/localstack

@@ -1,3 +1,4 @@
+from logging import config
 from celery import Celery
 
 from hexrepo_task.interactor.event.app import Dependency, TaskApp, TaskDTO
@@ -8,10 +9,28 @@ from app.domain.user import UserPermissionCreateDTO
 from ..dependencies import get_uow
 
 
-app = Celery('tasks', broker='sqs://')
+celery_app = Celery(
+    'tasks',
+    broker=config.CELERY_BROKER_URL.format(
+        aws_access_key_id=config.CELERY_AWS_ACCESS_KEY_ID,
+        aws_secret_access_key=config.CELERY_AWS_SECRET_ACCESS_KEY
+    ),
+    backend=config.CELERY_RESULT_BACKEND
+)
+celery_app.conf.broker_transport_options = {
+    'region': config.REGION
+}
+
+if config.ENVIRONMENT == "local":
+    celery_app.conf.broker_transport_options["endpoint_url"] = "http://localhost:4566"
 
 
-@app.task
+@celery_app.task
+def test_task():
+    print("test task")
+
+
+@celery_app.task
 def create_example_task(task: TaskDTO, uow: SqlUOW = Dependency(get_uow)):
     user_dto: UserPermissionCreateDTO = UserPermissionCreateDTO(**task.params)
     uow.user.create(user_dto)
