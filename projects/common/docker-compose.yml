@@ -43,9 +43,9 @@ services:
       - ../../libs:/libs
       - ./src:/code/src
     depends_on:
-      - api
       - db
-    command: "celery -A app.main.celery worker --loglevel=info"
+      - localstack
+    command: "celery -A app.interactor.event.celery.celery_app worker --loglevel=info"
     
 
   lambda:

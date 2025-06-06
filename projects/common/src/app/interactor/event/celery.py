@@ -3,6 +3,7 @@ from celery import Celery
 
 from hexrepo_task.interactor.event.app import Dependency, TaskApp, TaskDTO
 
+from app.config import config
 from app.adaptor.db.sql import SqlUOW
 from app.domain.user import UserPermissionCreateDTO
 
@@ -11,18 +12,12 @@ from ..dependencies import get_uow
 
 celery_app = Celery(
     'tasks',
-    broker=config.CELERY_BROKER_URL.format(
-        aws_access_key_id=config.CELERY_AWS_ACCESS_KEY_ID,
-        aws_secret_access_key=config.CELERY_AWS_SECRET_ACCESS_KEY
-    ),
+    broker=config.CELERY_BROKER_URL,
     backend=config.CELERY_RESULT_BACKEND
 )
 celery_app.conf.broker_transport_options = {
     'region': config.REGION
 }
-
-if config.ENVIRONMENT == "local":
-    celery_app.conf.broker_transport_options["endpoint_url"] = "http://localhost:4566"
 
 
 @celery_app.task

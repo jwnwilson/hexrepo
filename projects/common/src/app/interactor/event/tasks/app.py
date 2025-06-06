@@ -5,7 +5,7 @@ from app.domain.user import UserPermissionCreateDTO
 
 from ...dependencies import get_queue_uow, get_task_queue, get_uow
 
-app = TaskApp(get_uow=get_queue_uow, get_queue=get_task_queue)
+app = TaskApp(mode="lambda", get_uow=get_queue_uow, get_queue=get_task_queue)
 
 
 @app.task

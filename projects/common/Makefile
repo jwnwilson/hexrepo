@@ -55,8 +55,14 @@ down:
 # Local Development
 
 # Host API locally, loading local env file
-run: down db venv
-	PYTHONPATH=src ENVIRONMENT=default uv run uvicorn app.interactor.api.fastapi.main:app --reload --env-file env/local.env
+run: down db celery venv
+	PYTHONPATH=src ENVIRONMENT=local uv run uvicorn app.interactor.api.fastapi.main:app --reload --env-file env/local.env
+
+celery_local:
+	PYTHONPATH=src ENVIRONMENT=local uv run celery -A app.interactor.event.celery.celery_app worker --loglevel=info
+
+celery:
+	docker compose up celery
 
 # Host API locally, connect to cloud db. Still requires manual setting of DB_PASSWORD_SECRET_NAME in bastion.env
 run_bastion: bastion venv
