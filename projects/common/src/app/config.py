@@ -1,7 +1,7 @@
-import logging
 import os
 import sys
 from typing import Optional
+
 from pydantic_settings import BaseSettings
 
 
@@ -36,16 +36,20 @@ class Config(BaseSettings):
 
     # Celery settings
     CELERY_AWS_ACCESS_KEY_ID: str = os.environ.get("CELERY_AWS_ACCESS_KEY_ID", "test")
-    CELERY_AWS_SECRET_ACCESS_KEY: str = os.environ.get("CELERY_AWS_SECRET_ACCESS_KEY", "test")
+    CELERY_AWS_SECRET_ACCESS_KEY: str = os.environ.get(
+        "CELERY_AWS_SECRET_ACCESS_KEY", "test"
+    )
     CELERY_BROKER_URL: str = os.environ.get(
-        "CELERY_BROKER_URL", 
+        "CELERY_BROKER_URL",
         "sqs://{aws_access_key_id}:{aws_secret_access_key}@".format(
             aws_access_key_id=CELERY_AWS_ACCESS_KEY_ID,
-            aws_secret_access_key=CELERY_AWS_SECRET_ACCESS_KEY
-        )
+            aws_secret_access_key=CELERY_AWS_SECRET_ACCESS_KEY,
+        ),
     )
-    CELERY_RESULT_BACKEND: str = os.environ.get("CELERY_RESULT_BACKEND", "")
-    
+    CELERY_RESULT_BACKEND: str = os.environ.get(
+        "CELERY_RESULT_BACKEND", "db+sqlite:///celery.sqlite"
+    )
+
     @property
     def DB_PASSWORD_SECRET_NAME(self) -> str:
         return os.environ.get("DB_PASSWORD_SECRET_NAME", "").format(

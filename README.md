@@ -43,7 +43,7 @@ Setup the following env vars directly or run:
                 - Attempt to apply resolve dependencies in a celery task
                 - Combine this into the task app class
             - task dependency call function and queue it
-            - look at celery + pydantic\;
+            - look at celery + pydantic;
                 https://benninger.ca/posts/celery-serializer-pydantic/
         - Setup Flower 
         - Setup airflow / prefect on ECS / EC2
