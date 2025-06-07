@@ -11,9 +11,13 @@ model_registry: dict[str, type[BaseModel]] = {}
 class PydanticSerializer(json.JSONEncoder):   
     def default(self, obj):
         if isinstance(obj, BaseModel):
-            return json.loads(obj.model_dump_json()) | {'__module_path__': f"{obj.__class__.__module__}.{obj.__class__.__name__}"}
+            return json.loads(obj.model_dump_json()) | {
+                "__module_path__": f"{obj.__class__.__module__}.{obj.__class__.__name__}"
+            }
+        elif isinstance(obj, str):
+            return super().default(obj)
         else:
-            return json.JSONEncoder.default(self, obj)
+            return obj
 
 
 def pydantic_decoder(obj):
@@ -38,7 +42,7 @@ def pydantic_loads(obj):
     return json.loads(obj, object_hook=pydantic_decoder)
 
 
-def pydantic_celery_app(celery_app: Celery):
+def pydantic_celery(celery_app: Celery):
     register(
         "pydantic",
         pydantic_dumps,

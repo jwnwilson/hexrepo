@@ -1,9 +1,8 @@
-from logging import config
-
 from celery import Celery
 from hexrepo_task.interactor.event.app import Dependency, TaskDTO
-from hexrepo_task.interactor.event.celery_pydantic import pydantic_celery_app
+from hexrepo_task.interactor.event.celery_pydantic import pydantic_celery
 
+from app.config import config
 from app.adaptor.db.sql import SqlUOW
 from app.domain.user import UserPermissionCreateDTO
 
@@ -13,7 +12,7 @@ celery_app = Celery(
     "tasks", broker=config.CELERY_BROKER_URL, backend=config.CELERY_RESULT_BACKEND
 )
 
-pydantic_celery_app(celery_app)
+pydantic_celery(celery_app)
 
 celery_app.conf.broker_transport_options = {"region": config.REGION}
 
