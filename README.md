@@ -39,12 +39,10 @@ Setup the following env vars directly or run:
     - Create orchestrator logic
         - Standard async tasks with celery + SQS + container                
             - task app return celery task with decorated task logic with dependency resolving
-                - Get vanilla celery tasks working
-                - Attempt to apply resolve dependencies in a celery task
-                - Combine this into the task app class
-            - task dependency call function and queue it
-            - look at celery + pydantic;
-                https://benninger.ca/posts/celery-serializer-pydantic/
+                - Combine this into the task app class return celery app with resolved dependencies
+                - task adapter will wrap celery task get?
+                - make lambda tasks work like celery tasks
+                - task adaptor to get task results only
         - Setup Flower 
         - Setup airflow / prefect on ECS / EC2
             - Look at prefect as less effort to implement

@@ -26,12 +26,13 @@ router_v1 = CrudRouter(
 def start_task(
     create_task: CreateExampleDTO, task_adaptor: TaskAdaptor = Depends(get_task_adaptor)
 ) -> TaskDTO:
-    # Maybe the "create_example_task" should come through a dependency?
     # Maybe we should have all tasks added to task_adaptor?
-    task_data: TaskDTO = task_adaptor.queue(
-        create_example_task, params={"example": create_task}
-    ).task
-    return task_data
+    # task_data: TaskDTO = task_adaptor.queue(
+    #     create_example_task, params={"example": create_task}
+    # ).task
+    # Delay will use the api context
+    async_result = create_example_task.delay(example=create_task)
+    return async_result
 
 
 @router_v1.router.get("/task/{id}")
