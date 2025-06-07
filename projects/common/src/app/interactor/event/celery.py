@@ -1,5 +1,5 @@
 from celery import Celery
-from hexrepo_task.interactor.event.app import Dependency, TaskDTO
+from hexrepo_task.interactor.event.app import Dependency, TaskDTO, resolve_dependencies
 from hexrepo_task.interactor.event.celery_pydantic import pydantic_celery
 
 from app.config import config
@@ -23,6 +23,7 @@ def test_task():
 
 
 @celery_app.task()
+@resolve_dependencies
 def create_example_task(task: TaskDTO, uow: SqlUOW = Dependency(get_uow)):
     from celery.contrib import rdb
 
