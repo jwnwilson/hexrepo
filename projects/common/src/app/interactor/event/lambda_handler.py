@@ -1,6 +1,6 @@
 from hexrepo_log import log_manager, setup_logger
 
-from .tasks.app import app
+from .tasks.serverless_tasks import app
 
 
 def handler(event, context):
