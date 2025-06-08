@@ -12,7 +12,7 @@ def test_task():
     print("test task")
 
 
-@celery_app.task()
+@celery_app.task
 @resolve_dependencies
 def create_example_task(user_dto: UserPermissionCreateDTO, uow: SqlUOW = Dependency(get_uow)):
     uow.user.create(user_dto)
