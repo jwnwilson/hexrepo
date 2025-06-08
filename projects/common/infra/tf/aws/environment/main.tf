@@ -144,6 +144,20 @@ module "common_api" {
 #   subdomain_name                  = local.api_subdomain_ecs
 # }
 
+# module "common_alb" {
+#   source = "../../../../../../infra/tf/aws/modules/alb"
+
+#   project     = var.project
+#   environment = terraform.workspace
+# }
+
+# module "common_ecs_task" {
+#   source = "../../../../../../infra/tf/aws/modules/ecs_task"
+
+#   project     = var.project
+#   environment = terraform.workspace
+# }
+
 module "common_ecs_alb" {
   source = "../../../../../../infra/tf/aws/modules/ecs_alb"
   project            = var.project

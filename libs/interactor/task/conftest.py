@@ -33,7 +33,7 @@ def task_app(uow: UOW, queue: QueueAdaptor) -> TaskApp:
         yield queue
     
     # Make dependencies generic
-    app: TaskApp = TaskApp(mode="lambda", get_uow=get_queue_uow_override, get_queue=get_queue_override) 
+    app: TaskApp = TaskApp(get_uow=get_queue_uow_override, get_queue=get_queue_override) 
     return app
 
 
