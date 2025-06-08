@@ -37,10 +37,9 @@ Setup the following env vars directly or run:
 
 - Setup backend
     - Create orchestrator logic
-        - Standard async tasks with celery + SQS + container                
-            - task app return celery task with decorated task logic with dependency resolving
-                - make lambda tasks work like celery tasks
-                - task adaptor to get task results only
+        - Setup celery auto reload
+            https://fastapitutorial.com/blog/celery-autoreload-fastapi/
+        - Validate lambda tasks work
         - Setup Flower 
         - Setup airflow / prefect on ECS / EC2
             - Look at prefect as less effort to implement
