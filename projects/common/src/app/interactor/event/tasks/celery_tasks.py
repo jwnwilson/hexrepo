@@ -14,5 +14,7 @@ def test_task():
 
 @celery_app.task
 @resolve_dependencies
-def create_example_task(user_dto: UserPermissionCreateDTO, uow: SqlUOW = Dependency(get_uow)):
+def create_example_task(
+    user_dto: UserPermissionCreateDTO, uow: SqlUOW = Dependency(get_uow)
+):
     uow.user.create(user_dto)

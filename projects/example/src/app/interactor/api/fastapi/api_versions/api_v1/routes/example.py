@@ -24,9 +24,7 @@ router_v1 = CrudRouter(
 
 
 @router_v1.router.post("/task")
-def start_task(
-    create_task: CreateExampleDTO
-) -> TaskDTO:
+def start_task(create_task: CreateExampleDTO) -> TaskDTO:
     async_result: TaskPromise = create_example_task.delay(example=create_task)
     return async_result.task
 

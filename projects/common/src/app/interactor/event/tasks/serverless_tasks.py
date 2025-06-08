@@ -8,5 +8,7 @@ from ..lambda_app import app
 
 
 @app.task
-def create_example_task_serverless(user_dto: UserPermissionCreateDTO, uow: SqlUOW = Dependency(get_uow)):
+def create_example_task_serverless(
+    user_dto: UserPermissionCreateDTO, uow: SqlUOW = Dependency(get_uow)
+):
     uow.user.create(user_dto)

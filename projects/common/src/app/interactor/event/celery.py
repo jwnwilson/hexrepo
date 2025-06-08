@@ -1,5 +1,5 @@
 from celery import Celery
-from hexrepo_task.interactor.event.celery import create_celery_app, CeleryConfig
+from hexrepo_task.interactor.event.celery import CeleryConfig, create_celery_app
 
 from app.config import config
 

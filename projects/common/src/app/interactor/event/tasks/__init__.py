@@ -1,2 +1,2 @@
-from .celery_tasks import *
-from .serverless_tasks import *
+from .celery_tasks import *  # noqa
+from .serverless_tasks import *  # noqa

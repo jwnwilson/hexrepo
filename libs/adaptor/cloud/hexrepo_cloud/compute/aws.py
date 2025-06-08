@@ -42,7 +42,9 @@ class AWSEcsManager:
             raise ValueError(f"No running tasks found for service {service_name}")
         return response["taskArns"][0].split("/")[-1]
 
-    def execute_command(self, cluster_name: str, task_id: str, command: str, interactive: bool = True) -> None:
+    def execute_command(
+        self, cluster_name: str, task_id: str, command: str, interactive: bool = True
+    ) -> None:
         """Execute a command on an ECS task."""
         if interactive:
             run_system_command(

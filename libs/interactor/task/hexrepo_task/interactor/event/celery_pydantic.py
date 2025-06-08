@@ -1,14 +1,14 @@
 import importlib
 import json
-from pydantic import BaseModel
+
 from celery import Celery
 from kombu.serialization import register
-
+from pydantic import BaseModel
 
 model_registry: dict[str, type[BaseModel]] = {}
 
 
-class PydanticSerializer(json.JSONEncoder):   
+class PydanticSerializer(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, BaseModel):
             return json.loads(obj.model_dump_json()) | {
@@ -21,21 +21,22 @@ class PydanticSerializer(json.JSONEncoder):
 
 
 def pydantic_decoder(obj):
-    if '__module_path__' in obj:
-        if obj['__module_path__'] not in model_registry:
-            module_path = ".".join(obj['__module_path__'].split('.')[:-1])
-            cls_name = obj['__module_path__'].split('.')[-1]
+    if "__module_path__" in obj:
+        if obj["__module_path__"] not in model_registry:
+            module_path = ".".join(obj["__module_path__"].split(".")[:-1])
+            cls_name = obj["__module_path__"].split(".")[-1]
             model_module = importlib.import_module(module_path)
             cls = getattr(model_module, cls_name)
-            model_registry[obj['__module_path__']] = cls
-        cls = model_registry[obj['__module_path__']]
+            model_registry[obj["__module_path__"]] = cls
+        cls = model_registry[obj["__module_path__"]]
         return cls.model_validate(obj)
     return obj
 
 
-# Encoder function      
+# Encoder function
 def pydantic_dumps(obj):
     return json.dumps(obj, cls=PydanticSerializer)
+
 
 # Decoder function
 def pydantic_loads(obj):
@@ -50,7 +51,7 @@ def pydantic_celery(celery_app: Celery):
         content_type="application/x-pydantic",
         content_encoding="utf-8",
     )
-    
+
     celery_app.conf.update(
         task_serializer="pydantic",
         result_serializer="pydantic",

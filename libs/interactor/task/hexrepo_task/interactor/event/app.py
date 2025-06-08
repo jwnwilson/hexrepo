@@ -4,7 +4,6 @@ import logging
 import types
 from asyncio import sleep
 from contextlib import contextmanager
-from enum import Enum
 from functools import wraps
 from inspect import signature
 from typing import Any, Callable, Dict, Generator, List, Optional, cast
