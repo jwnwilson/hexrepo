@@ -64,7 +64,7 @@ api_local: down db localstack venv
 
 # Run celery locally, loading local env file
 celery_local: down db localstack venv
-	PYTHONPATH=src ENVIRONMENT=local uv run celery -A app.interactor.event.celery.celery_app worker --loglevel=info
+	PYTHONPATH=src ENVIRONMENT=local uv run watchmedo auto-restart --directory=./src --pattern="*.py" --recursive -- celery -A app.interactor.event.celery.celery_app worker --loglevel=info
 
 python_cli: venv
 	PYTHONPATH=src ENVIRONMENT=local uv run python
