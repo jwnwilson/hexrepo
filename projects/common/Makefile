@@ -54,10 +54,15 @@ down:
 	
 # Local Development
 
-# Host API locally, loading local env file
-run: down db celery venv
+# Host API locally, loading local env file with all supporting services required
+run: docker_stop celery venv
 	PYTHONPATH=src ENVIRONMENT=local uv run uvicorn app.interactor.api.fastapi.main:app --reload --env-file env/local.env
 
+# Host API locally, loading local env file without celery to run that locally also
+api_local: down db localstack venv
+	PYTHONPATH=src ENVIRONMENT=local uv run uvicorn app.interactor.api.fastapi.main:app --reload --env-file env/local.env
+
+# Run celery locally, loading local env file
 celery_local: down db localstack venv
 	PYTHONPATH=src ENVIRONMENT=local uv run celery -A app.interactor.event.celery.celery_app worker --loglevel=info
 

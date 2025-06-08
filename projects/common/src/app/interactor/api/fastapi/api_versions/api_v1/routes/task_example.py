@@ -9,22 +9,21 @@ from hexrepo_task.interface import TaskDTO
 
 from app.interactor.event.tasks.serverless_tasks import create_example_task_serverless
 from app.interactor.event.tasks.celery_tasks import create_example_task
-from projects.common.src.app.domain.user import UserPermissionCreateDTO
-
-from ......dependencies import get_task_adaptor, get_uow
+from app.domain.user import UserPermissionCreateDTO
+from app.interactor.dependencies import get_task_adaptor, get_uow
 
 router_v1 = APIRouter()
 
 
-@router_v1.router.post("/task/celery")
+@router_v1.post("/task/celery")
 def start_task_celery(
     user_permission: UserPermissionCreateDTO
-) -> Any:
+) -> str:
     async_result = create_example_task.delay(user_dto=user_permission)
-    return async_result.task
+    return async_result.task_id
 
 
-@router_v1.router.post("/task/serverless")
+@router_v1.post("/task/serverless")
 def start_task_serverless(
     user_permission: UserPermissionCreateDTO
 ) -> TaskDTO:
@@ -32,7 +31,7 @@ def start_task_serverless(
     return async_result.task
 
 
-@router_v1.router.get("/task/{id}")
+@router_v1.get("/task/{id}")
 def get_task(
     id: UUID, task_adaptor: TaskAdaptor = Depends(get_task_adaptor)
 ) -> TaskDTO:

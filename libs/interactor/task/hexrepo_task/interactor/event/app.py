@@ -28,11 +28,6 @@ GetQueue = Callable[[], QueueAdaptor]
 GetUOW = Callable[[], UOW]
 
 
-class TaskMode(Enum):
-    LAMBDA = "lambda"
-    CELERY = "celery"
-
-
 class TaskApp:
     # Initialise task app to configure how tasks are run
     task_registry: Dict[str, "TaskFuncWrapper"] = {}
@@ -40,7 +35,6 @@ class TaskApp:
 
     def __init__(
         self,
-        mode: TaskMode,
         get_queue: GetQueue,
         get_uow: GetUOW,
         config: Optional[TaskConfig] = None,
@@ -48,7 +42,6 @@ class TaskApp:
         self._get_queue: GetQueue = get_queue
         self._get_uow: GetUOW = get_uow
         self.config: TaskConfig = config or default_config
-        self.mode: TaskMode = mode
 
     @property
     def dependency_overrides(self) -> Dict[Callable, Callable]:

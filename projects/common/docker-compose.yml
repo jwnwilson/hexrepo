@@ -46,7 +46,6 @@ services:
       - db
       - localstack
     command: "celery -A app.interactor.event.celery.celery_app worker --loglevel=info"
-    
 
   lambda:
     container_name: common-lambda
