@@ -39,8 +39,6 @@ Setup the following env vars directly or run:
     - Create orchestrator logic
         - Standard async tasks with celery + SQS + container                
             - task app return celery task with decorated task logic with dependency resolving
-                - Combine this into the task app class return celery app with resolved dependencies
-                - task adapter will wrap celery task get?
                 - make lambda tasks work like celery tasks
                 - task adaptor to get task results only
         - Setup Flower 
@@ -68,6 +66,7 @@ Setup the following env vars directly or run:
         - tach: https://github.com/gauge-sh/tach
         - https://roman.pt/posts/python-architecture-linter/
         - restricting adaptors imports to a dependencies module
+    - Convert to async for thoughput in APIs
     - Move to GCP for cost reasons
         - Use 3rd party auth provider to avoid vender locking?
     - branch deploys

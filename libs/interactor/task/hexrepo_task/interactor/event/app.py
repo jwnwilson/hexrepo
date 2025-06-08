@@ -261,6 +261,35 @@ class TaskPromise:
         return
 
 
+class TaskFuncWrapper:
+    """
+    Call task function and handle dependencies
+    """
+
+    def __init__(
+        self, func: TaskFunc, app: TaskApp, dependency_overrides: Optional[Dict] = None
+    ):
+        self.app: TaskApp = app
+        self.func: TaskFunc = func
+        self.dependency_overrides: Dict = dependency_overrides or {}
+
+    @property
+    def __name__(self) -> str:
+        return self.func.__name__
+
+    def __call__(self, *args, **kwargs) -> Any:
+        resolved_func = resolve_dependencies(
+            self.func, overrides=self.dependency_overrides
+        )
+        return resolved_func(*args, **kwargs)
+
+    def queue_task(self, **kwargs) -> TaskPromise:
+        return self.app.queue_task(self.func, kwargs)
+
+    def delay(self, **kwargs) -> TaskPromise:
+        return self.queue_task(self.func, kwargs)
+
+
 class Dependency:
     cache: Dict[Callable, Any] = {}
     generators: List[Generator] = []
@@ -371,29 +400,3 @@ def resolve_dependencies(
         return resolve_dependencies_wrapper_async
     else:
         return resolve_dependencies_wrapper
-
-
-class TaskFuncWrapper:
-    """
-    Call task function and handle dependencies
-    """
-
-    def __init__(
-        self, func: TaskFunc, app: TaskApp, dependency_overrides: Optional[Dict] = None
-    ):
-        self.app: TaskApp = app
-        self.func: TaskFunc = func
-        self.dependency_overrides: Dict = dependency_overrides or {}
-
-    @property
-    def __name__(self) -> str:
-        return self.func.__name__
-
-    def __call__(self, *args, **kwargs) -> Any:
-        resolved_func = resolve_dependencies(
-            self.func, overrides=self.dependency_overrides
-        )
-        return resolved_func(*args, **kwargs)
-
-    def queue_task(self, **kwargs) -> TaskPromise:
-        return self.app.queue_task(self.func, kwargs)
