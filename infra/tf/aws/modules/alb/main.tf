@@ -194,4 +194,4 @@ resource "aws_security_group" "lb" {
     Environment = var.environment
     Project     = var.project
   }
-
+}
