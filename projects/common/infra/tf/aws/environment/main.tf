@@ -102,6 +102,7 @@ module "common_ecs_api" {
 
   environment_variables = {
     ENVIRONMENT             = terraform.workspace
+    PROJECT                 = var.project
     CLOUD_PROVIDER          = "AWS"
     DB_URL                  = local.db_url
     DB_RO_URL               = local.db_ro_url
@@ -142,6 +143,7 @@ module "common_ecs_task" {
 
   environment_variables = {
     ENVIRONMENT             = terraform.workspace
+    PROJECT                 = var.project
     CLOUD_PROVIDER          = "AWS"
     DB_URL                  = local.db_url
     DB_RO_URL               = local.db_ro_url
@@ -199,6 +201,7 @@ module "common_api" {
 
   environment_variables = {
     ENVIRONMENT             = terraform.workspace
+    PROJECT                 = var.project
     CLOUD_PROVIDER          = "AWS"
     DB_URL                  = local.db_url
     DB_RO_URL               = local.db_ro_url
@@ -224,6 +227,7 @@ module "common_tasks" {
   keep_warm_schedule = ""
   environment_variables = {
     ENVIRONMENT             = terraform.workspace
+    PROJECT                 = var.project
     CLOUD_PROVIDER          = "AWS"
     DB_URL                  = local.db_url
     DB_RO_URL               = local.db_ro_url
