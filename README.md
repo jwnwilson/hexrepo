@@ -39,8 +39,8 @@ Setup the following env vars directly or run:
     - Setup celery worker
         - Celery infra / deploy validate
         - Validate lambda & celery tasks work
-        - Setup Flower 
     - Create orchestrator logic
+        - Setup Flower 
         - Setup airflow / prefect on ECS / EC2
             - Look at prefect as less effort to implement?
             - setup airflow on kubernetes cluseter?

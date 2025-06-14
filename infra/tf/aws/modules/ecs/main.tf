@@ -12,7 +12,7 @@ provider "aws" {
 }
 
 locals {
-  name = "${var.project}-ecs-${var.environment}"
+  name = "${var.project}-ecs-${var.name}-${var.environment}"
 }
 
 # ECS Cluster
@@ -300,6 +300,13 @@ resource "aws_iam_role_policy" "ecs_task_secrets" {
         Effect = "Allow"
         Action = [
           "logs:*"
+        ]
+        Resource = "*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "sqs:*"
         ]
         Resource = "*"
       }
