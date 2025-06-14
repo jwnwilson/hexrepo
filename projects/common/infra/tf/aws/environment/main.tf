@@ -113,6 +113,7 @@ module "common_ecs_api" {
     ALLOWED_ORIGINS         = "*"
     LOG_JSON                = "true"
     ORIGIN_URL              = "https://${local.api_subdomain_ecs}.${var.domain}"
+    TASK_TABLE_NAME         = module.common_task_nosql.table_name
   }
   secrets = {
     DB_PASSWORD = data.aws_secretsmanager_secret.db_secret.arn
@@ -152,6 +153,7 @@ module "common_ecs_task" {
     ALLOWED_ORIGINS         = "*"
     LOG_JSON                = "true"
     ORIGIN_URL              = "https://${local.api_subdomain_ecs}.${var.domain}"
+    TASK_TABLE_NAME         = module.common_task_nosql.table_name
   }
   secrets = {
     DB_PASSWORD = data.aws_secretsmanager_secret.db_secret.arn
@@ -167,6 +169,13 @@ module "queue" {
 
   project     = var.project
   name        = "${var.project}-${terraform.workspace}"
+  environment = terraform.workspace
+}
+
+module "common_task_nosql" {
+  source = "../../../../../../infra/tf/aws/modules/dynamodb"
+  project = var.project
+  table_name = "tasks"
   environment = terraform.workspace
 }
 

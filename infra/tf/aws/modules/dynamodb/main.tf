@@ -1,7 +1,11 @@
+locals {
+  table_name = "${var.project}_${var.environment}_${var.table_name}"
+}
+
 module "dynamodb_table" {
   source   = "terraform-aws-modules/dynamodb-table/aws"
 
-  name     = "${var.project}_${var.environment}_${var.table_name}"
+  name     = local.table_name
   hash_key = "${var.hash_key}"
 #   sort_key = "${var.sort_key}"
 
