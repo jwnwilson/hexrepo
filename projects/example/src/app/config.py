@@ -31,7 +31,7 @@ class Config(BaseSettings):
 
     # Task Queue settings
     TASK_QUEUE: str = os.environ.get("TASK_QUEUE", "hexrepo-tasks")
-    DB_QUEUE_URL: str = os.environ.get("DB_QUQUE_URL", "")
+    DB_QUEUE_URL: str = os.environ.get("DB_QUEUE_URL", "")
 
     # API settings
     API_PREFIX: str = "/api/v1"

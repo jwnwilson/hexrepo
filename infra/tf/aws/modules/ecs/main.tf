@@ -306,7 +306,8 @@ resource "aws_iam_role_policy" "ecs_task_secrets" {
       {
         Effect = "Allow"
         Action = [
-          "sqs:*"
+          "sqs:*",
+          "dynamodb:*"
         ]
         Resource = "*"
       }
