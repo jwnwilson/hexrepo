@@ -53,6 +53,7 @@ class Config(BaseSettings):
     CELERY_RESULT_BACKEND: str = os.environ.get(
         "CELERY_RESULT_BACKEND", "db+sqlite:///celery.sqlite"
     )
+    TASK_QUEUE: str = os.environ.get("TASK_QUEUE", "common-tasks")
 
     @property
     def DB_PASSWORD_SECRET_NAME(self) -> str:

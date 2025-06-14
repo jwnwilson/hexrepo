@@ -10,6 +10,7 @@ from hexrepo_db.sql import get_sql_db_url
 from hexrepo_task import QueueAdaptor, SqsQueueAdaptor
 from hexrepo_task.adaptor.db import QueueUOW
 from hexrepo_task.interactor.event.app import TaskAdaptor
+from hexrepo_task.interface import QueueConfig
 from starlette.status import HTTP_403_FORBIDDEN
 
 from app.adaptor.db.sql import SqlUOW
@@ -40,7 +41,8 @@ def get_queue_uow() -> Generator[QueueUOW, None, None]:
 
 
 def get_task_queue() -> Generator[QueueAdaptor, None, None]:
-    queue = SqsQueueAdaptor(queue="hexrepo-tasks")
+    queue_config: QueueConfig = QueueConfig(default_queue=config.TASK_QUEUE)
+    queue = SqsQueueAdaptor(config=queue_config)
     yield queue
 
 
