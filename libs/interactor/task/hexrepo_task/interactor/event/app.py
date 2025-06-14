@@ -279,7 +279,7 @@ class TaskFuncWrapper:
         return self.app.queue_task(self.func, kwargs)
 
     def delay(self, **kwargs) -> TaskPromise:
-        return self.queue_task(self.func, kwargs)
+        return self.queue_task(**kwargs)
 
 
 class Dependency:

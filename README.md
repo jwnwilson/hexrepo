@@ -37,8 +37,8 @@ Setup the following env vars directly or run:
 
 - Setup backend
     - Setup celery worker
-        - Celery infra / deploy validate
-        - Validate lambda & celery tasks work
+        - Validate lambda tasks work
+        - Task logging setup
     - Create orchestrator logic
         - Setup Flower 
         - Setup airflow / prefect on ECS / EC2
