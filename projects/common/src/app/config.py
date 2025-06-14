@@ -35,17 +35,6 @@ class Config(BaseSettings):
     DB_RO_URL: str = os.environ.get("DB_RO_URL", "")
 
     # Celery settings
-    # CELERY_AWS_ACCESS_KEY_ID: str = os.environ.get("CELERY_AWS_ACCESS_KEY_ID", "test")
-    # CELERY_AWS_SECRET_ACCESS_KEY: str = os.environ.get(
-    #     "CELERY_AWS_SECRET_ACCESS_KEY", "test"
-    # )
-    # CELERY_BROKER_URL: str = os.environ.get(
-    #     "CELERY_BROKER_URL",
-    #     "sqs://{aws_access_key_id}:{aws_secret_access_key}@".format(
-    #         aws_access_key_id=CELERY_AWS_ACCESS_KEY_ID,
-    #         aws_secret_access_key=CELERY_AWS_SECRET_ACCESS_KEY,
-    #     ),
-    # )
     CELERY_BROKER_URL: str = os.environ.get(
         "CELERY_BROKER_URL",
         "sqs://"
@@ -54,6 +43,7 @@ class Config(BaseSettings):
         "CELERY_RESULT_BACKEND", "db+sqlite:///celery.sqlite"
     )
     TASK_QUEUE: str = os.environ.get("TASK_QUEUE", "common-tasks")
+    DB_QUEUE_URL: str = os.environ.get("DB_QUEUE_URL", "")
 
     @property
     def DB_PASSWORD_SECRET_NAME(self) -> str:

@@ -36,7 +36,7 @@ def get_uow_ro(uow: SqlUOW = Depends(get_uow)) -> Generator[SqlUOW, None, None]:
 
 
 def get_queue_uow() -> Generator[QueueUOW, None, None]:
-    uow: QueueUOW = QueueUOW()
+    uow: QueueUOW = QueueUOW(db_url=config.DB_QUEUE_URL)
     yield uow
 
 

@@ -10,7 +10,7 @@ from ...interface import UOW
 class BaseDynamoUOW(UOW):
     def __init__(
         self,
-        db_url: str,
+        db_url: str | None = None,
         required_filters: Optional[Dict[str, str]] = None,
         config: Optional[Dict[str, Any]] = None,
     ):
