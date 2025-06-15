@@ -39,11 +39,14 @@ Setup the following env vars directly or run:
     - Setup celery worker
         - Task celery JSON logging setup
         - Lambda remove debug logs
+    - Cheaper infra
+        - GCP?
+        - scaleway cheap kubernetes cluster?
+        - Use 3rd party auth provider to avoid vender locking?
     - Create orchestrator logic
         - Setup Flower 
-        - Setup airflow / prefect on ECS / EC2
+        - Setup airflow / prefect on ECS / EC2 / K8s
             - Look at prefect as less effort to implement?
-            - setup airflow on kubernetes cluseter?
         - Setup task tracking debugging UI
             - Airflow?
                 - This will likely require EC2 / kubernetes due to number of containers
@@ -67,10 +70,6 @@ Setup the following env vars directly or run:
         - https://roman.pt/posts/python-architecture-linter/
         - restricting adaptors imports to a dependencies module
     - Convert to async for thoughput in APIs
-    - Cheaper infra
-        - GCP?
-        - scaleway cheap kubernetes cluster?
-        - Use 3rd party auth provider to avoid vender locking?
     - branch deploys
     - blue green deployments via load balancer
     - Setup multienv
@@ -92,39 +91,35 @@ Setup the following env vars directly or run:
         - Create apps folder for FE
         - User Event tracking
         - Add turborepo with auth
+    - Add ability to disable / turn off / turn on projects
+    - Add smoke test / E2E tests
+    - Add user setup to infra as code
+        - During project config setup define hexrepo user with admin account
+        - login with mono repo user and store credentials to work specifically with hexrepo
+
+### Project Ideas
     - Play with AI crawler project 
         - Setup crawl spider for PLP pages
         - Cache all page data to avoid recrawls
         - Store data in graph format and visualise it
         - Categorise PLP pages
         - Fan out and crawl web page PDP page contents
-    - Add ability to disable / turn off / turn on projects
-    - Improve docker container builds
-        - Reduce image size
-            https://github.com/astral-sh/uv/issues/8935
-        - Setup base lib image to re-use for projects
-    - Combine shared infra + env infra pull add envs to config and pull them down
-    - Project improvements
-        - set pythonpath in vscode settings to current project command
-    - Add smoke test / E2E tests
-    - Add user setup to infra as code
-        - During project config setup define hexrepo user with admin account
-        - login with mono repo user and store credentials to work specifically with hexrepo
-
-- Investigate setting up company services
-    - Create generic hexrepo setup cli tool to setup projects like turborepo
-    - Feature Flagging / A / B testing
-    - Switching calculation verisons
-    - Better stack tracing / logging
-    - Analytics
-    - JIRA / Confluence
-    - Spendesk
-    - Charlie hr
-    - Product board
-    - Payments
-    - Automated API docs
-    - External APIs
-    - Free infra under my own domain to allow users to try it out
+    - Cycling running area capture app.
+        - AI agents to proactively onboard new users
+    - Start up starter kit
+        - Create generic hexrepo setup cli tool to setup projects like turborepo
+        - Feature Flagging / A / B testing
+        - Switching calculation verisons
+        - Better stack tracing / logging
+        - Analytics
+        - JIRA / Confluence
+        - Spendesk
+        - Charlie hr
+        - Product board
+        - Payments
+        - Automated API docs
+        - External APIs
+        - Free infra under my own domain to allow users to try it out
 
 - Setup Frontend
     - rename project -> backend?
