@@ -206,7 +206,7 @@ wheels = [
 
 [[package]]
 name = "hexrepo-log"
-version = "0.1.13"
+version = "0.1.15"
 source = { editable = "." }
 dependencies = [
     { name = "fastapi" },

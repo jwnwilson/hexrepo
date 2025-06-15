@@ -1,20 +1,8 @@
-import logging
 import os
 import sys
 from typing import Optional
 
-from dotenv import load_dotenv
 from pydantic_settings import BaseSettings
-
-logger = logging.getLogger()
-# Silence noisy logs from faker
-logging.getLogger("faker.factory").setLevel(logging.ERROR)
-
-ENV = os.environ.get("ENVIRONMENT", "local")
-
-env_file: str = os.environ.get("ENV_FILE", f"./env/{ENV}.env")
-logger.info(f"Loading environment variables from : {env_file}")
-load_dotenv(env_file)
 
 
 class Config(BaseSettings):
@@ -45,6 +33,14 @@ class Config(BaseSettings):
     )
     DB_URL: str = os.environ["DB_URL"]
     DB_RO_URL: str = os.environ.get("DB_RO_URL", "")
+
+    # Celery settings
+    CELERY_BROKER_URL: str = os.environ.get("CELERY_BROKER_URL", "sqs://")
+    CELERY_RESULT_BACKEND: str = os.environ.get(
+        "CELERY_RESULT_BACKEND", "db+sqlite:///celery.sqlite"
+    )
+    TASK_QUEUE: str = os.environ.get("TASK_QUEUE", "common-tasks")
+    DB_QUEUE_URL: str = os.environ.get("DB_QUEUE_URL", "")
 
     @property
     def DB_PASSWORD_SECRET_NAME(self) -> str:

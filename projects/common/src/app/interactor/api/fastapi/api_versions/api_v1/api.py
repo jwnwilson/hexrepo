@@ -8,6 +8,7 @@ from .routes.feature_flags import router_v1 as feature_flags_router
 from .routes.groups import router_v1 as groups_router
 from .routes.healthcheck import router_v1 as healthcheck_router
 from .routes.permissions import router_v1 as permissions_router
+from .routes.task_example import router_v1 as task_example_router
 from .routes.users import router_v1 as users_router
 
 api_router_v1 = APIRouter()
@@ -64,4 +65,10 @@ api_router_v1.include_router(
     environments_router,
     tags=["Environments"],
     prefix="/environment",
+)
+
+api_router_v1.include_router(
+    task_example_router,
+    tags=["Task Example"],
+    prefix="/task",
 )

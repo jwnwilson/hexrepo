@@ -30,6 +30,23 @@ services:
       - db
     # command: "uvicorn app.interactor.api.fastapi.main:app --host 0.0.0.0 --port 8000 --reload"
 
+  celery:
+    container_name: common-celery
+    platform: "linux/amd64"
+    env_file:
+      - env/docker.env
+    image: "common"
+    # Run this contain as if it's in the terminal, useful for debugging
+    tty: true
+    # Mount local files into the container so we can update files inside the container
+    volumes:
+      - ../../libs:/libs
+      - ./src:/code/src
+    depends_on:
+      - db
+      - localstack
+    command: "celery -A app.interactor.event.celery.celery_app worker --loglevel=info"
+
   lambda:
     container_name: common-lambda
     platform: "linux/amd64"
@@ -66,6 +83,7 @@ services:
       - "0.0.0.0:5432:5432"
     expose:
       - "5432"
+
   localstack:
     container_name: "common-localstack"
     image: localstack/localstack

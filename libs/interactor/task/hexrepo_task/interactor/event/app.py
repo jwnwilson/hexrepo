@@ -29,11 +29,14 @@ GetUOW = Callable[[], UOW]
 
 class TaskApp:
     # Initialise task app to configure how tasks are run
-    task_registry: Dict[str, Callable] = {}
+    task_registry: Dict[str, "TaskFuncWrapper"] = {}
     _dependency_overrides: Dict[Callable, Callable] = {}
 
     def __init__(
-        self, get_queue: GetQueue, get_uow: GetUOW, config: Optional[TaskConfig] = None
+        self,
+        get_queue: GetQueue,
+        get_uow: GetUOW,
+        config: Optional[TaskConfig] = None,
     ):
         self._get_queue: GetQueue = get_queue
         self._get_uow: GetUOW = get_uow
@@ -65,7 +68,7 @@ class TaskApp:
         else:
             yield uow
 
-    def add_task_func(self, func: TaskFunc):
+    def _add_task_func(self, func: TaskFunc) -> "TaskFuncWrapper":
         func_name = func.__name__
         if (
             self.task_registry.get(func_name)
@@ -74,14 +77,15 @@ class TaskApp:
             raise DuplicateTaskName(
                 f"Duplicate functions with name: {func_name} please rename: {func}"
             )
-        self.task_registry[func_name] = func
+        wrapped_func = TaskFuncWrapper(
+            func, self, dependency_overrides=self.dependency_overrides
+        )
+        self.task_registry[func_name] = wrapped_func
+        return wrapped_func
 
     def task(self, func: TaskFunc, **config) -> "TaskFuncWrapper":
         """Task decorator to register task functions"""
-        self.add_task_func(func)
-        return TaskFuncWrapper(
-            func, self, dependency_overrides=self.dependency_overrides
-        )
+        return self._add_task_func(func)
 
     def handle(self, event: Dict | TaskDTO) -> Any:
         """Handle event and run task"""
@@ -100,9 +104,7 @@ class TaskApp:
                 )
                 raise
 
-    def queue_task(
-        self, func: TaskFunc | "TaskFuncWrapper", params: Dict
-    ) -> "TaskPromise":
+    def queue_task(self, func: "TaskFuncWrapper", params: Dict) -> "TaskPromise":
         """Queue task from app initialising deodependencies"""
         if isinstance(func, TaskFuncWrapper):
             func = func.func
@@ -218,10 +220,7 @@ class TaskAdaptor:
         func: TaskFunc = self._app.task_registry[task.name]
         try:
             logger.info(f"Running task: {task.name}, id: {task.id}")
-            task_wrapper: TaskFuncWrapper = TaskFuncWrapper(
-                func, self, dependency_overrides=self._app.dependency_overrides
-            )
-            result: Any = task_wrapper(**task.params)
+            result: Any = func(**task.params)
         except Exception as e:
             logger.error(f"Error running task: {task.name}, id: {task.id}, error: {e}")
             self.update(task.id, TaskUpdateDTO(status="error", error=str(e)))
@@ -252,6 +251,35 @@ class TaskPromise:
             timer += 1
             self.task_adaptor.read(self.task.id)
         return
+
+
+class TaskFuncWrapper:
+    """
+    Call task function and handle dependencies
+    """
+
+    def __init__(
+        self, func: TaskFunc, app: TaskApp, dependency_overrides: Optional[Dict] = None
+    ):
+        self.app: TaskApp = app
+        self.func: TaskFunc = func
+        self.dependency_overrides: Dict = dependency_overrides or {}
+
+    @property
+    def __name__(self) -> str:
+        return self.func.__name__
+
+    def __call__(self, *args, **kwargs) -> Any:
+        resolved_func = resolve_dependencies(
+            self.func, overrides=self.dependency_overrides
+        )
+        return resolved_func(*args, **kwargs)
+
+    def queue_task(self, **kwargs) -> TaskPromise:
+        return self.app.queue_task(self.func, kwargs)
+
+    def delay(self, **kwargs) -> TaskPromise:
+        return self.queue_task(**kwargs)
 
 
 class Dependency:
@@ -289,7 +317,7 @@ def resolve_dependencies(
     func: Callable | Dependency,
     overrides: Optional[Dict[Callable, Callable]] = None,
 ) -> Callable:
-    """Run functions with dependencies and resolve them.
+    """Run functions with dependencies and resolve them. Compatible with fastapi dependency classes.
     E.G.:
     overrides: Used to replace dependencies during testing
 
@@ -364,29 +392,3 @@ def resolve_dependencies(
         return resolve_dependencies_wrapper_async
     else:
         return resolve_dependencies_wrapper
-
-
-class TaskFuncWrapper:
-    """
-    Call task function and handle dependencies
-    """
-
-    def __init__(
-        self, func: TaskFunc, app: TaskApp, dependency_overrides: Optional[Dict] = None
-    ):
-        self.app: TaskApp = app
-        self.func: TaskFunc = func
-        self.dependency_overrides: Dict = dependency_overrides or {}
-
-    @property
-    def __name__(self) -> str:
-        return self.func.__name__
-
-    def __call__(self, *args, **kwargs) -> Any:
-        resolved_func = resolve_dependencies(
-            self.func, overrides=self.dependency_overrides
-        )
-        return resolved_func(*args, **kwargs)
-
-    def queue_task(self, **kwargs) -> TaskPromise:
-        return self.app.queue_task(self.func, kwargs)

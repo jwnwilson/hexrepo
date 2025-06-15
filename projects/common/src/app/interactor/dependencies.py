@@ -5,9 +5,12 @@ from fastapi import Depends, HTTPException
 from hexrepo_cloud.auth.cognito import get_jwt_token
 from hexrepo_cloud.auth.cognito.fastapi_auth import JWTAuthorizationCredentials
 from hexrepo_cloud.auth.interface import AuthAdapter
+from hexrepo_db.interface import UOW
 from hexrepo_db.sql import get_sql_db_url
 from hexrepo_task import QueueAdaptor, SqsQueueAdaptor
 from hexrepo_task.adaptor.db import QueueUOW
+from hexrepo_task.interactor.event.app import TaskAdaptor
+from hexrepo_task.interface import QueueConfig
 from starlette.status import HTTP_403_FORBIDDEN
 
 from app.adaptor.db.sql import SqlUOW
@@ -33,12 +36,13 @@ def get_uow_ro(uow: SqlUOW = Depends(get_uow)) -> Generator[SqlUOW, None, None]:
 
 
 def get_queue_uow() -> Generator[QueueUOW, None, None]:
-    uow: QueueUOW = QueueUOW()
+    uow: QueueUOW = QueueUOW(db_url=config.DB_QUEUE_URL)
     yield uow
 
 
 def get_task_queue() -> Generator[QueueAdaptor, None, None]:
-    queue = SqsQueueAdaptor(queue="hexrepo-tasks")
+    queue_config: QueueConfig = QueueConfig(default_queue=config.TASK_QUEUE)
+    queue = SqsQueueAdaptor(config=queue_config)
     yield queue
 
 
@@ -75,3 +79,12 @@ def get_superadmin_user(
             status_code=HTTP_403_FORBIDDEN, detail="Admin access required"
         )
     return user
+
+
+def get_task_adaptor(
+    uow: UOW = Depends(get_queue_uow), queue: QueueAdaptor = Depends(get_task_queue)
+) -> Generator[TaskAdaptor, None, None]:
+    from app.interactor.event.lambda_app import app as lambda_app
+
+    task_adaptor = TaskAdaptor(lambda_app, uow=uow, queue=queue)
+    yield task_adaptor

@@ -3,6 +3,11 @@ variable "project" {
   type        = string
 }
 
+variable "name" {
+  description = "Name of the ECS service"
+  type        = string
+}
+
 variable "environment" {
   description = "Environment name"
   type        = string
@@ -21,18 +26,6 @@ variable "vpc_id" {
 variable "private_subnet_ids" {
   description = "List of private subnet IDs for the ECS tasks"
   type        = list(string)
-}
-
-variable "public_subnet_ids" {
-  description = "List of public subnet IDs for the ALB"
-  type        = list(string)
-  default     = []
-}
-
-variable "vpc_cidr_blocks" {
-  description = "List of VPC CIDR blocks for internal ALB access"
-  type        = list(string)
-  default     = []
 }
 
 variable "task_cpu" {
@@ -109,22 +102,16 @@ variable "min_capacity" {
   description = "Minimum number of tasks"
   type        = number
   default     = 1
-} 
-
-variable "domain_name" {
-  description = "Domain name for the API Gateway"
-  type        = string
-  default     = "jwnwilson.co.uk"
-}
-
-variable "subdomain_name" {
-  description = "Subdomain name for the API Gateway"
-  type        = string
-  default     = "ecs"
 }
 
 variable "security_group_ids" {
   description = "List of security group IDs for the ECS tasks"
   type        = list(string)
   default     = []
+}
+
+variable "target_group_arn" {
+  description = "ARN of the target group for the ECS service"
+  type        = string
+  default     = ""
 }

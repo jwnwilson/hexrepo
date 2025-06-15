@@ -4,6 +4,7 @@ from fastapi import Depends, HTTPException
 from hexrepo_api import CrudRouter
 from hexrepo_db.exception import RecordNotFound
 from hexrepo_task import TaskAdaptor
+from hexrepo_task.interactor.event.app import TaskPromise
 from hexrepo_task.interface import TaskDTO
 
 from app.adaptor.db.sql.models.example import ExampleDTO
@@ -23,15 +24,9 @@ router_v1 = CrudRouter(
 
 
 @router_v1.router.post("/task")
-def start_task(
-    create_task: CreateExampleDTO, task_adaptor: TaskAdaptor = Depends(get_task_adaptor)
-) -> TaskDTO:
-    # Maybe the "create_example_task" should come through a dependency?
-    # Maybe we should have all tasks added to task_adaptor?
-    task_data: TaskDTO = task_adaptor.queue(
-        create_example_task, params={"example": create_task}
-    ).task
-    return task_data
+def start_task(create_task: CreateExampleDTO) -> TaskDTO:
+    async_result: TaskPromise = create_example_task.delay(example=create_task)
+    return async_result.task
 
 
 @router_v1.router.get("/task/{id}")

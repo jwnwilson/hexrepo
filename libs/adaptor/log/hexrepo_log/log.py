@@ -130,6 +130,7 @@ def setup_logger():
                 )
             ]
         )
+    logger.info(f"Logger setup complete, level: {level}")
     return logger
 
 
