@@ -36,7 +36,7 @@ Setup the following env vars directly or run:
 # To Do
 
 - Setup backend
-    - Fix deployment issues 
+    - Update template
     - Setup simple FE with auth?
         - User Event tracking
         - Add auth
