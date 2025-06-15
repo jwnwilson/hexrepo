@@ -1,6 +1,6 @@
 deployments:
   - hextech-monitor-lambda:
-    container_image: monitor-lambda
+    container_image: monitor
     image_type: serverless
     targets:
       - module.monitor_api

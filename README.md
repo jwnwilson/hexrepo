@@ -36,6 +36,13 @@ Setup the following env vars directly or run:
 # To Do
 
 - Setup backend
+    - Fix deployment issues 
+    - Setup simple FE with auth?
+        - User Event tracking
+        - Add auth
+        - monolith setup
+            - add frontend folder
+            - src -> backend
     - Cheaper infra / kubernetes?
         - GCP?
         - scaleway cheap kubernetes cluster?
@@ -61,12 +68,6 @@ Setup the following env vars directly or run:
         - Latency tracking and visualisation
         - Setup BI dashboard
         - Setup sonarqube
-    - monolith / multiteam setup
-        - team folders
-        - Remove lib type
-        - tach: https://github.com/gauge-sh/tach
-        - https://roman.pt/posts/python-architecture-linter/
-        - restricting adaptors imports to a dependencies module
     - Convert to async for thoughput in APIs
     - branch deploys
     - blue green deployments via load balancer
@@ -85,10 +86,6 @@ Setup the following env vars directly or run:
     - Improve feature flags
         - Add setup data command to add envs with config
         - Optimise feature flag endpoint with a db view caching or something
-    - Setup simple FE with auth?
-        - Create apps folder for FE
-        - User Event tracking
-        - Add turborepo with auth
     - Add ability to disable / turn off / turn on projects
     - Add smoke test / E2E tests
     - Add user setup to infra as code
