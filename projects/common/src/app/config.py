@@ -35,10 +35,7 @@ class Config(BaseSettings):
     DB_RO_URL: str = os.environ.get("DB_RO_URL", "")
 
     # Celery settings
-    CELERY_BROKER_URL: str = os.environ.get(
-        "CELERY_BROKER_URL",
-        "sqs://"
-    )
+    CELERY_BROKER_URL: str = os.environ.get("CELERY_BROKER_URL", "sqs://")
     CELERY_RESULT_BACKEND: str = os.environ.get(
         "CELERY_RESULT_BACKEND", "db+sqlite:///celery.sqlite"
     )

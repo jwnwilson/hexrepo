@@ -1,6 +1,6 @@
 from celery import Celery
-from hexrepo_task.interactor.event.celery import CeleryConfig, create_celery_app
 from hexrepo_log import setup_logger
+from hexrepo_task.interactor.event.celery import CeleryConfig, create_celery_app
 
 from app.config import config
 
