@@ -252,19 +252,19 @@ module "common_auth" {
   callback_urls = [local.app_url]
 }
 
-# module "common_api_gateway" {
-#   source = "../../../../../../infra/tf/aws/modules/apigateway"
+module "common_api_gateway" {
+  source = "../../../../../../infra/tf/aws/modules/apigateway"
 
-#   environment           = terraform.workspace
-#   lambda_invoke_arn     = module.common_api.lambda_function_invoke_arn
-#   lambda_name           = module.common_api.lambda_function_name
-#   domain                = var.domain
-#   api_subdomain         = local.api_subdomain
-#   project               = "common"
-#   cognito_user_pool_arn = module.common_auth.user_pool_arn
-#   # Auth handled in api middleware
-#   auth_enabled = false
-# }
+  environment           = terraform.workspace
+  lambda_invoke_arn     = module.common_api.lambda_function_invoke_arn
+  lambda_name           = module.common_api.lambda_function_name
+  domain                = var.domain
+  api_subdomain         = local.api_subdomain
+  project               = "common"
+  cognito_user_pool_arn = module.common_auth.user_pool_arn
+  # Auth handled in api middleware
+  auth_enabled = false
+}
 
 module "common_postgres" {
   source = "../../../../../../infra/tf/aws/modules/rds"
