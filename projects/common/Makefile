@@ -23,7 +23,7 @@ build:
 
 # DB management
 db_migrate_pipeline:
-	bash -c "uv run alembic upgrade head" ;\
+	bash -c "ENVIRONMENT=$(ENVIRONMENT) uv run alembic upgrade head" ;\
 	EXIT_CODE=$$?;\
     exit $$EXIT_CODE
 
