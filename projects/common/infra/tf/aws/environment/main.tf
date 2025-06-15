@@ -115,6 +115,7 @@ module "common_ecs_api" {
     LOG_JSON                = "true"
     ORIGIN_URL              = "https://${local.api_subdomain_ecs}.${var.domain}"
     TASK_TABLE_NAME         = module.common_task_nosql.table_name
+    LOG_LEVEL               = "INFO"
   }
   secrets = {
     DB_PASSWORD = data.aws_secretsmanager_secret.db_secret.arn
@@ -156,6 +157,7 @@ module "common_ecs_task" {
     LOG_JSON                = "true"
     ORIGIN_URL              = "https://${local.api_subdomain_ecs}.${var.domain}"
     TASK_TABLE_NAME         = module.common_task_nosql.table_name
+    LOG_LEVEL               = "INFO"
   }
   secrets = {
     DB_PASSWORD = data.aws_secretsmanager_secret.db_secret.arn
@@ -210,6 +212,7 @@ module "common_api" {
     TASK_QUEUE              = "${var.project}_${terraform.workspace}_tasks"
     CLIENT_ID               = module.common_auth.client_id
     USER_POOL_ID            = module.common_auth.user_pool_id
+    LOG_LEVEL               = "INFO"
   }
 }
 
@@ -236,6 +239,7 @@ module "common_tasks" {
     TASK_QUEUE              = "${var.project}_${terraform.workspace}_tasks"
     CLIENT_ID               = module.common_auth.client_id
     USER_POOL_ID            = module.common_auth.user_pool_id
+    LOG_LEVEL               = "INFO"
   }
 }
 
@@ -248,19 +252,19 @@ module "common_auth" {
   callback_urls = [local.app_url]
 }
 
-module "common_api_gateway" {
-  source = "../../../../../../infra/tf/aws/modules/apigateway"
+# module "common_api_gateway" {
+#   source = "../../../../../../infra/tf/aws/modules/apigateway"
 
-  environment           = terraform.workspace
-  lambda_invoke_arn     = module.common_api.lambda_function_invoke_arn
-  lambda_name           = module.common_api.lambda_function_name
-  domain                = var.domain
-  api_subdomain         = local.api_subdomain
-  project               = "common"
-  cognito_user_pool_arn = module.common_auth.user_pool_arn
-  # Auth handled in api middleware
-  auth_enabled = false
-}
+#   environment           = terraform.workspace
+#   lambda_invoke_arn     = module.common_api.lambda_function_invoke_arn
+#   lambda_name           = module.common_api.lambda_function_name
+#   domain                = var.domain
+#   api_subdomain         = local.api_subdomain
+#   project               = "common"
+#   cognito_user_pool_arn = module.common_auth.user_pool_arn
+#   # Auth handled in api middleware
+#   auth_enabled = false
+# }
 
 module "common_postgres" {
   source = "../../../../../../infra/tf/aws/modules/rds"
