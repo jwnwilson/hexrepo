@@ -170,7 +170,7 @@ module "queue" {
   source = "../../../../../../infra/tf/aws/modules/sqs"
 
   project     = var.project
-  name        = "${var.project}-${terraform.workspace}"
+  name        = "tasks"
   environment = terraform.workspace
 }
 

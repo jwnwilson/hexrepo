@@ -37,8 +37,8 @@ Setup the following env vars directly or run:
 
 - Setup backend
     - Setup celery worker
-        - Validate lambda tasks work
-        - Task logging setup
+        - Task celery JSON logging setup
+        - Lambda remove debug logs
     - Create orchestrator logic
         - Setup Flower 
         - Setup airflow / prefect on ECS / EC2
@@ -67,7 +67,9 @@ Setup the following env vars directly or run:
         - https://roman.pt/posts/python-architecture-linter/
         - restricting adaptors imports to a dependencies module
     - Convert to async for thoughput in APIs
-    - Move to GCP for cost reasons
+    - Cheaper infra
+        - GCP?
+        - scaleway cheap kubernetes cluster?
         - Use 3rd party auth provider to avoid vender locking?
     - branch deploys
     - blue green deployments via load balancer
