@@ -36,10 +36,7 @@ Setup the following env vars directly or run:
 # To Do
 
 - Setup backend
-    - Setup celery worker
-        - Task celery JSON logging setup
-        - Lambda remove debug logs
-    - Cheaper infra
+    - Cheaper infra / kubernetes?
         - GCP?
         - scaleway cheap kubernetes cluster?
         - Use 3rd party auth provider to avoid vender locking?
@@ -53,6 +50,7 @@ Setup the following env vars directly or run:
                 - https://github.com/jwnwilson/airflow-kubernetes/tree/main
     - Lambda keep warm events are probably using event free quota
         - Disable lambda keep warm events
+        - Lambda remove debug logs
     - Add monitoring dashboard for services
         - Look at graphana?
         - Generic change log syncing to tracking metrics
