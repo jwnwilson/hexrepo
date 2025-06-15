@@ -36,13 +36,11 @@ Setup the following env vars directly or run:
 # To Do
 
 - Setup backend
-    - Update template
     - Setup simple FE with auth?
         - User Event tracking
+            - Mixpanel
         - Add auth
-        - monolith setup
-            - add frontend folder
-            - src -> backend
+            - Look at Auth0
     - Cheaper infra / kubernetes?
         - GCP?
         - scaleway cheap kubernetes cluster?
@@ -68,7 +66,9 @@ Setup the following env vars directly or run:
         - Latency tracking and visualisation
         - Setup BI dashboard
         - Setup sonarqube
-    - Convert to async for thoughput in APIs
+    - Convert fastapi to async for thoughput in APIs
+    - Update templates
+        - Add FE template hextool option
     - branch deploys
     - blue green deployments via load balancer
     - Setup multienv
