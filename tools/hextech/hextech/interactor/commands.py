@@ -31,7 +31,6 @@ from hextech.domain.infra.user import (
 from hextech.domain.project import (
     cli_setup,
     get_libraries,
-    get_library_type,
     get_modified_libraries,
     get_modified_projects,
     get_projects,
@@ -42,7 +41,6 @@ from hextech.domain.project import (
 from hextech.domain.prompts.common import (
     prompt_environment,
     prompt_library,
-    prompt_library_type,
     prompt_project,
 )
 from hextech.domain.prompts.infra import (
@@ -86,9 +84,8 @@ def destroy():
 
 @cli_setup
 def create_library():
-    library_type = prompt_library_type()
     # CD to libs/adaptor or libs/interactor folder
-    with chdir(f"libs/{library_type}"):
+    with chdir("libs"):
         # Run copier command to copy template
         lib_name: str = typer.prompt("Please Enter project folder name")
         copier.run_copy("../../templates/library", f"./{lib_name}")
@@ -169,11 +166,10 @@ def test_libs(libraries: Optional[List[str]] = None):
     libraries: List[str] = validate_libraries(libraries)
 
     for lib in libraries:
-        lib_type: str = get_library_type(lib)
         typer.echo(f"Running linting for {lib} library...")
-        run_system_command(f"cd libs/{lib_type}/{lib} && make lint_check")
+        run_system_command(f"cd libs/{lib} && make lint_check")
         typer.echo(f"Running tests for {lib} library...")
-        run_system_command(f"cd libs/{lib_type}/{lib} && make test")
+        run_system_command(f"cd libs/{lib} && make test")
 
 
 @cli_setup
@@ -212,9 +208,9 @@ def check_project_modified(project: str):
     typer.echo(f"Project: '{project}' unmodified...")
 
 
-def _bump_library_version(library: str, lib_type: str):
+def _bump_library_version(library: str):
     run_system_command(
-        f"""cd libs/{lib_type}/{library} && \\
+        f"""cd libs/{library} && \\
         VERSION=$(uvx --from=toml-cli toml get --toml-path=pyproject.toml project.version) && \\
         VERSION=$(echo $VERSION | awk -F. '/[0-9]+\\./{{$NF++;print}}' OFS=.) && \\
         uvx --from=toml-cli toml set --toml-path=pyproject.toml project.version $VERSION
@@ -226,9 +222,8 @@ def _bump_library_version(library: str, lib_type: str):
 def bump_library_version():
     library: str = prompt_library()
     typer.echo(f"Bumping version for {library} library...")
-    lib_type: str = get_library_type(library)
     # Work around to bump uv version until uv version managment function is added
-    _bump_library_version(library, lib_type)
+    _bump_library_version(library)
 
 
 @cli_setup
@@ -236,9 +231,8 @@ def bump_all_library_versions():
     all_libraries: List[str] = get_libraries()
     for library in all_libraries:
         typer.echo(f"Bumping version for {library} library...")
-        lib_type: str = get_library_type(library)
         # Work around to bump uv version until uv version managment function is added
-        _bump_library_version(library, lib_type)
+        _bump_library_version(library)
 
 
 @cli_setup
@@ -253,9 +247,8 @@ def lint():
     typer.echo("Running linting for libraries...")
     libraries: List[str] = get_libraries()
     for lib in libraries:
-        lib_type: str = get_library_type(lib)
-        typer.echo(f"Running linting for {lib_type}/{lib} library...")
-        run_system_command(f"cd libs/{lib_type}/{lib} && make lint")
+        typer.echo(f"Running linting for {lib} library...")
+        run_system_command(f"cd libs/{lib} && make lint")
 
 
 @cli_setup

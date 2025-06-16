@@ -31,11 +31,11 @@ jobs:
     strategy:
       matrix:
         library:
-        - "libs/adaptor/db"
-        - "libs/adaptor/cloud"
-        - "libs/adaptor/log"
-        - "libs/interactor/api"
-        - "libs/interactor/task"
+        - "libs/db"
+        - "libs/cloud"
+        - "libs/log"
+        - "libs/api"
+        - "libs/task"
     runs-on: ubuntu-latest
     outputs:
       skip: ${{ steps.check_modified.outputs.skip }}
@@ -62,13 +62,13 @@ jobs:
             echo "skip=true" >> $GITHUB_OUTPUT
         fi
     - name: Start LocalStack
-      if: (matrix.library == 'libs/adaptor/db' || matrix.library == 'libs/interactor/task') && steps.check_modified.outputs.skip == 'false'
+      if: (matrix.library == 'libs/db' || matrix.library == 'libs/task') && steps.check_modified.outputs.skip == 'false'
       uses: LocalStack/setup-localstack@v0.2.2
       with:
         image-tag: 'latest'
         install-awslocal: 'true'
     - name: Setup Test DBs
-      if: matrix.library == 'libs/adaptor/db' && steps.check_modified.outputs.skip == 'false'
+      if: matrix.library == 'libs/db' && steps.check_modified.outputs.skip == 'false'
       working-directory: ${{ matrix.library }}
       run: |
         docker compose up postgres_db mongodb -d
@@ -82,11 +82,11 @@ jobs:
     strategy:
       matrix:
         library:
-        - "libs/adaptor/db"
-        - "libs/adaptor/cloud"
-        - "libs/adaptor/log"
-        - "libs/interactor/api"
-        - "libs/interactor/task"
+        - "libs/db"
+        - "libs/cloud"
+        - "libs/log"
+        - "libs/api"
+        - "libs/task"
     runs-on: ubuntu-latest
     if: github.ref != 'refs/heads/main'
     steps:
@@ -108,11 +108,11 @@ jobs:
       fail-fast: false
       matrix:
         library:
-        - "libs/adaptor/db"
-        - "libs/adaptor/cloud"
-        - "libs/adaptor/log"
-        - "libs/interactor/api"
-        - "libs/interactor/task"
+        - "libs/db"
+        - "libs/cloud"
+        - "libs/log"
+        - "libs/api"
+        - "libs/task"
     runs-on: ubuntu-latest
     outputs:
       skip: ${{ steps.check_modified.outputs.skip }}

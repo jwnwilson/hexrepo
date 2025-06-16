@@ -72,8 +72,8 @@ python_version = "3.12"
 strict = true
 
 [tool.uv.sources]
-hexrepo-api = { path = "../../libs/interactor/api", editable = true }
-hexrepo-db = { path = "../../libs/adaptor/db", editable = true }
-hexrepo-cloud = { path = "../../libs/adaptor/cloud", editable = true }
-hexrepo-task = { path = "../../libs/interactor/task", editable = true }
-hexrepo-log = { path = "../../libs/adaptor/log", editable = true }
+hexrepo-api = { path = "../../libs/api", editable = true }
+hexrepo-db = { path = "../../libs/db", editable = true }
+hexrepo-cloud = { path = "../../libs/cloud", editable = true }
+hexrepo-task = { path = "../../libs/task", editable = true }
+hexrepo-log = { path = "../../libs/log", editable = true }

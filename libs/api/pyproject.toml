@@ -3,24 +3,24 @@ authors = [
     {name = "Noel Wilson", email = "jwnwilson@hotmail.co.uk"},
 ]
 requires-python = "<4.0,>=3.12"
-name = "monitor"
-version = "0.1.0"
+name = "hexrepo_api"
+version = "0.1.24"
 description = "A short description of the project"
 readme = "README.md"
 dependencies = [
-    "requests<3.0.0,>=2.32.3",
-    "python-dotenv<2.0.0,>=1.0.1",
-    "pydantic-settings<3.0.0,>=2.6.0",
-    "gevent<25.0.0,>=24.10.3",
-    "hexrepo-cloud @ file:///${PROJECT_ROOT}/../../libs/cloud",
-    "hexrepo-api @ file:///${PROJECT_ROOT}/../../libs/api",
-    "boto3-stubs[essential]<2.0.0,>=1.35.86",
+    "pydantic<3.0.0,>=2.9.2",
+    "pydantic-settings<3.0.0,>=2.6.1",
+    "fastapi<1.0.0,>=0.115.4",
+    "hexrepo-db",
+    "hexrepo-log",
+    "aws-xray-sdk>=2.14.0",
 ]
 
+[tool.uv.sources]
+hexrepo-db = { path = "../db", editable = true }
+hexrepo-log = { path = "../log", editable = true }
+
 [dependency-groups]
-aws = [
-    "mangum<1.0.0,>=0.19.0",
-]
 dev = [
     "pytest<9.0.0,>=8.3.3",
     "mypy<2.0.0,>=1.13.0",
@@ -29,7 +29,8 @@ dev = [
     "pytest-dotenv<1.0.0,>=0.5.2",
     "pytest-cov<7.0.0,>=6.0.0",
     "pytest-xdist<4.0.0,>=3.6.1",
-    "polyfactory<3.0.0,>=2.17.0",
+    "gevent<25.0.0,>=24.10.3",
+    "polyfactory<3.0.0,>=2.18.0",
 ]
 
 [tool.pdm.build]
@@ -39,17 +40,15 @@ requires = ["pdm-backend"]
 build-backend = "pdm.backend"
 
 [tool.pytest.ini_options]
-addopts = "-vv --cov --cov-report xml --cov-report term-missing --cov-fail-under=50"
-testpaths = ["app/tests"]
+addopts = "-vv --cov --cov-report xml --cov-report term-missing --cov-fail-under=45"
+asyncio_mode = "auto"
+testpaths = ["tests"]
 env_files = ["env/local.env"]
-pythonpath = [
-  "src"
-]
 
 [tool.coverage.run]
 concurrency = ["gevent"]
-omit = ["app/tests/*"]
-source = ["app"]
+omit = ["tests/*"]
+source = ["hexrepo_api"]
 
 [tool.mypy]
 python_version = "3.12"
