@@ -1,21 +1,14 @@
 import logging
-import uuid
 from collections.abc import Generator
-from pydantic import BaseModel
-
-from app.config import config
-from hexrepo_task.interface import QueueConfig
-
-from hexrepo_task import QueueAdaptor, SqsQueueAdaptor
-from hexrepo_task.adaptor.db import QueueUOW
-
 
 from hexrepo_db import UOW
-
-
 from hexrepo_db.sql import get_sql_db_url
-from app.adaptor.db.sql import SqlUOW
+from hexrepo_task import QueueAdaptor, SqsQueueAdaptor
+from hexrepo_task.adaptor.db import QueueUOW
+from hexrepo_task.interface import QueueConfig
 
+from app.adaptor.db.sql import SqlUOW
+from app.config import config
 
 logger = logging.getLogger(__name__)
 

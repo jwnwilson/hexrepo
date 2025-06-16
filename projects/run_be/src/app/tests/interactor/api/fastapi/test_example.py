@@ -1,5 +1,5 @@
-from fastapi.testclient import TestClient
 import pytest
+from fastapi.testclient import TestClient
 
 
 @pytest.fixture
@@ -39,7 +39,7 @@ def test_example_read_filter_name(client: TestClient, created_example):
 
 
 def test_example_read_filter_none(client: TestClient, created_example):
-    response = client.get(f'/api/v1/example/?filters=%7B"name"%3A"doesntexist"%7D')
+    response = client.get('/api/v1/example/?filters=%7B"name"%3A"doesntexist"%7D')
     assert response.status_code == 200
     assert response.json()["total"] == 0
 

@@ -1,21 +1,16 @@
 from typing import Optional
 from uuid import UUID
+
 from fastapi import Depends
-from pydantic import BaseModel
-
 from hexrepo_api import CrudRouter
-
 from hexrepo_task.adaptor.db import QueueUOW
 from hexrepo_task.interface import TaskDTO
-
+from pydantic import BaseModel
 
 from app.domain.example import ExampleDTO
-
 from app.interactor.event.tasks.serverless_tasks import example_task
 
 from ......dependencies import get_queue_uow, get_uow
-
-
 
 
 class CreateExampleDTO(BaseModel):

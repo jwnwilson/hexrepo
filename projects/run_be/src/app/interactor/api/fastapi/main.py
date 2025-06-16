@@ -1,21 +1,21 @@
 import os
 
 import sentry_sdk
-
-from hexrepo_log import LogMiddleware, setup_logger
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
+from hexrepo_log import LogMiddleware, setup_logger
 from starlette.middleware.sessions import SessionMiddleware
 
-from .api_versions.api_v1.api import api_router_v1
 from app.config import config
+
+from .api_versions.api_v1.api import api_router_v1
 
 ENVIRONMENT = os.environ.get("ENVIRONMENT", "")
 
 setup_logger()
 
-root_prefix = f""
+root_prefix = ""
 
 if config.SENTRY_DSN:
     sentry_sdk.init(

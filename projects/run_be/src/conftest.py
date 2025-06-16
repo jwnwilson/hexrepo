@@ -1,22 +1,13 @@
 import os
 from collections.abc import Generator
-from typing import Any
-from unittest.mock import Mock
+
 import pytest
-
 from fastapi.testclient import TestClient
-
-
-
+from hexrepo_db import UOW
 from hexrepo_db.interface import UOW
 
-
 from app.adaptor.db.sql.uow import SqlUOW
-
-from hexrepo_db import UOW
-
 from app.domain.example import ExampleDTO
-
 
 # Silence SQLALchemy deprecation warning until we can upgrade
 os.environ["SQLALCHEMY_SILENCE_UBER_WARNING"] = "1"

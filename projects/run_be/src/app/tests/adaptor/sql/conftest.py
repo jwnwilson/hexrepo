@@ -1,7 +1,6 @@
 import pytest
 from pytest_alembic.config import Config
 
-
 from app.adaptor.db.sql import SqlUOW
 
 
