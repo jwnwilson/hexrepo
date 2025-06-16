@@ -85,7 +85,7 @@ def destroy():
 @cli_setup
 def create_library():
     # CD to libs/adaptor or libs/interactor folder
-    with chdir(f"libs"):
+    with chdir("libs"):
         # Run copier command to copy template
         lib_name: str = typer.prompt("Please Enter project folder name")
         copier.run_copy("../../templates/library", f"./{lib_name}")

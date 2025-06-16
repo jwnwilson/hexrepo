@@ -17,8 +17,8 @@ dependencies = [
 ]
 
 [tool.uv.sources]
-hexrepo-db = { path = "../../db", editable = true }
-hexrepo-log = { path = "../../log", editable = true }
+hexrepo-db = { path = "../db", editable = true }
+hexrepo-log = { path = "../log", editable = true }
 
 [dependency-groups]
 dev = [

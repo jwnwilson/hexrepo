@@ -57,9 +57,8 @@ def get_projects() -> List[str]:
 
 
 def get_libraries() -> List[str]:
-    adaptor_folder = "libs/adaptor"
-    interactor_folder = "libs/interactor"
-    return scan_folder(adaptor_folder) + scan_folder(interactor_folder)
+    libs_folder = "libs"
+    return scan_folder(libs_folder)
 
 
 def validate_libraries(libraries: Optional[List[str]] = None) -> List[str]:
