@@ -25,7 +25,7 @@ def copy_project_dependencies(
     def copy_component(component: str) -> None:
         src = src_path / component
         if lib:
-            dst = dst_path.parent.parent.parent / component
+            dst = dst_path.parent.parent / component
         else:
             dst = dst_path.parent.parent / component
         if src.exists():
