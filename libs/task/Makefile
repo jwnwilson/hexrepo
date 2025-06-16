@@ -10,9 +10,16 @@ VENV_DIR = $(MKFILE_DIR)$(VENV)
 venv:
 	@../../tools/bash_scripts/setup_env.sh
 
-test: venv
+test: venv db
 	@echo "Running tests..."
 	@../../tools/bash_scripts/test.sh
+
+docker_stop:
+	@-bash -c "docker ps -aq | xargs docker stop | xargs docker rm"
+
+db: docker_stop
+	@echo "Starting db..."
+	@docker compose up -d 
 
 coverage:
 	@echo "Running unit tests"	
@@ -20,10 +27,10 @@ coverage:
 	pytest --cov-report html	
 
 lint: venv
-	@TARGET_DIRS="hexrepo_{{project_slug}} tests" bash ../../tools/bash_scripts/lint.sh 
+	@TARGET_DIRS="hexrepo_task tests" bash ../../tools/bash_scripts/lint.sh 
 
 lint_check: venv
-	@TARGET_DIRS="hexrepo_{{project_slug}} tests" bash ../../tools/bash_scripts/lint.sh --check
+	@TARGET_DIRS="hexrepo_task tests" bash ../../tools/bash_scripts/lint.sh --check
 
 clean:
 	@find . -type f -name '*.py[co]' -delete -o -type d -name __pycache__ -delete

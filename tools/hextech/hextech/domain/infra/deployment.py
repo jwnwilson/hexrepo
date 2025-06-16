@@ -13,7 +13,6 @@ from hextech.domain.project import (
     find_repo_root,
     get_docker_tags,
     get_libraries,
-    get_library_type,
     get_modified_libraries,
     get_modified_projects,
     get_projects,
@@ -69,8 +68,7 @@ def publish_libs(
             return
 
         for lib in libraries:
-            lib_type = get_library_type(lib)
-            with chdir(f"libs/{lib_type}/{lib}"):
+            with chdir(f"libs/{lib}"):
                 run_system_command(
                     f"make publish HEXREPO_LIB_REPO_URL={config.hexrepo_lib_repo_url}"
                 )

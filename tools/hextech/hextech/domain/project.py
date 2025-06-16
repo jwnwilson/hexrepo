@@ -57,9 +57,8 @@ def get_projects() -> List[str]:
 
 
 def get_libraries() -> List[str]:
-    adaptor_folder = "libs/adaptor"
-    interactor_folder = "libs/interactor"
-    return scan_folder(adaptor_folder) + scan_folder(interactor_folder)
+    libs_folder = "libs"
+    return scan_folder(libs_folder)
 
 
 def validate_libraries(libraries: Optional[List[str]] = None) -> List[str]:
@@ -89,11 +88,10 @@ def get_modified_files() -> str:
 
 
 def library_version_bump_required(library: str) -> bool:
-    library_type: str = get_library_type(library)
     modified_files = get_modified_files()
-    if f"libs/{library_type}/{library}" in modified_files:
+    if f"libs/{library}" in modified_files:
         pyproject_diff: str = subprocess.getoutput(
-            f"git diff origin/main HEAD libs/{library_type}/{library}/pyproject.toml"
+            f"git diff origin/main HEAD libs/{library}/pyproject.toml"
         )
         if "version = " in pyproject_diff:
             return False
@@ -106,8 +104,7 @@ def get_modified_libraries(libraries: Optional[List[str]] = None) -> List[str]:
     modified_libs: List[str] = []
     modified_files = get_modified_files()
     for lib in libraries:
-        lib_type = get_library_type(lib)
-        if f"libs/{lib_type}/{lib}" in modified_files:
+        if f"libs/{lib}" in modified_files:
             modified_libs.append(lib)
     return modified_libs
 
@@ -133,17 +130,6 @@ def get_projects_usings_libraries(libraries: List[str]) -> List[str]:
     return list(projects_using_libs)
 
 
-def get_library_type(library: str) -> str:
-    adaptor_folder = "libs/adaptor"
-    interactor_folder = "libs/interactor"
-    if library in scan_folder(adaptor_folder):
-        return "adaptor"
-    elif library in scan_folder(interactor_folder):
-        return "interactor"
-    else:
-        raise RuntimeError(f"Library {library} not found")
-
-
 def install_library_in_project(library: str, project: str):
     # Install library locally in uv dev group
     libraries: List[str] = get_libraries()
@@ -152,9 +138,8 @@ def install_library_in_project(library: str, project: str):
     assert project in projects, f"Project {project} not found"
     assert library in libraries, f"Library {library} not found"
 
-    library_type = get_library_type(library)
     with chdir(f"projects/{project}"):
-        run_system_command(f"uv add --editable ../../libs/{library_type}/{library}")
+        run_system_command(f"uv add --editable ../../libs/{library}")
     typer.echo(f"Library {library} installed in project {project}")
 
 

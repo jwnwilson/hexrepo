@@ -36,7 +36,6 @@ Setup the following env vars directly or run:
 # To Do
 
 - Setup backend
-    - Fix deployment issues 
     - Setup simple FE with auth?
         - User Event tracking
         - Add auth
@@ -47,6 +46,7 @@ Setup the following env vars directly or run:
         - GCP?
         - scaleway cheap kubernetes cluster?
         - Use 3rd party auth provider to avoid vender locking?
+    - Setup coder rabit
     - Create orchestrator logic
         - Setup Flower 
         - Setup airflow / prefect on ECS / EC2 / K8s
