@@ -19,7 +19,7 @@ dependencies = [
 ]
 
 [tool.uv.sources]
-hexrepo-cloud = { path = "../../libs/adaptor/cloud", editable = true }
+hexrepo-cloud = { path = "../../libs/cloud", editable = true }
 
 [project.scripts]
 hextech = "hextech.interactor.cli:app"

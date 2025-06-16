@@ -396,11 +396,11 @@ requires-dist = [
     { name = "celery", specifier = ">=5.5.3" },
     { name = "fastapi", specifier = ">=0.115.8" },
     { name = "gevent", specifier = ">=24.10.3,<25.0.0" },
-    { name = "hexrepo-api", editable = "../../libs/interactor/api" },
-    { name = "hexrepo-cloud", editable = "../../libs/adaptor/cloud" },
-    { name = "hexrepo-db", editable = "../../libs/adaptor/db" },
-    { name = "hexrepo-log", editable = "../../libs/adaptor/log" },
-    { name = "hexrepo-task", editable = "../../libs/interactor/task" },
+    { name = "hexrepo-api", editable = "../../libs/api" },
+    { name = "hexrepo-cloud", editable = "../../libs/cloud" },
+    { name = "hexrepo-db", editable = "../../libs/db" },
+    { name = "hexrepo-log", editable = "../../libs/log" },
+    { name = "hexrepo-task", editable = "../../libs/task" },
     { name = "itsdangerous", specifier = ">=2.2.0" },
     { name = "mangum", specifier = ">=0.19.0,<1.0.0" },
     { name = "psycopg", extras = ["binary"], specifier = "==3.2.6" },
@@ -690,7 +690,7 @@ wheels = [
 [[package]]
 name = "hexrepo-api"
 version = "0.1.24"
-source = { editable = "../../libs/interactor/api" }
+source = { editable = "../../libs/api" }
 dependencies = [
     { name = "aws-xray-sdk" },
     { name = "fastapi" },
@@ -704,8 +704,8 @@ dependencies = [
 requires-dist = [
     { name = "aws-xray-sdk", specifier = ">=2.14.0" },
     { name = "fastapi", specifier = ">=0.115.4,<1.0.0" },
-    { name = "hexrepo-db", editable = "../../libs/adaptor/db" },
-    { name = "hexrepo-log", editable = "../../libs/adaptor/log" },
+    { name = "hexrepo-db", editable = "../../libs/db" },
+    { name = "hexrepo-log", editable = "../../libs/log" },
     { name = "pydantic", specifier = ">=2.9.2,<3.0.0" },
     { name = "pydantic-settings", specifier = ">=2.6.1,<3.0.0" },
 ]
@@ -726,7 +726,7 @@ dev = [
 [[package]]
 name = "hexrepo-cloud"
 version = "0.3.31"
-source = { editable = "../../libs/adaptor/cloud" }
+source = { editable = "../../libs/cloud" }
 dependencies = [
     { name = "boto3-stubs", extra = ["essential"] },
     { name = "pydantic" },
@@ -757,7 +757,7 @@ dev = [
 [[package]]
 name = "hexrepo-db"
 version = "0.1.35"
-source = { editable = "../../libs/adaptor/db" }
+source = { editable = "../../libs/db" }
 dependencies = [
     { name = "boto3" },
     { name = "boto3-stubs", extra = ["essential"] },
@@ -771,7 +771,7 @@ dependencies = [
 requires-dist = [
     { name = "boto3", specifier = ">=1.35.68,<2.0.0" },
     { name = "boto3-stubs", extras = ["essential"], specifier = ">=1.35.86,<2.0.0" },
-    { name = "hexrepo-cloud", editable = "../../libs/adaptor/cloud" },
+    { name = "hexrepo-cloud", editable = "../../libs/cloud" },
     { name = "loguru", specifier = ">=0.7.3" },
     { name = "pydantic", specifier = ">=2.9.2,<3.0.0" },
     { name = "pydantic-settings", specifier = ">=2.6.1,<3.0.0" },
@@ -798,7 +798,7 @@ sql = [
 [[package]]
 name = "hexrepo-log"
 version = "0.1.15"
-source = { editable = "../../libs/adaptor/log" }
+source = { editable = "../../libs/log" }
 dependencies = [
     { name = "fastapi" },
     { name = "loguru" },
@@ -826,7 +826,7 @@ dev = [
 [[package]]
 name = "hexrepo-task"
 version = "0.1.20"
-source = { editable = "../../libs/interactor/task" }
+source = { editable = "../../libs/task" }
 dependencies = [
     { name = "fastapi" },
     { name = "hexrepo-db" },
@@ -836,7 +836,7 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "fastapi", specifier = ">=0.115.6" },
-    { name = "hexrepo-db", editable = "../../libs/adaptor/db" },
+    { name = "hexrepo-db", editable = "../../libs/db" },
     { name = "pymongo", specifier = ">=4.10.1" },
 ]
 

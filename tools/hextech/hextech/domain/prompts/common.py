@@ -33,19 +33,6 @@ def prompt_library() -> str:
     return library
 
 
-def prompt_library_type() -> str:
-    print("Please enter the library type:")
-    print("1 - adaptor")
-    print("2 - interactor")
-    library_option: str = typer.prompt("Choose from [1, 2]")
-    try:
-        library_type = {"1": "adaptor", "2": "interactor"}[library_option]
-    except KeyError:
-        typer.echo("Invalid library type, please select an option: 1, 2.")
-        return
-    return library_type
-
-
 def prompt_shell_file() -> str:
     print("Please enter shell file:")
     print("1 - ~/.hexrepo")
