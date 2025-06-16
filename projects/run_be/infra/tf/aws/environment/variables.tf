@@ -11,7 +11,7 @@ variable "aws_secret_key" {
 }
 
 variable "project" {
-  default = "run"
+  default = "run_be"
 }
 
 variable "docker_tag" {
@@ -23,10 +23,10 @@ variable "domain" {
 }
 
 variable "api_subdomain" {
-  default = "run"
+  default = "run_be"
 }
 
 variable "api_repo" {
   description = "Name of container image repository"
-  default     = "run_api"
+  default     = "run_be_api"
 }

@@ -2,7 +2,7 @@ terraform {
   backend "s3" {
     region = "eu-west-1"
     bucket = "hexrepo-jwn"
-    key = "run-shared.tfstate"
+    key = "run_be-shared.tfstate"
   }
   required_providers {
     aws = {

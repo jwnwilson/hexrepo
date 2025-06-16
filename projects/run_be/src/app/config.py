@@ -23,7 +23,7 @@ class Config(BaseSettings):
     with environment variables.
     """
     # Current environment
-    PROJECT: str = os.environ.get("PROJECT", "run")
+    PROJECT: str = os.environ.get("PROJECT", "run_be")
     CLOUD_PROVIDER: str = os.environ.get("CLOUD_PROVIDER", "local")
     ENVIRONMENT: str = os.environ.get("ENVIRONMENT", "dev")
     REGION: str = os.environ.get("REGION", "eu-west-1")
@@ -35,7 +35,7 @@ class Config(BaseSettings):
 
     # FEATURE FLAGS
 
-    TASK_QUEUE: str = os.environ.get("TASK_QUEUE", "run-tasks")
+    TASK_QUEUE: str = os.environ.get("TASK_QUEUE", "run_be-tasks")
 
     # Database settings
     DB_PASSWORD_SECRET_NAME: str = os.environ.get("DB_PASSWORD_SECRET_NAME", "").format(env=ENVIRONMENT)

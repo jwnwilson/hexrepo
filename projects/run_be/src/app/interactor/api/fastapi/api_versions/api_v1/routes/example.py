@@ -11,7 +11,7 @@ from hexrepo_task.interface import TaskDTO
 
 from app.domain.example import ExampleDTO
 
-from app.interactor.event.tasks.serverless_tasks import example_task_serverless
+from app.interactor.event.tasks.serverless_tasks import example_task
 
 from ......dependencies import get_queue_uow, get_uow
 
@@ -45,7 +45,7 @@ def start_task():
     example: ExampleDTO = ExampleDTO(
         name="example", url="example.com", location="example"
     )
-    example_task_serverless.delay(example)
+    example_task.delay(params=example)
     return 204
 
 

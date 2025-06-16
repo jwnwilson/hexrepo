@@ -26,8 +26,8 @@ if config.SENTRY_DSN:
     )
 
 app = FastAPI(
-    title="run Service",
-    description="run description",
+    title="run_be Service",
+    description="run_be description",
     version="1.0.0",
     root_path=root_prefix,
 )
@@ -48,4 +48,4 @@ app.include_router(api_router_v1, prefix="/api/v1")
 
 @app.get("/")
 async def root():
-    return {"message": "run service"}
+    return {"message": "run_be service"}

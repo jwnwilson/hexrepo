@@ -2,7 +2,7 @@ terraform {
   backend "s3" {
     region = "eu-west-1"
     bucket = "hexrepo-jwn"
-    key = "run-environment.tfstate"
+    key = "run_be-environment.tfstate"
   }
   required_providers {
     aws = {
@@ -21,7 +21,7 @@ locals {
 
 
 locals {
-  db_url = "postgresql+psycopg://postgres:{password}@${module.run_postgres.db_instance_endpoint}/${var.project}"
+  db_url = "postgresql+psycopg://postgres:{password}@${module.run_be_postgres.db_instance_endpoint}/${var.project}"
 }
 
 
@@ -42,7 +42,7 @@ data "aws_ecr_repository" "ecr_repo" {
 
 
 
-module "run_api" {
+module "run_be_api" {
   source = "../../../../../../infra/tf/aws/modules/lambda"
 
   environment       = terraform.workspace
@@ -54,11 +54,11 @@ module "run_api" {
   lambda_command    = ["uvicorn", "app.interactor.api.fastapi.main:app", "--host", "0.0.0.0", "--port", "8000"]
   
   
-  security_group_ids = [module.run_postgres.db_security_group_id]
+  security_group_ids = [module.run_be_postgres.db_security_group_id]
   
   
   
-  bucket            = module.run_bucket.bucket_name
+  bucket            = module.run_be_bucket.bucket_name
   
 
   environment_variables = {
@@ -115,40 +115,40 @@ module "example_tasks" {
 }
 
 
-module "run_api_gateway" {
+module "run_be_api_gateway" {
   source = "../../../../../../infra/tf/aws/modules/apigateway"
 
   environment       = terraform.workspace
-  lambda_invoke_arn = module.run_api.lambda_function_invoke_arn
-  lambda_name       = module.run_api.lambda_function_name
+  lambda_invoke_arn = module.run_be_api.lambda_function_invoke_arn
+  lambda_name       = module.run_be_api.lambda_function_name
   domain            = var.domain
-  api_subdomain     = "run-${terraform.workspace}"
-  project           = "run"
+  api_subdomain     = "run_be-${terraform.workspace}"
+  project           = "run_be"
   cognito_user_pool_arn = module.common_auth.user_pool_arn
   # Auth handled in api middleware
   auth_enabled          = false
 }
 
 
-module "run_postgres" {
+module "run_be_postgres" {
   source = "../../../../../../infra/tf/aws/modules/rds"
 
   environment       = terraform.workspace
-  project           = "run"
+  project           = "run_be"
   vpc_id            = data.aws_vpc.hexrepo.id
   username          = "postgres"
 }
 
 data "aws_secretsmanager_secret" "db_secret" {
-  arn = module.run_postgres.db_password_secret_arn
+  arn = module.run_be_postgres.db_password_secret_arn
 }
 
 
 
-module "run_bucket" {
+module "run_be_bucket" {
   source = "../../../../../../infra/tf/aws/modules/s3"
 
   environment = terraform.workspace
-  project     = "run"
+  project     = "run_be"
   name        = "example"
 }
