@@ -36,16 +36,18 @@ Setup the following env vars directly or run:
 # To Do
 
 - Setup backend
-    - Setup coder rabit to help with FE
+    - Add ecs to template project
+    - Look at superbase
+        - Auth
+        - Basic hosting
     - Setup simple FE with auth?
+        - Add auth
         - User Event tracking
             - Mixpanel
-        - Add auth
-            - Look at superbase
-            - Look at Auth0
+    - Setup coder rabit to help with FE
     - Cheaper infra / kubernetes?
         - Supabase?
-        - scaleway cheap kubernetes cluster?
+        - Scaleway cheap kubernetes cluster?
         - GCP?
         - Use 3rd party auth provider to avoid vender locking?
     - Create orchestrator logic
