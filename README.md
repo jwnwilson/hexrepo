@@ -36,7 +36,6 @@ Setup the following env vars directly or run:
 # To Do
 
 - Setup backend
-    - Add ecs to template project
     - Look at superbase
         - Auth
         - Basic hosting
