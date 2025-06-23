@@ -36,7 +36,6 @@ Setup the following env vars directly or run:
 # To Do
 
 - Setup backend
-    - Scale common to 0 and turn off DB
     - Setup coder rabit to help with FE
     - Setup simple FE with auth?
         - User Event tracking
@@ -45,8 +44,9 @@ Setup the following env vars directly or run:
             - Look at superbase
             - Look at Auth0
     - Cheaper infra / kubernetes?
-        - GCP?
+        - Supabase?
         - scaleway cheap kubernetes cluster?
+        - GCP?
         - Use 3rd party auth provider to avoid vender locking?
     - Create orchestrator logic
         - Setup Flower 
