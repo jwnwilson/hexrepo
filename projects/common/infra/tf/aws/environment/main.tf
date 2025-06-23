@@ -83,6 +83,7 @@ module "common_alb" {
   container_port     = 8000
   domain_name        = var.domain
   subdomain_name     = local.api_subdomain_ecs
+  enabled            = false
 }
 
 module "common_ecs_api" {
@@ -97,6 +98,7 @@ module "common_ecs_api" {
   target_group_arn   = module.common_alb.target_group_arn
   # This costs money
   container_insights = "disabled"
+  min_capacity       = 0
 
   ecr_url        = data.aws_ecr_repository.ecr_repo.repository_url
   docker_tag     = var.docker_tag_container
@@ -145,6 +147,7 @@ module "common_ecs_task" {
   container_command = ["celery", "-A", "app.interactor.event.celery.celery_app", "worker", "--loglevel=info"]
   docker_tag     = var.docker_tag_container
   container_port = 8000
+  min_capacity   = 0
 
   environment_variables = {
     ENVIRONMENT             = terraform.workspace
@@ -203,7 +206,7 @@ module "common_api" {
   lambda_command     = ["src.app.interactor.api.lambda_handler"]
   security_group_ids = [module.common_postgres.db_security_group_id]
   bucket             = module.common_bucket.bucket_name
-  keep_warm_schedule = "cron(* 09-17 * * ? *)"
+  # keep_warm_schedule = "cron(* 09-17 * * ? *)"
 
   environment_variables = {
     ENVIRONMENT             = terraform.workspace
@@ -279,7 +282,7 @@ module "common_postgres" {
   username     = "postgres"
   read_replica = false
   start_time   = "09:00:00"
-  stop_time    = "17:00:00"
+  stop_time    = "10:00:00"
 }
 
 data "aws_secretsmanager_secret" "db_secret" {

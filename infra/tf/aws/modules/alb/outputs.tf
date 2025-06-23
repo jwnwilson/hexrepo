@@ -1,11 +1,11 @@
 output "aws_lb_http_listener_arn" {
   description = "The ARN of the AWS Load Balancer Listener"
-  value       = aws_lb_listener.http.arn
+  value       = var.enabled ? aws_lb_listener.http[0].arn : null
 }
 
 output "target_group_arn" {
   description = "The ARN of the target group"
-  value       = aws_lb_target_group.lb.arn
+  value       = var.enabled ? aws_lb_target_group.lb[0].arn : null
 }
 
 # output "aws_lb_https_listener_arn" {

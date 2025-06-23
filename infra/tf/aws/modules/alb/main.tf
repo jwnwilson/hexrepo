@@ -45,11 +45,12 @@ resource "aws_s3_bucket_policy" "lb_logs" {
 
 # Appliacation Load Balancer
 resource "aws_lb" "main" {
+  count              = var.enabled ? 1 : 0
   name               = "${local.name}-alb"
   load_balancer_type = "application"
   internal           = false
   subnets            = var.public_subnet_ids
-  security_groups    = [aws_security_group.lb.id]
+  security_groups    = [aws_security_group.lb[0].id]
 
   access_logs {
     bucket  = aws_s3_bucket.lb_logs.id
@@ -66,6 +67,7 @@ resource "aws_lb" "main" {
 
 # Load Balancer Target Group
 resource "aws_lb_target_group" "lb" {
+  count       = var.enabled ? 1 : 0
   name        = "${local.name}-alb-tg"
   port        = var.container_port
   vpc_id      = var.vpc_id
@@ -90,7 +92,8 @@ resource "aws_lb_target_group" "lb" {
 
 # Update the listener to use the new certificate
 resource "aws_lb_listener" "http" {
-  load_balancer_arn = aws_lb.main.arn
+  count             = var.enabled ? 1 : 0
+  load_balancer_arn = aws_lb.main[0].arn
   port              = 80
   protocol          = "HTTP"
 
@@ -105,15 +108,16 @@ resource "aws_lb_listener" "http" {
 }
 
 resource "aws_lb_listener" "https" {
-  load_balancer_arn = aws_lb.main.arn
+  count             = var.enabled ? 1 : 0
+  load_balancer_arn = aws_lb.main[0].arn
   port              = "443"
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-2016-08"
-  certificate_arn   = aws_acm_certificate.main.arn
+  certificate_arn   = aws_acm_certificate.main[0].arn
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.lb.arn
+    target_group_arn = aws_lb_target_group.lb[0].arn
   }
 
   depends_on = [
@@ -127,15 +131,17 @@ data "aws_route53_zone" "api_zone" {
 }
 
 resource "aws_route53_record" "ecs_cname" {
+  count   = var.enabled ? 1 : 0
   zone_id = data.aws_route53_zone.api_zone.id
   name    = "${var.subdomain_name}.${var.domain_name}"
   type    = "CNAME"
   ttl     = "60"
-  records = [aws_lb.main.dns_name]
+  records = [aws_lb.main[0].dns_name]
 }
 
 # ACM Certificate
 resource "aws_acm_certificate" "main" {
+  count             = var.enabled ? 1 : 0
   # provider = aws.us-east-1
   domain_name       = "${var.subdomain_name}.${var.domain_name}"
   validation_method = "DNS"
@@ -153,9 +159,10 @@ resource "aws_acm_certificate" "main" {
 
 # Certificate Validation
 resource "aws_acm_certificate_validation" "main" {
+  count             = var.enabled ? 1 : 0
   # provider = aws.us-east-1
-  certificate_arn         = aws_acm_certificate.main.arn
-  validation_record_fqdns = [for record in aws_acm_certificate.main.domain_validation_options : record.resource_record_name]
+  certificate_arn         = aws_acm_certificate.main[0].arn
+  validation_record_fqdns = [for record in aws_acm_certificate.main[0].domain_validation_options : record.resource_record_name]
 
   depends_on = [
     aws_route53_record.ecs_cname
@@ -164,6 +171,7 @@ resource "aws_acm_certificate_validation" "main" {
 
 # Security Group for Gateway Load Balancer
 resource "aws_security_group" "lb" {
+  count       = var.enabled ? 1 : 0
   name        = "${local.name}-alb-sg"
   description = "Security group for Gateway Load Balancer"
   vpc_id      = var.vpc_id
