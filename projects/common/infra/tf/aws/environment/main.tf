@@ -95,6 +95,8 @@ module "common_ecs_api" {
   private_subnet_ids = data.aws_subnets.private.ids
   security_group_ids = [module.common_postgres.db_security_group_id]
   target_group_arn   = module.common_alb.target_group_arn
+  # This costs money
+  container_insights = "disabled"
 
   ecr_url        = data.aws_ecr_repository.ecr_repo.repository_url
   docker_tag     = var.docker_tag_container
@@ -136,6 +138,8 @@ module "common_ecs_task" {
   vpc_id             = data.aws_vpc.hexrepo.id
   private_subnet_ids = data.aws_subnets.private.ids
   security_group_ids = [module.common_postgres.db_security_group_id]
+  # This costs money
+  container_insights = "disabled"
 
   ecr_url        = data.aws_ecr_repository.ecr_repo.repository_url
   container_command = ["celery", "-A", "app.interactor.event.celery.celery_app", "worker", "--loglevel=info"]

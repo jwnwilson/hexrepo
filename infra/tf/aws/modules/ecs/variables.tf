@@ -115,3 +115,9 @@ variable "target_group_arn" {
   type        = string
   default     = ""
 }
+
+variable "container_insights" {
+  description = "Whether to enable container insights"
+  type        = string
+  default     = "disabled"
+}

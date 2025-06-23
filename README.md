@@ -37,6 +37,7 @@ Setup the following env vars directly or run:
 
 - Setup backend
     - Setup coder rabit to help with FE
+    - Scale common to 0 and turn off DB
     - Setup simple FE with auth?
         - User Event tracking
             - Mixpanel
