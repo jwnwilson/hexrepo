@@ -14,7 +14,11 @@ variable "project" {
   default = "run_be"
 }
 
-variable "docker_tag" {
+variable "docker_tag_container" {
+  default = "latest"
+}
+
+variable "docker_tag_serverless" {
   default = "latest"
 }
 
@@ -30,3 +34,4 @@ variable "api_repo" {
   description = "Name of container image repository"
   default     = "run_be_api"
 }
+

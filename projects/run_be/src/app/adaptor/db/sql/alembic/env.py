@@ -1,11 +1,11 @@
 from logging.config import fileConfig
 
 from alembic import context
-from hexrepo_db.sql import get_sql_db_url
-from hexrepo_db.sql.models.base_model import Base
+from app.config import config as app_config
 from sqlalchemy import Connection, engine_from_config, pool
 
-from app.config import config as app_config
+from hexrepo_db.sql import get_sql_db_url
+from hexrepo_db.sql.models.base_model import Base
 
 
 def get_db_url_alembic():

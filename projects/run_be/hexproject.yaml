@@ -2,10 +2,5 @@ deployments:
   - hextech-run_be:
     container_image: run_be
     targets:
-      - module.run_be_ecs_alb
-  - hextech-run_be-lambda:
-    container_image: run_be-lambda
-    targets:
-      - module.run_be_api
-      - module.example_tasks
-
+      - module.common_ecs_api
+      - module.common_ecs_task

@@ -5,24 +5,36 @@ authors = [
 requires-python = "<4.0,>=3.12"
 name = "run_be"
 version = "0.1.0"
-description = "Run App Backend"
+description = "Run Backend"
 readme = "README.md"
 dependencies = [
+    
     "fastapi<1.0.0,>=0.115.3",
     "itsdangerous>=2.2.0",
     "uvicorn<1.0.0,>=0.32.0",
     "gevent<25.0.0,>=24.10.3",
+    
     "requests<3.0.0,>=2.32.3",
     "python-dotenv<2.0.0,>=1.0.1",
     "pydantic-settings<3.0.0,>=2.6.0",
+    
     "alembic<2.0.0,>=1.13.3",
     "sqlalchemy-continuum>=1.4.2",
     "psycopg[binary]==3.2.6",
+    
+    
     "sentry-sdk[fastapi]>=2.25.1",
     "hexrepo-cloud",
+    
+    
     "hexrepo-db",
+    
+    
     "hexrepo-api",
+    
+    
     "hexrepo-task",
+    
     "hexrepo-log",
 ]
 
@@ -71,7 +83,14 @@ strict = true
 [tool.uv.sources]
 
 hexrepo-api = { path = "../../libs/api", editable = true }
+
+
 hexrepo-db = { path = "../../libs/db", editable = true }
+
+
 hexrepo-cloud = { path = "../../libs/cloud", editable = true }
+
+
 hexrepo-task = { path = "../../libs/task", editable = true }
+
 hexrepo-log = { path = "../../libs/log", editable = true }
