@@ -36,16 +36,13 @@ Setup the following env vars directly or run:
 # To Do
 
 - Setup backend
-    - Look at superbase
-        - Auth
-        - Basic hosting
     - Setup simple FE with auth?
         - Add auth
+            - Auth0
         - User Event tracking
             - Mixpanel
     - Setup coder rabit to help with FE
     - Cheaper infra / kubernetes?
-        - Supabase?
         - Scaleway cheap kubernetes cluster?
         - GCP?
         - Use 3rd party auth provider to avoid vender locking?
@@ -57,9 +54,6 @@ Setup the following env vars directly or run:
             - Airflow?
                 - This will likely require EC2 / kubernetes due to number of containers
                 - https://github.com/jwnwilson/airflow-kubernetes/tree/main
-    - Lambda keep warm events are probably using event free quota
-        - Disable lambda keep warm events
-        - Lambda remove debug logs
     - Add monitoring dashboard for services
         - Look at graphana?
         - Generic change log syncing to tracking metrics
