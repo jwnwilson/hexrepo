@@ -8,6 +8,12 @@ variable "environment" {
   type        = string
 }
 
+variable "enabled" {
+  description = "Whether to enable the ALB"
+  type        = bool
+  default     = true
+}
+
 variable "aws_region" {
   description = "AWS region"
   type        = string

@@ -36,17 +36,18 @@ Setup the following env vars directly or run:
 # To Do
 
 - Setup backend
+    - Create run_be with django ninja
+        - Setup Auth and permissiong / feature flags 
+        - Update template add django ninja option
     - Setup simple FE with auth?
-        - User Event tracking
         - Add auth
-        - monolith setup
-            - add frontend folder
-            - src -> backend
+            - Auth0
+        - User Event tracking
+            - Mixpanel
     - Cheaper infra / kubernetes?
+        - Scaleway cheap kubernetes cluster?
         - GCP?
-        - scaleway cheap kubernetes cluster?
         - Use 3rd party auth provider to avoid vender locking?
-    - Setup coder rabit
     - Create orchestrator logic
         - Setup Flower 
         - Setup airflow / prefect on ECS / EC2 / K8s
@@ -55,11 +56,9 @@ Setup the following env vars directly or run:
             - Airflow?
                 - This will likely require EC2 / kubernetes due to number of containers
                 - https://github.com/jwnwilson/airflow-kubernetes/tree/main
-    - Lambda keep warm events are probably using event free quota
-        - Disable lambda keep warm events
-        - Lambda remove debug logs
     - Add monitoring dashboard for services
-        - Look at graphana?
+        - Look at graphana
+        - Look at logfire
         - Generic change log syncing to tracking metrics
         - Add log based event tracking
         - Change data capture streaming to data warehouse
@@ -68,7 +67,9 @@ Setup the following env vars directly or run:
         - Latency tracking and visualisation
         - Setup BI dashboard
         - Setup sonarqube
-    - Convert to async for thoughput in APIs
+    - Convert fastapi to async for thoughput in APIs
+    - Update templates
+        - Add FE template hextool option
     - branch deploys
     - blue green deployments via load balancer
     - Setup multienv
@@ -93,20 +94,16 @@ Setup the following env vars directly or run:
         - login with mono repo user and store credentials to work specifically with hexrepo
 
 ### Project Ideas
-    - Play with AI crawler project 
-        - Setup crawl spider for PLP pages
-        - Cache all page data to avoid recrawls
-        - Store data in graph format and visualise it
-        - Categorise PLP pages
-        - Fan out and crawl web page PDP page contents
     - Cycling running area capture app.
+        - Map strava data to a map to show the total area you have covered
         - AI agents to proactively onboard new users
+    - Bunny App
     - Start up starter kit
-        - Create generic hexrepo setup cli tool to setup projects like turborepo
+        - UI to manage the app and link to all services
+            - Company index
         - Feature Flagging / A / B testing
-        - Switching calculation verisons
         - Better stack tracing / logging
-        - Analytics
+        - Analytics - Graphana?
         - JIRA / Confluence
         - Spendesk
         - Charlie hr
@@ -115,6 +112,12 @@ Setup the following env vars directly or run:
         - Automated API docs
         - External APIs
         - Free infra under my own domain to allow users to try it out
+    - Play with AI crawler project 
+        - Setup crawl spider for PLP pages
+        - Cache all page data to avoid recrawls
+        - Store data in graph format and visualise it
+        - Categorise PLP pages
+        - Fan out and crawl web page PDP page contents
 
 - Setup Frontend
     - rename project -> backend?

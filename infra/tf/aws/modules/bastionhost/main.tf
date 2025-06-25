@@ -7,6 +7,7 @@ terraform {
 }
 data "aws_ami" "amazon-linux-2" {
   most_recent = true
+  owners      = ["amazon"]
 
   filter {
     name   = "owner-alias"
@@ -15,7 +16,17 @@ data "aws_ami" "amazon-linux-2" {
 
   filter {
     name   = "name"
-    values = ["amzn2-ami-hvm*"]
+    values = ["amzn2-ami-hvm-*-x86_64-gp2"]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+
+  filter {
+    name   = "architecture"
+    values = ["x86_64"]
   }
 }
 
