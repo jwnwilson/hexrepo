@@ -36,12 +36,13 @@ Setup the following env vars directly or run:
 # To Do
 
 - Setup backend
+    - Setup Auth and permissiong / feature flags with django ninja
+        - Update template add django ninja option
     - Setup simple FE with auth?
         - Add auth
             - Auth0
         - User Event tracking
             - Mixpanel
-    - Setup coder rabit to help with FE
     - Cheaper infra / kubernetes?
         - Scaleway cheap kubernetes cluster?
         - GCP?
@@ -55,7 +56,8 @@ Setup the following env vars directly or run:
                 - This will likely require EC2 / kubernetes due to number of containers
                 - https://github.com/jwnwilson/airflow-kubernetes/tree/main
     - Add monitoring dashboard for services
-        - Look at graphana?
+        - Look at graphana
+        - Look at logfire
         - Generic change log syncing to tracking metrics
         - Add log based event tracking
         - Change data capture streaming to data warehouse
