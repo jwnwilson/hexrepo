@@ -1,0 +1,9 @@
+deployments:
+
+  - hextech-run_be:
+    container_image: run_be
+    image_type: container
+    targets:
+      - module.run_be_ecs_api
+      - module.run_be_ecs_task
+

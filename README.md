@@ -36,6 +36,7 @@ Setup the following env vars directly or run:
 # To Do
 
 - Setup backend
+    - Setup gunicorn for production grade servers
     - Create run_be with django ninja
         - Setup Auth and permissiong / feature flags 
         - Update template add django ninja option
