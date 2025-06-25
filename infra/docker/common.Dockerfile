@@ -1,8 +1,8 @@
 FROM python:3.12-alpine
 
 ARG PROJECT
-ARG WORKERS=2
 WORKDIR /code/project
+ENV WORKERS=2
 ENV PYTHONPATH=/code/project/src
 EXPOSE 8000
 
