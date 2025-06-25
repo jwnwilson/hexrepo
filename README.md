@@ -36,7 +36,8 @@ Setup the following env vars directly or run:
 # To Do
 
 - Setup backend
-    - Setup Auth and permissiong / feature flags with django ninja
+    - Create run_be with django ninja
+        - Setup Auth and permissiong / feature flags 
         - Update template add django ninja option
     - Setup simple FE with auth?
         - Add auth
