@@ -6,7 +6,7 @@ import './map.css';
 export default function Map() {
   const mapContainer = useRef(null);
   const map = useRef<maptilersdk.Map | null>(null);
-  maptilersdk.config.apiKey = 'EQqTDQpQLmXSNBIrEdMM';
+  maptilersdk.config.apiKey = process.env.EXPO_PUBLIC_MAPTILER_API_KEY || '';
   const tokyo = { lng: 139.753, lat: 35.6844 };
   const zoom = 14;
 
