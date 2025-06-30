@@ -275,6 +275,19 @@ wheels = [
 ]
 
 [[package]]
+name = "django-ninja-crud"
+version = "0.6.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "django" },
+    { name = "django-ninja" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/0a/50/bcea64366f7d32ec9df12ba0fa7a41ce8845879ada68dc1fc7cbf8b17b10/django_ninja_crud-0.6.2.tar.gz", hash = "sha256:f6698469e19687b646afed1b0aa5a12aec9fbb2192b1c69f97e0219f4644bfed", size = 17938 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/29/00/a9f1eb25d616897147669ca5a8e964e9a84e71df3d46269eafb724df6824/django_ninja_crud-0.6.2-py3-none-any.whl", hash = "sha256:8c769f58143b7359bfd7f90c9abd5a6abe12de9335d7ee8ce19e13e5dc31fd51", size = 23775 },
+]
+
+[[package]]
 name = "dnspython"
 version = "2.7.0"
 source = { registry = "https://pypi.org/simple" }
@@ -1144,6 +1157,7 @@ source = { editable = "." }
 dependencies = [
     { name = "alembic" },
     { name = "django-ninja" },
+    { name = "django-ninja-crud" },
     { name = "gevent" },
     { name = "hexrepo-api" },
     { name = "hexrepo-cloud" },
@@ -1183,6 +1197,7 @@ dev = [
 requires-dist = [
     { name = "alembic", specifier = ">=1.13.3,<2.0.0" },
     { name = "django-ninja", specifier = ">=1.4.3" },
+    { name = "django-ninja-crud", specifier = ">=0.6.2" },
     { name = "gevent", specifier = ">=24.10.3,<25.0.0" },
     { name = "hexrepo-api", editable = "../../libs/api" },
     { name = "hexrepo-cloud", editable = "../../libs/cloud" },

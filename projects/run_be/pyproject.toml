@@ -24,6 +24,7 @@ dependencies = [
     "hexrepo-api",
     "hexrepo-task",
     "hexrepo-log",
+    "django-ninja-crud>=0.6.2",
 ]
 
 [dependency-groups]

@@ -12,6 +12,7 @@ TF_VAR_aws_region=${AWS_DEFAULT_REGION}
 VENV := .venv
 MKFILE_DIR := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 VENV_DIR = $(MKFILE_DIR)$(VENV)
+ARGS := 
 
 # Setup commands
 venv:
@@ -68,6 +69,9 @@ run_bastion: bastion venv
 # Host API locally and run in docker
 run_docker:
 	docker compose up
+
+manage:
+	PYTHONPATH=src uv run python -m app.interactor.api.ninja.manage ${ARGS}
 
 # Testing commands
 
