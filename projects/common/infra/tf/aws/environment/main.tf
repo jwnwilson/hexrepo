@@ -22,6 +22,23 @@ locals {
   api_subdomain     = "common-${terraform.workspace}"
   api_subdomain_ecs = "common-${terraform.workspace}-ecs"
   app_url           = "https://${local.api_subdomain}.${var.domain}"
+  common_env_vars   = {
+    ENVIRONMENT             = terraform.workspace
+    PROJECT                 = var.project
+    CLOUD_PROVIDER          = "AWS"
+    DB_URL                  = local.db_url
+    DB_RO_URL               = local.db_ro_url
+    READ_REPLICA_ENABLED    = "false"
+    DB_PASSWORD_SECRET_NAME = data.aws_secretsmanager_secret.db_secret.name
+    TASK_QUEUE              = "${var.project}_${terraform.workspace}_tasks"
+    CLIENT_ID               = module.common_auth.client_id
+    USER_POOL_ID            = module.common_auth.user_pool_id
+    ALLOWED_ORIGINS         = "*"
+    LOG_JSON                = "true"
+    ORIGIN_URL              = "https://${local.api_subdomain_ecs}.${var.domain}"
+    TASK_TABLE_NAME         = module.common_task_nosql.table_name
+    LOG_LEVEL               = "INFO"
+  }
 }
 
 provider "aws" {
@@ -104,23 +121,7 @@ module "common_ecs_api" {
   docker_tag     = var.docker_tag_container
   container_port = 8000
 
-  environment_variables = {
-    ENVIRONMENT             = terraform.workspace
-    PROJECT                 = var.project
-    CLOUD_PROVIDER          = "AWS"
-    DB_URL                  = local.db_url
-    DB_RO_URL               = local.db_ro_url
-    READ_REPLICA_ENABLED    = "false"
-    DB_PASSWORD_SECRET_NAME = data.aws_secretsmanager_secret.db_secret.name
-    TASK_QUEUE              = "${var.project}_${terraform.workspace}_tasks"
-    CLIENT_ID               = module.common_auth.client_id
-    USER_POOL_ID            = module.common_auth.user_pool_id
-    ALLOWED_ORIGINS         = "*"
-    LOG_JSON                = "true"
-    ORIGIN_URL              = "https://${local.api_subdomain_ecs}.${var.domain}"
-    TASK_TABLE_NAME         = module.common_task_nosql.table_name
-    LOG_LEVEL               = "INFO"
-  }
+  environment_variables = local.common_env_vars
   secrets = {
     DB_PASSWORD = data.aws_secretsmanager_secret.db_secret.arn
   }
@@ -149,23 +150,7 @@ module "common_ecs_task" {
   container_port = 8000
   min_capacity   = 0
 
-  environment_variables = {
-    ENVIRONMENT             = terraform.workspace
-    PROJECT                 = var.project
-    CLOUD_PROVIDER          = "AWS"
-    DB_URL                  = local.db_url
-    DB_RO_URL               = local.db_ro_url
-    READ_REPLICA_ENABLED    = "false"
-    DB_PASSWORD_SECRET_NAME = data.aws_secretsmanager_secret.db_secret.name
-    TASK_QUEUE              = "${var.project}_${terraform.workspace}_tasks"
-    CLIENT_ID               = module.common_auth.client_id
-    USER_POOL_ID            = module.common_auth.user_pool_id
-    ALLOWED_ORIGINS         = "*"
-    LOG_JSON                = "true"
-    ORIGIN_URL              = "https://${local.api_subdomain_ecs}.${var.domain}"
-    TASK_TABLE_NAME         = module.common_task_nosql.table_name
-    LOG_LEVEL               = "INFO"
-  }
+  environment_variables = local.common_env_vars
   secrets = {
     DB_PASSWORD = data.aws_secretsmanager_secret.db_secret.arn
   }
@@ -235,19 +220,7 @@ module "common_tasks" {
   lambda_command     = ["src.app.interactor.event.lambda_handler"]
   security_group_ids = [module.common_postgres.db_security_group_id]
   keep_warm_schedule = ""
-  environment_variables = {
-    ENVIRONMENT             = terraform.workspace
-    PROJECT                 = var.project
-    CLOUD_PROVIDER          = "AWS"
-    DB_URL                  = local.db_url
-    DB_RO_URL               = local.db_ro_url
-    READ_REPLICA_ENABLED    = "false"
-    DB_PASSWORD_SECRET_NAME = data.aws_secretsmanager_secret.db_secret.name
-    TASK_QUEUE              = "${var.project}_${terraform.workspace}_tasks"
-    CLIENT_ID               = module.common_auth.client_id
-    USER_POOL_ID            = module.common_auth.user_pool_id
-    LOG_LEVEL               = "INFO"
-  }
+  environment_variables = local.common_env_vars
 }
 
 module "common_auth" {

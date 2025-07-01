@@ -2,6 +2,7 @@ FROM python:3.12-alpine
 
 ARG PROJECT
 WORKDIR /code/project
+ENV WORKERS=2
 ENV PYTHONPATH=/code/project/src
 EXPOSE 8000
 
@@ -20,4 +21,5 @@ ENV PATH="/code/project/.venv/bin/:$PATH"
 COPY ./projects/${PROJECT}/src ./src
 COPY ./projects/${PROJECT}/alembic.ini ./
 COPY ./projects/${PROJECT}/env ./env
-CMD ["uvicorn", "app.interactor.api.fastapi.main:app", "--forwarded-allow-ips=*", "--proxy-headers", "--host", "0.0.0.0", "--port", "8000" ]
+
+CMD ["gunicorn", "-w", ${WORKERS}, "-k", "uvicorn.workers.UvicornWorker", "app.interactor.api.fastapi.main:app", "--forwarded-allow-ips=*", "--proxy-headers", "--host", "0.0.0.0", "--port", "8000" ]
