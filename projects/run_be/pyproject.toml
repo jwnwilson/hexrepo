@@ -9,6 +9,7 @@ description = "Run Backend"
 readme = "README.md"
 dependencies = [
     "django-ninja>=1.4.3",
+    "django-ninja-crud>=0.6.2",
     "itsdangerous>=2.2.0",
     "uvicorn<1.0.0,>=0.32.0",
     "gevent<25.0.0,>=24.10.3",
@@ -24,7 +25,6 @@ dependencies = [
     "hexrepo-api",
     "hexrepo-task",
     "hexrepo-log",
-    "django-ninja-crud>=0.6.2",
 ]
 
 [dependency-groups]
