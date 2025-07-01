@@ -150,7 +150,7 @@ module "common_ecs_task" {
   container_port = 8000
   min_capacity   = 0
 
-  environment_variables = 
+  environment_variables = local.common_env_vars
   secrets = {
     DB_PASSWORD = data.aws_secretsmanager_secret.db_secret.arn
   }
