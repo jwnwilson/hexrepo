@@ -1,0 +1,9 @@
+deployments:
+
+  - hextech-aipet_be:
+    container_image: aipet_be
+    image_type: container
+    targets:
+      - module.aipet_be_ecs_api
+      - module.aipet_be_ecs_task
+
