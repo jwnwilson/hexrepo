@@ -1,14 +1,16 @@
 {
-  "name": "vite-babylon-800",
-  "author": "Andrei Stepanov <eldinor@gmail.com> (https://babylonpress.org/)",
-  "contributors":["minibao (https://github.com/minibao/babylon-vite)"],
+  "name": "aipet",
+  "author": "noel wilson",
+  "contributors":[""],
   "private": true,
   "version": "0.0.1",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "build:pwa": "vite build --mode pwa",
+    "build:mobile": "vite build --mode mobile"
   },
   "devDependencies": {
     "@types/node": "^22.13.14",
