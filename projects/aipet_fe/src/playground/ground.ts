@@ -1,13 +1,21 @@
+import { KeyboardEventTypes } from "@babylonjs/core/Events/keyboardEvents";
 import { Scene } from "@babylonjs/core/scene";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/";
+import type { Mesh } from "@babylonjs/core/Meshes/mesh";
+import { Vector3 } from "@babylonjs/core";
 
 export class Ground {
+  private mesh: Mesh | null = null;
+  private meshAggregate: PhysicsAggregate | null = null;
+
   constructor(private scene: Scene) {
     this.scene = scene;
+    this.mesh = null;
     this._createGround();
     this._createSphere();
+    this._createKeyboardControls();
   }
 
   _createGround(): void {
@@ -16,9 +24,39 @@ export class Ground {
   }
 
   _createSphere(): void {
-    const mesh = MeshBuilder.CreateSphere("sphere", { diameter: 2, segments: 32 }, this.scene);
-    mesh.position.y = 4;
+    this.mesh = MeshBuilder.CreateSphere("sphere", { diameter: 2, segments: 32 }, this.scene);
+    this.mesh.position.y = 4;
 
-    new PhysicsAggregate(mesh, PhysicsShapeType.SPHERE, { mass: 1, restitution: 0.75 }, this.scene);
+    this.meshAggregate = new PhysicsAggregate(this.mesh, PhysicsShapeType.SPHERE, { mass: 1, restitution: 0.75 }, this.scene);
+    // this.meshAggregate.bodsy.disablePreStep = false;
+  }
+
+  _createKeyboardControls(): void {
+    this.scene.onKeyboardObservable.add((kbInfo) => {
+      if (!this.mesh || !this.meshAggregate) return;
+
+      switch (kbInfo.type) {
+        case KeyboardEventTypes.KEYDOWN:
+          switch (kbInfo.event.key) {
+            case "a":
+            case "A":
+              this.meshAggregate.body.applyImpulse(new Vector3(1, 0, 0), this.mesh.position);
+            break
+            case "d":
+            case "D":
+              this.meshAggregate.body.applyImpulse(new Vector3(-1, 0, 0), this.mesh.position);
+            break
+            case "w":
+            case "W":
+              this.meshAggregate.body.applyImpulse(new Vector3(0, 0, -1), this.mesh.position);
+            break
+            case "s":
+            case "S":
+              this.meshAggregate.body.applyImpulse(new Vector3(0, 0, 1), this.mesh.position);
+            break
+        }
+        break;
+      }
+    });
   }
 }
