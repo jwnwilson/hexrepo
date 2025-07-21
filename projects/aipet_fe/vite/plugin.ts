@@ -1,6 +1,7 @@
 import viteCompression from 'vite-plugin-compression'
 import { createHtmlPlugin } from 'vite-plugin-html'
 import glsl from 'vite-plugin-glsl'
+import { VitePWA } from 'vite-plugin-pwa'
 
 const vitePlugins: any = (env: any) => {
   return [
@@ -19,7 +20,14 @@ const vitePlugins: any = (env: any) => {
           title: env.VITE_APP_TITLE // Need to reference environment variables in html
         }
       }
-    })
+    }),
+    VitePWA({
+      registerType: 'autoUpdate',
+      injectRegister: 'auto',
+      devOptions: {
+        enabled: true,
+      },
+    }),
   ]
 }
 

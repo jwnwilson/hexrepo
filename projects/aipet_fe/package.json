@@ -1,7 +1,9 @@
 {
   "name": "aipet",
   "author": "noel wilson",
-  "contributors":[""],
+  "contributors": [
+    ""
+  ],
   "private": true,
   "version": "0.0.1",
   "type": "module",
@@ -18,7 +20,8 @@
     "vite": "^6.2.3",
     "vite-plugin-compression": "^0.5.1",
     "vite-plugin-glsl": "^1.3.3",
-    "vite-plugin-html": "^3.2.2"
+    "vite-plugin-html": "^3.2.2",
+    "vite-plugin-pwa": "^1.0.1"
   },
   "dependencies": {
     "@babylonjs/core": "^8.7.0",
