@@ -4,11 +4,13 @@ import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/";
 import type { Mesh } from "@babylonjs/core/Meshes/mesh";
-import { Vector3 } from "@babylonjs/core";
+import { Vector3, SpriteManager, Sprite } from "@babylonjs/core";
 
 export class Ground {
   private mesh: Mesh | null = null;
   private meshAggregate: PhysicsAggregate | null = null;
+  private spriteManagerPlayer: SpriteManager | null = null;
+  private aipet: Sprite | null = null;
 
   constructor(private scene: Scene) {
     this.scene = scene;
@@ -16,6 +18,7 @@ export class Ground {
     this._createGround();
     this._createSphere();
     this._createKeyboardControls();
+    this._createAIPet();
   }
 
   _createGround(): void {
@@ -29,6 +32,13 @@ export class Ground {
 
     this.meshAggregate = new PhysicsAggregate(this.mesh, PhysicsShapeType.SPHERE, { mass: 1, restitution: 0.75 }, this.scene);
     // this.meshAggregate.bodsy.disablePreStep = false;
+  }
+
+  _createAIPet(): void {
+    // Create a sprite manager
+    this.spriteManagerPlayer = new SpriteManager("playerManager", "texture/player.png", 3, 64, this.scene);
+    this.aipet = new Sprite("aipet", this.spriteManagerPlayer);
+    this.aipet.playAnimation(0, 40, true, 100);
   }
 
   _createKeyboardControls(): void {
