@@ -36,17 +36,9 @@ Setup the following env vars directly or run:
 # To Do
 
 - Aipet
-    - Setup babylon project
-    - Setup PWA + mobile app build
-        - Look at ionic
-            - https://doc.babylonjs.com/guidedLearning/devStories/fruitFalling
-            - https://ionicframework.com/docs/intro/cli
-    - Create simple isometric scene
-    - Control a sphere to move around
-        - add jumping  
 - Setup backend
-    - Setup gunicorn for production grade servers
     - Create run_be with django ninja
+        - add django-ninja-extra
         - Setup Auth and permissiong / feature flags 
         - Update template add django ninja option
     - Setup simple FE with auth?
