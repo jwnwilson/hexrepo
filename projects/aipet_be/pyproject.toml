@@ -1,41 +1,27 @@
 [project]
 authors = [
-    {name = "Noel", email = "jwnwilson@hotmail.co.uk"},
+    {name = "Noel Wilson", email = "jwnwilson@hotmail.co.uk"},
 ]
 requires-python = "<4.0,>=3.12"
 name = "aipet_be"
 version = "0.1.0"
-description = "AI Pet BE"
+description = "AI pet BE"
 readme = "README.md"
 dependencies = [
-    
-    
     "django-ninja>=1.4.3",
     "django-ninja-crud>=0.6.2",
-    
     "uvicorn<1.0.0,>=0.32.0",
     "gevent<25.0.0,>=24.10.3",
     "requests<3.0.0,>=2.32.3",
     "python-dotenv<2.0.0,>=1.0.1",
     "pydantic-settings<3.0.0,>=2.6.0",
-    
     "alembic<2.0.0,>=1.13.3",
     "sqlalchemy-continuum>=1.4.2",
     "psycopg[binary]==3.2.6",
-    
-    
     "sentry-sdk[fastapi]>=2.25.1",
     "hexrepo-cloud",
-    
-    
     "hexrepo-db",
-    
-    
     "hexrepo-api",
-    
-    
-    "hexrepo-task",
-    
     "hexrepo-log",
 ]
 
@@ -91,7 +77,5 @@ hexrepo-db = { path = "../../libs/db", editable = true }
 
 hexrepo-cloud = { path = "../../libs/cloud", editable = true }
 
-
-hexrepo-task = { path = "../../libs/task", editable = true }
 
 hexrepo-log = { path = "../../libs/log", editable = true }

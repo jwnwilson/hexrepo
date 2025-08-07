@@ -36,14 +36,15 @@ Setup the following env vars directly or run:
 # To Do
 
 - Aipet
-- Setup backend
+    - Setup backend
     - Create run_be with django ninja
         - add django-ninja-extra
-        - Setup Auth and permissiong / feature flags 
+        - Setup Auth and permission / feature flags 
         - Update template add django ninja option
     - Setup simple FE with auth?
         - Add auth
             - Auth0
+            - django ninja?
         - User Event tracking
             - Mixpanel
     - Cheaper infra / kubernetes?
@@ -51,7 +52,6 @@ Setup the following env vars directly or run:
         - GCP?
         - Use 3rd party auth provider to avoid vender locking?
     - Create orchestrator logic
-        - Setup Flower 
         - Setup airflow / prefect on ECS / EC2 / K8s
             - Look at prefect as less effort to implement?
         - Setup task tracking debugging UI
@@ -96,10 +96,10 @@ Setup the following env vars directly or run:
         - login with mono repo user and store credentials to work specifically with hexrepo
 
 ### Project Ideas
+    - AI Pet App
     - Cycling running area capture app.
         - Map strava data to a map to show the total area you have covered
         - AI agents to proactively onboard new users
-    - Bunny App
     - Start up starter kit
         - UI to manage the app and link to all services
             - Company index

@@ -13,7 +13,7 @@ services:
     image: "aipet_be"
     build: 
       context: ../../
-      dockerfile: infra/docker/.Dockerfile
+      dockerfile: infra/docker/django-ninja.Dockerfile
       args:
           PROJECT: aipet_be
     # Run this contain as if it's in the terminal, useful for debugging
@@ -29,9 +29,6 @@ services:
     
     depends_on:
       - db
-    
-    
-
 
   db:
     container_name: aipet_be_db
@@ -53,26 +50,10 @@ services:
       - "5432"
 
 
-  localstack:
-    container_name: "aipet_be-localstack"
-    image: localstack/localstack
-    ports:
-      - "127.0.0.1:4566:4566"            # LocalStack Gateway
-      - "127.0.0.1:4510-4559:4510-4559"  # external services port range
-    environment:
-      # LocalStack configuration: https://docs.localstack.cloud/references/configuration/
-      - DEBUG=${DEBUG:-0}
-      - PERSISTENCE=1
-    volumes:
-      - localstack:/var/lib/localstack
-      - "/var/run/docker.sock:/var/run/docker.sock"
-
 
 
 volumes:
   
   postgres_db:
   
-  
-  localstack:
   

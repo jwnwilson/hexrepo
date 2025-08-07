@@ -93,46 +93,9 @@ module "aipet_be_ecs_api" {
 
 
 
-module "queue" {
-  source = "../../../../../../infra/tf/aws/modules/sqs"
-
-  project     = var.project
-  name        = "${var.project}-${terraform.workspace}"
-  environment = terraform.workspace
-}
 
 
 
-
-
-module "aipet_be_ecs_task" {
-  source = "../../../../../../infra/tf/aws/modules/ecs"
-
-  project            = var.project
-  name               = "task"
-  environment        = terraform.workspace
-  aws_region         = var.aws_region
-  vpc_id             = data.aws_vpc.hexrepo.id
-  private_subnet_ids = data.aws_subnets.private.ids
-  security_group_ids = [module.common_postgres.db_security_group_id]
-  # This costs money
-  container_insights = "disabled"
-
-  ecr_url        = data.aws_ecr_repository.ecr_repo.repository_url
-  container_command = ["celery", "-A", "app.interactor.event.celery.celery_app", "worker", "--loglevel=info"]
-  docker_tag     = var.docker_tag_container
-  container_port = 8000
-  min_capacity   = 0
-
-  environment_variables = local.common_env_vars
-  secrets = {
-    DB_PASSWORD = data.aws_secretsmanager_secret.db_secret.arn
-  }
-
-  desired_count = 1
-  task_cpu      = 256
-  task_memory   = 512
-}
 
 
 module "aipet_be_api_gateway" {
