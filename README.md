@@ -36,15 +36,15 @@ Setup the following env vars directly or run:
 # To Do
 
 - Aipet
+    - Fix gunicorn in workers
     - Create aipet be with django ninja
-        - Setup Auth and permissions
         - Setup postgres 
         - Setup Celery 
-        - Create seprate django ninja template and remove ninja from original template
     - Setup simple FE with auth?
         - Add auth
-            - Auth0
-            - django ninja?
+            - look at oauth2 for django ninja
+            - https://pypi.org/project/django-ninja-oauth2/
+            - https://github.com/vitalik/django-ninja/issues/1015#issuecomment-1899359588
         - User Event tracking
             - Mixpanel
     - Cheaper infra / kubernetes?
@@ -58,6 +58,7 @@ Setup the following env vars directly or run:
             - Airflow?
                 - This will likely require EC2 / kubernetes due to number of containers
                 - https://github.com/jwnwilson/airflow-kubernetes/tree/main
+    - Create seprate django ninja template and remove ninja from original template
     - Add monitoring dashboard for services
         - Look at graphana
         - Look at logfire

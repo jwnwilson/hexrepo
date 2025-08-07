@@ -22,4 +22,4 @@ COPY ./projects/${PROJECT}/src ./src
 COPY ./projects/${PROJECT}/alembic.ini ./
 COPY ./projects/${PROJECT}/env ./env
 
-CMD ["gunicorn", "-w", ${WORKERS}, "-k", "uvicorn.workers.UvicornWorker", "app.interactor.api.fastapi.main:app", "--forwarded-allow-ips=*", "--proxy-headers", "--host", "0.0.0.0", "--port", "8000" ]
+CMD ["sh", "-c", "gunicorn --forwarded-allow-ips=* --bind 0.0.0.0:8000 -w ${WORKERS} -k uvicorn.workers.UvicornWorker app.interactor.api.fastapi.main:app"]
