@@ -36,11 +36,11 @@ Setup the following env vars directly or run:
 # To Do
 
 - Aipet
-    - Setup backend
-    - Create run_be with django ninja
-        - add django-ninja-extra
-        - Setup Auth and permission / feature flags 
-        - Update template add django ninja option
+    - Create aipet be with django ninja
+        - Setup Auth and permissions
+        - Setup postgres 
+        - Setup Celery 
+        - Create seprate django ninja template and remove ninja from original template
     - Setup simple FE with auth?
         - Add auth
             - Auth0

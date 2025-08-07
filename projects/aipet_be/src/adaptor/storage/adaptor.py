@@ -1,5 +1,5 @@
 from hexrepo_cloud.storage import S3Adaptor, StorageConfig
-from app.config import config
+from config import config
 
 
 def get_storage(

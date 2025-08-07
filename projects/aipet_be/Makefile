@@ -12,6 +12,7 @@ TF_VAR_aws_region=${AWS_DEFAULT_REGION}
 VENV := .venv
 MKFILE_DIR := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 VENV_DIR = $(MKFILE_DIR)$(VENV)
+DJANGO_MANAGE_PY = PYTHONPATH=src uv run manage.py
 
 # Setup commands
 venv:
@@ -26,27 +27,21 @@ db: docker_stop
 	docker compose run --service-ports -d db 
 
 db_migrate_pipeline:
-	bash -c "uv run alembic upgrade head" ;\
+	$(DJANGO_MANAGE_PY) migrate
 	EXIT_CODE=$$?;\
     exit $$EXIT_CODE
 
 db_migrate_local:
-	bash -c "env $$(cat env/local.env|xargs) uv run alembic upgrade head"
+	$(DJANGO_MANAGE_PY) migrate
 
 db_migrate_docker:
-	docker compose run api bash -c "alembic upgrade head"
+	docker compose run api bash -c "$(DJANGO_MANAGE_PY) migrate"
 
 db_delete_data: 
 	docker compose run db bash -c "rm -rf /var/lib/postgresql/data/*"
 
-db_upgrade: db_migrate 
-
-db_downgrade: 
-	bash -c "uv run alembic downgrade -1"
-
 db_create_migration: 
-	bash -c "uv run alembic revision --autogenerate -m \"DB migration\""
-
+	$(DJANGO_MANAGE_PY) makemigrations
 
 docker_stop:
 	@-bash -c "docker ps -aq | xargs docker stop | xargs docker rm"
@@ -59,11 +54,11 @@ down:
 
 # Host API locally, loading local env file
 run: down db venv
-	PYTHONPATH=src uv run src/app/interactor/api/ninja/manage.py runserver
+	$(DJANGO_MANAGE_PY) runserver
 
 # Host API locally, connect to cloud db. Still requires manual setting of DB_PASSWORD_SECRET_NAME in bastion.env
 run_bastion: bastion venv
-	PYTHONPATH=src uv run src/app/interactor/api/ninja/manage.py runserver
+	$(DJANGO_MANAGE_PY) runserver
 
 # Host API locally and run in docker
 run_docker:

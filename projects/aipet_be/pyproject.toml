@@ -23,6 +23,8 @@ dependencies = [
     "hexrepo-db",
     "hexrepo-api",
     "hexrepo-log",
+    "django-ninja-extra>=0.30.1",
+    "ninja-schema>=0.14.3",
 ]
 
 [dependency-groups]
