@@ -35,14 +35,18 @@ Setup the following env vars directly or run:
 
 # To Do
 
-- Setup backend
-    - Setup gunicorn for production grade servers
-    - Create run_be with django ninja
-        - Setup Auth and permissiong / feature flags 
-        - Update template add django ninja option
+- Aipet
+    - Add signup / login / change password
+        -  https://learndjango.com/tutorials/django-login-and-logout-tutorial
+    - Create aipet be with django ninja
+        - Setup postgres 
+        - Setup Celery (use kubernetes on GCP) 
+        - Create django ninja template
     - Setup simple FE with auth?
         - Add auth
-            - Auth0
+            - look at oauth2 for django ninja
+            - https://pypi.org/project/django-ninja-oauth2/
+            - https://github.com/vitalik/django-ninja/issues/1015#issuecomment-1899359588
         - User Event tracking
             - Mixpanel
     - Cheaper infra / kubernetes?
@@ -50,13 +54,13 @@ Setup the following env vars directly or run:
         - GCP?
         - Use 3rd party auth provider to avoid vender locking?
     - Create orchestrator logic
-        - Setup Flower 
         - Setup airflow / prefect on ECS / EC2 / K8s
             - Look at prefect as less effort to implement?
         - Setup task tracking debugging UI
             - Airflow?
                 - This will likely require EC2 / kubernetes due to number of containers
                 - https://github.com/jwnwilson/airflow-kubernetes/tree/main
+    - Create seprate django ninja template and remove ninja from original template
     - Add monitoring dashboard for services
         - Look at graphana
         - Look at logfire
@@ -95,10 +99,10 @@ Setup the following env vars directly or run:
         - login with mono repo user and store credentials to work specifically with hexrepo
 
 ### Project Ideas
+    - AI Pet App
     - Cycling running area capture app.
         - Map strava data to a map to show the total area you have covered
         - AI agents to proactively onboard new users
-    - Bunny App
     - Start up starter kit
         - UI to manage the app and link to all services
             - Company index

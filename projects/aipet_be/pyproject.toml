@@ -3,14 +3,15 @@ authors = [
     {name = "Noel Wilson", email = "jwnwilson@hotmail.co.uk"},
 ]
 requires-python = "<4.0,>=3.12"
-name = "run_be"
+name = "aipet_be"
 version = "0.1.0"
-description = "Run Backend"
+description = "AI pet BE"
 readme = "README.md"
 dependencies = [
     "django-ninja>=1.4.3",
     "django-ninja-crud>=0.6.2",
-    "itsdangerous>=2.2.0",
+    "django-ninja-extra>=0.30.1",
+    "ninja-schema>=0.14.3",
     "uvicorn<1.0.0,>=0.32.0",
     "gevent<25.0.0,>=24.10.3",
     "requests<3.0.0,>=2.32.3",
@@ -23,14 +24,12 @@ dependencies = [
     "hexrepo-cloud",
     "hexrepo-db",
     "hexrepo-api",
-    "hexrepo-task",
     "hexrepo-log",
     "gunicorn>=23.0.0",
 ]
 
 [dependency-groups]
 aws = [
-    "mangum<1.0.0,>=0.19.0",
     "aws-xray-sdk>=2.14.0",
     "boto3<2.0.0,>=1.35.66",
     "boto3-stubs[essential]<2.0.0,>=1.35.86",
@@ -73,14 +72,6 @@ strict = true
 [tool.uv.sources]
 
 hexrepo-api = { path = "../../libs/api", editable = true }
-
-
 hexrepo-db = { path = "../../libs/db", editable = true }
-
-
 hexrepo-cloud = { path = "../../libs/cloud", editable = true }
-
-
-hexrepo-task = { path = "../../libs/task", editable = true }
-
 hexrepo-log = { path = "../../libs/log", editable = true }

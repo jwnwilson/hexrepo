@@ -1,0 +1,82 @@
+project_name:
+    type: str
+    help: Name of the project
+
+project_slug:
+    type: str
+    help: Project slug (automatically generated from project name)
+    default: "aipet_be"
+
+description:
+    type: str
+    help: A short description of the project
+
+full_name:
+    type: str
+    help: Your name
+
+email:
+    type: str
+    help: Your email address
+    default: you@example.com
+
+version:
+    type: str
+    help: Project version
+    default: 0.1.0
+
+use_api:
+    type: bool
+    help: Do you want to use API functionality?
+    default: true
+
+use_api_type:
+    type: str
+    help: What type of api do you want to use?
+    choices: ["serverless", "container"]
+    default: "container"
+    when: "True"
+
+use_db:
+    type: bool
+    help: Do you want to use database functionality?
+    default: true
+
+use_db_logic:
+    type: str
+    help: What type of database do you want to use?
+    choices: ["sql", "nosql"]
+    default: "sql"
+    when: "True"
+
+use_storage:
+    type: bool
+    help: Do you want to use cloud storage functionality?
+    default: true
+
+use_task:
+    type: bool
+    help: Do you want to use task queue functionality?
+    default: true
+
+use_task_type:
+    type: str
+    help: What type of task queue do you want to use?
+    choices: ["serverless", "container"]
+    default: "container"
+    when: "False"
+
+_templates_suffix: ""
+# Jinja2 environment configuration
+_jinja2_env_vars:
+    lstrip_blocks: true
+    trim_blocks: true 
+
+_exclude:
+    - ""
+    - "src/app/interactor/api/fastapi"
+    - "src/app/interactor/api/lambda_wrapper.py"
+    - ""
+    - "src/app/interactor/event"
+    - ""
+    - ""

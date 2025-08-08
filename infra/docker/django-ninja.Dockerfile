@@ -19,7 +19,7 @@ RUN uv sync --frozen --no-group dev --compile-bytecode
 ENV PATH="/code/project/.venv/bin/:$PATH"
 
 COPY ./projects/${PROJECT}/src ./src
-COPY ./projects/${PROJECT}/alembic.ini ./
 COPY ./projects/${PROJECT}/env ./env
 
-CMD ["sh", "-c", "gunicorn --forwarded-allow-ips=* --bind 0.0.0.0:8000 -w ${WORKERS} -k uvicorn.workers.UvicornWorker app.interactor.api.fastapi.main:app"]
+CMD ["sh", "-c", "gunicorn --forwarded-allow-ips=* --bind 0.0.0.0:8000 -w ${WORKERS} -k gevent main.wsgi"]
+

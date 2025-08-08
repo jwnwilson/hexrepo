@@ -6,16 +6,16 @@
 version: '3.8'
 services:
   api:
-    container_name: run_be
+    container_name: aipet_be
     platform: "linux/amd64"
     env_file:
       - env/docker.env
-    image: "run_be"
+    image: "aipet_be"
     build: 
       context: ../../
-      dockerfile: infra/docker/common.Dockerfile
+      dockerfile: infra/docker/django-ninja.Dockerfile
       args:
-          PROJECT: run_be
+          PROJECT: aipet_be
     # Run this contain as if it's in the terminal, useful for debugging
     tty: true
     # Mount local files into the container so we can update files inside the container
@@ -26,15 +26,11 @@ services:
       - "8000"
     ports:
       - 0.0.0.0:8000:8000
-    
     depends_on:
       - db
-    
-    
-
 
   db:
-    container_name: run_be_db
+    container_name: aipet_be_db
     restart: unless-stopped
     image: postgres:15
     volumes:
@@ -42,7 +38,7 @@ services:
       - ./tools:/code/tools
       - postgres_db:/var/lib/postgresql/data
     environment:
-      - POSTGRES_MULTIPLE_DATABASES=run_be_db,test_db
+      - POSTGRES_MULTIPLE_DATABASES=aipet_be_db,test_db
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password
     env_file:
@@ -53,26 +49,10 @@ services:
       - "5432"
 
 
-  localstack:
-    container_name: "run_be-localstack"
-    image: localstack/localstack
-    ports:
-      - "127.0.0.1:4566:4566"            # LocalStack Gateway
-      - "127.0.0.1:4510-4559:4510-4559"  # external services port range
-    environment:
-      # LocalStack configuration: https://docs.localstack.cloud/references/configuration/
-      - DEBUG=${DEBUG:-0}
-      - PERSISTENCE=1
-    volumes:
-      - localstack:/var/lib/localstack
-      - "/var/run/docker.sock:/var/run/docker.sock"
-
 
 
 volumes:
   
   postgres_db:
   
-  
-  localstack:
   
