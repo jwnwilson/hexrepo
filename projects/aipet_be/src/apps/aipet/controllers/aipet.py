@@ -21,7 +21,7 @@ class IsAdmin(BasePermission):
         return request.user.is_staff
 
 
-@api_controller('/aipet', permissions=[IsAuthenticated, IsAdmin])
+@api_controller('/aipet', permissions=[IsAuthenticated, IsAdmin], tags=['Aipet'])
 class AipetController(ModelControllerBase):
     user_model = get_user_model()
     model_config = ModelConfig(
