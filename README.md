@@ -36,12 +36,12 @@ Setup the following env vars directly or run:
 # To Do
 
 - Aipet
-    - Check fix gunicorn in workers
     - Add signup / login / change password
         -  https://learndjango.com/tutorials/django-login-and-logout-tutorial
     - Create aipet be with django ninja
         - Setup postgres 
-        - Setup Celery 
+        - Setup Celery (use kubernetes on GCP) 
+        - Create django ninja template
     - Setup simple FE with auth?
         - Add auth
             - look at oauth2 for django ninja

@@ -25,6 +25,7 @@ dependencies = [
     "hexrepo-api",
     "hexrepo-task",
     "hexrepo-log",
+    "gunicorn>=23.0.0",
 ]
 
 [dependency-groups]
