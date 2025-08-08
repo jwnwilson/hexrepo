@@ -38,9 +38,9 @@ Setup the following env vars directly or run:
 - Aipet
     - Add signup / login / change password
         -  https://learndjango.com/tutorials/django-login-and-logout-tutorial
-    - Create aipet be with django ninja
         - Setup postgres 
-        - Setup Celery (use kubernetes on GCP) 
+    - Create aipet be with django ninja
+        - Setup Celery 
         - Create django ninja template
     - Setup simple FE with auth?
         - Add auth
@@ -54,13 +54,11 @@ Setup the following env vars directly or run:
         - GCP?
         - Use 3rd party auth provider to avoid vender locking?
     - Create orchestrator logic
-        - Setup airflow / prefect on ECS / EC2 / K8s
-            - Look at prefect as less effort to implement?
+        - Setup airflow on EC2 / K8s
         - Setup task tracking debugging UI
-            - Airflow?
+            - Airflow
                 - This will likely require EC2 / kubernetes due to number of containers
                 - https://github.com/jwnwilson/airflow-kubernetes/tree/main
-    - Create seprate django ninja template and remove ninja from original template
     - Add monitoring dashboard for services
         - Look at graphana
         - Look at logfire
@@ -73,8 +71,6 @@ Setup the following env vars directly or run:
         - Setup BI dashboard
         - Setup sonarqube
     - Convert fastapi to async for thoughput in APIs
-    - Update templates
-        - Add FE template hextool option
     - branch deploys
     - blue green deployments via load balancer
     - Setup multienv
@@ -83,9 +79,6 @@ Setup the following env vars directly or run:
         - Simplify feature flags to be for one env
         - feature flag env -> company flag env
     - Improve pipeline yaml, update cli commands to update yaml to add and remove projects
-    - Copier
-        - Support no db and uncomment test
-        - Support nosql db and uncomment test
     - Add API lib to call projects and pass request-id-header
     - versions endpoint if versions enabled
         https://sqlalchemy-continuum.readthedocs.io/en/latest/
