@@ -36,7 +36,9 @@ Setup the following env vars directly or run:
 # To Do
 
 - Aipet
-    - Fix gunicorn in workers
+    - Check fix gunicorn in workers
+    - Add signup / login / change password
+        -  https://learndjango.com/tutorials/django-login-and-logout-tutorial
     - Create aipet be with django ninja
         - Setup postgres 
         - Setup Celery 
