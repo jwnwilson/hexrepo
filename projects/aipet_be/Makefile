@@ -12,7 +12,7 @@ TF_VAR_aws_region=${AWS_DEFAULT_REGION}
 VENV := .venv
 MKFILE_DIR := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 VENV_DIR = $(MKFILE_DIR)$(VENV)
-DJANGO_MANAGE_PY = DJANGO_SETTINGS_MODULE=main.settings PYTHONPATH=src uv run manage.py
+PYTHONPATH=src uv run manage.py
 
 # Setup commands
 venv:
@@ -68,11 +68,11 @@ run_docker:
 
 test: venv db
 	@echo "Running unit tests"
-	DJANGO_SETTINGS_MODULE=main.settings uv run pytest
+	uv run pytest
 
 coverage:
 	@echo "Running unit tests"	
-	DJANGO_SETTINGS_MODULE=main.settings uv run pytest --cov-report html	
+	uv run pytest --cov-report html	
 
 lint:
 	@TARGET_DIRS="src" bash ../../tools/bash_scripts/lint.sh 

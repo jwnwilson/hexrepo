@@ -162,9 +162,10 @@ class SignupController(ControllerBase):
         Returns:
             Verification result with success/failure message
         """
-        try:
-            verification = get_object_or_404(EmailVerification, token=token)
+        # Let get_object_or_404 raise the 404 exception naturally for invalid tokens
+        verification = get_object_or_404(EmailVerification, token=token)
 
+        try:
             # Check if already verified
             if verification.is_verified:
                 return {"message": "Email already verified", "verified": True}
@@ -204,10 +205,10 @@ class SignupController(ControllerBase):
 
         Expects a JSON payload with 'email' field.
         """
+        # Let get_object_or_404 raise the 404 exception naturally for nonexistent users
+        user = get_object_or_404(User, email=payload.email)
 
         try:
-            user = get_object_or_404(User, email=payload.email)
-
             # Check if user is already verified
             if user.is_active:
                 return {

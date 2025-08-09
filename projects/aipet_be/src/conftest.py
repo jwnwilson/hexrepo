@@ -54,7 +54,15 @@ def user_factory():
 
     # Cleanup
     for user in created_users:
-        user.delete()
+        try:
+            user.delete()
+        except ValueError as err:
+            if (
+                "User object can't be deleted because its id attribute is set to None"
+                in str(err)
+            ):
+                # User is already deleted
+                pass
 
 
 @pytest.fixture
