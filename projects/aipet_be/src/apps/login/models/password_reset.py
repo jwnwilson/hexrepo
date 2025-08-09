@@ -20,6 +20,8 @@ class PasswordReset(BaseModel):
     
     def mark_as_used(self):
         """Mark the reset token as used."""
+        if self.is_used:
+            return
         self.is_used = True
         self.used_at = timezone.now()
         self.save()

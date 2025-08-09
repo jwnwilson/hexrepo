@@ -20,6 +20,8 @@ class EmailVerification(BaseModel):
     
     def verify(self):
         """Mark the verification as completed."""
+        if self.is_verified:
+            return
         self.is_verified = True
         self.verified_at = timezone.now()
         self.user.is_active = True
