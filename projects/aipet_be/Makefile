@@ -54,8 +54,14 @@ down:
 create_superuser:
 	$(DJANGO_MANAGE_PY) createsuperuser
 
+celery:
+	docker compose run --service-ports -d celery 
+
+db_celery:
+	docker compose up -d db celery 
+
 # Host API locally, loading local env file
-run: down db venv
+run: down db_celery venv
 	$(DJANGO_MANAGE_PY) runserver
 
 # Host API locally, connect to cloud db. Still requires manual setting of DB_PASSWORD_SECRET_NAME in bastion.env
