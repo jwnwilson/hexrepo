@@ -27,6 +27,7 @@ dependencies = [
     "hexrepo-log",
     "gunicorn>=23.0.0",
     "django-ninja-jwt>=5.3.7",
+    "pytest-django>=4.11.1",
 ]
 
 [dependency-groups]
@@ -55,11 +56,12 @@ build-backend = "pdm.backend"
 
 [tool.pytest.ini_options]
 addopts = "-vv --cov --cov-report xml --cov-report term-missing --cov-fail-under=50"
-testpaths = ["app/tests"]
+testpaths = ["tests"]
 env_files = ["env/local.env"]
 pythonpath = [
   "src"
 ]
+DJANGO_SETTINGS_MODULE = "main.settings"
 
 [tool.coverage.run]
 concurrency = ["thread"]

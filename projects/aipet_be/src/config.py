@@ -1,7 +1,8 @@
-import os
 import logging
+import os
 import sys
 from typing import Optional
+
 from dotenv import load_dotenv
 from pydantic_settings import BaseSettings
 
@@ -22,6 +23,7 @@ class Config(BaseSettings):
     These parameters can be configured
     with environment variables.
     """
+
     # Current environment
     PROJECT: str = os.environ.get("PROJECT", "aipet_be")
     CLOUD_PROVIDER: str = os.environ.get("CLOUD_PROVIDER", "local")
@@ -38,7 +40,9 @@ class Config(BaseSettings):
     TASK_QUEUE: str = os.environ.get("TASK_QUEUE", "aipet_be-tasks")
 
     # Database settings
-    DB_PASSWORD_SECRET_NAME: str = os.environ.get("DB_PASSWORD_SECRET_NAME", "").format(env=ENVIRONMENT)
+    DB_PASSWORD_SECRET_NAME: str = os.environ.get("DB_PASSWORD_SECRET_NAME", "").format(
+        env=ENVIRONMENT
+    )
     DB_URL: str = os.environ["DB_URL"]
 
     DB_SQL_LOGGING: bool = os.environ.get("DB_SQL_LOGGING", "false") == "true"

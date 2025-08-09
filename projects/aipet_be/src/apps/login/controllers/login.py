@@ -1,16 +1,18 @@
-from ninja import Schema
-from ninja_extra import api_controller, ControllerBase, http_post, http_get
-from ninja_jwt.controller import TokenVerificationController, TokenObtainPairController
-from ninja_extra.permissions import AllowAny
+import logging
+from typing import Any, Dict
+
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.core.mail import send_mail
-from django.conf import settings
 from django.http import HttpRequest
 from django.shortcuts import get_object_or_404
-from typing import Dict, Any
-import logging
+from ninja import Schema
+from ninja_extra import ControllerBase, api_controller, http_get, http_post
+from ninja_extra.permissions import AllowAny
+from ninja_jwt.controller import TokenObtainPairController, TokenVerificationController
+
 from ..models import EmailVerification, PasswordReset
 
 logger = logging.getLogger(__name__)
@@ -18,6 +20,7 @@ logger = logging.getLogger(__name__)
 
 class SignupSchema(Schema):
     """Schema for user signup."""
+
     username: str
     email: str
     password: str
@@ -27,6 +30,7 @@ class SignupSchema(Schema):
 
 class SignupResponseSchema(Schema):
     """Schema for signup response."""
+
     message: str
     user_id: int
     verification_required: bool = True
@@ -34,28 +38,33 @@ class SignupResponseSchema(Schema):
 
 class VerificationResponseSchema(Schema):
     """Schema for verification response."""
+
     message: str
     verified: bool
 
 
 class ResendVerificationSchema(Schema):
     """Schema for resending verification email."""
+
     email: str
 
 
 class PasswordResetRequestSchema(Schema):
     """Schema for password reset request."""
+
     email: str
 
 
 class PasswordResetConfirmSchema(Schema):
     """Schema for password reset confirmation."""
+
     token: str
     new_password: str
 
 
 class PasswordResetResponseSchema(Schema):
     """Schema for password reset response."""
+
     message: str
     success: bool
 
@@ -69,16 +78,15 @@ class NinjaJWTController(
     auto_import = False
 
 
-
-@api_controller('/auth', auth=None, tags=['Authentication'])
+@api_controller("/auth", auth=None, tags=["Authentication"])
 class SignupController(ControllerBase):
     """Controller for user signup and email verification."""
 
-    @http_post('/signup', response=SignupResponseSchema)
+    @http_post("/signup", response=SignupResponseSchema)
     def signup(self, request: HttpRequest, payload: SignupSchema) -> Dict[str, Any]:
         """
         Register a new user account.
-        
+
         Creates a new user account and sends an email verification link.
         The user account will be inactive until email verification is completed.
         """
@@ -88,17 +96,17 @@ class SignupController(ControllerBase):
                 return {
                     "message": "Username already exists",
                     "user_id": 0,
-                    "verification_required": False
+                    "verification_required": False,
                 }
-            
+
             # Check if email already exists
             if User.objects.filter(email=payload.email).exists():
                 return {
                     "message": "Email already registered",
                     "user_id": 0,
-                    "verification_required": False
+                    "verification_required": False,
                 }
-            
+
             # Validate password
             try:
                 validate_password(payload.password)
@@ -106,9 +114,9 @@ class SignupController(ControllerBase):
                 return {
                     "message": f"Password validation failed: {', '.join(e.messages)}",
                     "user_id": 0,
-                    "verification_required": False
+                    "verification_required": False,
                 }
-            
+
             # Create user (inactive by default)
             user = User.objects.create_user(
                 username=payload.username,
@@ -116,126 +124,131 @@ class SignupController(ControllerBase):
                 password=payload.password,
                 first_name=payload.first_name,
                 last_name=payload.last_name,
-                is_active=False  # User will be activated after email verification
+                is_active=False,  # User will be activated after email verification
             )
-            
+
             # Create email verification record
             verification = EmailVerification.objects.create(user=user)
-            
+
             # Send verification email
             self._send_verification_email(user, verification)
-            
-            logger.info(f"User {user.username} registered successfully. Verification email sent.")
-            
+
+            logger.info(
+                f"User {user.username} registered successfully. Verification email sent."
+            )
+
             return {
                 "message": "User registered successfully. Please check your email for verification link.",
                 "user_id": user.id,
-                "verification_required": True
+                "verification_required": True,
             }
-            
+
         except Exception as e:
             logger.error(f"Error during user signup: {str(e)}")
             return {
                 "message": "An error occurred during registration. Please try again.",
                 "user_id": 0,
-                "verification_required": False
+                "verification_required": False,
             }
 
-    @http_get('/verify/{token}', response=VerificationResponseSchema)
+    @http_get("/verify/{token}", response=VerificationResponseSchema)
     def verify_email(self, request: HttpRequest, token: str) -> Dict[str, Any]:
         """
         Verify user email address using verification token.
-        
+
         Args:
             token: UUID verification token sent to user's email
-            
+
         Returns:
             Verification result with success/failure message
         """
         try:
             verification = get_object_or_404(EmailVerification, token=token)
-            
+
             # Check if already verified
             if verification.is_verified:
-                return {
-                    "message": "Email already verified",
-                    "verified": True
-                }
-            
+                return {"message": "Email already verified", "verified": True}
+
             # Check if token is expired
             if verification.is_expired():
                 return {
                     "message": "Verification token has expired. Please request a new verification email.",
-                    "verified": False
+                    "verified": False,
                 }
-            
+
             # Verify the email
             verification.verify()
-            
-            logger.info(f"Email verified successfully for user {verification.user.username}")
-            
+
+            logger.info(
+                f"Email verified successfully for user {verification.user.username}"
+            )
+
             return {
                 "message": "Email verified successfully. Your account is now active.",
-                "verified": True
+                "verified": True,
             }
-            
+
         except Exception as e:
             logger.error(f"Error during email verification: {str(e)}")
             return {
                 "message": "Invalid or expired verification token.",
-                "verified": False
+                "verified": False,
             }
 
-    @http_post('/resend-verification', response=SignupResponseSchema)
-    def resend_verification(self, request: HttpRequest, payload: ResendVerificationSchema) -> Dict[str, Any]:
+    @http_post("/resend-verification", response=SignupResponseSchema)
+    def resend_verification(
+        self, request: HttpRequest, payload: ResendVerificationSchema
+    ) -> Dict[str, Any]:
         """
         Resend verification email for a user.
-        
+
         Expects a JSON payload with 'email' field.
         """
-        
+
         try:
             user = get_object_or_404(User, email=payload.email)
-            
+
             # Check if user is already verified
             if user.is_active:
                 return {
                     "message": "User is already verified",
                     "user_id": user.id,
-                    "verification_required": False
+                    "verification_required": False,
                 }
-            
+
             # Get or create verification record
             verification, created = EmailVerification.objects.get_or_create(user=user)
-            
+
             # If verification exists and is not expired, use it; otherwise create new token
             if not created and verification.is_expired():
                 verification.delete()
                 verification = EmailVerification.objects.create(user=user)
-            
+
             # Send verification email
             self._send_verification_email(user, verification)
-            
+
             logger.info(f"Verification email resent for user {user.username}")
-            
+
             return {
                 "message": "Verification email sent. Please check your email.",
                 "user_id": user.id,
-                "verification_required": True
+                "verification_required": True,
             }
-            
+
         except Exception as e:
             logger.error(f"Error resending verification email: {str(e)}")
             return {
                 "message": "Error sending verification email. Please try again.",
                 "user_id": 0,
-                "verification_required": False
+                "verification_required": False,
             }
 
-    def _send_verification_email(self, user: User, verification: EmailVerification) -> None:
+    def _send_verification_email(
+        self, user: User, verification: EmailVerification
+    ) -> None:
         """
         Send verification email to user.
-        
+
         Args:
             user: User instance
             verification: EmailVerification instance
@@ -243,8 +256,10 @@ class SignupController(ControllerBase):
         try:
             subject = "Verify Your Email Address"
             # In production, this should be your actual domain
-            verification_url = f"http://localhost:8000/api/v1/auth/verify/{verification.token}"
-            
+            verification_url = (
+                f"http://localhost:8000/api/v1/auth/verify/{verification.token}"
+            )
+
             message = f"""
             Hi {user.first_name or user.username},
             
@@ -260,25 +275,27 @@ class SignupController(ControllerBase):
             Best regards,
             AI Pet Team
             """
-            
+
             send_mail(
                 subject=subject,
                 message=message,
-                from_email=getattr(settings, 'DEFAULT_FROM_EMAIL', 'noreply@aipet.com'),
+                from_email=getattr(settings, "DEFAULT_FROM_EMAIL", "noreply@aipet.com"),
                 recipient_list=[user.email],
                 fail_silently=False,
             )
-            
+
         except Exception as e:
             logger.error(f"Failed to send verification email to {user.email}: {str(e)}")
             # Re-raise the exception so the caller can handle it
             raise
 
-    @http_post('/password-reset/request', response=PasswordResetResponseSchema)
-    def request_password_reset(self, request: HttpRequest, payload: PasswordResetRequestSchema) -> Dict[str, Any]:
+    @http_post("/password-reset/request", response=PasswordResetResponseSchema)
+    def request_password_reset(
+        self, request: HttpRequest, payload: PasswordResetRequestSchema
+    ) -> Dict[str, Any]:
         """
         Request a password reset email.
-        
+
         Sends a password reset email to the user if the email exists in the system.
         Always returns success to prevent email enumeration attacks.
         """
@@ -287,103 +304,110 @@ class SignupController(ControllerBase):
             # But only send email if user exists
             try:
                 user = User.objects.get(email=payload.email)
-                
+
                 # Only send reset email if user is active
                 if user.is_active:
                     # Invalidate any existing password reset tokens for this user
-                    PasswordReset.objects.filter(user=user, is_used=False).update(is_used=True)
-                    
+                    PasswordReset.objects.filter(user=user, is_used=False).update(
+                        is_used=True
+                    )
+
                     # Create new password reset token
                     reset_token = PasswordReset.objects.create(user=user)
-                    
+
                     # Send password reset email
                     self._send_password_reset_email(user, reset_token)
-                    
+
                     logger.info(f"Password reset email sent for user {user.username}")
-                
+
             except User.DoesNotExist:
                 # Don't reveal that the user doesn't exist
-                logger.info(f"Password reset requested for non-existent email: {payload.email}")
+                logger.info(
+                    f"Password reset requested for non-existent email: {payload.email}"
+                )
                 pass
-            
+
             return {
                 "message": "If the email exists in our system, a password reset link has been sent.",
-                "success": True
+                "success": True,
             }
-            
+
         except Exception as e:
             logger.error(f"Error during password reset request: {str(e)}")
             return {
                 "message": "An error occurred while processing your request. Please try again.",
-                "success": False
+                "success": False,
             }
 
-    @http_post('/password-reset/confirm', response=PasswordResetResponseSchema)
-    def confirm_password_reset(self, request: HttpRequest, payload: PasswordResetConfirmSchema) -> Dict[str, Any]:
+    @http_post("/password-reset/confirm", response=PasswordResetResponseSchema)
+    def confirm_password_reset(
+        self, request: HttpRequest, payload: PasswordResetConfirmSchema
+    ) -> Dict[str, Any]:
         """
         Confirm password reset using the token from email.
-        
+
         Args:
             payload: Contains token and new_password
-            
+
         Returns:
             Success/failure message
         """
         try:
             # Get the password reset token
             try:
-                reset_token = PasswordReset.objects.get(token=payload.token, is_used=False)
+                reset_token = PasswordReset.objects.get(
+                    token=payload.token, is_used=False
+                )
             except PasswordReset.DoesNotExist:
-                return {
-                    "message": "Invalid or expired reset token.",
-                    "success": False
-                }
-            
+                return {"message": "Invalid or expired reset token.", "success": False}
+
             # Check if token is expired
             if reset_token.is_expired():
                 return {
                     "message": "Password reset token has expired. Please request a new one.",
-                    "success": False
+                    "success": False,
                 }
-            
+
             # Validate the new password
             try:
                 validate_password(payload.new_password, reset_token.user)
             except ValidationError as e:
                 return {
                     "message": f"Password validation failed: {', '.join(e.messages)}",
-                    "success": False
+                    "success": False,
                 }
-            
+
             # Update the user's password
             user = reset_token.user
             user.set_password(payload.new_password)
             user.save()
-            
+
             # Mark the reset token as used
             reset_token.mark_as_used()
-            
+
             # Invalidate any other unused reset tokens for this user
             PasswordReset.objects.filter(user=user, is_used=False).update(is_used=True)
-            
+
             logger.info(f"Password successfully reset for user {user.username}")
-            
+
             return {
                 "message": "Password has been successfully reset. You can now login with your new password.",
-                "success": True
+                "success": True,
             }
-            
+
         except Exception as e:
             logger.error(f"Error during password reset confirmation: {str(e)}")
             return {
                 "message": "An error occurred while resetting your password. Please try again.",
-                "success": False
+                "success": False,
             }
 
-    def _send_password_reset_email(self, user: User, reset_token: PasswordReset) -> None:
+    def _send_password_reset_email(
+        self, user: User, reset_token: PasswordReset
+    ) -> None:
         """
         Send password reset email to user.
-        
+
         Args:
             user: User instance
             reset_token: PasswordReset instance
@@ -391,8 +415,8 @@ class SignupController(ControllerBase):
         try:
             subject = "Reset Your Password"
             # In production, this should be your actual domain
-            reset_url = f"http://localhost:8000/api/v1/auth/password-reset/confirm"
-            
+            reset_url = "http://localhost:8000/api/v1/auth/password-reset/confirm"
+
             message = f"""
             Hi {user.first_name or user.username},
             
@@ -417,16 +441,18 @@ class SignupController(ControllerBase):
             Best regards,
             AI Pet Team
             """
-            
+
             send_mail(
                 subject=subject,
                 message=message,
-                from_email=getattr(settings, 'DEFAULT_FROM_EMAIL', 'noreply@aipet.com'),
+                from_email=getattr(settings, "DEFAULT_FROM_EMAIL", "noreply@aipet.com"),
                 recipient_list=[user.email],
                 fail_silently=False,
             )
-            
+
         except Exception as e:
-            logger.error(f"Failed to send password reset email to {user.email}: {str(e)}")
+            logger.error(
+                f"Failed to send password reset email to {user.email}: {str(e)}"
+            )
             # Re-raise the exception so the caller can handle it
             raise

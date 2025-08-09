@@ -1,15 +1,16 @@
 """
 Pytest configuration and fixtures for the aipet_be project.
 """
-import pytest
-import django
-from django.conf import settings
-from django.test import RequestFactory
-from django.contrib.auth.models import User
-from django.core.management import call_command
-from django.core import mail
-from unittest.mock import patch
+
 import uuid
+from unittest.mock import patch
+
+import django
+import pytest
+from django.conf import settings
+from django.contrib.auth.models import User
+from django.core import mail
+from django.test import RequestFactory
 
 
 @pytest.fixture(scope="session")
@@ -30,26 +31,26 @@ def user_factory():
     Factory for creating test users.
     """
     created_users = []
-    
+
     def _create_user(
         username="testuser",
-        email="test@example.com", 
+        email="test@example.com",
         password="testpass123",
         is_active=True,
-        **kwargs
+        **kwargs,
     ):
         user = User.objects.create_user(
             username=username,
             email=email,
             password=password,
             is_active=is_active,
-            **kwargs
+            **kwargs,
         )
         created_users.append(user)
         return user
-    
+
     yield _create_user
-    
+
     # Cleanup
     for user in created_users:
         user.delete()
@@ -73,7 +74,7 @@ def sample_user_data():
         "email": "newuser@example.com",
         "password": "securepass123",
         "first_name": "New",
-        "last_name": "User"
+        "last_name": "User",
     }
 
 
@@ -92,7 +93,7 @@ def mock_send_mail():
     """
     Mock email sending for testing.
     """
-    with patch('django.core.mail.send_mail') as mock:
+    with patch("django.core.mail.send_mail") as mock:
         yield mock
 
 
@@ -118,6 +119,7 @@ def client():
     Django test client.
     """
     from django.test import Client
+
     return Client()
 
 
@@ -127,26 +129,16 @@ def api_client():
     API test client with JSON support.
     """
     from django.test import Client
-    
+
     class APIClient(Client):
         def post_json(self, path, data=None, **extra):
             """Post JSON data."""
-            return self.post(
-                path, 
-                data=data, 
-                content_type='application/json',
-                **extra
-            )
-        
+            return self.post(path, data=data, content_type="application/json", **extra)
+
         def put_json(self, path, data=None, **extra):
             """Put JSON data."""
-            return self.put(
-                path, 
-                data=data, 
-                content_type='application/json',
-                **extra
-            )
-    
+            return self.put(path, data=data, content_type="application/json", **extra)
+
     return APIClient()
 
 
@@ -159,7 +151,7 @@ def authenticated_user(user_factory):
         username="authuser",
         email="auth@example.com",
         password="authpass123",
-        is_active=True
+        is_active=True,
     )
 
 
@@ -170,7 +162,7 @@ def inactive_user(user_factory):
     """
     return user_factory(
         username="inactiveuser",
-        email="inactive@example.com", 
+        email="inactive@example.com",
         password="inactivepass123",
-        is_active=False
+        is_active=False,
     )

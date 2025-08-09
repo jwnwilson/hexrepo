@@ -1,3 +1,3 @@
 from .aipet import AipetController
 
-__all__ = ['AipetController']
+__all__ = ["AipetController"]

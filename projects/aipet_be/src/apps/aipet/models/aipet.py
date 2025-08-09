@@ -1,4 +1,5 @@
 from django.db import models
+
 from .base import BaseModel
 
 
@@ -8,4 +9,3 @@ class Aipet(BaseModel):
 
     def __str__(self):
         return self.name
-
