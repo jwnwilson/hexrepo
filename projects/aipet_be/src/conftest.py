@@ -25,17 +25,17 @@ def django_db_setup(worker_id):
     else:
         # Parallel run - each worker gets its own file-based database
         db_name = f"test_db_{worker_id}.sqlite3"
-    
+
     settings.DATABASES["default"] = {
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": db_name,
         "ATOMIC_REQUESTS": True,
     }
     django.setup()
-    
+
     # Cleanup after session
     yield
-    
+
     # Remove temporary database files (only for parallel workers)
     if worker_id != "master" and os.path.exists(db_name):
         try:

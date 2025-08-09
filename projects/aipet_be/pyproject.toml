@@ -15,6 +15,9 @@ dependencies = [
     "ninja-schema>=0.14.3",
     "uvicorn<1.0.0,>=0.32.0",
     "gevent<25.0.0,>=24.10.3",
+    "gunicorn>=23.0.0",
+    "celery>=5.4.0",
+    "redis>=5.0.0",
     "requests<3.0.0,>=2.32.3",
     "python-dotenv<2.0.0,>=1.0.1",
     "pydantic-settings<3.0.0,>=2.6.0",
@@ -26,7 +29,6 @@ dependencies = [
     "hexrepo-db",
     "hexrepo-api",
     "hexrepo-log",
-    "gunicorn>=23.0.0",
 ]
 
 [dependency-groups]
@@ -46,6 +48,7 @@ dev = [
     "pytest-cov<7.0.0,>=6.0.0",
     "pytest-xdist<4.0.0,>=3.6.1",
     "polyfactory<3.0.0,>=2.17.0",
+    "pytest-celery>=1.2.1",
 ]
 
 [tool.pdm.build]

@@ -36,29 +36,17 @@ Setup the following env vars directly or run:
 # To Do
 
 - Aipet
-    - Setup postgres 
-    - Setup background tasks
-        - Setup Celery 
+    - Setup infra / terraform
     - Deploy App
     - Create django ninja template
-    - Setup simple FE with auth?
-        - Add auth
-            - look at oauth2 for django ninja
-            - https://pypi.org/project/django-ninja-oauth2/
-            - https://github.com/vitalik/django-ninja/issues/1015#issuecomment-1899359588
-    - User Event tracking
-        - Mixpanel
-    - Cheaper infra / kubernetes?
-        - Scaleway cheap kubernetes cluster?
-        - GCP?
-        - Use 3rd party auth provider to avoid vender locking?
     - Create orchestrator logic
-        - Setup airflow on EC2 / K8s
+        - Setup airflow on EC2 / K3 / K8s
         - Setup task tracking debugging UI
             - Airflow
                 - This will likely require EC2 / kubernetes due to number of containers
                 - https://github.com/jwnwilson/airflow-kubernetes/tree/main
     - Add monitoring dashboard for services
+        - Mixpanel
         - Look at graphana
         - Look at logfire
         - Generic change log syncing to tracking metrics
@@ -69,6 +57,11 @@ Setup the following env vars directly or run:
         - Latency tracking and visualisation
         - Setup BI dashboard
         - Setup sonarqube
+    - Setup better auth
+        - Add auth
+            - look at oauth2 for django ninja
+            - https://pypi.org/project/django-ninja-oauth2/
+            - https://github.com/vitalik/django-ninja/issues/1015#issuecomment-1899359588
     - Convert fastapi to async for thoughput in APIs
     - branch deploys
     - blue green deployments via load balancer

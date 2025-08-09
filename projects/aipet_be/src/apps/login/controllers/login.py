@@ -13,6 +13,8 @@ from ninja_extra import ControllerBase, api_controller, http_get, http_post
 from ninja_extra.permissions import AllowAny
 from ninja_jwt.controller import TokenObtainPairController, TokenVerificationController
 
+from apps.core.tasks import send_email_task
+
 from ..models import EmailVerification, PasswordReset
 
 logger = logging.getLogger(__name__)
@@ -258,7 +260,7 @@ class SignupController(ControllerBase):
             subject = "Verify Your Email Address"
             # In production, this should be your actual domain
             verification_url = (
-                f"http://localhost:8000/api/v1/auth/verify/{verification.token}"
+                f"{getattr(settings, 'FRONTEND_VERIFY_URL')}/{verification.token}"
             )
 
             message = f"""
@@ -277,7 +279,7 @@ class SignupController(ControllerBase):
             AI Pet Team
             """
 
-            send_mail(
+            send_email_task.delay(
                 subject=subject,
                 message=message,
                 from_email=getattr(settings, "DEFAULT_FROM_EMAIL", "noreply@aipet.com"),
