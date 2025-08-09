@@ -4,7 +4,7 @@ Tests for signup functionality.
 
 import json
 from datetime import timedelta
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 
 import pytest
 from django.contrib.auth.models import User
@@ -17,8 +17,12 @@ from apps.login.models import EmailVerification
 class TestSignupEndpoints:
     """Test SignupController signup-related endpoints."""
 
-    def test_signup_success(self, api_client, sample_user_data, mailbox):
+    @patch("apps.core.tasks.send_email_task.delay")
+    def test_signup_success(self, mock_send_email_task, api_client, sample_user_data, mailbox):
         """Test successful user signup."""
+        # Mock the Celery task to return a mock result
+        mock_send_email_task.return_value = MagicMock()
+        
         response = api_client.post_json("/api/v1/auth/signup", sample_user_data)
 
         assert response.status_code == 200
@@ -37,9 +41,13 @@ class TestSignupEndpoints:
         verification = EmailVerification.objects.get(user=user)
         assert not verification.is_verified
 
-        # Check email was sent
-        assert len(mailbox) == 1
-        assert sample_user_data["email"] in mailbox[0].to
+        # Verify Celery task was called with correct parameters
+        mock_send_email_task.assert_called_once()
+        call_args = mock_send_email_task.call_args
+        assert call_args.kwargs["subject"] == "Verify Your Email Address"
+        assert sample_user_data["email"] in call_args.kwargs["recipient_list"]
+        assert str(verification.token) in call_args.kwargs["message"]
+        assert "noreply@aipet.com" == call_args.kwargs["from_email"]
 
     def test_signup_duplicate_username(
         self, api_client, sample_user_data, user_factory
@@ -84,10 +92,10 @@ class TestSignupEndpoints:
         assert "Password validation failed" in data["message"]
         assert data["user_id"] == 0
 
-    @patch("apps.login.controllers.login.SignupController._send_verification_email")
-    def test_signup_email_failure(self, mock_send_email, api_client, sample_user_data):
+    @patch("apps.core.tasks.send_email_task.delay")
+    def test_signup_email_failure(self, mock_send_email_task, api_client, sample_user_data):
         """Test signup when email sending fails."""
-        mock_send_email.side_effect = Exception("Email failed")
+        mock_send_email_task.side_effect = Exception("Email failed")
 
         response = api_client.post_json("/api/v1/auth/signup", sample_user_data)
 
@@ -97,6 +105,9 @@ class TestSignupEndpoints:
         assert data["verification_required"] is False
         assert "error occurred during registration" in data["message"]
         assert data["user_id"] == 0
+        
+        # Verify Celery task was called but failed
+        mock_send_email_task.assert_called_once()
 
 
 @pytest.mark.django_db
@@ -159,10 +170,14 @@ class TestEmailVerificationEndpoints:
         assert data["verified"] is False
         assert "expired" in data["message"]
 
-    def test_resend_verification_success(self, api_client, user_factory, mailbox):
+    @patch("apps.core.tasks.send_email_task.delay")
+    def test_resend_verification_success(self, mock_send_email_task, api_client, user_factory, mailbox):
         """Test successful verification email resend."""
+        # Mock the Celery task to return a mock result
+        mock_send_email_task.return_value = MagicMock()
+        
         user = user_factory(is_active=False)
-        EmailVerification.objects.create(user=user)
+        verification = EmailVerification.objects.create(user=user)
 
         response = api_client.post_json(
             "/api/v1/auth/resend-verification", {"email": user.email}
@@ -173,7 +188,14 @@ class TestEmailVerificationEndpoints:
 
         assert data["verification_required"] is True
         assert "email sent" in data["message"]
-        assert len(mailbox) == 1
+        
+        # Verify Celery task was called with correct parameters
+        mock_send_email_task.assert_called_once()
+        call_args = mock_send_email_task.call_args
+        assert call_args.kwargs["subject"] == "Verify Your Email Address"
+        assert user.email in call_args.kwargs["recipient_list"]
+        assert str(verification.token) in call_args.kwargs["message"]
+        assert "noreply@aipet.com" == call_args.kwargs["from_email"]
 
     def test_resend_verification_already_verified(self, api_client, user_factory):
         """Test resending verification for already verified user."""
@@ -196,3 +218,50 @@ class TestEmailVerificationEndpoints:
         )
 
         assert response.status_code == 404  # get_object_or_404 returns 404
+
+
+@pytest.mark.django_db
+class TestCeleryEmailTask:
+    """Test the Celery email task directly."""
+
+    @patch("apps.core.tasks.send_mail")
+    def test_send_email_task_success(self, mock_send_mail):
+        """Test that the Celery email task works correctly."""
+        from apps.core.tasks import send_email_task
+        
+        # Mock successful email sending
+        mock_send_mail.return_value = None
+        
+        # Call the task directly
+        send_email_task(
+            subject="Test Subject",
+            message="Test message",
+            recipient_list=["test@example.com"],
+            from_email="from@example.com",
+            fail_silently=False
+        )
+        
+        # Verify send_mail was called with correct parameters
+        mock_send_mail.assert_called_once_with(
+            subject="Test Subject",
+            message="Test message",
+            from_email="from@example.com",
+            recipient_list=["test@example.com"],
+            fail_silently=False
+        )
+
+    @patch("apps.core.tasks.send_mail")
+    def test_send_email_task_failure(self, mock_send_mail):
+        """Test that the Celery email task handles failures correctly."""
+        from apps.core.tasks import send_email_task
+        
+        # Mock email sending failure
+        mock_send_mail.side_effect = Exception("SMTP Error")
+        
+        with pytest.raises(Exception, match="SMTP Error"):
+            # Call the task
+            send_email_task(
+                subject="Test Subject",
+                message="Test message",
+                recipient_list=["test@example.com"]
+            )
