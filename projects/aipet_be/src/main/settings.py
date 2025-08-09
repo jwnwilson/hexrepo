@@ -164,6 +164,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # In production, configure SMTP settings
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 DEFAULT_FROM_EMAIL = "noreply@aipet.com"
+FRONTEND_VERIFY_URL = os.getenv("FRONTEND_VERIFY_URL", "http://localhost:8000/api/v1/auth/verify")
 
 # For production, use SMTP backend:
 # EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
