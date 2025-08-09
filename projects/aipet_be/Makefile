@@ -12,7 +12,7 @@ TF_VAR_aws_region=${AWS_DEFAULT_REGION}
 VENV := .venv
 MKFILE_DIR := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 VENV_DIR = $(MKFILE_DIR)$(VENV)
-DJANGO_MANAGE_PY = PYTHONPATH=src uv run manage.py
+PYTHONPATH=src uv run manage.py
 
 # Setup commands
 venv:
@@ -67,7 +67,6 @@ run_docker:
 # Testing commands
 
 test: venv db
-
 	@echo "Running unit tests"
 	uv run pytest
 
@@ -83,6 +82,8 @@ lint_check: venv
 
 clean:
 	@find . -type f -name '*.py[co]' -delete -o -type d -name __pycache__ -delete
+	@find . -name 'test_db_*.sqlite3' -delete
+	@find . -name '.coverage.*' -delete
 
 tf_workspace:
 	@cd infra/tf/aws/environment && \

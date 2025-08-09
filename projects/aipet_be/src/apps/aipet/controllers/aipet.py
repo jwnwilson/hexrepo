@@ -1,19 +1,20 @@
+from django.contrib.auth import get_user_model
 from ninja import ModelSchema
 from ninja_extra import (
     ModelConfig,
+    ModelControllerBase,
     ModelSchemaConfig,
-    api_controller, 
-    ModelControllerBase
+    api_controller,
 )
-from ninja_extra.permissions import IsAuthenticated, BasePermission
-from django.contrib.auth import get_user_model
+from ninja_extra.permissions import BasePermission, IsAuthenticated
+
 from ..models import Aipet
 
 
 class PetSchema(ModelSchema):
     class Config:
         model = Aipet
-        model_fields = ['name', 'description']
+        model_fields = ["name", "description"]
 
 
 class IsAdmin(BasePermission):
@@ -21,13 +22,12 @@ class IsAdmin(BasePermission):
         return request.user.is_staff
 
 
-@api_controller('/aipet', permissions=[IsAuthenticated, IsAdmin])
+@api_controller("/aipet", permissions=[IsAuthenticated, IsAdmin], tags=["Aipet"])
 class AipetController(ModelControllerBase):
     user_model = get_user_model()
     model_config = ModelConfig(
         model=Aipet,
         schema_config=ModelSchemaConfig(
-            read_only_fields=["id", "created_at", "updated_at"]  
+            read_only_fields=["id", "created_at", "updated_at"]
         ),
     )
-
