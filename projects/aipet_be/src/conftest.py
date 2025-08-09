@@ -1,0 +1,176 @@
+"""
+Pytest configuration and fixtures for the aipet_be project.
+"""
+import pytest
+import django
+from django.conf import settings
+from django.test import RequestFactory
+from django.contrib.auth.models import User
+from django.core.management import call_command
+from django.core import mail
+from unittest.mock import patch
+import uuid
+
+
+@pytest.fixture(scope="session")
+def django_db_setup():
+    """
+    Configure the test database.
+    """
+    settings.DATABASES["default"] = {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": ":memory:",
+    }
+    django.setup()
+
+
+@pytest.fixture
+def user_factory():
+    """
+    Factory for creating test users.
+    """
+    created_users = []
+    
+    def _create_user(
+        username="testuser",
+        email="test@example.com", 
+        password="testpass123",
+        is_active=True,
+        **kwargs
+    ):
+        user = User.objects.create_user(
+            username=username,
+            email=email,
+            password=password,
+            is_active=is_active,
+            **kwargs
+        )
+        created_users.append(user)
+        return user
+    
+    yield _create_user
+    
+    # Cleanup
+    for user in created_users:
+        user.delete()
+
+
+@pytest.fixture
+def api_request_factory():
+    """
+    Factory for creating API requests.
+    """
+    return RequestFactory()
+
+
+@pytest.fixture
+def sample_user_data():
+    """
+    Sample user registration data.
+    """
+    return {
+        "username": "newuser",
+        "email": "newuser@example.com",
+        "password": "securepass123",
+        "first_name": "New",
+        "last_name": "User"
+    }
+
+
+@pytest.fixture
+def mailbox():
+    """
+    Access to the test mailbox.
+    """
+    # Clear any existing emails
+    mail.outbox.clear()
+    return mail.outbox
+
+
+@pytest.fixture
+def mock_send_mail():
+    """
+    Mock email sending for testing.
+    """
+    with patch('django.core.mail.send_mail') as mock:
+        yield mock
+
+
+@pytest.fixture
+def uuid_token():
+    """
+    Generate a UUID token for testing.
+    """
+    return str(uuid.uuid4())
+
+
+@pytest.fixture(autouse=True)
+def enable_db_access_for_all_tests(db):
+    """
+    Allow database access for all tests.
+    """
+    pass
+
+
+@pytest.fixture
+def client():
+    """
+    Django test client.
+    """
+    from django.test import Client
+    return Client()
+
+
+@pytest.fixture
+def api_client():
+    """
+    API test client with JSON support.
+    """
+    from django.test import Client
+    
+    class APIClient(Client):
+        def post_json(self, path, data=None, **extra):
+            """Post JSON data."""
+            return self.post(
+                path, 
+                data=data, 
+                content_type='application/json',
+                **extra
+            )
+        
+        def put_json(self, path, data=None, **extra):
+            """Put JSON data."""
+            return self.put(
+                path, 
+                data=data, 
+                content_type='application/json',
+                **extra
+            )
+    
+    return APIClient()
+
+
+@pytest.fixture
+def authenticated_user(user_factory):
+    """
+    Create an authenticated user for testing.
+    """
+    return user_factory(
+        username="authuser",
+        email="auth@example.com",
+        password="authpass123",
+        is_active=True
+    )
+
+
+@pytest.fixture
+def inactive_user(user_factory):
+    """
+    Create an inactive user for testing.
+    """
+    return user_factory(
+        username="inactiveuser",
+        email="inactive@example.com", 
+        password="inactivepass123",
+        is_active=False
+    )
