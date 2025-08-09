@@ -1,6 +1,6 @@
 from django.db import models
 
-from .base import BaseModel
+from apps.core.models import BaseModel
 
 
 class Aipet(BaseModel):

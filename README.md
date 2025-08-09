@@ -36,11 +36,12 @@ Setup the following env vars directly or run:
 # To Do
 
 - Aipet
-    - Add signup / login / change password
-        - Setup postgres 
-    - Create aipet be with django ninja
+    - Setup parallel tests
+    - Setup postgres 
+    - Setup background tasks
         - Setup Celery 
-        - Create django ninja template
+    - Deploy App
+    - Create django ninja template
     - Setup simple FE with auth?
         - Add auth
             - look at oauth2 for django ninja
