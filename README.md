@@ -37,7 +37,6 @@ Setup the following env vars directly or run:
 
 - Aipet
     - Add signup / login / change password
-        -  https://learndjango.com/tutorials/django-login-and-logout-tutorial
         - Setup postgres 
     - Create aipet be with django ninja
         - Setup Celery 
@@ -47,8 +46,8 @@ Setup the following env vars directly or run:
             - look at oauth2 for django ninja
             - https://pypi.org/project/django-ninja-oauth2/
             - https://github.com/vitalik/django-ninja/issues/1015#issuecomment-1899359588
-        - User Event tracking
-            - Mixpanel
+    - User Event tracking
+        - Mixpanel
     - Cheaper infra / kubernetes?
         - Scaleway cheap kubernetes cluster?
         - GCP?

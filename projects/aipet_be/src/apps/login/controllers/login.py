@@ -11,7 +11,7 @@ from django.http import HttpRequest
 from django.shortcuts import get_object_or_404
 from typing import Dict, Any
 import logging
-from ..models import EmailVerification
+from ..models import EmailVerification, PasswordReset
 
 logger = logging.getLogger(__name__)
 
@@ -41,6 +41,23 @@ class VerificationResponseSchema(Schema):
 class ResendVerificationSchema(Schema):
     """Schema for resending verification email."""
     email: str
+
+
+class PasswordResetRequestSchema(Schema):
+    """Schema for password reset request."""
+    email: str
+
+
+class PasswordResetConfirmSchema(Schema):
+    """Schema for password reset confirmation."""
+    token: str
+    new_password: str
+
+
+class PasswordResetResponseSchema(Schema):
+    """Schema for password reset response."""
+    message: str
+    success: bool
 
 
 @api_controller("/token", permissions=[AllowAny], tags=["Authentication"], auth=None)
@@ -254,5 +271,162 @@ class SignupController(ControllerBase):
             
         except Exception as e:
             logger.error(f"Failed to send verification email to {user.email}: {str(e)}")
+            # Re-raise the exception so the caller can handle it
+            raise
+
+    @http_post('/password-reset/request', response=PasswordResetResponseSchema)
+    def request_password_reset(self, request: HttpRequest, payload: PasswordResetRequestSchema) -> Dict[str, Any]:
+        """
+        Request a password reset email.
+        
+        Sends a password reset email to the user if the email exists in the system.
+        Always returns success to prevent email enumeration attacks.
+        """
+        try:
+            # Always return success to prevent email enumeration
+            # But only send email if user exists
+            try:
+                user = User.objects.get(email=payload.email)
+                
+                # Only send reset email if user is active
+                if user.is_active:
+                    # Invalidate any existing password reset tokens for this user
+                    PasswordReset.objects.filter(user=user, is_used=False).update(is_used=True)
+                    
+                    # Create new password reset token
+                    reset_token = PasswordReset.objects.create(user=user)
+                    
+                    # Send password reset email
+                    self._send_password_reset_email(user, reset_token)
+                    
+                    logger.info(f"Password reset email sent for user {user.username}")
+                
+            except User.DoesNotExist:
+                # Don't reveal that the user doesn't exist
+                logger.info(f"Password reset requested for non-existent email: {payload.email}")
+                pass
+            
+            return {
+                "message": "If the email exists in our system, a password reset link has been sent.",
+                "success": True
+            }
+            
+        except Exception as e:
+            logger.error(f"Error during password reset request: {str(e)}")
+            return {
+                "message": "An error occurred while processing your request. Please try again.",
+                "success": False
+            }
+
+    @http_post('/password-reset/confirm', response=PasswordResetResponseSchema)
+    def confirm_password_reset(self, request: HttpRequest, payload: PasswordResetConfirmSchema) -> Dict[str, Any]:
+        """
+        Confirm password reset using the token from email.
+        
+        Args:
+            payload: Contains token and new_password
+            
+        Returns:
+            Success/failure message
+        """
+        try:
+            # Get the password reset token
+            try:
+                reset_token = PasswordReset.objects.get(token=payload.token, is_used=False)
+            except PasswordReset.DoesNotExist:
+                return {
+                    "message": "Invalid or expired reset token.",
+                    "success": False
+                }
+            
+            # Check if token is expired
+            if reset_token.is_expired():
+                return {
+                    "message": "Password reset token has expired. Please request a new one.",
+                    "success": False
+                }
+            
+            # Validate the new password
+            try:
+                validate_password(payload.new_password, reset_token.user)
+            except ValidationError as e:
+                return {
+                    "message": f"Password validation failed: {', '.join(e.messages)}",
+                    "success": False
+                }
+            
+            # Update the user's password
+            user = reset_token.user
+            user.set_password(payload.new_password)
+            user.save()
+            
+            # Mark the reset token as used
+            reset_token.mark_as_used()
+            
+            # Invalidate any other unused reset tokens for this user
+            PasswordReset.objects.filter(user=user, is_used=False).update(is_used=True)
+            
+            logger.info(f"Password successfully reset for user {user.username}")
+            
+            return {
+                "message": "Password has been successfully reset. You can now login with your new password.",
+                "success": True
+            }
+            
+        except Exception as e:
+            logger.error(f"Error during password reset confirmation: {str(e)}")
+            return {
+                "message": "An error occurred while resetting your password. Please try again.",
+                "success": False
+            }
+
+    def _send_password_reset_email(self, user: User, reset_token: PasswordReset) -> None:
+        """
+        Send password reset email to user.
+        
+        Args:
+            user: User instance
+            reset_token: PasswordReset instance
+        """
+        try:
+            subject = "Reset Your Password"
+            # In production, this should be your actual domain
+            reset_url = f"http://localhost:8000/api/v1/auth/password-reset/confirm"
+            
+            message = f"""
+            Hi {user.first_name or user.username},
+            
+            You have requested to reset your password for your AI Pet account.
+            
+            Please use the following token to reset your password:
+            Token: {reset_token.token}
+            
+            You can reset your password by making a POST request to:
+            {reset_url}
+            
+            With the following JSON payload:
+            {{
+                "token": "{reset_token.token}",
+                "new_password": "your_new_password"
+            }}
+            
+            This token will expire in 1 hour.
+            
+            If you didn't request this password reset, please ignore this email.
+            
+            Best regards,
+            AI Pet Team
+            """
+            
+            send_mail(
+                subject=subject,
+                message=message,
+                from_email=getattr(settings, 'DEFAULT_FROM_EMAIL', 'noreply@aipet.com'),
+                recipient_list=[user.email],
+                fail_silently=False,
+            )
+            
+        except Exception as e:
+            logger.error(f"Failed to send password reset email to {user.email}: {str(e)}")
             # Re-raise the exception so the caller can handle it
             raise

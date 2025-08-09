@@ -1,13 +1,14 @@
-# User Signup and Verification API
+# User Authentication API
 
-This document describes the new user signup and email verification endpoints added to the AI Pet Django-Ninja application.
+This document describes the user authentication endpoints including signup, email verification, and password reset functionality for the AI Pet Django-Ninja application.
 
 ## Overview
 
-The signup system includes:
+The authentication system includes:
 - User registration with email verification
 - Email verification via token
 - Resend verification email functionality
+- Password reset via email with token verification
 
 ## API Endpoints
 
@@ -83,6 +84,52 @@ Resend verification email for a user who hasn't verified their email yet.
 }
 ```
 
+### 4. Request Password Reset
+**POST** `/api/v1/auth/password-reset/request`
+
+Request a password reset email. Always returns success to prevent email enumeration attacks.
+
+**Request Body:**
+```json
+{
+    "email": "john@example.com"
+}
+```
+
+**Response:**
+```json
+{
+    "message": "If the email exists in our system, a password reset link has been sent.",
+    "success": true
+}
+```
+
+### 5. Confirm Password Reset
+**POST** `/api/v1/auth/password-reset/confirm`
+
+Reset password using the token received via email.
+
+**Request Body:**
+```json
+{
+    "token": "12345678-1234-1234-1234-123456789abc",
+    "new_password": "new_secure_password123"
+}
+```
+
+**Response:**
+```json
+{
+    "message": "Password has been successfully reset. You can now login with your new password.",
+    "success": true
+}
+```
+
+**Error Responses:**
+- Invalid or expired reset token
+- Password validation failed
+- Token expired (1 hour)
+
 ## Email Configuration
 
 ### Development
@@ -110,6 +157,15 @@ EMAIL_HOST_PASSWORD = 'your-app-password'
 - `is_verified`: Boolean verification status
 - `is_expired()`: Method to check if token expired (24 hours)
 - `verify()`: Method to mark verification as complete and activate user
+
+### PasswordReset Model
+- `user`: ForeignKey to Django User model (allows multiple reset tokens per user)
+- `token`: UUID field for reset token
+- `created_at`: Creation timestamp
+- `used_at`: Timestamp when token was used (null until used)
+- `is_used`: Boolean status indicating if token has been used
+- `is_expired()`: Method to check if token expired (1 hour)
+- `mark_as_used()`: Method to mark token as used
 
 ## Integration with Existing Authentication
 
@@ -140,3 +196,28 @@ To test the signup flow:
    ```
 
 4. **Login using existing JWT endpoints** (user is now active)
+
+### Password Reset Flow
+
+1. **Request password reset:**
+   ```bash
+   curl -X POST http://localhost:8000/api/v1/auth/password-reset/request \
+     -H "Content-Type: application/json" \
+     -d '{
+       "email": "test@example.com"
+     }'
+   ```
+
+2. **Check console for password reset email** (development mode)
+
+3. **Reset password using token from email:**
+   ```bash
+   curl -X POST http://localhost:8000/api/v1/auth/password-reset/confirm \
+     -H "Content-Type: application/json" \
+     -d '{
+       "token": "12345678-1234-1234-1234-123456789abc",
+       "new_password": "mynewsecurepassword123"
+     }'
+   ```
+
+4. **Login with new password using existing JWT endpoints**
