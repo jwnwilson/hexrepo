@@ -12,8 +12,9 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 import os
 from pathlib import Path
-from dotenv import load_dotenv
 from urllib.parse import ParseResult, urlparse
+
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -39,9 +40,9 @@ def parse_database_url(url: str | None) -> dict:
             "NAME": BASE_DIR / "db.sqlite3",
             "ATOMIC_REQUESTS": True,
         }
-    
+
     parsed: ParseResult = urlparse(url)
-    
+
     return {
         "ENGINE": "django.db.backends.postgresql",
         "NAME": parsed.path.lstrip("/"),
@@ -52,11 +53,14 @@ def parse_database_url(url: str | None) -> dict:
         "ATOMIC_REQUESTS": True,
     }
 
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-17w_61abp)n_5!mrw8(wwj_#9igoq^#j$pgy*sq$z-4ir)f=r7")
+SECRET_KEY = os.getenv(
+    "SECRET_KEY", "django-insecure-17w_61abp)n_5!mrw8(wwj_#9igoq^#j$pgy*sq$z-4ir)f=r7"
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG", "True").lower() in ("true", "1", "yes")
@@ -113,9 +117,7 @@ WSGI_APPLICATION = "main.wsgi.application"
 # Get database URL from environment variable
 DATABASE_URL = os.getenv("DB_URL", "")
 
-DATABASES = {
-    "default": parse_database_url(DATABASE_URL)
-}
+DATABASES = {"default": parse_database_url(DATABASE_URL)}
 
 
 # Password validation
@@ -164,7 +166,9 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # In production, configure SMTP settings
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 DEFAULT_FROM_EMAIL = "noreply@aipet.com"
-FRONTEND_VERIFY_URL = os.getenv("FRONTEND_VERIFY_URL", "http://localhost:8000/api/v1/auth/verify")
+FRONTEND_VERIFY_URL = os.getenv(
+    "FRONTEND_VERIFY_URL", "http://localhost:8000/api/v1/auth/verify"
+)
 
 # For production, use SMTP backend:
 # EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

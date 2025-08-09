@@ -3,15 +3,18 @@ Celery tasks for the aipet application.
 """
 
 import logging
+
 from celery import shared_task
-from django.core.mail import send_mail
 from django.conf import settings
+from django.core.mail import send_mail
 
 logger = logging.getLogger(__name__)
 
 
 @shared_task
-def send_email_task(subject, message, recipient_list, from_email=None, fail_silently=False):
+def send_email_task(
+    subject, message, recipient_list, from_email=None, fail_silently=False
+):
     """Send notification email asynchronously."""
     try:
         send_mail(

@@ -13,8 +13,9 @@ from ninja_extra import ControllerBase, api_controller, http_get, http_post
 from ninja_extra.permissions import AllowAny
 from ninja_jwt.controller import TokenObtainPairController, TokenVerificationController
 
-from ..models import EmailVerification, PasswordReset
 from apps.core.tasks import send_email_task
+
+from ..models import EmailVerification, PasswordReset
 
 logger = logging.getLogger(__name__)
 
