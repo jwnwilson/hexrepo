@@ -36,8 +36,7 @@ Setup the following env vars directly or run:
 # To Do
 
 - Aipet
-    - Setup background tasks
-        - Setup Celery 
+    - Setup infra / terraform
     - Deploy App
     - Create django ninja template
     - Create orchestrator logic
