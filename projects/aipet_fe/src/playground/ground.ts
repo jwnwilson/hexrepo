@@ -5,18 +5,21 @@ import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/";
 import type { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { Vector3, SpriteManager, Sprite } from "@babylonjs/core";
+import { Pet } from "./pet";
 
 export class Ground {
   private mesh: Mesh | null = null;
   private meshAggregate: PhysicsAggregate | null = null;
   private spriteManagerPlayer: SpriteManager | null = null;
   private aipet: Sprite | null = null;
+  private pet: Pet | null = null;
 
   constructor(private scene: Scene) {
     this.scene = scene;
     this.mesh = null;
     this._createGround();
     this._createSphere();
+    this._createPet();
     this._createKeyboardControls();
     this._createAIPet();
   }
@@ -32,6 +35,11 @@ export class Ground {
 
     this.meshAggregate = new PhysicsAggregate(this.mesh, PhysicsShapeType.SPHERE, { mass: 1, restitution: 0.75 }, this.scene);
     // this.meshAggregate.bodsy.disablePreStep = false;
+  }
+
+  _createPet(): void {
+    // Create a Pet instance with needs
+    this.pet = new Pet(this.scene, "Buddy", new Vector3(0, 3, 0));
   }
 
   _createAIPet(): void {
@@ -64,9 +72,39 @@ export class Ground {
             case "S":
               this.meshAggregate.body.applyImpulse(new Vector3(0, 0, 1), this.mesh.position);
             break
+            // Pet interaction controls
+            case "f":
+            case "F":
+              if (this.pet) {
+                this.pet.feed();
+              }
+            break
+            case "t":
+            case "T":
+              if (this.pet) {
+                this.pet.toilet();
+              }
+            break
+            case "p":
+            case "P":
+              if (this.pet) {
+                this.pet.play();
+              }
+            break
+            case "z":
+            case "Z":
+              if (this.pet) {
+                this.pet.sleep();
+              }
+            break
         }
         break;
       }
     });
+  }
+
+  // Method to get the pet instance
+  getPet(): Pet | null {
+    return this.pet;
   }
 }

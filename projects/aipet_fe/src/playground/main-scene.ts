@@ -11,6 +11,7 @@ import { Ground } from "./ground";
 
 export default class MainScene {
   private camera: ArcRotateCamera;
+  private ground: Ground | null = null;
 
   constructor(private scene: Scene, private canvas: HTMLCanvasElement, private engine: Engine | WebGPUEngine) {
     this._setCamera(scene);
@@ -42,6 +43,11 @@ export default class MainScene {
 
   async loadComponents(): Promise<void> {
     // Load your files in order
-    new Ground(this.scene);
+    this.ground = new Ground(this.scene);
+  }
+
+  // Method to get the ground instance (which contains the pet)
+  getGround(): Ground | null {
+    return this.ground;
   }
 }
