@@ -2,6 +2,7 @@
 Pytest configuration and fixtures for the aipet_be project.
 """
 
+import os
 import uuid
 from unittest.mock import patch
 
@@ -13,17 +14,34 @@ from django.core import mail
 from django.test import RequestFactory
 
 
-@pytest.fixture(scope="session")
-def django_db_setup():
+def django_db_setup(worker_id):
     """
-    Configure the test database.
+    Configure the test database for parallel execution.
+    Each worker gets its own database to avoid conflicts.
     """
+    if worker_id == "master":
+        # Single process run
+        db_name = ":memory:"
+    else:
+        # Parallel run - each worker gets its own file-based database
+        db_name = f"test_db_{worker_id}.sqlite3"
+    
     settings.DATABASES["default"] = {
         "ENGINE": "django.db.backends.sqlite3",
-        "NAME": ":memory:",
+        "NAME": db_name,
         "ATOMIC_REQUESTS": True,
     }
     django.setup()
+    
+    # Cleanup after session
+    yield
+    
+    # Remove temporary database files (only for parallel workers)
+    if worker_id != "master" and os.path.exists(db_name):
+        try:
+            os.remove(db_name)
+        except OSError:
+            pass  # File might already be cleaned up
 
 
 @pytest.fixture
@@ -123,7 +141,7 @@ def enable_db_access_for_all_tests(db):
 
 
 @pytest.fixture
-def client():
+def client(django_db_setup):
     """
     Django test client.
     """
@@ -133,7 +151,7 @@ def client():
 
 
 @pytest.fixture
-def api_client():
+def api_client(django_db_setup):
     """
     API test client with JSON support.
     """
