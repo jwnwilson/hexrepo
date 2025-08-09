@@ -36,7 +36,6 @@ Setup the following env vars directly or run:
 # To Do
 
 - Aipet
-    - Setup postgres 
     - Setup background tasks
         - Setup Celery 
     - Deploy App

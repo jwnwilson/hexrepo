@@ -48,11 +48,57 @@ services:
     expose:
       - "5432"
 
+  redis:
+    container_name: aipet_be_redis
+    restart: unless-stopped
+    image: redis:7-alpine
+    ports:
+      - "0.0.0.0:6379:6379"
+    expose:
+      - "6379"
+    volumes:
+      - redis_data:/data
 
+  celery:
+    container_name: aipet_be_celery
+    platform: "linux/amd64"
+    env_file:
+      - env/docker.env
+    image: "aipet_be"
+    build: 
+      context: ../../
+      dockerfile: infra/docker/django-ninja.Dockerfile
+      args:
+          PROJECT: aipet_be
+    volumes:
+      - ../../libs:/libs
+      - ./src:/code/src
+    command: celery -A main worker --loglevel=info
+    depends_on:
+      - redis
+      - db
 
+  celery-beat:
+    container_name: aipet_be_celery_beat
+    platform: "linux/amd64"
+    env_file:
+      - env/docker.env
+    image: "aipet_be"
+    build: 
+      context: ../../
+      dockerfile: infra/docker/django-ninja.Dockerfile
+      args:
+          PROJECT: aipet_be
+    volumes:
+      - ../../libs:/libs
+      - ./src:/code/src
+    command: celery -A main beat --loglevel=info
+    depends_on:
+      - redis
+      - db
 
 volumes:
-  
   postgres_db:
+  redis_data:
   
   
