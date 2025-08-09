@@ -12,7 +12,7 @@ TF_VAR_aws_region=${AWS_DEFAULT_REGION}
 VENV := .venv
 MKFILE_DIR := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 VENV_DIR = $(MKFILE_DIR)$(VENV)
-PYTHONPATH=src uv run manage.py
+DJANGO_MANAGE_PY = PYTHONPATH=src uv run manage.py
 
 # Setup commands
 venv:
@@ -51,6 +51,8 @@ down:
 	bash -c "docker ps -aq | xargs docker stop | xargs docker rm"
 	
 # Local Development
+create_superuser:
+	$(DJANGO_MANAGE_PY) createsuperuser
 
 # Host API locally, loading local env file
 run: down db venv

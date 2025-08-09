@@ -10,22 +10,56 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+import os
 from pathlib import Path
+from dotenv import load_dotenv
+from urllib.parse import ParseResult, urlparse
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 PROJECT_PATH = Path(__file__).resolve()
 SITE_ROOT = PROJECT_PATH.parent
 
+# Load environment variables from .env file
+# Look for .env files in the env directory relative to the project root
+env_dir = BASE_DIR.parent / "env"
+env_name = os.environ.get("ENVIRONMENT", "local")
+env_file = f"{env_name}.env"
+env_path = env_dir / env_file
+if env_path.exists():
+    load_dotenv(env_path)
+
+
+def parse_database_url(url: str | None) -> dict:
+    """Parse a database URL into Django database configuration."""
+    if not url:
+        # Fallback to SQLite if no URL provided
+        return {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+            "ATOMIC_REQUESTS": True,
+        }
+    
+    parsed: ParseResult = urlparse(url)
+    
+    return {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": parsed.path.lstrip("/"),
+        "USER": parsed.username,
+        "PASSWORD": parsed.password,
+        "HOST": parsed.hostname,
+        "PORT": parsed.port,
+        "ATOMIC_REQUESTS": True,
+    }
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-17w_61abp)n_5!mrw8(wwj_#9igoq^#j$pgy*sq$z-4ir)f=r7"
+SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-17w_61abp)n_5!mrw8(wwj_#9igoq^#j$pgy*sq$z-4ir)f=r7")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv("DEBUG", "True").lower() in ("true", "1", "yes")
 
 ALLOWED_HOSTS = ["0.0.0.0", "localhost", "127.0.0.1"]
 
@@ -76,12 +110,11 @@ WSGI_APPLICATION = "main.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+# Get database URL from environment variable
+DATABASE_URL = os.getenv("DB_URL", "")
+
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-        "ATOMIC_REQUESTS": True,
-    }
+    "default": parse_database_url(DATABASE_URL)
 }
 
 
