@@ -22,7 +22,7 @@ export class Ground {
 
   _createGround(): void {
     const mesh = MeshBuilder.CreateGround("ground", { width: 20, height: 20 }, this.scene);
-    new PhysicsAggregate(mesh, PhysicsShapeType.BOX, { mass: 0 }, this.scene);
+    new PhysicsAggregate(mesh, PhysicsShapeType.BOX, { mass: 0, friction: 1 }, this.scene);
   }
 
   _createWalls(): void {

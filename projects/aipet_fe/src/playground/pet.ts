@@ -22,6 +22,7 @@ export class Pet {
   private meshAggregate: PhysicsAggregate | null = null;
   private sprite: Sprite | null = null;
   private spriteManager: SpriteManager | null = null;
+  private shadowMesh: Mesh | null = null;
   private needs: PetNeeds;
   private name: string;
 
@@ -49,8 +50,8 @@ export class Pet {
     // Add physics to the invisible sphere
     this.meshAggregate = new PhysicsAggregate(
       this.mesh, 
-      PhysicsShapeType.SPHERE, 
-      { mass: 0.5, restitution: 0.6 }, 
+      PhysicsShapeType.BOX, 
+      { mass: 0.5, restitution: 0.6, friction: 1}, 
       this.scene
     );
 
@@ -62,12 +63,34 @@ export class Pet {
     this.sprite.width = 1.5;
     this.sprite.height = 1.5;
     
+    // Create shadow mesh and shadow generator
+    this._createShadow();
+    
     // Update sprite position to follow physics body
     this.scene.registerBeforeRender(() => {
       if (this.mesh && this.sprite) {
         this.sprite.position = this.mesh.position;
+        // Update shadow position to follow the pet
+        if (this.shadowMesh) {
+          this.shadowMesh.position = new Vector3(this.mesh.position.x, 0.01, this.mesh.position.z);
+        }
       }
     });
+  }
+
+  private _createShadow(): void {
+    // Create a flat circle mesh for the shadow
+    this.shadowMesh = MeshBuilder.CreateDisc("petShadow", { radius: 0.4, tessellation: 32 }, this.scene);
+    this.shadowMesh.position = new Vector3(0, 0.01, 0); // Slightly above ground to avoid z-fighting
+    this.shadowMesh.rotation.x = Math.PI / 2; // Rotate to lay flat on the ground
+    
+    // Create shadow material
+    const shadowMaterial = new StandardMaterial("shadowMaterial", this.scene);
+    shadowMaterial.diffuseColor = new Color3(0, 0, 0);
+    shadowMaterial.alpha = 0.3; // Semi-transparent
+    shadowMaterial.emissiveColor = new Color3(0, 0, 0);
+    shadowMaterial.specularColor = new Color3(0, 0, 0);
+    this.shadowMesh.material = shadowMaterial;
   }
 
   private _startNeedsDecay(): void {
@@ -254,6 +277,9 @@ export class Pet {
     }
     if (this.meshAggregate) {
       this.meshAggregate.dispose();
+    }
+    if (this.shadowMesh) {
+      this.shadowMesh.dispose();
     }
     
     // Remove status display
