@@ -18,7 +18,7 @@ export class Ground {
     this.scene = scene;
     this.mesh = null;
     this._createGround();
-    this._createSphere();
+    // this._createSphere();
     this._createPet();
     this._createKeyboardControls();
     this._createAIPet();
@@ -27,14 +27,6 @@ export class Ground {
   _createGround(): void {
     const mesh = MeshBuilder.CreateGround("ground", { width: 10, height: 10 }, this.scene);
     new PhysicsAggregate(mesh, PhysicsShapeType.BOX, { mass: 0 }, this.scene);
-  }
-
-  _createSphere(): void {
-    this.mesh = MeshBuilder.CreateSphere("sphere", { diameter: 2, segments: 32 }, this.scene);
-    this.mesh.position.y = 4;
-
-    this.meshAggregate = new PhysicsAggregate(this.mesh, PhysicsShapeType.SPHERE, { mass: 1, restitution: 0.75 }, this.scene);
-    // this.meshAggregate.bodsy.disablePreStep = false;
   }
 
   _createPet(): void {
@@ -51,26 +43,32 @@ export class Ground {
 
   _createKeyboardControls(): void {
     this.scene.onKeyboardObservable.add((kbInfo) => {
-      if (!this.mesh || !this.meshAggregate) return;
-
       switch (kbInfo.type) {
         case KeyboardEventTypes.KEYDOWN:
           switch (kbInfo.event.key) {
             case "a":
             case "A":
-              this.meshAggregate.body.applyImpulse(new Vector3(1, 0, 0), this.mesh.position);
+              if (this.pet && this.pet.getPhysicsBody()) {
+                this.pet.getPhysicsBody()!.body.applyImpulse(new Vector3(1, 0, 0), this.pet.getMesh()!.position);
+              }
             break
             case "d":
             case "D":
-              this.meshAggregate.body.applyImpulse(new Vector3(-1, 0, 0), this.mesh.position);
+              if (this.pet && this.pet.getPhysicsBody()) {
+                this.pet.getPhysicsBody()!.body.applyImpulse(new Vector3(-1, 0, 0), this.pet.getMesh()!.position);
+              }
             break
             case "w":
             case "W":
-              this.meshAggregate.body.applyImpulse(new Vector3(0, 0, -1), this.mesh.position);
+              if (this.pet && this.pet.getPhysicsBody()) {
+                this.pet.getPhysicsBody()!.body.applyImpulse(new Vector3(0, 0, -1), this.pet.getMesh()!.position);
+              }
             break
             case "s":
             case "S":
-              this.meshAggregate.body.applyImpulse(new Vector3(0, 0, 1), this.mesh.position);
+              if (this.pet && this.pet.getPhysicsBody()) {
+                this.pet.getPhysicsBody()!.body.applyImpulse(new Vector3(0, 0, 1), this.pet.getMesh()!.position);
+              }
             break
             // Pet interaction controls
             case "f":
