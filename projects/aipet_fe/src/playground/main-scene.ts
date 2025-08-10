@@ -8,10 +8,12 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { WebGPUEngine } from "@babylonjs/core/Engines/webgpuEngine";
 // import { LoadAssetContainerAsync } from "@babylonjs/core/Loading/sceneLoader";
 import { Ground } from "./ground";
+import { Pet } from "./pet";
 
 export default class MainScene {
   private camera: ArcRotateCamera;
   private ground: Ground | null = null;
+  private pet: Pet | null = null;
 
   constructor(private scene: Scene, private canvas: HTMLCanvasElement, private engine: Engine | WebGPUEngine) {
     this._setCamera(scene);
@@ -44,10 +46,21 @@ export default class MainScene {
   async loadComponents(): Promise<void> {
     // Load your files in order
     this.ground = new Ground(this.scene);
+    this._createPet();
+  }
+
+  private _createPet(): void {
+    // Create a Pet instance with needs
+    this.pet = new Pet(this.scene, "Buddy", new Vector3(0, 3, 0));
   }
 
   // Method to get the ground instance (which contains the pet)
   getGround(): Ground | null {
     return this.ground;
+  }
+
+  // Method to get the pet instance
+  getPet(): Pet | null {
+    return this.pet;
   }
 }

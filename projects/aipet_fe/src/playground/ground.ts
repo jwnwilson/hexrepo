@@ -1,108 +1,72 @@
-import { KeyboardEventTypes } from "@babylonjs/core/Events/keyboardEvents";
 import { Scene } from "@babylonjs/core/scene";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/";
 import type { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { Vector3, SpriteManager, Sprite } from "@babylonjs/core";
-import { Pet } from "./pet";
 
 export class Ground {
   private mesh: Mesh | null = null;
   private meshAggregate: PhysicsAggregate | null = null;
   private spriteManagerPlayer: SpriteManager | null = null;
   private aipet: Sprite | null = null;
-  private pet: Pet | null = null;
+  private walls: Mesh[] = [];
+  private wallAggregates: PhysicsAggregate[] = [];
 
   constructor(private scene: Scene) {
     this.scene = scene;
     this.mesh = null;
     this._createGround();
-    // this._createSphere();
-    this._createPet();
-    this._createKeyboardControls();
-    this._createAIPet();
+    this._createWalls();
   }
 
   _createGround(): void {
-    const mesh = MeshBuilder.CreateGround("ground", { width: 10, height: 10 }, this.scene);
+    const mesh = MeshBuilder.CreateGround("ground", { width: 20, height: 20 }, this.scene);
     new PhysicsAggregate(mesh, PhysicsShapeType.BOX, { mass: 0 }, this.scene);
   }
 
-  _createPet(): void {
-    // Create a Pet instance with needs
-    this.pet = new Pet(this.scene, "Buddy", new Vector3(0, 3, 0));
-  }
+  _createWalls(): void {
+    const groundSize = 20;
+    const wallHeight = 2;
+    const wallThickness = 0.5;
+    const halfSize = groundSize / 2;
 
-  _createAIPet(): void {
-    // Create a sprite manager
-    this.spriteManagerPlayer = new SpriteManager("playerManager", "texture/player.png", 3, 64, this.scene);
-    this.aipet = new Sprite("aipet", this.spriteManagerPlayer);
-    this.aipet.playAnimation(0, 40, true, 100);
-  }
+    // Create four walls around the ground
+    const wallPositions = [
+      // North wall
+      { position: new Vector3(0, wallHeight / 2, halfSize), rotation: new Vector3(0, 0, 0) },
+      // South wall
+      { position: new Vector3(0, wallHeight / 2, -halfSize), rotation: new Vector3(0, 0, 0) },
+      // East wall
+      { position: new Vector3(halfSize, wallHeight / 2, 0), rotation: new Vector3(0, Math.PI / 2, 0) },
+      // West wall
+      { position: new Vector3(-halfSize, wallHeight / 2, 0), rotation: new Vector3(0, Math.PI / 2, 0) }
+    ];
 
-  _createKeyboardControls(): void {
-    this.scene.onKeyboardObservable.add((kbInfo) => {
-      switch (kbInfo.type) {
-        case KeyboardEventTypes.KEYDOWN:
-          switch (kbInfo.event.key) {
-            case "a":
-            case "A":
-              if (this.pet && this.pet.getPhysicsBody()) {
-                this.pet.getPhysicsBody()!.body.applyImpulse(new Vector3(1, 0, 0), this.pet.getMesh()!.position);
-              }
-            break
-            case "d":
-            case "D":
-              if (this.pet && this.pet.getPhysicsBody()) {
-                this.pet.getPhysicsBody()!.body.applyImpulse(new Vector3(-1, 0, 0), this.pet.getMesh()!.position);
-              }
-            break
-            case "w":
-            case "W":
-              if (this.pet && this.pet.getPhysicsBody()) {
-                this.pet.getPhysicsBody()!.body.applyImpulse(new Vector3(0, 0, -1), this.pet.getMesh()!.position);
-              }
-            break
-            case "s":
-            case "S":
-              if (this.pet && this.pet.getPhysicsBody()) {
-                this.pet.getPhysicsBody()!.body.applyImpulse(new Vector3(0, 0, 1), this.pet.getMesh()!.position);
-              }
-            break
-            // Pet interaction controls
-            case "f":
-            case "F":
-              if (this.pet) {
-                this.pet.feed();
-              }
-            break
-            case "t":
-            case "T":
-              if (this.pet) {
-                this.pet.toilet();
-              }
-            break
-            case "p":
-            case "P":
-              if (this.pet) {
-                this.pet.play();
-              }
-            break
-            case "z":
-            case "Z":
-              if (this.pet) {
-                this.pet.sleep();
-              }
-            break
-        }
-        break;
-      }
+    wallPositions.forEach((wallData, index) => {
+      const wall = MeshBuilder.CreateBox(
+        `wall_${index}`,
+        {
+          width: groundSize,
+          height: wallHeight,
+          depth: wallThickness
+        },
+        this.scene
+      );
+
+      wall.position = wallData.position;
+      wall.rotation = wallData.rotation;
+
+      // Add physics to the wall
+      const wallAggregate = new PhysicsAggregate(
+        wall,
+        PhysicsShapeType.BOX,
+        { mass: 0 },
+        this.scene
+      );
+
+      this.walls.push(wall);
+      this.wallAggregates.push(wallAggregate);
     });
-  }
-
-  // Method to get the pet instance
-  getPet(): Pet | null {
-    return this.pet;
   }
 }

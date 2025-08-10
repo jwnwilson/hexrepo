@@ -6,6 +6,9 @@ import type { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { Vector3 } from "@babylonjs/core";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
+import { KeyboardEventTypes } from "@babylonjs/core/Events/keyboardEvents";
+import { SpriteManager } from "@babylonjs/core/Sprites/spriteManager";
+import { Sprite } from "@babylonjs/core/Sprites/sprite";
 
 export interface PetNeeds {
   hungry: number;      // 0-100 (100 = very hungry)
@@ -17,6 +20,8 @@ export interface PetNeeds {
 export class Pet {
   private mesh: Mesh | null = null;
   private meshAggregate: PhysicsAggregate | null = null;
+  private sprite: Sprite | null = null;
+  private spriteManager: SpriteManager | null = null;
   private needs: PetNeeds;
   private name: string;
 
@@ -32,26 +37,37 @@ export class Pet {
     
     this._createPet(position);
     this._startNeedsDecay();
+    this._createKeyboardControls();
   }
 
   private _createPet(position: Vector3): void {
-    // Create a sphere to represent the pet
-    this.mesh = MeshBuilder.CreateSphere("pet", { diameter: 1.5, segments: 32 }, this.scene);
+    // Create an invisible sphere for physics
+    this.mesh = MeshBuilder.CreateSphere("petPhysics", { diameter: 1.5, segments: 32 }, this.scene);
     this.mesh.position = position;
+    this.mesh.isVisible = false; // Make the mesh invisible
 
-    // Create a material for the pet
-    const material = new StandardMaterial("petMaterial", this.scene);
-    material.diffuseColor = new Color3(0.8, 0.6, 0.4); // Light brown color
-    material.specularColor = new Color3(0.2, 0.2, 0.2);
-    this.mesh.material = material;
-
-    // Add physics to the pet
+    // Add physics to the invisible sphere
     this.meshAggregate = new PhysicsAggregate(
       this.mesh, 
       PhysicsShapeType.SPHERE, 
       { mass: 0.5, restitution: 0.6 }, 
       this.scene
     );
+
+    // Create sprite manager and sprite
+    this.spriteManager = new SpriteManager("petSpriteManager", "/public/texture/player.png", 1, { width: 64, height: 64 }, this.scene);
+    this.sprite = new Sprite("petSprite", this.spriteManager);
+    this.sprite.playAnimation(0, 40, true, 100);
+    this.sprite.position = position;
+    this.sprite.width = 1.5;
+    this.sprite.height = 1.5;
+    
+    // Update sprite position to follow physics body
+    this.scene.registerBeforeRender(() => {
+      if (this.mesh && this.sprite) {
+        this.sprite.position = this.mesh.position;
+      }
+    });
   }
 
   private _startNeedsDecay(): void {
@@ -171,6 +187,58 @@ export class Pet {
     }
 
     return { need: maxNeed, value: maxValue };
+  }
+
+  private _createKeyboardControls(): void {
+    this.scene.onKeyboardObservable.add((kbInfo) => {
+      switch (kbInfo.type) {
+        case KeyboardEventTypes.KEYDOWN:
+          switch (kbInfo.event.key) {
+            case "a":
+            case "A":
+              if (this.meshAggregate) {
+                this.meshAggregate.body.applyImpulse(new Vector3(1, 0, 0), this.mesh!.position);
+              }
+            break
+            case "d":
+            case "D":
+              if (this.meshAggregate) {
+                this.meshAggregate.body.applyImpulse(new Vector3(-1, 0, 0), this.mesh!.position);
+              }
+            break
+            case "w":
+            case "W":
+              if (this.meshAggregate) {
+                this.meshAggregate.body.applyImpulse(new Vector3(0, 0, -1), this.mesh!.position);
+              }
+            break
+            case "s":
+            case "S":
+              if (this.meshAggregate) {
+                this.meshAggregate.body.applyImpulse(new Vector3(0, 0, 1), this.mesh!.position);
+              }
+            break
+            // Pet interaction controls
+            case "f":
+            case "F":
+              this.feed();
+            break
+            case "t":
+            case "T":
+              this.toilet();
+            break
+            case "p":
+            case "P":
+              this.play();
+            break
+            case "z":
+            case "Z":
+              this.sleep();
+            break
+        }
+        break;
+      }
+    });
   }
 
   // Cleanup method
