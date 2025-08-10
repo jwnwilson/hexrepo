@@ -129,7 +129,7 @@ export class Pet {
       <strong>Most Urgent:</strong> ${urgentNeed.need} (${urgentNeed.value.toFixed(1)})<br/>
       <br/>
       <strong>Controls:</strong><br/>
-      F - Feed | P - Play | Z - Sleep | T - Toilet
+      WASD - Move | SPACE - Jump | F - Feed | P - Play | Z - Sleep | T - Toilet
     `;
   }
 
@@ -234,6 +234,12 @@ export class Pet {
             case "z":
             case "Z":
               this.sleep();
+            break
+            case " ":
+              // Jump movement on spacebar
+              if (this.meshAggregate) {
+                this.meshAggregate.body.applyImpulse(new Vector3(0, 4, 0), this.mesh!.position);
+              }
             break
         }
         break;
