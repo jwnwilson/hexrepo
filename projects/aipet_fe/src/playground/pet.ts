@@ -58,7 +58,7 @@ export class Pet {
     // Create sprite manager and sprite
     this.spriteManager = new SpriteManager("petSpriteManager", "/public/texture/bunny.png", 1, { width: 32, height: 32 }, this.scene);
     this.sprite = new Sprite("petSprite", this.spriteManager);
-    this.sprite.playAnimation(0, 7, true, 100);
+    this.sprite.playAnimation(0, 4, true, 100);
     this.sprite.position = position;
     this.sprite.width = 1.5;
     this.sprite.height = 1.5;
