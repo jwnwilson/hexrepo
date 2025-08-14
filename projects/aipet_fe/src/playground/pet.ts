@@ -9,6 +9,7 @@ import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { KeyboardEventTypes } from "@babylonjs/core/Events/keyboardEvents";
 import { SpriteManager } from "@babylonjs/core/Sprites/spriteManager";
 import { Sprite } from "@babylonjs/core/Sprites/sprite";
+import { Need } from "./need";
 
 export interface PetNeeds {
   hungry: number;      // 0-100 (100 = very hungry)
@@ -25,10 +26,18 @@ export class Pet {
   private shadowMesh: Mesh | null = null;
   private needs: PetNeeds;
   private name: string;
+  private needObjects: Need[] = [];
+  private proximityThreshold: number = 3.0; // Distance threshold for need interaction
 
-  constructor(private scene: Scene, name: string = "Pet", position: Vector3 = new Vector3(0, 2, 0)) {
+  constructor(
+    private scene: Scene, 
+    name: string = "Pet", 
+    position: Vector3 = new Vector3(0, 2, 0),
+    needObjects: Need[] = []
+  ) {
     this.scene = scene;
     this.name = name;
+    this.needObjects = needObjects;
     this.needs = {
       hungry: 50,
       tiredness: 30,
@@ -142,6 +151,13 @@ export class Pet {
     }
 
     const urgentNeed = this.getMostUrgentNeed();
+    
+    // Check what needs are nearby
+    const nearbyNeeds = this.getNearbyNeeds();
+    const nearbyText = nearbyNeeds.length > 0 
+      ? nearbyNeeds.map(need => need.getName()).join(', ')
+      : 'None';
+    
     statusDiv.innerHTML = `
       <strong>${this.name} Status:</strong><br/>
       🍔 Hungry: ${this.needs.hungry.toFixed(1)}<br/>
@@ -150,24 +166,114 @@ export class Pet {
       🚽 Toilet: ${this.needs.toilet.toFixed(1)}<br/>
       <br/>
       <strong>Most Urgent:</strong> ${urgentNeed.need} (${urgentNeed.value.toFixed(1)})<br/>
+      <strong>Nearby Needs:</strong> ${nearbyText}<br/>
+      <strong>Proximity Range:</strong> ${this.proximityThreshold.toFixed(1)}m<br/>
       <br/>
       <strong>Controls:</strong><br/>
       WASD - Move | SPACE - Jump | F - Feed | P - Play | Z - Sleep | T - Toilet
     `;
   }
 
+  private getNearbyNeeds(): Need[] {
+    if (!this.mesh) return [];
+    
+    const petPosition = this.mesh.position;
+    const nearby: Need[] = [];
+    
+    for (const need of this.needObjects) {
+      const distance = Vector3.Distance(petPosition, need.getPosition());
+      if (distance <= this.proximityThreshold) {
+        nearby.push(need);
+      }
+    }
+    
+    return nearby;
+  }
+
+  // Methods to check proximity to needs
+  private isNearNeed(needType: string): boolean {
+    if (!this.mesh) return false;
+    
+    const petPosition = this.mesh.position;
+    
+    for (const need of this.needObjects) {
+      const needName = need.getName().toLowerCase();
+      if (needName.includes(needType.toLowerCase())) {
+        const distance = Vector3.Distance(petPosition, need.getPosition());
+        if (distance <= this.proximityThreshold) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  private findClosestNeed(needType: string): Need | null {
+    if (!this.mesh) return null;
+    
+    const petPosition = this.mesh.position;
+    let closestNeed: Need | null = null;
+    let closestDistance = Infinity;
+    
+    for (const need of this.needObjects) {
+      const needName = need.getName().toLowerCase();
+      if (needName.includes(needType.toLowerCase())) {
+        const distance = Vector3.Distance(petPosition, need.getPosition());
+        if (distance < closestDistance) {
+          closestDistance = distance;
+          closestNeed = need;
+        }
+      }
+    }
+    
+    return closestNeed;
+  }
+
   // Methods to satisfy pet needs
   public feed(): void {
+    if (!this.isNearNeed('food')) {
+      const closestFood = this.findClosestNeed('food');
+      if (closestFood) {
+        console.log(`${this.name} needs to go to the food! It's at position ${closestFood.getPosition()}`);
+        return;
+      } else {
+        console.log(`${this.name} can't find any food nearby!`);
+        return;
+      }
+    }
+    
     this.needs.hungry = Math.max(0, this.needs.hungry - 30);
     console.log(`${this.name} has been fed! Hunger: ${this.needs.hungry}`);
   }
 
   public sleep(): void {
+    if (!this.isNearNeed('sleep') && !this.isNearNeed('bed')) {
+      const closestSleep = this.findClosestNeed('sleep') || this.findClosestNeed('bed');
+      if (closestSleep) {
+        console.log(`${this.name} needs to go to the sleep area! It's at position ${closestSleep.getPosition()}`);
+        return;
+      } else {
+        console.log(`${this.name} can't find any sleep area nearby!`);
+        return;
+      }
+    }
+    
     this.needs.tiredness = Math.max(0, this.needs.tiredness - 40);
     console.log(`${this.name} has slept! Tiredness: ${this.needs.tiredness}`);
   }
 
   public play(): void {
+    if (!this.isNearNeed('toy') && !this.isNearNeed('play')) {
+      const closestToy = this.findClosestNeed('toy') || this.findClosestNeed('play');
+      if (closestToy) {
+        console.log(`${this.name} needs to go to the toy! It's at position ${closestToy.getPosition()}`);
+        return;
+      } else {
+        console.log(`${this.name} can't find any toys nearby!`);
+        return;
+      }
+    }
+    
     this.needs.boredom = Math.max(0, this.needs.boredom - 35);
     // Playing also increases tiredness slightly
     this.needs.tiredness = Math.min(100, this.needs.tiredness + 10);
@@ -175,6 +281,17 @@ export class Pet {
   }
 
   public toilet(): void {
+    if (!this.isNearNeed('toilet') && !this.isNearNeed('bathroom')) {
+      const closestToilet = this.findClosestNeed('toilet') || this.findClosestNeed('bathroom');
+      if (closestToilet) {
+        console.log(`${this.name} needs to go to the toilet! It's at position ${closestToilet.getPosition()}`);
+        return;
+      } else {
+        console.log(`${this.name} can't find any toilet nearby!`);
+        return;
+      }
+    }
+    
     this.needs.toilet = Math.max(0, this.needs.toilet - 50);
     console.log(`${this.name} used the toilet! Toilet need: ${this.needs.toilet}`);
   }
@@ -196,6 +313,21 @@ export class Pet {
     return this.meshAggregate;
   }
 
+  // Method to update the need objects
+  public setNeedObjects(needObjects: Need[]): void {
+    this.needObjects = needObjects;
+  }
+
+  // Method to get current need objects
+  public getNeedObjects(): Need[] {
+    return [...this.needObjects];
+  }
+
+  // Method to set proximity threshold
+  public setProximityThreshold(threshold: number): void {
+    this.proximityThreshold = threshold;
+  }
+
   // Method to get the most urgent need
   public getMostUrgentNeed(): { need: keyof PetNeeds; value: number } {
     const needs = this.getNeeds();
@@ -213,35 +345,41 @@ export class Pet {
   }
 
   private _createKeyboardControls(): void {
+    // Track key states for simultaneous key presses
+    const keyStates: { [key: string]: boolean } = {};
+    
     this.scene.onKeyboardObservable.add((kbInfo) => {
       switch (kbInfo.type) {
         case KeyboardEventTypes.KEYDOWN:
+          // Update key state
+          keyStates[kbInfo.event.key.toLowerCase()] = true;
+          
+          // Handle movement keys with simultaneous press support
+          if (this.meshAggregate) {
+            let impulse = new Vector3(0, 0, 0);
+            
+            // Check all movement keys and combine their impulses
+            if (keyStates['a']) {
+              impulse.addInPlace(new Vector3(1, 0, 0));
+            }
+            if (keyStates['d']) {
+              impulse.addInPlace(new Vector3(-1, 0, 0));
+            }
+            if (keyStates['w']) {
+              impulse.addInPlace(new Vector3(0, 0, -1));
+            }
+            if (keyStates['s']) {
+              impulse.addInPlace(new Vector3(0, 0, 1));
+            }
+            
+            // Apply combined impulse if any movement keys are pressed
+            if (!impulse.equals(Vector3.Zero())) {
+              this.meshAggregate.body.applyImpulse(impulse, this.mesh!.position);
+            }
+          }
+          
+          // Handle single-press interaction controls
           switch (kbInfo.event.key) {
-            case "a":
-            case "A":
-              if (this.meshAggregate) {
-                this.meshAggregate.body.applyImpulse(new Vector3(1, 0, 0), this.mesh!.position);
-              }
-            break
-            case "d":
-            case "D":
-              if (this.meshAggregate) {
-                this.meshAggregate.body.applyImpulse(new Vector3(-1, 0, 0), this.mesh!.position);
-              }
-            break
-            case "w":
-            case "W":
-              if (this.meshAggregate) {
-                this.meshAggregate.body.applyImpulse(new Vector3(0, 0, -1), this.mesh!.position);
-              }
-            break
-            case "s":
-            case "S":
-              if (this.meshAggregate) {
-                this.meshAggregate.body.applyImpulse(new Vector3(0, 0, 1), this.mesh!.position);
-              }
-            break
-            // Pet interaction controls
             case "f":
             case "F":
               this.feed();
@@ -264,7 +402,12 @@ export class Pet {
                 this.meshAggregate.body.applyImpulse(new Vector3(0, 4, 0), this.mesh!.position);
               }
             break
-        }
+          }
+        break;
+        
+        case KeyboardEventTypes.KEYUP:
+          // Update key state when key is released
+          keyStates[kbInfo.event.key.toLowerCase()] = false;
         break;
       }
     });
