@@ -4,6 +4,8 @@ import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/";
 import type { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { Vector3, SpriteManager, Sprite } from "@babylonjs/core";
+import { Texture } from "@babylonjs/core/Materials/Textures/texture";
+import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 
 export class Ground {
   private mesh: Mesh | null = null;
@@ -22,6 +24,15 @@ export class Ground {
 
   _createGround(): void {
     const mesh = MeshBuilder.CreateGround("ground", { width: 20, height: 20 }, this.scene);
+    
+    // Create material and apply floor texture
+    const groundMaterial = new StandardMaterial("groundMaterial", this.scene);
+    const floorTexture = new Texture("/texture/floor.png", this.scene);
+    groundMaterial.diffuseTexture = floorTexture;
+    
+    // Apply material to the ground mesh
+    mesh.material = groundMaterial;
+    
     new PhysicsAggregate(mesh, PhysicsShapeType.BOX, { mass: 0, friction: 1 }, this.scene);
   }
 

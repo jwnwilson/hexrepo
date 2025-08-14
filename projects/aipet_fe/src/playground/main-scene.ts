@@ -5,15 +5,18 @@ import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { Scene } from "@babylonjs/core/scene";
 import { Tools } from "@babylonjs/core/Misc/tools";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { WebGPUEngine } from "@babylonjs/core/Engines/webgpuEngine";
 // import { LoadAssetContainerAsync } from "@babylonjs/core/Loading/sceneLoader";
 import { Ground } from "./ground";
 import { Pet } from "./pet";
+import { Need } from "./need";
 
 export default class MainScene {
   private camera: ArcRotateCamera;
   private ground: Ground | null = null;
   private pet: Pet | null = null;
+  private needs: Need[] = [];
 
   constructor(private scene: Scene, private canvas: HTMLCanvasElement, private engine: Engine | WebGPUEngine) {
     this._setCamera(scene);
@@ -47,6 +50,7 @@ export default class MainScene {
     // Load your files in order
     this.ground = new Ground(this.scene);
     this._createPet();
+    await this._place_needs();
   }
 
   private _createPet(): void {
@@ -62,5 +66,98 @@ export default class MainScene {
   // Method to get the pet instance
   getPet(): Pet | null {
     return this.pet;
+  }
+
+  // Method to get all needs
+  getNeeds(): Need[] {
+    return this.needs;
+  }
+
+  private async _place_needs(): Promise<void> {
+    try {
+      // Fetch the JSON file containing need configurations
+      const response = await fetch('/public/needs-config.json');
+      if (!response.ok) {
+        console.warn('Could not load needs configuration file, using default needs');
+        this._createDefaultNeeds();
+        return;
+      }
+
+      const needsConfig = await response.json();
+      
+      // Clear existing needs
+      this.needs.forEach(need => need.dispose());
+      this.needs = [];
+
+      // Create needs based on the configuration
+      needsConfig.needs.forEach((needConfig: any) => {
+        const need = new Need(
+          this.scene,
+          needConfig.name,
+          new Vector3(needConfig.position.x, needConfig.position.y, needConfig.position.z),
+          {
+            size: needConfig.size || 1,
+            color: new Color3(needConfig.color.r, needConfig.color.g, needConfig.color.b),
+            mass: needConfig.mass || 1,
+            isStatic: needConfig.isStatic || false,
+            isVisible: needConfig.isVisible !== undefined ? needConfig.isVisible : true
+          }
+        );
+        this.needs.push(need);
+      });
+
+      console.log(`Placed ${this.needs.length} needs on the ground`);
+    } catch (error) {
+      console.error('Error loading needs configuration:', error);
+      this._createDefaultNeeds();
+    }
+  }
+
+  private _createDefaultNeeds(): void {
+    // Create some default needs if the JSON file is not available
+    const defaultNeeds = [
+      {
+        name: "FoodNeed",
+        position: { x: 5, y: 0.5, z: 0 },
+        size: 1,
+        color: { r: 1, g: 0, b: 0 }, // Red
+        mass: 1,
+        isStatic: false
+      },
+      {
+        name: "WaterNeed", 
+        position: { x: -5, y: 0.5, z: 0 },
+        size: 1,
+        color: { r: 0, g: 0, b: 1 }, // Blue
+        mass: 1,
+        isStatic: false
+      },
+      {
+        name: "ToyNeed",
+        position: { x: 0, y: 0.5, z: 5 },
+        size: 1.5,
+        color: { r: 1, g: 1, b: 0 }, // Yellow
+        mass: 2,
+        isStatic: false
+      }
+    ];
+
+    defaultNeeds.forEach(needConfig => {
+      const need = new Need(
+        this.scene,
+        needConfig.name,
+        new Vector3(needConfig.position.x, needConfig.position.y, needConfig.position.z),
+        {
+          size: needConfig.size,
+          color: new Color3(needConfig.color.r, needConfig.color.g, needConfig.color.b),
+          mass: needConfig.mass,
+          isStatic: needConfig.isStatic,
+          isVisible: true
+        }
+      );
+      this.needs.push(need);
+    });
+
+    console.log('Created default needs');
   }
 }
