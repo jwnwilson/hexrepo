@@ -37,14 +37,8 @@ Setup the following env vars directly or run:
 
 - Aipet
     - Focus on App
-        - Create pet needs
-        - Add needs to map
-        - Create way for pet to move around the map
-            - Respect gravity
-            - Respect obsticles
-        - Create logic to reduce need if close to right object
-    - Setup infra / terraform
-    - Deploy App
+        - Setup infra / terraform
+        - Deploy App
     - Create django ninja template
     - Create orchestrator logic
         - Setup airflow on EC2 / K3 / K8s
