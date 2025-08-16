@@ -43,7 +43,6 @@ Setup the following env vars directly or run:
         - Setup Auth / email sending
         - Setup infra / terraform
         - Deploy App
-    - Create django ninja template
     - Create orchestrator logic
         - Setup airflow on EC2 / K3 / K8s
         - Setup task tracking debugging UI

@@ -56,5 +56,11 @@ class Config(BaseSettings):
     ALLOWED_ORIGINS: str = os.environ.get("ALLOWED_ORIGINS", "localhost")
     TESTING: bool = "pytest" in sys.argv[0]
 
+    # OpenRouter settings
+    OPENROUTER_API_KEY: str = os.environ.get("OPENROUTER_API_KEY", "")
+    OPENROUTER_BASE_URL: str = os.environ.get("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1")
+    OPENROUTER_DEFAULT_MODEL: str = os.environ.get("OPENROUTER_DEFAULT_MODEL", "anthropic/claude-3.5-sonnet")
+    OPENROUTER_TIMEOUT: int = int(os.environ.get("OPENROUTER_TIMEOUT", "30"))
+
 
 config = Config()  # type: ignore
