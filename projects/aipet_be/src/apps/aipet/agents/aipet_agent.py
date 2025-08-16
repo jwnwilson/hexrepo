@@ -1,8 +1,10 @@
-from logging import config
-from typing import List, Optional
+from typing import List
 from pydantic import BaseModel, Field
 from pydantic_ai import Agent
+from pydantic_ai.models.openai import OpenAIModel
 import logging
+
+from config import config
 
 logger = logging.getLogger(__name__)
 
@@ -41,8 +43,14 @@ class AipetAgent:
     
     def _create_agent(self) -> Agent:
         """Create the pydantic_ai agent with appropriate configuration."""
+        model = OpenAIModel(
+            self.model,  # or any other OpenRouter model
+            base_url="https://openrouter.ai/api/v1",
+            api_key=config.OPENROUTER_API_KEY,
+        )
+        
         return Agent(
-            model=self.model,
+            model=model,
             output_type=PetActionRecommendation,
             system_prompt=self._get_system_message(),
             retries=2
