@@ -25,13 +25,6 @@ async def chat_with_llm(
 ):
     """
     Chat with an LLM using OpenRouter.
-    
-    Args:
-        prompt: The user's prompt
-        system_message: Optional system message to set context
-        model: Model to use (defaults to configured default)
-        temperature: Controls randomness (0.0 to 2.0)
-        max_tokens: Maximum tokens to generate
     """
     try:
         client = get_openrouter_client()
@@ -58,13 +51,6 @@ async def chat_completion(
 ):
     """
     Make a full chat completion request to OpenRouter.
-    
-    Args:
-        messages: List of message dictionaries with 'role' and 'content'
-        model: Model to use (defaults to configured default)
-        temperature: Controls randomness (0.0 to 2.0)
-        max_tokens: Maximum tokens to generate
-        stream: Whether to stream the response
     """
     try:
         client = get_openrouter_client()

@@ -46,17 +46,6 @@ class OpenRouterClient:
         endpoint: str,
         **kwargs
     ) -> Dict[str, Any]:
-        """
-        Make an HTTP request to the OpenRouter API.
-        
-        Args:
-            method: HTTP method (GET, POST, etc.)
-            endpoint: API endpoint path
-            **kwargs: Additional arguments to pass to httpx request
-        
-        Returns:
-            API response as a dictionary
-        """
         try:
             async with httpx.AsyncClient(timeout=self.timeout) as client:
                 response = await client.request(
@@ -87,20 +76,6 @@ class OpenRouterClient:
         stream: bool = False,
         **kwargs
     ) -> Dict[str, Any]:
-        """
-        Make a chat completion request to OpenRouter.
-        
-        Args:
-            messages: List of messages in the conversation
-            model: Model to use (defaults to OPENROUTER_DEFAULT_MODEL)
-            temperature: Controls randomness (0.0 to 2.0)
-            max_tokens: Maximum tokens to generate
-            stream: Whether to stream the response
-            **kwargs: Additional parameters to pass to the API
-        
-        Returns:
-            API response as a dictionary
-        """
         if not messages:
             raise ValueError("At least one message is required")
         
@@ -135,19 +110,6 @@ class OpenRouterClient:
         temperature: float = 0.7,
         max_tokens: Optional[int] = None
     ) -> str:
-        """
-        Simplified chat method for single prompt responses.
-        
-        Args:
-            prompt: The user's prompt
-            system_message: Optional system message
-            model: Model to use
-            temperature: Controls randomness
-            max_tokens: Maximum tokens to generate
-        
-        Returns:
-            The generated response text
-        """
         messages = []
         
         if system_message:
@@ -165,11 +127,5 @@ class OpenRouterClient:
         return response["choices"][0]["message"]["content"]
     
     async def get_models(self) -> List[Dict[str, Any]]:
-        """
-        Get available models from OpenRouter.
-        
-        Returns:
-            List of available models
-        """
         data = await self._make_request("GET", "/models")
         return data.get("data", []) 
