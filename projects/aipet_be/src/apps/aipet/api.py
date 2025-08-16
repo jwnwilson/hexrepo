@@ -1,79 +1,72 @@
 from ninja import Router
 from ninja.errors import HttpError
 from typing import Optional
+from pydantic import BaseModel
 
-from .dependencies import get_openrouter_client
+from ...config import config
+from .services.aipet import AipetService
 
 router = Router(
     tags=["Aipet"],
 )
 
+# Request/Response models for pet recommendations
+class PetNeedsRequest(BaseModel):
+    hungry: int
+    tiredness: int
+    boredom: int
+    toilet: int
 
-@router.get("/action")
-async def get_aipet(request):
-    return {"message": "Hello, World!"}
 
-
-@router.post("/chat")
-async def chat_with_llm(
+@router.post("/recommendations")
+async def get_pet_recommendations(
     request,
-    prompt: str,
-    system_message: Optional[str] = None,
-    model: Optional[str] = None,
-    temperature: float = 0.7,
-    max_tokens: Optional[int] = None
+    pet_needs: PetNeedsRequest,
+    model: Optional[str] = None
 ):
     """
-    Chat with an LLM using OpenRouter.
+    Get AI-powered recommendations for pet care based on current needs.
+    
+    This endpoint uses the pydantic_ai agent to analyze pet needs and provide
+    intelligent recommendations for actions to take.
     """
     try:
-        client = get_openrouter_client()
-        response = await client.simple_chat(
-            prompt=prompt,
-            system_message=system_message,
-            model=model,
-            temperature=temperature,
-            max_tokens=max_tokens
+        # Initialize the service with optional model override
+        service = AipetService(model=model)
+        
+        # Get recommendations
+        recommendations = await service.get_pet_recommendations(
+            hungry=pet_needs.hungry,
+            tiredness=pet_needs.tiredness,
+            boredom=pet_needs.boredom,
+            toilet=pet_needs.toilet
         )
-        return {"response": response}
+        
+        return recommendations.dict()
+        
     except Exception as e:
-        raise HttpError(500, f"Error communicating with LLM: {str(e)}")
+        raise HttpError(500, f"Error getting pet recommendations: {str(e)}")
 
 
-@router.post("/chat/completion")
-async def chat_completion(
+@router.post("/recommendations/dict")
+async def get_pet_recommendations_from_dict(
     request,
-    messages: list[str],
-    model: Optional[str] = None,
-    temperature: float = 0.7,
-    max_tokens: Optional[int] = None,
-    stream: bool = False
+    needs_data: dict,
+    model: Optional[str] = None
 ):
     """
-    Make a full chat completion request to OpenRouter.
+    Get AI-powered recommendations for pet care from a dictionary of needs.
+    
+    Alternative endpoint that accepts a dictionary instead of structured data.
     """
     try:
-        client = get_openrouter_client()
-        response = await client.chat_completion(
-            messages=messages,
-            model=model,
-            temperature=temperature,
-            max_tokens=max_tokens,
-            stream=stream
-        )
-        return response
+        # Initialize the service with optional model override
+        service = AipetService(model=model)
+        
+        # Get recommendations from dictionary
+        recommendations = await service.get_pet_recommendations_from_dict(needs_data)
+        
+        return recommendations.dict()
+        
     except Exception as e:
-        raise HttpError(500, f"Error communicating with LLM: {str(e)}")
-
-
-@router.get("/models")
-async def get_available_models(request):
-    """
-    Get available models from OpenRouter.
-    """
-    try:
-        client = get_openrouter_client()
-        models = await client.get_models()
-        return {"models": models}
-    except Exception as e:
-        raise HttpError(500, f"Error fetching models: {str(e)}")
+        raise HttpError(500, f"Error getting pet recommendations: {str(e)}")

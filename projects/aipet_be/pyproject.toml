@@ -30,6 +30,7 @@ dependencies = [
     "hexrepo-db",
     "hexrepo-api",
     "hexrepo-log",
+    "pydantic-ai[logfire]>=0.7.2",
 ]
 
 [dependency-groups]
@@ -39,6 +40,7 @@ aws = [
     "boto3-stubs[essential]<2.0.0,>=1.35.86",
 ]
 dev = [
+    "pytest-asyncio>=1.1.0",
     "pytest-django>=4.11.1",
     "pytest<9.0.0,>=8.3.3",
     "mypy<2.0.0,>=1.13.0",
