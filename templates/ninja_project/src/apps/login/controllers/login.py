@@ -420,6 +420,7 @@ class SignupController(ControllerBase):
             # In production, this should be your actual domain
             reset_url = "http://localhost:8000/api/v1/auth/password-reset/confirm"
 
+            {% raw %}
             message = f"""
             Hi {user.first_name or user.username},
             
@@ -444,6 +445,7 @@ class SignupController(ControllerBase):
             Best regards,
             AI Pet Team
             """
+            {% endraw %}
 
             send_mail(
                 subject=subject,
