@@ -37,6 +37,10 @@ Setup the following env vars directly or run:
 
 - Aipet
     - Focus on App
+        - Setup llm endpoint
+            - Pass pet / scene info to llm to make a decision and return an action
+        - Add logfire
+        - Setup Auth / email sending
         - Setup infra / terraform
         - Deploy App
     - Create django ninja template
