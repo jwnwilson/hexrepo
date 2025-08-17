@@ -41,14 +41,12 @@ class PetActionRecommendation(BaseModel):
 class AipetAgent:
     """AI agent for processing pet needs and recommending actions."""
     
-    def __init__(self, model: str = config.AI_DEFAULT_MODEL):
-        self.model = model
+    def __init__(self, model: str | None = None):
+        self.model = model or config.AI_DEFAULT_MODEL
         self.agent = self._create_agent()
     
     def _create_agent(self) -> Agent:
-        """Create the pydantic_ai agent with appropriate configuration."""
-        breakpoint()
-        
+        """Create the pydantic_ai agent with appropriate configuration."""        
         agent = Agent(
             model=self.model,
             output_type=PetActionRecommendation,
@@ -90,6 +88,22 @@ Available actions you can recommend:
 - Training session (addresses boredom, mental stimulation)
 
 Always provide a primary action (highest priority) and secondary actions (additional considerations)."""
+    
+    def _format_needs_message(self, pet_needs: PetNeeds) -> str:
+        """Format pet needs into a message for the AI agent."""
+        return f"""Please analyze the following pet needs and recommend appropriate actions:
+
+Current Pet Needs:
+- Hunger: {pet_needs.hungry}/100
+- Tiredness: {pet_needs.tiredness}/100  
+- Boredom: {pet_needs.boredom}/100
+- Toilet: {pet_needs.toilet}/100
+
+Please provide a comprehensive recommendation including:
+1. Primary action (most urgent need)
+2. Secondary actions (additional considerations)
+3. Overall health assessment
+4. Any urgent needs requiring immediate attention"""
     
     async def get_recommendations(self, pet_needs: PetNeeds) -> PetActionRecommendation:
         """
@@ -134,104 +148,7 @@ Always provide a primary action (highest priority) and secondary actions (additi
                     toilet=pet_needs.toilet
                 )
                 logger.error(f"Error getting pet recommendations: {e}")
-                # Return a fallback recommendation
-                return self._get_fallback_recommendation(pet_needs)
+                raise
     
-    def _format_needs_message(self, pet_needs: PetNeeds) -> str:
-        """Format pet needs into a message for the AI agent."""
-        return f"""Please analyze the following pet needs and recommend appropriate actions:
-
-Current Pet Needs:
-- Hunger: {pet_needs.hungry}/100
-- Tiredness: {pet_needs.tiredness}/100  
-- Boredom: {pet_needs.boredom}/100
-- Toilet: {pet_needs.toilet}/100
-
-Please provide a comprehensive recommendation including:
-1. Primary action (most urgent need)
-2. Secondary actions (additional considerations)
-3. Overall health assessment
-4. Any urgent needs requiring immediate attention"""
     
-    def _get_fallback_recommendation(self, pet_needs: PetNeeds) -> PetActionRecommendation:
-        """Provide a fallback recommendation if the AI agent fails."""
-        logfire.warn(
-            "Using fallback recommendation due to AI agent failure",
-            hungry=pet_needs.hungry,
-            tiredness=pet_needs.tiredness,
-            boredom=pet_needs.boredom,
-            toilet=pet_needs.toilet
-        )
-        
-        # Simple logic to determine the most urgent need
-        needs_dict = {
-            "hungry": pet_needs.hungry,
-            "tiredness": pet_needs.tiredness,
-            "boredom": pet_needs.boredom,
-            "toilet": pet_needs.toilet
-        }
-        
-        most_urgent_need = max(needs_dict, key=needs_dict.get)
-        urgent_value = needs_dict[most_urgent_need]
-        
-        logfire.info(
-            "Fallback recommendation generated",
-            most_urgent_need=most_urgent_need,
-            urgent_value=urgent_value
-        )
-        
-        # Create fallback actions based on the most urgent need
-        if most_urgent_need == "hungry":
-            primary_action = RecommendedAction(
-                action="Feed the pet immediately",
-                priority=5 if urgent_value > 80 else 4,
-                reasoning=f"Pet is very hungry ({urgent_value}/100) and needs food",
-                target_need="hungry",
-                estimated_effect=80
-            )
-        elif most_urgent_need == "toilet":
-            primary_action = RecommendedAction(
-                action="Take pet outside or to designated toilet area",
-                priority=5 if urgent_value > 80 else 4,
-                reasoning=f"Pet urgently needs to relieve themselves ({urgent_value}/100)",
-                target_need="toilet",
-                estimated_effect=90
-            )
-        elif most_urgent_need == "tiredness":
-            primary_action = RecommendedAction(
-                action="Provide a quiet rest area for the pet",
-                priority=4 if urgent_value > 70 else 3,
-                reasoning=f"Pet is tired ({urgent_value}/100) and needs rest",
-                target_need="tiredness",
-                estimated_effect=70
-            )
-        else:  # boredom
-            primary_action = RecommendedAction(
-                action="Play with the pet using toys or interactive games",
-                priority=3 if urgent_value > 60 else 2,
-                reasoning=f"Pet is bored ({urgent_value}/100) and needs stimulation",
-                target_need="boredom",
-                estimated_effect=60
-            )
-        
-        # Calculate overall health score
-        overall_health = 100 - (sum(needs_dict.values()) / len(needs_dict))
-        
-        # Identify urgent needs
-        urgent_needs = [need for need, value in needs_dict.items() if value > 80]
-        
-        fallback_recommendation = PetActionRecommendation(
-            primary_action=primary_action,
-            secondary_actions=[],
-            overall_health_score=int(overall_health),
-            urgent_needs=urgent_needs
-        )
-        
-        logfire.info(
-            "Fallback recommendation completed",
-            primary_action=primary_action.action,
-            overall_health_score=int(overall_health),
-            urgent_needs=urgent_needs
-        )
-        
-        return fallback_recommendation
+    

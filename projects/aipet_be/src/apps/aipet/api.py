@@ -32,7 +32,6 @@ async def get_pet_recommendations(
     intelligent recommendations for actions to take.
     """
     try:
-        breakpoint()
         # Initialize the service with optional model override
         service = AipetService(model=model)
         
