@@ -40,7 +40,9 @@ Setup the following env vars directly or run:
         - Setup llm endpoint
             - Pass pet / scene info to llm to make a decision and return an action
         - Add logfire
-        - Setup Auth / email sending
+            - Add cost tracking to logfire dashboard
+            - Add endpoint and user info to logfire
+        - Setup Signup / email sending
         - Setup infra / terraform
         - Deploy App
     - Create orchestrator logic
