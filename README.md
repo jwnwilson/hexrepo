@@ -39,6 +39,8 @@ Setup the following env vars directly or run:
     - Focus on App
         - Setup llm endpoint
             - Pass pet / scene info to llm to make a decision and return an action
+            - Setup API client and make llm request with jwt token
+            - Add login / signup pages
         - Add logfire
             - Add cost tracking to logfire dashboard
             - Add endpoint and user info to logfire
