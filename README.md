@@ -46,9 +46,14 @@ Setup the following env vars directly or run:
             - Add endpoint and user info to logfire
         - Setup Signup / email sending
         - Setup infra / terraform
-        - Deploy App
+        - Deploy App - Kubernetes with k3 / rancher
+    - Improve pet logic
+        - Maintain llm context
+        - Multiple pets
+        - Add social need
+            - Interact with player or another pet
     - Create orchestrator logic
-        - Setup airflow on EC2 / K3 / K8s
+        - Setup airflow on Kubernetes / K3 / Rancher
         - Setup task tracking debugging UI
             - Airflow
                 - This will likely require EC2 / kubernetes due to number of containers
