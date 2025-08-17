@@ -1,7 +1,7 @@
 from typing import List
 from pydantic import BaseModel, Field
 from pydantic_ai import Agent
-from pydantic_ai.models.openai import OpenAIModel
+from pydantic_ai.run import AgentRunResult
 import logging
 import logfire
 
@@ -123,19 +123,19 @@ Please provide a comprehensive recommendation including:
                 user_message = self._format_needs_message(pet_needs)
                 
                 # Get recommendations from the agent
-                breakpoint()
-                response = await self.agent.run(user_message)
+                response: AgentRunResult = await self.agent.run(user_message)
+                recommendation: PetActionRecommendation = response.output
                 
                 logfire.info(
                     "Successfully generated recommendations",
-                    primary_action=response.primary_action.action,
-                    primary_priority=response.primary_action.priority,
-                    overall_health_score=response.overall_health_score,
-                    urgent_needs_count=len(response.urgent_needs)
+                    primary_action=recommendation.primary_action.action,
+                    primary_priority=recommendation.primary_action.priority,
+                    overall_health_score=recommendation.overall_health_score,
+                    urgent_needs_count=len(recommendation.urgent_needs)
                 )
                 
                 logger.info(f"Generated recommendations for pet needs: {pet_needs}")
-                return response
+                return recommendation
                 
             except Exception as e:
                 logfire.error(

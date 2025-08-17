@@ -49,34 +49,3 @@ class AipetService:
         except Exception as e:
             logger.error(f"Error in AipetService.get_pet_recommendations: {e}")
             raise
-    
-    async def get_pet_recommendations_from_dict(
-        self,
-        needs_data: dict
-    ) -> PetActionRecommendation:
-        """
-        Get recommendations from a dictionary containing pet needs.
-        
-        Args:
-            needs_data: Dictionary with keys: hungry, tiredness, boredom, toilet
-            
-        Returns:
-            PetActionRecommendation with AI-generated recommendations
-        """
-        try:
-            # Extract needs from dictionary
-            hungry = needs_data.get("hungry", 0)
-            tiredness = needs_data.get("tiredness", 0)
-            boredom = needs_data.get("boredom", 0)
-            toilet = needs_data.get("toilet", 0)
-            
-            return await self.get_pet_recommendations(
-                hungry=hungry,
-                tiredness=tiredness,
-                boredom=boredom,
-                toilet=toilet
-            )
-            
-        except Exception as e:
-            logger.error(f"Error in AipetService.get_pet_recommendations_from_dict: {e}")
-            raise
