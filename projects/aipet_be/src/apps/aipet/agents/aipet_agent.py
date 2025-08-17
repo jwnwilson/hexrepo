@@ -3,6 +3,10 @@ from pydantic import BaseModel, Field
 from pydantic_ai import Agent
 from pydantic_ai.models.openai import OpenAIModel
 import logging
+import logfire
+
+logfire.configure(token='pylf_v1_eu_XTHBY13Y5Kv8GLgf9DFZfjNsBb12c8jyRmYtxFsQ2y6W')
+logfire.instrument_pydantic_ai()
 
 from config import config
 
@@ -37,24 +41,22 @@ class PetActionRecommendation(BaseModel):
 class AipetAgent:
     """AI agent for processing pet needs and recommending actions."""
     
-    def __init__(self, model: str = config.OPENROUTER_DEFAULT_MODEL):
+    def __init__(self, model: str = config.AI_DEFAULT_MODEL):
         self.model = model
         self.agent = self._create_agent()
     
     def _create_agent(self) -> Agent:
         """Create the pydantic_ai agent with appropriate configuration."""
-        model = OpenAIModel(
-            self.model,  # or any other OpenRouter model
-            base_url="https://openrouter.ai/api/v1",
-            api_key=config.OPENROUTER_API_KEY,
-        )
+        breakpoint()
         
-        return Agent(
-            model=model,
+        agent = Agent(
+            model=self.model,
             output_type=PetActionRecommendation,
             system_prompt=self._get_system_message(),
-            retries=2
+            retries=2,
         )
+        
+        return agent
     
     def _get_system_message(self) -> str:
         """Get the system message for the pet care agent."""
@@ -99,20 +101,41 @@ Always provide a primary action (highest priority) and secondary actions (additi
         Returns:
             PetActionRecommendation with primary and secondary actions
         """
-        try:
-            # Create a user message describing the pet's needs
-            user_message = self._format_needs_message(pet_needs)
+        with logfire.span("Getting pet recommendations"):
+            try:
+                logfire.info("Getting pet recommendations", model=self.model, pet_needs=pet_needs)
             
-            # Get recommendations from the agent
-            response = await self.agent.run(user_message)
-            
-            logger.info(f"Generated recommendations for pet needs: {pet_needs}")
-            return response
-            
-        except Exception as e:
-            logger.error(f"Error getting pet recommendations: {e}")
-            # Return a fallback recommendation
-            return self._get_fallback_recommendation(pet_needs)
+                # Create a user message describing the pet's needs
+                user_message = self._format_needs_message(pet_needs)
+                
+                # Get recommendations from the agent
+                breakpoint()
+                response = await self.agent.run(user_message)
+                
+                logfire.info(
+                    "Successfully generated recommendations",
+                    primary_action=response.primary_action.action,
+                    primary_priority=response.primary_action.priority,
+                    overall_health_score=response.overall_health_score,
+                    urgent_needs_count=len(response.urgent_needs)
+                )
+                
+                logger.info(f"Generated recommendations for pet needs: {pet_needs}")
+                return response
+                
+            except Exception as e:
+                logfire.error(
+                    "Error getting pet recommendations",
+                    error=str(e),
+                    error_type=type(e).__name__,
+                    hungry=pet_needs.hungry,
+                    tiredness=pet_needs.tiredness,
+                    boredom=pet_needs.boredom,
+                    toilet=pet_needs.toilet
+                )
+                logger.error(f"Error getting pet recommendations: {e}")
+                # Return a fallback recommendation
+                return self._get_fallback_recommendation(pet_needs)
     
     def _format_needs_message(self, pet_needs: PetNeeds) -> str:
         """Format pet needs into a message for the AI agent."""
@@ -132,6 +155,14 @@ Please provide a comprehensive recommendation including:
     
     def _get_fallback_recommendation(self, pet_needs: PetNeeds) -> PetActionRecommendation:
         """Provide a fallback recommendation if the AI agent fails."""
+        logfire.warn(
+            "Using fallback recommendation due to AI agent failure",
+            hungry=pet_needs.hungry,
+            tiredness=pet_needs.tiredness,
+            boredom=pet_needs.boredom,
+            toilet=pet_needs.toilet
+        )
+        
         # Simple logic to determine the most urgent need
         needs_dict = {
             "hungry": pet_needs.hungry,
@@ -142,6 +173,12 @@ Please provide a comprehensive recommendation including:
         
         most_urgent_need = max(needs_dict, key=needs_dict.get)
         urgent_value = needs_dict[most_urgent_need]
+        
+        logfire.info(
+            "Fallback recommendation generated",
+            most_urgent_need=most_urgent_need,
+            urgent_value=urgent_value
+        )
         
         # Create fallback actions based on the most urgent need
         if most_urgent_need == "hungry":
@@ -183,9 +220,18 @@ Please provide a comprehensive recommendation including:
         # Identify urgent needs
         urgent_needs = [need for need, value in needs_dict.items() if value > 80]
         
-        return PetActionRecommendation(
+        fallback_recommendation = PetActionRecommendation(
             primary_action=primary_action,
             secondary_actions=[],
             overall_health_score=int(overall_health),
             urgent_needs=urgent_needs
         )
+        
+        logfire.info(
+            "Fallback recommendation completed",
+            primary_action=primary_action.action,
+            overall_health_score=int(overall_health),
+            urgent_needs=urgent_needs
+        )
+        
+        return fallback_recommendation

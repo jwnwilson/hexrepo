@@ -3,7 +3,8 @@ from ninja.errors import HttpError
 from typing import Optional
 from pydantic import BaseModel
 
-from ...config import config
+from apps.core.auth import SessionAuthAsync, JWTAuthAsync
+from config import config
 from .services.aipet import AipetService
 
 router = Router(
@@ -18,7 +19,7 @@ class PetNeedsRequest(BaseModel):
     toilet: int
 
 
-@router.post("/recommendations")
+@router.post("/recommendations", auth=[SessionAuthAsync(), JWTAuthAsync()])
 async def get_pet_recommendations(
     request,
     pet_needs: PetNeedsRequest,
@@ -31,6 +32,7 @@ async def get_pet_recommendations(
     intelligent recommendations for actions to take.
     """
     try:
+        breakpoint()
         # Initialize the service with optional model override
         service = AipetService(model=model)
         
@@ -42,13 +44,13 @@ async def get_pet_recommendations(
             toilet=pet_needs.toilet
         )
         
-        return recommendations.dict()
+        return recommendations.model_dump()
         
     except Exception as e:
         raise HttpError(500, f"Error getting pet recommendations: {str(e)}")
 
 
-@router.post("/recommendations/dict")
+@router.post("/recommendations/dict", auth=[SessionAuthAsync(), JWTAuthAsync()])
 async def get_pet_recommendations_from_dict(
     request,
     needs_data: dict,

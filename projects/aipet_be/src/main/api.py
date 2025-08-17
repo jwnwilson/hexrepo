@@ -6,6 +6,7 @@ from apps.aipet.api import router as aipet_router
 from apps.aipet.controllers import AipetController
 from apps.login.controllers.login import NinjaJWTController, SignupController
 
+
 api = NinjaExtraAPI(
     title="AI Pet API",
     description="AI Pet",

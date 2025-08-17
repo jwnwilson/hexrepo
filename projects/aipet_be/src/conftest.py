@@ -29,7 +29,7 @@ def django_db_setup(worker_id):
     settings.DATABASES["default"] = {
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": db_name,
-        "ATOMIC_REQUESTS": True,
+        "ATOMIC_REQUESTS": False,
     }
     django.setup()
 

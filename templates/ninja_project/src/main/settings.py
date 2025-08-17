@@ -38,7 +38,7 @@ def parse_database_url(url: str | None) -> dict:
         return {
             "ENGINE": "django.db.backends.sqlite3",
             "NAME": BASE_DIR / "db.sqlite3",
-            "ATOMIC_REQUESTS": True,
+            "ATOMIC_REQUESTS": False,
         }
 
     parsed: ParseResult = urlparse(url)
@@ -50,7 +50,7 @@ def parse_database_url(url: str | None) -> dict:
         "PASSWORD": parsed.password,
         "HOST": parsed.hostname,
         "PORT": parsed.port,
-        "ATOMIC_REQUESTS": True,
+        "ATOMIC_REQUESTS": False,
     }
 
 

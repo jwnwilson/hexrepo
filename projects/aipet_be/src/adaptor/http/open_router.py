@@ -27,8 +27,8 @@ class OpenRouterClient:
     def __init__(self):
         self.api_key = config.OPENROUTER_API_KEY
         self.base_url = config.OPENROUTER_BASE_URL
-        self.default_model = config.OPENROUTER_DEFAULT_MODEL
-        self.timeout = config.OPENROUTER_TIMEOUT
+        self.default_model = config.AI_DEFAULT_MODEL
+        self.timeout = config.AI_TIMEOUT
         
         if not self.api_key:
             raise ValueError("OPENROUTER_API_KEY is required")

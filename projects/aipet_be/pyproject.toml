@@ -22,6 +22,7 @@ dependencies = [
     "httpx<1.0.0,>=0.27.2",
     "python-dotenv<2.0.0,>=1.0.1",
     "pydantic-settings<3.0.0,>=2.6.0",
+    "pydantic-ai[logfire]>=0.7.2",
     "alembic<2.0.0,>=1.13.3",
     "sqlalchemy-continuum>=1.4.2",
     "psycopg[binary]==3.2.6",
@@ -30,7 +31,6 @@ dependencies = [
     "hexrepo-db",
     "hexrepo-api",
     "hexrepo-log",
-    "pydantic-ai[logfire]>=0.7.2",
 ]
 
 [dependency-groups]
