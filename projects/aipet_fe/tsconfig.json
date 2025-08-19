@@ -5,6 +5,7 @@
             "dom", // mandatory for all browser-based apps
             "ESNext" // mandatory for targeting ES6
         ],
+        "jsx": "react-jsx", // enable JSX support for React
         "strict": true,
         "noEmit": true,
         "baseUrl": "./",
