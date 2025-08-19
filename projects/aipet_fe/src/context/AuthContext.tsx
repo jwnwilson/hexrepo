@@ -1,5 +1,6 @@
 import React, { createContext, useState, ReactNode, useEffect } from 'react';
 import { User, AuthContextType } from './types';
+import { apiClient, LoginRequest, SignupRequest } from '../api/client';
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -11,46 +12,70 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
 
   const login = async (email: string, password: string) => {
-    // TODO: Replace with actual API call
-    console.log('Logging in with:', { email, password });
-    
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // For demo purposes, create a mock user
-    const mockUser: User = {
-      id: '1',
-      name: 'Demo User',
-      email: email
-    };
-    
-    setUser(mockUser);
-    
-    // Store in localStorage for persistence
-    localStorage.setItem('user', JSON.stringify(mockUser));
+    try {
+      const loginRequest: LoginRequest = {
+        username: email, // Using email as username for now
+        password: password
+      };
+      
+      const response = await apiClient.login(loginRequest);
+      
+      if (response.error) {
+        throw new Error(response.error);
+      }
+      
+      if (response.data) {
+        const user: User = {
+          id: response.data.user.id.toString(),
+          name: `${response.data.user.first_name} ${response.data.user.last_name}`.trim() || response.data.user.username,
+          email: response.data.user.email
+        };
+        
+        setUser(user);
+        localStorage.setItem('user', JSON.stringify(user));
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      throw error;
+    }
   };
 
   const signup = async (name: string, email: string, password: string) => {
-    // TODO: Replace with actual API call
-    console.log('Signing up with:', { name, email, password });
-    
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // For demo purposes, create a mock user
-    const mockUser: User = {
-      id: '1',
-      name: name,
-      email: email
-    };
-    
-    setUser(mockUser);
-    
-    // Store in localStorage for persistence
-    localStorage.setItem('user', JSON.stringify(mockUser));
+    try {
+      // Split name into first and last name
+      const nameParts = name.trim().split(' ');
+      const firstName = nameParts[0] || '';
+      const lastName = nameParts.slice(1).join(' ') || '';
+      
+      const signupRequest: SignupRequest = {
+        username: email, // Using email as username for now
+        email: email,
+        password: password,
+        first_name: firstName,
+        last_name: lastName
+      };
+      
+      const response = await apiClient.signup(signupRequest);
+      
+      if (response.error) {
+        throw new Error(response.error);
+      }
+      
+      if (response.data && response.data.verification_required) {
+        // User needs to verify email before they can log in
+        throw new Error('Please check your email for verification link before logging in.');
+      }
+      
+      // If no verification required, proceed with login
+      await login(email, password);
+    } catch (error) {
+      console.error('Signup error:', error);
+      throw error;
+    }
   };
 
-  const logout = () => {
+  const logout = async () => {
+    await apiClient.logout();
     setUser(null);
     localStorage.removeItem('user');
   };

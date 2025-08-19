@@ -1,0 +1,231 @@
+// API Client for aipet_be backend
+export interface ApiResponse<T = any> {
+  data?: T;
+  message?: string;
+  error?: string;
+  status: number;
+}
+
+export interface SignupRequest {
+  username: string;
+  email: string;
+  password: string;
+  first_name: string;
+  last_name: string;
+}
+
+export interface SignupResponse {
+  message: string;
+  user_id: number;
+  verification_required: boolean;
+}
+
+export interface LoginRequest {
+  username: string;
+  password: string;
+}
+
+export interface LoginResponse {
+  access: string;
+  refresh: string;
+  user: {
+    id: number;
+    username: string;
+    email: string;
+    first_name: string;
+    last_name: string;
+  };
+}
+
+export interface PetNeedsRequest {
+  hungry: number;
+  tiredness: number;
+  boredom: number;
+  toilet: number;
+}
+
+export interface PetActionRecommendation {
+  action: string;
+  reasoning: string;
+  priority: 'high' | 'medium' | 'low';
+  estimated_duration?: number;
+}
+
+export interface VerificationRequest {
+  email: string;
+}
+
+export interface PasswordResetRequest {
+  email: string;
+}
+
+export interface PasswordResetConfirmRequest {
+  token: string;
+  new_password: string;
+}
+
+import { currentApiConfig } from '../config/api';
+
+class ApiClient {
+  private baseUrl: string;
+  private token: string | null = null;
+
+  constructor(baseUrl?: string) {
+    this.baseUrl = baseUrl || currentApiConfig.BASE_URL;
+    this.token = localStorage.getItem('access_token');
+  }
+
+  private async request<T>(
+    endpoint: string,
+    options: RequestInit = {}
+  ): Promise<ApiResponse<T>> {
+    const url = `${this.baseUrl}${endpoint}`;
+    
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      ...(options.headers as Record<string, string>),
+    };
+
+    if (this.token) {
+      headers.Authorization = `Bearer ${this.token}`;
+    }
+
+    try {
+      const response = await fetch(url, {
+        ...options,
+        headers,
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        return {
+          error: data.message || data.detail || 'An error occurred',
+          status: response.status,
+        };
+      }
+
+      return {
+        data,
+        status: response.status,
+      };
+    } catch (error) {
+      return {
+        error: error instanceof Error ? error.message : 'Network error',
+        status: 0,
+      };
+    }
+  }
+
+  // Authentication methods
+  async signup(request: SignupRequest): Promise<ApiResponse<SignupResponse>> {
+    return this.request<SignupResponse>('/auth/signup', {
+      method: 'POST',
+      body: JSON.stringify(request),
+    });
+  }
+
+  async login(request: LoginRequest): Promise<ApiResponse<LoginResponse>> {
+    const response = await this.request<LoginResponse>('/token', {
+      method: 'POST',
+      body: JSON.stringify(request),
+    });
+
+    if (response.data) {
+      this.token = response.data.access;
+      localStorage.setItem('access_token', response.data.access);
+      localStorage.setItem('refresh_token', response.data.refresh);
+    }
+
+    return response;
+  }
+
+  async logout(): Promise<void> {
+    this.token = null;
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+  }
+
+  async verifyEmail(token: string): Promise<ApiResponse<{ message: string; verified: boolean }>> {
+    return this.request<{ message: string; verified: boolean }>(`/auth/verify/${token}`, {
+      method: 'GET',
+    });
+  }
+
+  async resendVerification(request: VerificationRequest): Promise<ApiResponse<SignupResponse>> {
+    return this.request<SignupResponse>('/auth/resend-verification', {
+      method: 'POST',
+      body: JSON.stringify(request),
+    });
+  }
+
+  async requestPasswordReset(request: PasswordResetRequest): Promise<ApiResponse<{ message: string; success: boolean }>> {
+    return this.request<{ message: string; success: boolean }>('/auth/password-reset/request', {
+      method: 'POST',
+      body: JSON.stringify(request),
+    });
+  }
+
+  async confirmPasswordReset(request: PasswordResetConfirmRequest): Promise<ApiResponse<{ message: string; success: boolean }>> {
+    return this.request<{ message: string; success: boolean }>('/auth/password-reset/confirm', {
+      method: 'POST',
+      body: JSON.stringify(request),
+    });
+  }
+
+  // AI Pet methods
+  async getPetRecommendations(
+    petNeeds: PetNeedsRequest,
+    model?: string
+  ): Promise<ApiResponse<PetActionRecommendation>> {
+    const params = model ? `?model=${encodeURIComponent(model)}` : '';
+    return this.request<PetActionRecommendation>(`/aipet/recommendations${params}`, {
+      method: 'POST',
+      body: JSON.stringify(petNeeds),
+    });
+  }
+
+  // Token management
+  setToken(token: string): void {
+    this.token = token;
+    localStorage.setItem('access_token', token);
+  }
+
+  getToken(): string | null {
+    return this.token;
+  }
+
+  isAuthenticated(): boolean {
+    return !!this.token;
+  }
+
+  // Refresh token method (if needed)
+  async refreshToken(): Promise<ApiResponse<{ access: string; refresh: string }>> {
+    const refreshToken = localStorage.getItem('refresh_token');
+    if (!refreshToken) {
+      return {
+        error: 'No refresh token available',
+        status: 401,
+      };
+    }
+
+    const response = await this.request<{ access: string; refresh: string }>('/token/refresh', {
+      method: 'POST',
+      body: JSON.stringify({ refresh: refreshToken }),
+    });
+
+    if (response.data) {
+      this.token = response.data.access;
+      localStorage.setItem('access_token', response.data.access);
+      localStorage.setItem('refresh_token', response.data.refresh);
+    }
+
+    return response;
+  }
+}
+
+// Create and export a singleton instance
+export const apiClient = new ApiClient();
+
+// Export the class for testing or custom instances
+export default ApiClient; 
