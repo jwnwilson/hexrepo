@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AuthProvider } from './context';
+import { useAuth } from './hooks';
 import Login from './components/Login';
 import Signup from './components/Signup';
 import BabylonScene from './components/BabylonScene';
@@ -7,8 +8,16 @@ import './css/main.css';
 
 type Page = 'login' | 'signup' | 'app';
 
-const App: React.FC = () => {
+const AppContent: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<Page>('login');
+  const { isAuthenticated } = useAuth();
+
+  // Check for valid login on initial load
+  useEffect(() => {
+    if (isAuthenticated) {
+      setCurrentPage('app');
+    }
+  }, [isAuthenticated]);
 
   const renderPage = () => {
     switch (currentPage) {
@@ -24,10 +33,16 @@ const App: React.FC = () => {
   };
 
   return (
+    <div className="app">
+      {renderPage()}
+    </div>
+  );
+};
+
+const App: React.FC = () => {
+  return (
     <AuthProvider>
-      <div className="app">
-        {renderPage()}
-      </div>
+      <AppContent />
     </AuthProvider>
   );
 };
