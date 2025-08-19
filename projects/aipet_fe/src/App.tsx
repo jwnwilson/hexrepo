@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { AuthProvider } from './components/AuthContext';
+import { AuthProvider } from './context';
 import Login from './components/Login';
 import Signup from './components/Signup';
 import BabylonScene from './components/BabylonScene';
