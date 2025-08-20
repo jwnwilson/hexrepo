@@ -79,7 +79,11 @@ const Signup: React.FC<SignupProps> = ({ onNavigate }) => {
       onNavigate('app');
     } catch (error) {
       console.error('Signup error:', error);
-      setErrors({ general: 'Signup failed. Please try again.' });
+      if (error instanceof Error && error.message) {
+        setErrors({ general: error.message });
+      } else {
+        setErrors({ general: 'Signup failed. Please reach out for support.' });
+      }
     } finally {
       setIsLoading(false);
     }

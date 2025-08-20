@@ -63,7 +63,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       
       if (response.data && response.data.verification_required) {
         // User needs to verify email before they can log in
-        throw new Error('Please check your email for verification link before logging in.');
+        throw new Error('Please check your email for verification link then try logging in.');
       }
       
       // If no verification required, proceed with login

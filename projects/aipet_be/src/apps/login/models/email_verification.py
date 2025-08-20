@@ -1,7 +1,7 @@
 import uuid
 from datetime import timedelta
 
-from django.contrib.auth.models import User
+from django.conf import settings
 from django.db import models
 from django.utils import timezone
 
@@ -12,7 +12,7 @@ class EmailVerification(BaseModel):
     """Model to store email verification tokens for new user registrations."""
 
     user = models.OneToOneField(
-        User, on_delete=models.CASCADE, related_name="email_verification"
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="email_verification"
     )
     token = models.UUIDField(default=uuid.uuid4, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -29,7 +29,7 @@ class EmailVerification(BaseModel):
             return
         self.is_verified = True
         self.verified_at = timezone.now()
-        self.user.is_active = True
+        self.user.is_verified = True
         self.user.save()
         self.save()
 

@@ -1,3 +1,4 @@
+import { currentApiConfig } from './config';
 // API Client for aipet_be backend
 export interface ApiResponse<T = any> {
   data?: T;
@@ -64,7 +65,7 @@ export interface PasswordResetConfirmRequest {
   new_password: string;
 }
 
-import { currentApiConfig } from '../config/api';
+
 
 class ApiClient {
   private baseUrl: string;

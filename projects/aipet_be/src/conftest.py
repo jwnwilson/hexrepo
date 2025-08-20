@@ -9,7 +9,7 @@ from unittest.mock import patch
 import django
 import pytest
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.core import mail
 from django.test import RequestFactory
 
@@ -49,6 +49,7 @@ def user_factory():
     """
     Factory for creating test users.
     """
+    User = get_user_model()
     created_users = []
 
     def _create_user(

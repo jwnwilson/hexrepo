@@ -7,7 +7,7 @@ from datetime import timedelta
 from unittest.mock import MagicMock, patch
 
 import pytest
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.utils import timezone
 
 from apps.login.models import EmailVerification
@@ -34,6 +34,7 @@ class TestSignupEndpoints:
         assert "verification link" in data["message"]
         assert data["user_id"] > 0
 
+        User = get_user_model()
         # Check user was created but inactive
         user = User.objects.get(username=sample_user_data["username"])
         assert not user.is_active
