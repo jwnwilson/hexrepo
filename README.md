@@ -37,7 +37,8 @@ Setup the following env vars directly or run:
 
 - Aipet
     - Focus on App
-        - Add react login / signup pages
+        - Add game menu and exit / logout button
+        - Setup auth token auto refresh
         - Setup llm endpoint
             - Pass pet / scene info to llm to make a decision and return an action
             - Setup API client and make llm request with jwt token
