@@ -12,7 +12,7 @@ from django.shortcuts import get_object_or_404
 from ninja import Schema
 from ninja_extra import ControllerBase, api_controller, http_get, http_post
 from ninja_extra.permissions import AllowAny
-from ninja_jwt.controller import TokenObtainPairController, TokenVerificationController
+from ninja_jwt.controller import TokenObtainPairController, TokenVerificationController, schema
 
 from apps.core.tasks import send_email_task
 
@@ -79,7 +79,6 @@ class NinjaJWTController(
     """NinjaJWT controller for obtaining and refreshing tokens"""
 
     auto_import = False
-
 
 @api_controller("/auth", auth=None, tags=["Authentication"])
 class SignupController(ControllerBase):

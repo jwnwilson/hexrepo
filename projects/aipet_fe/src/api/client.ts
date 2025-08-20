@@ -29,13 +29,7 @@ export interface LoginRequest {
 export interface LoginResponse {
   access: string;
   refresh: string;
-  user: {
-    id: number;
-    username: string;
-    email: string;
-    first_name: string;
-    last_name: string;
-  };
+  username: string;
 }
 
 export interface PetNeedsRequest {
@@ -127,7 +121,7 @@ class ApiClient {
   }
 
   async login(request: LoginRequest): Promise<ApiResponse<LoginResponse>> {
-    const response = await this.request<LoginResponse>('/token', {
+    const response = await this.request<LoginResponse>('/token/pair', {
       method: 'POST',
       body: JSON.stringify(request),
     });

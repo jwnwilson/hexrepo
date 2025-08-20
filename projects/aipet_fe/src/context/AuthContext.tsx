@@ -26,9 +26,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       
       if (response.data) {
         const user: User = {
-          id: response.data.user.id.toString(),
-          name: `${response.data.user.first_name} ${response.data.user.last_name}`.trim() || response.data.user.username,
-          email: response.data.user.email
+          username: response.data.username,
         };
         
         setUser(user);
