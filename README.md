@@ -45,7 +45,6 @@ Setup the following env vars directly or run:
         - Add logfire
             - Add cost tracking to logfire dashboard
             - Add endpoint and user info to logfire
-        - Setup Signup / email sending
         - Setup infra / terraform
         - Deploy App - Kubernetes with k3 / rancher
     - Improve pet logic
@@ -53,6 +52,8 @@ Setup the following env vars directly or run:
         - Multiple pets
         - Add social need
             - Interact with player or another pet
+    - Setup Signup / email sending
+        - Keep manual for now via django console
     - Create orchestrator logic
         - Setup airflow on Kubernetes / K3 / Rancher
         - Setup task tracking debugging UI
