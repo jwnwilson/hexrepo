@@ -96,11 +96,14 @@ def create_project():
     project_name: str = typer.prompt("Please Enter project folder name")
     os.system("rm -r templates/project/.venv 2> /dev/null || echo > /dev/null")
     template_choice = typer.prompt(
-        "Which project template would you like to use?",
-        type=typer.Choice(["fastapi", "django_ninja"], case_sensitive=False),
-        default="fastapi"
+        "Which project template would you like to use? \n  1.fastapi\n  2.django_ninja\n",
+        default="1"
     )
-    if template_choice.lower() == "fastapi":
+    # Validate the choice
+    if template_choice.lower() not in ["1", "2"]:
+        typer.echo("Invalid choice. Please select '1' or '2'")
+        raise typer.Exit(1)
+    if template_choice.lower() == "1":
         template_path = "https://github.com/jwnwilson/fastapi_project_template.git"
     else:
         template_path = "https://github.com/jwnwilson/ninja_project_template.git"
@@ -108,7 +111,10 @@ def create_project():
     with chdir("projects"):
         # Run copier command to copy template
         copier.run_copy(
-            template_path, f"./{project_name}"
+            template_path, f"./{project_name}",
+            data={
+                "project_name": project_name,
+            }
         )
         # Setup infra for service
         if prompt_setup_project_infra():
