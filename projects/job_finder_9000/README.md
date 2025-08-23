@@ -1,4 +1,4 @@
-# job_finder_9000_be Project
+# job_finder_9000 Project
 
 This is a python hexagonal project that is compatible with the hextech monorepo.
 
