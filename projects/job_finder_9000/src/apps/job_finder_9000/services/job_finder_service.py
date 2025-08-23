@@ -8,13 +8,11 @@ providing a clean interface for controllers and handling business logic.
 import asyncio
 import logging
 from typing import List, Dict, Any, Optional
-from datetime import datetime
 
 from django.conf import settings
 from django.core.cache import cache
 
 from ..domain.job_finder_agent import (
-    JobFinderOrchestratorAgent,
     create_job_finder_agent,
     CandidateProfile,
     JobSearchRequest,
@@ -23,6 +21,7 @@ from ..domain.job_finder_agent import (
     Location,
     JobPosting
 )
+from config import config
 
 logger = logging.getLogger(__name__)
 
@@ -43,7 +42,7 @@ class JobFinderService:
         """Initialize the job finder agent with configuration."""
         try:
             # Get OpenAI API key from settings
-            openai_api_key = getattr(settings, 'OPENAI_API_KEY', None)
+            openai_api_key = config.OPENAI_API_KEY
             if not openai_api_key:
                 logger.warning("OpenAI API key not found in settings. Agent will not be initialized.")
                 return

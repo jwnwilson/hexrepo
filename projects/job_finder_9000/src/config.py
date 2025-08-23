@@ -56,5 +56,7 @@ class Config(BaseSettings):
     ALLOWED_ORIGINS: str = os.environ.get("ALLOWED_ORIGINS", "localhost")
     TESTING: bool = "pytest" in sys.argv[0]
 
+    OPENAI_API_KEY: str = os.environ.get("OPENAI_API_KEY")
+
 
 config = Config()  # type: ignore
