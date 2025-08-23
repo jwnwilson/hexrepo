@@ -6,7 +6,7 @@ import uuid
 from datetime import timedelta
 
 import pytest
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.utils import timezone
 
@@ -18,6 +18,7 @@ class EmailVerificationModelTest(TestCase):
 
     def setUp(self):
         """Set up test data."""
+        User = get_user_model()
         self.user = User.objects.create_user(
             username="testuser",
             email="test@example.com",
@@ -81,7 +82,7 @@ class EmailVerificationModelTest(TestCase):
         self.user.refresh_from_db()
         verification.refresh_from_db()
 
-        self.assertTrue(self.user.is_active)
+        self.assertTrue(self.user.is_verified)
         self.assertTrue(verification.is_verified)
         self.assertIsNotNone(verification.verified_at)
 
@@ -106,6 +107,7 @@ class PasswordResetModelTest(TestCase):
 
     def setUp(self):
         """Set up test data."""
+        User = get_user_model()
         self.user = User.objects.create_user(
             username="testuser", email="test@example.com", password="testpass123"
         )
@@ -187,6 +189,7 @@ class PasswordResetModelTest(TestCase):
 
     def test_reset_tokens_for_different_users(self):
         """Test that different users can have reset tokens."""
+        User = get_user_model()
         user2 = User.objects.create_user(
             username="testuser2", email="test2@example.com", password="testpass123"
         )

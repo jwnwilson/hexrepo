@@ -1,8 +1,9 @@
 import logging
 from typing import Any, Dict
+from uuid import UUID
 
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.core.mail import send_mail
@@ -11,11 +12,14 @@ from django.shortcuts import get_object_or_404
 from ninja import Schema
 from ninja_extra import ControllerBase, api_controller, http_get, http_post
 from ninja_extra.permissions import AllowAny
-from ninja_jwt.controller import TokenObtainPairController, TokenVerificationController
+from ninja_jwt.controller import (
+    TokenObtainPairController,
+    TokenVerificationController,
+)
 
 from apps.core.tasks import send_email_task
 
-from ..models import EmailVerification, PasswordReset
+from ..models import EmailVerification, PasswordReset, User
 
 logger = logging.getLogger(__name__)
 
@@ -34,7 +38,7 @@ class SignupResponseSchema(Schema):
     """Schema for signup response."""
 
     message: str
-    user_id: int
+    user_id: UUID | None = None
     verification_required: bool = True
 
 
@@ -92,21 +96,24 @@ class SignupController(ControllerBase):
         Creates a new user account and sends an email verification link.
         The user account will be inactive until email verification is completed.
         """
+        User = get_user_model()
         try:
+            user_query = User.objects.filter(username=payload.username)
             # Check if username already exists
-            if User.objects.filter(username=payload.username).exists():
+            if user_query.exists():
+                user = user_query.first()
                 return {
                     "message": "Username already exists",
-                    "user_id": 0,
-                    "verification_required": False,
+                    "verification_required": not user.is_verified,
                 }
 
             # Check if email already exists
-            if User.objects.filter(email=payload.email).exists():
+            user_query = User.objects.filter(email=payload.email)
+            if user_query.exists():
+                user = user_query.first()
                 return {
                     "message": "Email already registered",
-                    "user_id": 0,
-                    "verification_required": False,
+                    "verification_required": not user.is_verified,
                 }
 
             # Validate password
@@ -115,8 +122,6 @@ class SignupController(ControllerBase):
             except ValidationError as e:
                 return {
                     "message": f"Password validation failed: {', '.join(e.messages)}",
-                    "user_id": 0,
-                    "verification_required": False,
                 }
 
             # Create user (inactive by default)
@@ -126,7 +131,8 @@ class SignupController(ControllerBase):
                 password=payload.password,
                 first_name=payload.first_name,
                 last_name=payload.last_name,
-                is_active=False,  # User will be activated after email verification
+                is_verified=False,
+                is_active=False,
             )
 
             # Create email verification record
@@ -142,15 +148,13 @@ class SignupController(ControllerBase):
             return {
                 "message": "User registered successfully. Please check your email for verification link.",
                 "user_id": user.id,
-                "verification_required": True,
+                "verification_required": not user.is_verified,
             }
 
         except Exception as e:
             logger.error(f"Error during user signup: {str(e)}")
             return {
                 "message": "An error occurred during registration. Please try again.",
-                "user_id": 0,
-                "verification_required": False,
             }
 
     @http_get("/verify/{token}", response=VerificationResponseSchema)
@@ -207,17 +211,14 @@ class SignupController(ControllerBase):
 
         Expects a JSON payload with 'email' field.
         """
+        User = get_user_model()
         # Let get_object_or_404 raise the 404 exception naturally for nonexistent users
         user = get_object_or_404(User, email=payload.email)
 
         try:
             # Check if user is already verified
             if user.is_active:
-                return {
-                    "message": "User is already verified",
-                    "user_id": user.id,
-                    "verification_required": False,
-                }
+                return {"message": "User is already verified"}
 
             # Get or create verification record
             verification, created = EmailVerification.objects.get_or_create(user=user)
@@ -234,17 +235,11 @@ class SignupController(ControllerBase):
 
             return {
                 "message": "Verification email sent. Please check your email.",
-                "user_id": user.id,
-                "verification_required": True,
             }
 
         except Exception as e:
             logger.error(f"Error resending verification email: {str(e)}")
-            return {
-                "message": "Error sending verification email. Please try again.",
-                "user_id": 0,
-                "verification_required": False,
-            }
+            return {"message": "Error sending verification email. Please try again."}
 
     def _send_verification_email(
         self, user: User, verification: EmailVerification
@@ -303,6 +298,7 @@ class SignupController(ControllerBase):
         Always returns success to prevent email enumeration attacks.
         """
         try:
+            User = get_user_model()
             # Always return success to prevent email enumeration
             # But only send email if user exists
             try:

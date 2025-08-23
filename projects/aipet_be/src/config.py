@@ -56,5 +56,10 @@ class Config(BaseSettings):
     ALLOWED_ORIGINS: str = os.environ.get("ALLOWED_ORIGINS", "localhost")
     TESTING: bool = "pytest" in sys.argv[0]
 
+    # OpenRouter settings
+    OPENAI_API_KEY: str = os.environ.get("OPENAI_API_KEY", "")
+    AI_DEFAULT_MODEL: str = os.environ.get("AI_DEFAULT_MODEL", "gpt-4o-mini")
+    AI_TIMEOUT: int = int(os.environ.get("AI_TIMEOUT", "30"))
+
 
 config = Config()  # type: ignore

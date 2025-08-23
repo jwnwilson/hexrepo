@@ -37,17 +37,25 @@ Setup the following env vars directly or run:
 
 - Aipet
     - Focus on App
-        - Create pet needs
-        - Add needs to map
-        - Create way for pet to move around the map
-            - Respect gravity
-            - Respect obsticles
-        - Create logic to reduce need if close to right object
-    - Setup infra / terraform
-    - Deploy App
-    - Create django ninja template
+        - Add game menu and exit / logout button
+        - Setup auth token auto refresh
+        - Setup llm endpoint
+            - Pass pet / scene info to llm to make a decision and return an action
+            - Setup API client and make llm request with jwt token
+        - Add logfire
+            - Add cost tracking to logfire dashboard
+            - Add endpoint and user info to logfire
+        - Setup infra / terraform
+        - Deploy App - Kubernetes with k3 / rancher
+    - Improve pet logic
+        - Maintain llm context
+        - Multiple pets
+        - Add social need
+            - Interact with player or another pet
+    - Setup Signup / email sending
+        - Keep manual for now via django console
     - Create orchestrator logic
-        - Setup airflow on EC2 / K3 / K8s
+        - Setup airflow on Kubernetes / K3 / Rancher
         - Setup task tracking debugging UI
             - Airflow
                 - This will likely require EC2 / kubernetes due to number of containers

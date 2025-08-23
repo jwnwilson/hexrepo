@@ -2,9 +2,11 @@ import viteCompression from 'vite-plugin-compression'
 import { createHtmlPlugin } from 'vite-plugin-html'
 import glsl from 'vite-plugin-glsl'
 import { VitePWA } from 'vite-plugin-pwa'
+import react from '@vitejs/plugin-react'
 
 const vitePlugins: any = (env: any) => {
   return [
+    react(), // React plugin
     glsl(), // Convenient for you to write shader
     viteCompression({
       verbose: true, // Whether to output compression results on the console

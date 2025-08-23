@@ -7,7 +7,7 @@ from datetime import timedelta
 from unittest.mock import MagicMock, patch
 
 import pytest
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.utils import timezone
 
 from apps.login.models import EmailVerification
@@ -30,10 +30,11 @@ class TestSignupEndpoints:
         assert response.status_code == 200
         data = json.loads(response.content)
 
-        assert data["verification_required"] is True
+        assert data["verification_required"]
         assert "verification link" in data["message"]
-        assert data["user_id"] > 0
+        assert data["user_id"] is not None
 
+        User = get_user_model()
         # Check user was created but inactive
         user = User.objects.get(username=sample_user_data["username"])
         assert not user.is_active
@@ -63,9 +64,9 @@ class TestSignupEndpoints:
         assert response.status_code == 200
         data = json.loads(response.content)
 
-        assert data["verification_required"] is False
+        assert data["verification_required"]
         assert "Username already exists" in data["message"]
-        assert data["user_id"] == 0
+        assert data["user_id"] is None
 
     def test_signup_duplicate_email(self, api_client, sample_user_data, user_factory):
         """Test signup with duplicate email."""
@@ -77,9 +78,9 @@ class TestSignupEndpoints:
         assert response.status_code == 200
         data = json.loads(response.content)
 
-        assert data["verification_required"] is False
+        assert data["verification_required"]
         assert "Email already registered" in data["message"]
-        assert data["user_id"] == 0
+        assert data["user_id"] is None
 
     def test_signup_weak_password(self, api_client, sample_user_data):
         """Test signup with weak password."""
@@ -90,9 +91,9 @@ class TestSignupEndpoints:
         assert response.status_code == 200
         data = json.loads(response.content)
 
-        assert data["verification_required"] is False
+        assert data["verification_required"]
         assert "Password validation failed" in data["message"]
-        assert data["user_id"] == 0
+        assert data["user_id"] is None
 
     @patch("apps.core.tasks.send_email_task.delay")
     def test_signup_email_failure(
@@ -106,9 +107,9 @@ class TestSignupEndpoints:
         assert response.status_code == 200
         data = json.loads(response.content)
 
-        assert data["verification_required"] is False
+        assert data["verification_required"]
         assert "error occurred during registration" in data["message"]
-        assert data["user_id"] == 0
+        assert data["user_id"] is None
 
         # Verify Celery task was called but failed
         mock_send_email_task.assert_called_once()
@@ -214,7 +215,7 @@ class TestEmailVerificationEndpoints:
         assert response.status_code == 200
         data = json.loads(response.content)
 
-        assert data["verification_required"] is False
+        assert data["verification_required"]
         assert "already verified" in data["message"]
 
     def test_resend_verification_nonexistent_user(self, api_client):
