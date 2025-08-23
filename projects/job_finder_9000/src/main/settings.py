@@ -77,7 +77,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "ninja_extra",
     "ninja_jwt",
-    "apps.{{project_slug}}",
+    "apps.job_finder_9000",
     "apps.login",
 ]
 
@@ -165,7 +165,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # For development, we'll use console backend to print emails to console
 # In production, configure SMTP settings
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-DEFAULT_FROM_EMAIL = "noreply@{{project_slug}}.com"
+DEFAULT_FROM_EMAIL = "noreply@job_finder_9000.com"
 FRONTEND_VERIFY_URL = os.getenv(
     "FRONTEND_VERIFY_URL", "http://localhost:8000/api/v1/auth/verify"
 )

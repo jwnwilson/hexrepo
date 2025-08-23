@@ -49,7 +49,7 @@ class TestSignupEndpoints:
         assert call_args.kwargs["subject"] == "Verify Your Email Address"
         assert sample_user_data["email"] in call_args.kwargs["recipient_list"]
         assert str(verification.token) in call_args.kwargs["message"]
-        assert "noreply@{{project_slug}}.com" == call_args.kwargs["from_email"]
+        assert "noreply@job_finder_9000.com" == call_args.kwargs["from_email"]
 
     def test_signup_duplicate_username(
         self, api_client, sample_user_data, user_factory
@@ -201,7 +201,7 @@ class TestEmailVerificationEndpoints:
         assert call_args.kwargs["subject"] == "Verify Your Email Address"
         assert user.email in call_args.kwargs["recipient_list"]
         assert str(verification.token) in call_args.kwargs["message"]
-        assert "noreply@{{project_slug}}.com" == call_args.kwargs["from_email"]
+        assert "noreply@job_finder_9000.com" == call_args.kwargs["from_email"]
 
     def test_resend_verification_already_verified(self, api_client, user_factory):
         """Test resending verification for already verified user."""

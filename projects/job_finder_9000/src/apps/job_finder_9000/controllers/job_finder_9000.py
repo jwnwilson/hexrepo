@@ -8,12 +8,12 @@ from ninja_extra import (
 )
 from ninja_extra.permissions import BasePermission, IsAuthenticated
 
-from ..models import {{project_slug|capitalize}}
+from ..models import Job_finder_9000
 
 
 class PetSchema(ModelSchema):
     class Config:
-        model = {{project_slug|capitalize}}
+        model = Job_finder_9000
         model_fields = ["name", "description"]
 
 
@@ -22,11 +22,11 @@ class IsAdmin(BasePermission):
         return request.user.is_staff
 
 
-@api_controller("/{{project_slug}}", permissions=[IsAuthenticated, IsAdmin], tags=["{{project_slug|capitalize}}"])
-class {{project_slug|capitalize}}Controller(ModelControllerBase):
+@api_controller("/job_finder_9000", permissions=[IsAuthenticated, IsAdmin], tags=["Job_finder_9000"])
+class Job_finder_9000Controller(ModelControllerBase):
     user_model = get_user_model()
     model_config = ModelConfig(
-        model={{project_slug|capitalize}},
+        model=Job_finder_9000,
         schema_config=ModelSchemaConfig(
             read_only_fields=["id", "created_at", "updated_at"]
         ),

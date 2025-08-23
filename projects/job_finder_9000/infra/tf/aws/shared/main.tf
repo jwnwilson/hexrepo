@@ -2,7 +2,7 @@ terraform {
   backend "s3" {
     region = "eu-west-1"
     bucket = "hexrepo-jwn"
-    key = "{{project_slug}}_be-shared.tfstate"
+    key = "job_finder_9000_be-shared.tfstate"
   }
   required_providers {
     aws = {

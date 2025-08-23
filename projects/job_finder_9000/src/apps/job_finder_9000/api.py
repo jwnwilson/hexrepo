@@ -1,10 +1,10 @@
 from ninja import Router
 
 router = Router(
-    tags=["{{project_slug|capitalize}}"],
+    tags=["Job_finder_9000"],
 )
 
 
 @router.get("/additonal endpoint")
-def get_{{project_slug}}(request):
+def get_job_finder_9000(request):
     return {"message": "Hello, World!"}

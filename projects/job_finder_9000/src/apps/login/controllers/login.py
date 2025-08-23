@@ -282,7 +282,7 @@ class SignupController(ControllerBase):
             send_email_task.delay(
                 subject=subject,
                 message=message,
-                from_email=getattr(settings, "DEFAULT_FROM_EMAIL", "noreply@{{project_slug}}.com"),
+                from_email=getattr(settings, "DEFAULT_FROM_EMAIL", "noreply@job_finder_9000.com"),
                 recipient_list=[user.email],
                 fail_silently=False,
             )
@@ -420,7 +420,7 @@ class SignupController(ControllerBase):
             # In production, this should be your actual domain
             reset_url = "http://localhost:8000/api/v1/auth/password-reset/confirm"
 
-            {% raw %}
+            
             message = f"""
             Hi {user.first_name or user.username},
             
@@ -445,12 +445,12 @@ class SignupController(ControllerBase):
             Best regards,
             AI Pet Team
             """
-            {% endraw %}
+            
 
             send_mail(
                 subject=subject,
                 message=message,
-                from_email=getattr(settings, "DEFAULT_FROM_EMAIL", "noreply@{{project_slug}}.com"),
+                from_email=getattr(settings, "DEFAULT_FROM_EMAIL", "noreply@job_finder_9000.com"),
                 recipient_list=[user.email],
                 fail_silently=False,
             )

@@ -11,7 +11,7 @@ variable "aws_secret_key" {
 }
 
 variable "project" {
-  default = "{{project_slug}}_be"
+  default = "job_finder_9000_be"
 }
 
 variable "docker_tag_container" {
@@ -27,10 +27,10 @@ variable "domain" {
 }
 
 variable "api_subdomain" {
-  default = "{{project_slug}}_be"
+  default = "job_finder_9000_be"
 }
 
 variable "api_repo" {
   description = "Name of container image repository"
-  default     = "{{project_slug}}_be_api"
+  default     = "job_finder_9000_be_api"
 }

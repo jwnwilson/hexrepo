@@ -2,7 +2,7 @@ terraform {
   backend "s3" {
     region = "eu-west-1"
     bucket = "hexrepo-jwn"
-    key = "{{project_slug}}_be-environment.tfstate"
+    key = "job_finder_9000_be-environment.tfstate"
   }
   required_providers {
     aws = {
@@ -16,8 +16,8 @@ data "aws_region" "current" {}
 
 
 locals {
-  db_url = "postgresql+psycopg://postgres:{password}@${module.{{project_slug}}_be_postgres.db_instance_endpoint}/${var.project}"
-  db_ro_url = module.{{project_slug}}_be_postgres.db_instance_ro_endpoint != null ? "postgresql+psycopg://postgres:{password}@${module.{{project_slug}}_be_postgres.db_instance_ro_endpoint}/${var.project}" : "postgresql+psycopg://postgres:{password}@${module.{{project_slug}}_be_postgres.db_instance_endpoint}/${var.project}"
+  db_url = "postgresql+psycopg://postgres:{password}@${module.job_finder_9000_be_postgres.db_instance_endpoint}/${var.project}"
+  db_ro_url = module.job_finder_9000_be_postgres.db_instance_ro_endpoint != null ? "postgresql+psycopg://postgres:{password}@${module.job_finder_9000_be_postgres.db_instance_ro_endpoint}/${var.project}" : "postgresql+psycopg://postgres:{password}@${module.job_finder_9000_be_postgres.db_instance_endpoint}/${var.project}"
 }
 
 locals {
@@ -62,7 +62,7 @@ data "aws_ecr_repository" "ecr_repo" {
 
 
 
-module "{{project_slug}}_be_ecs_api" {
+module "job_finder_9000_be_ecs_api" {
   source             = "../../../../../../infra/tf/aws/modules/ecs"
   project            = var.project
   name               = "api"
@@ -98,39 +98,39 @@ module "{{project_slug}}_be_ecs_api" {
 
 
 
-module "{{project_slug}}_be_api_gateway" {
+module "job_finder_9000_be_api_gateway" {
   source = "../../../../../../infra/tf/aws/modules/apigateway"
 
   environment       = terraform.workspace
-  lambda_invoke_arn = module.{{project_slug}}_be_api.lambda_function_invoke_arn
-  lambda_name       = module.{{project_slug}}_be_api.lambda_function_name
+  lambda_invoke_arn = module.job_finder_9000_be_api.lambda_function_invoke_arn
+  lambda_name       = module.job_finder_9000_be_api.lambda_function_name
   domain            = var.domain
-  api_subdomain     = "{{project_slug}}_be-${terraform.workspace}"
-  project           = "{{project_slug}}_be"
+  api_subdomain     = "job_finder_9000_be-${terraform.workspace}"
+  project           = "job_finder_9000_be"
   cognito_user_pool_arn = module.common_auth.user_pool_arn
   # Auth handled in api middleware
   auth_enabled          = false
 }
 
 
-module "{{project_slug}}_be_postgres" {
+module "job_finder_9000_be_postgres" {
   source = "../../../../../../infra/tf/aws/modules/rds"
 
   environment       = terraform.workspace
-  project           = "{{project_slug}}_be"
+  project           = "job_finder_9000_be"
   vpc_id            = data.aws_vpc.hexrepo.id
   username          = "postgres"
 }
 
 data "aws_secretsmanager_secret" "db_secret" {
-  arn = module.{{project_slug}}_be_postgres.db_password_secret_arn
+  arn = module.job_finder_9000_be_postgres.db_password_secret_arn
 }
 
 
 
-module "{{project_slug}}_be_bucket" {
+module "job_finder_9000_be_bucket" {
   source = "../../../../../../infra/tf/aws/modules/s3"
 
-  project     = "{{project_slug}}_be"
-  name        = "{{project_slug}}_be"
+  project     = "job_finder_9000_be"
+  name        = "job_finder_9000_be"
 }

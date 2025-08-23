@@ -1,5 +1,5 @@
 """
-Celery tasks for the {{project_slug}} application.
+Celery tasks for the job_finder_9000 application.
 """
 
 import logging
