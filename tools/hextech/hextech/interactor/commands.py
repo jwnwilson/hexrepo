@@ -4,6 +4,7 @@ from typing import List, Optional
 
 import copier
 import typer
+import shutil
 from typing_extensions import Annotated
 
 from hextech.config import HexrepoConfig, get_or_create_config
@@ -118,6 +119,10 @@ def create_project():
         )
         # Setup infra for service
         if prompt_setup_project_infra():
+            # Delete the .git folder from the newly created project directory
+            git_dir = os.path.join(project_name, ".git")
+            if os.path.exists(git_dir):
+                shutil.rmtree(git_dir)
             with chdir(project_name):
                 typer.echo("Setting up initial infrastructure...")
                 run_system_command("make tf_setup ENVIROMENT=default")
