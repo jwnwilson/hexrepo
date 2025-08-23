@@ -1,5 +1,5 @@
 """
-Celery configuration for {{project_slug}}_be project.
+Celery configuration for job_finder_9000_be project.
 """
 
 import os
@@ -9,7 +9,7 @@ from celery import Celery
 # Set the default Django settings module for the 'celery' program.
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "main.settings")
 
-app = Celery("{{project_slug}}_be")
+app = Celery("job_finder_9000_be")
 
 # Using a string here means the worker doesn't have to serialize
 # the configuration object to child processes.

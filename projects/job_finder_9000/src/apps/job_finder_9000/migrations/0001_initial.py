@@ -12,7 +12,7 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name="{{project_slug|capitalize}}",
+            name="Job_finder_9000",
             fields=[
                 (
                     "id",

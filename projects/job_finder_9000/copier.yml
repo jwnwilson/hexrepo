@@ -5,7 +5,7 @@ project_name:
 project_slug:
     type: str
     help: Project slug (automatically generated from project name)
-    default: "{{ project_name.lower()|replace(' ', '_')|replace('-', '_')|replace('.', '_')|trim() }}"
+    default: "job_finder_9000"
 
 description:
     type: str
@@ -35,7 +35,7 @@ use_api_type:
     help: What type of api do you want to use?
     choices: ["serverless", "container"]
     default: "container"
-    when: "{{ use_api }}"
+    when: "True"
 
 use_db:
     type: bool
@@ -47,7 +47,7 @@ use_db_logic:
     help: What type of database do you want to use?
     choices: ["sql", "nosql"]
     default: "sql"
-    when: "{{ use_db }}"
+    when: "True"
 
 use_storage:
     type: bool
@@ -64,7 +64,7 @@ use_task_type:
     help: What type of task queue do you want to use?
     choices: ["serverless", "container"]
     default: "container"
-    when: "{{ use_task }}"
+    when: "True"
 
 _templates_suffix: ""
 # Jinja2 environment configuration
@@ -73,7 +73,7 @@ _jinja2_env_vars:
     trim_blocks: true 
 
 _exclude:
-    - "{% if not use_api %}src/app/interactor/api{% endif %}"
-    - "{% if not use_task %}src/app/interactor/event{% endif %}"
-    - "{% if not use_db %}src/app/adaptor/db{% endif %}"
-    - "{% if not use_storage %}src/app/adaptor/storage{% endif %}"
+    - ""
+    - ""
+    - ""
+    - ""

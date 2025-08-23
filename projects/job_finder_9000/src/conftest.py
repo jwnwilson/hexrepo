@@ -1,5 +1,5 @@
 """
-Pytest configuration and fixtures for the {{project_slug}}_be project.
+Pytest configuration and fixtures for the job_finder_9000_be project.
 """
 
 import os
