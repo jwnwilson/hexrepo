@@ -94,17 +94,22 @@ class SignupController(ControllerBase):
         """
         User = get_user_model()
         try:
-            user = User.objects.filter(username=payload.username)
+            user_query = User.objects.filter(username=payload.username)
             # Check if username already exists
-            if user.exists():
+            if user_query.exists():
+                user = user_query.first()
                 return {
-                    "message": "Username already exists"
+                    "message": "Username already exists",
+                    "verification_required": user.is_verified,
                 }
 
             # Check if email already exists
-            if User.objects.filter(email=payload.email).exists():
+            user_query = User.objects.filter(email=payload.email)
+            if user_query.exists():
+                user = user_query.first()
                 return {
-                    "message": "Email already registered"
+                    "message": "Email already registered",
+                    "verification_required": user.is_verified,
                 }
 
             # Validate password

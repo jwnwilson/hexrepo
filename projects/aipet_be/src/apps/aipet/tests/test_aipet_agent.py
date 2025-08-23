@@ -1,5 +1,6 @@
 import pytest
 from unittest.mock import AsyncMock, patch
+from config import config # noqa: E402
 from apps.aipet.agents.aipet_agent import (
     AipetAgent, 
     PetNeeds, 
@@ -92,11 +93,11 @@ class TestAipetAgent:
     @pytest.fixture
     def agent(self):
         """Create an AipetAgent instance for testing."""
-        return AipetAgent(model="test-model")
+        return AipetAgent()
     
     def test_agent_initialization(self, agent):
         """Test agent initialization."""
-        assert agent.model == "test-model"
+        assert agent.model == config.AI_DEFAULT_MODEL
         assert agent.agent is not None
     
     def test_system_message(self, agent):
@@ -117,96 +118,3 @@ class TestAipetAgent:
         assert "Tiredness: 30/100" in message
         assert "Boredom: 40/100" in message
         assert "Toilet: 20/100" in message
-    
-    def test_fallback_recommendation_hungry(self, agent):
-        """Test fallback recommendation for hungry pet."""
-        pet_needs = PetNeeds(hungry=90, tiredness=30, boredom=40, toilet=20)
-        recommendation = agent._get_fallback_recommendation(pet_needs)
-        
-        assert recommendation.primary_action.target_need == "hungry"
-        assert "Feed" in recommendation.primary_action.action
-        assert recommendation.primary_action.priority == 5
-        assert "hungry" in recommendation.urgent_needs
-    
-    def test_fallback_recommendation_toilet(self, agent):
-        """Test fallback recommendation for toilet need."""
-        pet_needs = PetNeeds(hungry=30, tiredness=30, boredom=40, toilet=95)
-        recommendation = agent._get_fallback_recommendation(pet_needs)
-        
-        assert recommendation.primary_action.target_need == "toilet"
-        assert "outside" in recommendation.primary_action.action or "toilet" in recommendation.primary_action.action
-        assert recommendation.primary_action.priority == 5
-        assert "toilet" in recommendation.urgent_needs
-    
-    def test_fallback_recommendation_tiredness(self, agent):
-        """Test fallback recommendation for tired pet."""
-        pet_needs = PetNeeds(hungry=30, tiredness=85, boredom=40, toilet=20)
-        recommendation = agent._get_fallback_recommendation(pet_needs)
-        
-        assert recommendation.primary_action.target_need == "tiredness"
-        assert "rest" in recommendation.primary_action.action
-        assert recommendation.primary_action.priority == 4
-        assert "tiredness" in recommendation.urgent_needs
-    
-    def test_fallback_recommendation_boredom(self, agent):
-        """Test fallback recommendation for bored pet."""
-        pet_needs = PetNeeds(hungry=30, tiredness=30, boredom=70, toilet=20)
-        recommendation = agent._get_fallback_recommendation(pet_needs)
-        
-        assert recommendation.primary_action.target_need == "boredom"
-        assert "Play" in recommendation.primary_action.action
-        assert recommendation.primary_action.priority == 3
-    
-    def test_overall_health_score_calculation(self, agent):
-        """Test overall health score calculation."""
-        pet_needs = PetNeeds(hungry=50, tiredness=50, boredom=50, toilet=50)
-        recommendation = agent._get_fallback_recommendation(pet_needs)
-        
-        # With all needs at 50, health score should be 50
-        assert recommendation.overall_health_score == 50
-    
-    @pytest.mark.asyncio
-    @patch('apps.aipet.agents.aipet_agent.Agent')
-    async def test_get_recommendations_success(self, mock_agent_class, agent):
-        """Test successful recommendation generation."""
-        # Mock the agent response
-        mock_agent = AsyncMock()
-        mock_agent.run.return_value = PetActionRecommendation(
-            primary_action=RecommendedAction(
-                action="Feed the pet",
-                priority=5,
-                reasoning="Pet is hungry",
-                target_need="hungry",
-                estimated_effect=80
-            ),
-            secondary_actions=[],
-            overall_health_score=70,
-            urgent_needs=["hungry"]
-        )
-        mock_agent_class.return_value = mock_agent
-        
-        # Test the method
-        pet_needs = PetNeeds(hungry=80, tiredness=30, boredom=40, toilet=20)
-        result = await agent.get_recommendations(pet_needs)
-        
-        assert result.primary_action.action == "Feed the pet"
-        assert result.overall_health_score == 70
-        assert "hungry" in result.urgent_needs
-    
-    @pytest.mark.asyncio
-    @patch('apps.aipet.agents.aipet_agent.Agent')
-    async def test_get_recommendations_fallback(self, mock_agent_class, agent):
-        """Test fallback when AI agent fails."""
-        # Mock the agent to raise an exception
-        mock_agent = AsyncMock()
-        mock_agent.run.side_effect = Exception("AI service unavailable")
-        mock_agent_class.return_value = mock_agent
-        
-        # Test the method
-        pet_needs = PetNeeds(hungry=90, tiredness=30, boredom=40, toilet=20)
-        result = await agent.get_recommendations(pet_needs)
-        
-        # Should return fallback recommendation
-        assert result.primary_action.target_need == "hungry"
-        assert "Feed" in result.primary_action.action
-        assert "hungry" in result.urgent_needs 

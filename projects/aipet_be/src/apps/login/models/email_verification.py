@@ -30,6 +30,7 @@ class EmailVerification(BaseModel):
         self.is_verified = True
         self.verified_at = timezone.now()
         self.user.is_verified = True
+        self.user.is_active = True
         self.user.save()
         self.save()
 

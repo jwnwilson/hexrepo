@@ -82,7 +82,7 @@ class EmailVerificationModelTest(TestCase):
         self.user.refresh_from_db()
         verification.refresh_from_db()
 
-        self.assertTrue(self.user.is_active)
+        self.assertTrue(self.user.is_verified)
         self.assertTrue(verification.is_verified)
         self.assertIsNotNone(verification.verified_at)
 

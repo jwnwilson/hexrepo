@@ -8,7 +8,7 @@ import logfire
 logfire.configure(token='pylf_v1_eu_XTHBY13Y5Kv8GLgf9DFZfjNsBb12c8jyRmYtxFsQ2y6W')
 logfire.instrument_pydantic_ai()
 
-from config import config
+from config import config # noqa: E402
 
 logger = logging.getLogger(__name__)
 

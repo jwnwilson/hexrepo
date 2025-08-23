@@ -66,7 +66,7 @@ class TestSignupEndpoints:
 
         assert data["verification_required"] is False
         assert "Username already exists" in data["message"]
-        assert data["user_id"] == 0
+        assert data["user_id"] is None
 
     def test_signup_duplicate_email(self, api_client, sample_user_data, user_factory):
         """Test signup with duplicate email."""
@@ -80,7 +80,7 @@ class TestSignupEndpoints:
 
         assert data["verification_required"] is False
         assert "Email already registered" in data["message"]
-        assert data["user_id"] == 0
+        assert data["user_id"] is None
 
     def test_signup_weak_password(self, api_client, sample_user_data):
         """Test signup with weak password."""
@@ -93,7 +93,7 @@ class TestSignupEndpoints:
 
         assert data["verification_required"] is False
         assert "Password validation failed" in data["message"]
-        assert data["user_id"] == 0
+        assert data["user_id"] is None
 
     @patch("apps.core.tasks.send_email_task.delay")
     def test_signup_email_failure(
@@ -109,7 +109,7 @@ class TestSignupEndpoints:
 
         assert data["verification_required"] is False
         assert "error occurred during registration" in data["message"]
-        assert data["user_id"] == 0
+        assert data["user_id"] is None
 
         # Verify Celery task was called but failed
         mock_send_email_task.assert_called_once()
