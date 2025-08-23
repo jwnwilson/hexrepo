@@ -95,11 +95,20 @@ def create_library():
 def create_project():
     project_name: str = typer.prompt("Please Enter project folder name")
     os.system("rm -r templates/project/.venv 2> /dev/null || echo > /dev/null")
+    template_choice = typer.prompt(
+        "Which project template would you like to use?",
+        type=typer.Choice(["fastapi", "django_ninja"], case_sensitive=False),
+        default="fastapi"
+    )
+    if template_choice.lower() == "fastapi":
+        template_path = "https://github.com/jwnwilson/fastapi_project_template.git"
+    else:
+        template_path = "https://github.com/jwnwilson/ninja_project_template.git"
     # CD to projects folder
     with chdir("projects"):
         # Run copier command to copy template
         copier.run_copy(
-            "git@github.com:jwnwilson/hexrepo_project_template.git", f"./{project_name}"
+            template_path, f"./{project_name}"
         )
         # Setup infra for service
         if prompt_setup_project_infra():

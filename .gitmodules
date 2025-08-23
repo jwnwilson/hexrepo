@@ -1,3 +1,6 @@
 [submodule "templates/fastapi_project"]
 	path = templates/fastapi_project
 	url = https://github.com/jwnwilson/fastapi_project_template.git
+[submodule "templates/ninja_project"]
+	path = templates/ninja_project
+	url = https://github.com/jwnwilson/ninja_project_template.git
