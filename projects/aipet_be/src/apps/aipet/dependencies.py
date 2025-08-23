@@ -7,8 +7,8 @@ from adaptor.http import OpenRouterClient
 def get_openrouter_client() -> OpenRouterClient:
     """
     Dependency function to get an OpenRouter client instance.
-    
+
     Returns:
         OpenRouterClient instance
     """
-    return OpenRouterClient() 
+    return OpenRouterClient()

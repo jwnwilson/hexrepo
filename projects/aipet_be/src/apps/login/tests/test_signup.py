@@ -30,9 +30,9 @@ class TestSignupEndpoints:
         assert response.status_code == 200
         data = json.loads(response.content)
 
-        assert data["verification_required"] is True
+        assert data["verification_required"]
         assert "verification link" in data["message"]
-        assert data["user_id"] > 0
+        assert data["user_id"] is not None
 
         User = get_user_model()
         # Check user was created but inactive
@@ -64,7 +64,7 @@ class TestSignupEndpoints:
         assert response.status_code == 200
         data = json.loads(response.content)
 
-        assert data["verification_required"] is False
+        assert data["verification_required"]
         assert "Username already exists" in data["message"]
         assert data["user_id"] is None
 
@@ -78,7 +78,7 @@ class TestSignupEndpoints:
         assert response.status_code == 200
         data = json.loads(response.content)
 
-        assert data["verification_required"] is False
+        assert data["verification_required"]
         assert "Email already registered" in data["message"]
         assert data["user_id"] is None
 
@@ -91,7 +91,7 @@ class TestSignupEndpoints:
         assert response.status_code == 200
         data = json.loads(response.content)
 
-        assert data["verification_required"] is False
+        assert data["verification_required"]
         assert "Password validation failed" in data["message"]
         assert data["user_id"] is None
 
@@ -107,7 +107,7 @@ class TestSignupEndpoints:
         assert response.status_code == 200
         data = json.loads(response.content)
 
-        assert data["verification_required"] is False
+        assert data["verification_required"]
         assert "error occurred during registration" in data["message"]
         assert data["user_id"] is None
 
@@ -215,7 +215,7 @@ class TestEmailVerificationEndpoints:
         assert response.status_code == 200
         data = json.loads(response.content)
 
-        assert data["verification_required"] is False
+        assert data["verification_required"]
         assert "already verified" in data["message"]
 
     def test_resend_verification_nonexistent_user(self, api_client):

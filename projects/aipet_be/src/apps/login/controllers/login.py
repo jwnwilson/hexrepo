@@ -12,7 +12,10 @@ from django.shortcuts import get_object_or_404
 from ninja import Schema
 from ninja_extra import ControllerBase, api_controller, http_get, http_post
 from ninja_extra.permissions import AllowAny
-from ninja_jwt.controller import TokenObtainPairController, TokenVerificationController, schema
+from ninja_jwt.controller import (
+    TokenObtainPairController,
+    TokenVerificationController,
+)
 
 from apps.core.tasks import send_email_task
 
@@ -80,6 +83,7 @@ class NinjaJWTController(
 
     auto_import = False
 
+
 @api_controller("/auth", auth=None, tags=["Authentication"])
 class SignupController(ControllerBase):
     """Controller for user signup and email verification."""
@@ -100,7 +104,7 @@ class SignupController(ControllerBase):
                 user = user_query.first()
                 return {
                     "message": "Username already exists",
-                    "verification_required": user.is_verified,
+                    "verification_required": not user.is_verified,
                 }
 
             # Check if email already exists
@@ -109,7 +113,7 @@ class SignupController(ControllerBase):
                 user = user_query.first()
                 return {
                     "message": "Email already registered",
-                    "verification_required": user.is_verified,
+                    "verification_required": not user.is_verified,
                 }
 
             # Validate password
@@ -128,6 +132,7 @@ class SignupController(ControllerBase):
                 first_name=payload.first_name,
                 last_name=payload.last_name,
                 is_verified=False,
+                is_active=False,
             )
 
             # Create email verification record
@@ -143,7 +148,7 @@ class SignupController(ControllerBase):
             return {
                 "message": "User registered successfully. Please check your email for verification link.",
                 "user_id": user.id,
-                "verification_required": True,
+                "verification_required": not user.is_verified,
             }
 
         except Exception as e:
@@ -213,9 +218,7 @@ class SignupController(ControllerBase):
         try:
             # Check if user is already verified
             if user.is_active:
-                return {
-                    "message": "User is already verified"
-                }
+                return {"message": "User is already verified"}
 
             # Get or create verification record
             verification, created = EmailVerification.objects.get_or_create(user=user)
@@ -236,9 +239,7 @@ class SignupController(ControllerBase):
 
         except Exception as e:
             logger.error(f"Error resending verification email: {str(e)}")
-            return {
-                "message": "Error sending verification email. Please try again."
-            }
+            return {"message": "Error sending verification email. Please try again."}
 
     def _send_verification_email(
         self, user: User, verification: EmailVerification
