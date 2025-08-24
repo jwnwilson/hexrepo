@@ -1,266 +1,36 @@
 """
-Tests for Job Finder Agent
-
-This module contains tests for the job finder agent system.
+Tests for the JobFinderAgent
 """
 
 import pytest
-import asyncio
-from unittest.mock import Mock, patch
+from unittest.mock import AsyncMock, patch
 from datetime import datetime
-
-from ..domain.job_finder_agent import (
-    SkillMatcherAgent,
-    JobScraperAgent,
-    SalaryAnalyzerAgent,
-    LocationAnalyzerAgent,
-    JobFinderOrchestratorAgent,
-    create_job_finder_agent,
+from apps.job_finder_9000.domain.job_finder_agent import (
+    JobFinderAgent,
+    JobSearchResponse,
+    JobPosting,
+    JobRequirement,
     CandidateProfile,
     Skill,
     Location,
-    JobRequirement,
-    JobPosting,
-    JobSearchRequest,
-    JobSearchResult
+    CompanySearchResult
 )
-from ..services.job_finder_service import JobFinderService
 
 
-class TestSkillMatcherAgent:
-    """Test cases for SkillMatcherAgent."""
+class TestJobFinderAgent:
+    """Test cases for JobFinderAgent"""
     
-    def setup_method(self):
-        """Set up test fixtures."""
-        self.agent = SkillMatcherAgent()
-        
-        self.candidate_skills = [
-            Skill(name="Python", proficiency="expert", years_experience=5),
-            Skill(name="JavaScript", proficiency="intermediate", years_experience=3),
-            Skill(name="AWS", proficiency="beginner", years_experience=1),
-        ]
-        
-        self.job_requirements = [
-            JobRequirement(skill="Python", level="senior", is_mandatory=True),
-            JobRequirement(skill="JavaScript", level="mid", is_mandatory=False),
-            JobRequirement(skill="Docker", level="entry", is_mandatory=False),
-        ]
+    @pytest.fixture
+    def agent(self):
+        """Create a JobFinderAgent instance for testing"""
+        return JobFinderAgent()
     
-    def test_calculate_skill_match_score_perfect_match(self):
-        """Test skill matching with perfect candidate-job alignment."""
-        score = self.agent.calculate_skill_match_score(
-            self.candidate_skills, self.job_requirements
-        )
-        
-        # Should have a high score due to Python expert matching senior requirement
-        assert score > 70
-        assert score <= 100
-    
-    def test_calculate_skill_match_score_no_match(self):
-        """Test skill matching with no relevant skills."""
-        candidate_skills = [
-            Skill(name="Java", proficiency="expert", years_experience=5),
-        ]
-        
-        score = self.agent.calculate_skill_match_score(
-            candidate_skills, self.job_requirements
-        )
-        
-        # Should have a low score due to no matching skills
-        assert score < 30
-    
-    def test_calculate_skill_match_score_missing_mandatory(self):
-        """Test skill matching when mandatory requirements are not met."""
-        job_requirements = [
-            JobRequirement(skill="Python", level="senior", is_mandatory=True),
-            JobRequirement(skill="Java", level="mid", is_mandatory=True),
-        ]
-        
-        score = self.agent.calculate_skill_match_score(
-            self.candidate_skills, job_requirements
-        )
-        
-        # Should have a very low score due to missing mandatory Java skill
-        assert score < 50
-    
-    def test_calculate_proficiency_match(self):
-        """Test proficiency level matching."""
-        # Expert should match senior requirement
-        assert self.agent._calculate_proficiency_match("expert", "senior") == 1.0
-        
-        # Intermediate should partially match senior requirement
-        assert self.agent._calculate_proficiency_match("intermediate", "senior") == 0.7
-        
-        # Beginner should have low match for senior requirement
-        assert self.agent._calculate_proficiency_match("beginner", "senior") == 0.3
-
-
-class TestJobScraperAgent:
-    """Test cases for JobScraperAgent."""
-    
-    def setup_method(self):
-        """Set up test fixtures."""
-        self.agent = JobScraperAgent()
-    
-    @pytest.mark.asyncio
-    async def test_scrape_linkedin_jobs(self):
-        """Test LinkedIn job scraping."""
-        keywords = ["Python", "Django"]
-        location = "San Francisco"
-        
-        jobs = await self.agent.scrape_linkedin_jobs(keywords, location, max_results=5)
-        
-        assert len(jobs) <= 5
-        assert all(isinstance(job, dict) for job in jobs)
-        assert all("title" in job for job in jobs)
-        assert all("company" in job for job in jobs)
-        assert all("location" in job for job in jobs)
-    
-    @pytest.mark.asyncio
-    async def test_scrape_indeed_jobs(self):
-        """Test Indeed job scraping."""
-        keywords = ["JavaScript", "React"]
-        location = "New York"
-        
-        jobs = await self.agent.scrape_indeed_jobs(keywords, location, max_results=3)
-        
-        assert len(jobs) <= 3
-        assert all(isinstance(job, dict) for job in jobs)
-        assert all("title" in job for job in jobs)
-    
-    @pytest.mark.asyncio
-    async def test_scrape_glassdoor_jobs(self):
-        """Test Glassdoor job scraping."""
-        keywords = ["Java", "Spring"]
-        location = "Austin"
-        
-        jobs = await self.agent.scrape_glassdoor_jobs(keywords, location, max_results=4)
-        
-        assert len(jobs) <= 4
-        assert all(isinstance(job, dict) for job in jobs)
-        assert all("title" in job for job in jobs)
-
-
-class TestSalaryAnalyzerAgent:
-    """Test cases for SalaryAnalyzerAgent."""
-    
-    def setup_method(self):
-        """Set up test fixtures."""
-        self.agent = SalaryAnalyzerAgent()
-    
-    def test_analyze_salary_market_rate(self):
-        """Test market rate analysis."""
-        analysis = self.agent.analyze_salary_market_rate(
-            "Software Engineer", "San Francisco", 5
-        )
-        
-        assert "market_rate" in analysis
-        assert "percentile_25" in analysis
-        assert "percentile_50" in analysis
-        assert "percentile_75" in analysis
-        assert "percentile_90" in analysis
-        assert analysis["market_rate"] > 0
-    
-    def test_analyze_salary_market_rate_high_cost_location(self):
-        """Test market rate analysis for high-cost locations."""
-        sf_analysis = self.agent.analyze_salary_market_rate(
-            "Software Engineer", "San Francisco", 3
-        )
-        
-        ny_analysis = self.agent.analyze_salary_market_rate(
-            "Software Engineer", "New York", 3
-        )
-        
-        # High-cost locations should have higher market rates
-        assert sf_analysis["market_rate"] > 70000
-        assert ny_analysis["market_rate"] > 70000
-    
-    def test_calculate_salary_score_above_market(self):
-        """Test salary scoring for above-market salaries."""
-        score = self.agent.calculate_salary_score(
-            job_salary=120000,
-            market_rate=100000,
-            candidate_expectation=110000
-        )
-        
-        # Should have a high score for above-market salary
-        assert score > 80
-    
-    def test_calculate_salary_score_below_market(self):
-        """Test salary scoring for below-market salaries."""
-        score = self.agent.calculate_salary_score(
-            job_salary=70000,
-            market_rate=100000,
-            candidate_expectation=90000
-        )
-        
-        # Should have a lower score for below-market salary
-        assert score < 70
-
-
-class TestLocationAnalyzerAgent:
-    """Test cases for LocationAnalyzerAgent."""
-    
-    def setup_method(self):
-        """Set up test fixtures."""
-        self.agent = LocationAnalyzerAgent()
-        
-        self.candidate_locations = [
-            Location(city="San Francisco", state="CA", country="USA", remote_preference="hybrid"),
-            Location(city="New York", state="NY", country="USA", remote_preference="on-site"),
-        ]
-    
-    def test_analyze_location_preferences_exact_match(self):
-        """Test location matching with exact city match."""
-        score = self.agent.analyze_location_preferences(
-            self.candidate_locations, "San Francisco, CA"
-        )
-        
-        # Should have perfect score for exact match
-        assert score == 100.0
-    
-    def test_analyze_location_preferences_state_match(self):
-        """Test location matching with state match."""
-        score = self.agent.analyze_location_preferences(
-            self.candidate_locations, "Los Angeles, CA"
-        )
-        
-        # Should have high score for state match
-        assert score == 80.0
-    
-    def test_analyze_location_preferences_remote_match(self):
-        """Test location matching with remote preference."""
-        remote_locations = [
-            Location(city="Any", state=None, country="Any", remote_preference="remote")
-        ]
-        
-        score = self.agent.analyze_location_preferences(
-            remote_locations, "Remote"
-        )
-        
-        # Should have high score for remote match
-        assert score == 90.0
-    
-    def test_analyze_location_preferences_no_match(self):
-        """Test location matching with no relevant match."""
-        score = self.agent.analyze_location_preferences(
-            self.candidate_locations, "London, UK"
-        )
-        
-        # Should have low score for no match
-        assert score == 20.0
-
-
-class TestJobFinderOrchestratorAgent:
-    """Test cases for JobFinderOrchestratorAgent."""
-    
-    def setup_method(self):
-        """Set up test fixtures."""
-        self.agent = JobFinderOrchestratorAgent()
-        
-        self.candidate = CandidateProfile(
-            name="Test User",
-            email="test@example.com",
+    @pytest.fixture
+    def sample_candidate(self):
+        """Create a sample candidate profile for testing"""
+        return CandidateProfile(
+            name="John Doe",
+            email="john.doe@example.com",
             skills=[
                 Skill(name="Python", proficiency="expert", years_experience=5),
                 Skill(name="JavaScript", proficiency="intermediate", years_experience=3),
@@ -268,184 +38,231 @@ class TestJobFinderOrchestratorAgent:
             experience_years=5,
             preferred_locations=[
                 Location(city="San Francisco", state="CA", country="USA", remote_preference="hybrid"),
+                Location(city="New York", state="NY", country="USA", remote_preference="hybrid"),
             ],
-            salary_expectation=120000
-        )
-        
-        self.search_request = JobSearchRequest(
-            candidate=self.candidate,
-            max_results=10,
-            include_remote=True,
-            salary_threshold=80000
+            salary_expectation=120000,
+            job_preferences={"industry": "tech", "company_size": "startup"}
         )
     
-    @pytest.mark.asyncio
-    async def test_find_jobs(self):
-        """Test the main job finding functionality."""
-        result = await self.agent.find_jobs(self.search_request)
-        
-        assert isinstance(result, JobSearchResult)
-        assert result.total_found >= 0
-        assert result.search_duration >= 0
-        assert len(result.sources_searched) > 0
-        assert result.summary is not None
-        
-        # Check that jobs are sorted by match score (highest first)
-        if len(result.jobs) > 1:
-            scores = [job.match_score or 0 for job in result.jobs]
-            assert scores == sorted(scores, reverse=True)
-    
-    def test_generate_search_summary(self):
-        """Test search summary generation."""
-        # Create mock job postings
-        jobs = [
-            JobPosting(
-                title="Python Developer",
-                company="Tech Corp",
-                location="San Francisco, CA",
-                salary_min=120000,
-                salary_max=150000,
-                description="Python developer role",
-                job_url="https://example.com/job1",
-                source="LinkedIn",
-                match_score=85.0
+    @pytest.fixture
+    def sample_company_details(self):
+        """Create sample company details for testing"""
+        return [
+            CompanySearchResult(
+                company_name="Google",
+                location="Mountain View, CA",
+                industry="Technology",
+                company_size="enterprise",
+                average_salary=150000,
+                hiring_status="active",
+                remote_friendly=True,
+                reasoning="High-paying tech company"
             ),
-            JobPosting(
-                title="Software Engineer",
-                company="Startup Inc",
-                location="Remote",
-                salary_min=100000,
-                salary_max=130000,
-                description="Software engineer role",
-                job_url="https://example.com/job2",
-                source="Indeed",
-                match_score=75.0
+            CompanySearchResult(
+                company_name="Meta",
+                location="Menlo Park, CA",
+                industry="Technology",
+                company_size="enterprise",
+                average_salary=140000,
+                hiring_status="active",
+                remote_friendly=True,
+                reasoning="Leading social media company"
             )
         ]
-        
-        summary = self.agent._generate_search_summary(jobs, self.candidate, 2.5)
-        
-        assert "Found 2 suitable jobs" in summary
-        assert "Test User" in summary
-        assert "2.50 seconds" in summary
-        assert "Python Developer" in summary
-        assert "Software Engineer" in summary
-
-
-class TestJobFinderService:
-    """Test cases for JobFinderService."""
     
-    def setup_method(self):
-        """Set up test fixtures."""
-        self.service = JobFinderService()
+    def test_agent_initialization(self, agent):
+        """Test that the agent initializes with the correct system prompt"""
+        assert agent.system_prompt is not None
+        assert "recruiter" in agent.system_prompt.lower()
+        assert "active job postings" in agent.system_prompt.lower()
+        assert "company websites" in agent.system_prompt.lower()
+    
+    @pytest.mark.asyncio
+    async def test_get_active_jobs_success(self, agent, sample_candidate, sample_company_details):
+        """Test successful job search with LLM response"""
+        # Mock LLM response for Google
+        google_jobs = JobSearchResponse(
+            jobs=[
+                JobPosting(
+                    title="Senior Software Engineer - Python",
+                    company="Google",
+                    location="Mountain View, CA",
+                    salary_range="$150,000-$200,000",
+                    salary_min=150000,
+                    salary_max=200000,
+                    description="Join Google's engineering team...",
+                    requirements=[
+                        JobRequirement(skill="Python", level="senior", is_mandatory=True),
+                        JobRequirement(skill="JavaScript", level="mid", is_mandatory=False)
+                    ],
+                    benefits=["Health insurance", "401k", "Free meals"],
+                    job_url="https://careers.google.com/jobs/123",
+                    posted_date=datetime.now(),
+                    match_score=90.0,
+                    source="Google Careers"
+                )
+            ],
+            company_name="Google",
+            total_jobs_found=1,
+            search_sources=["Google Careers", "LinkedIn"]
+        )
         
-        self.candidate_data = {
-            "name": "Test User",
-            "email": "test@example.com",
-            "skills": [
-                {"name": "Python", "proficiency": "expert", "years_experience": 5},
-                {"name": "JavaScript", "proficiency": "intermediate", "years_experience": 3},
+        # Mock LLM response for Meta
+        meta_jobs = JobSearchResponse(
+            jobs=[
+                JobPosting(
+                    title="Full Stack Engineer",
+                    company="Meta",
+                    location="Menlo Park, CA",
+                    salary_range="$140,000-$180,000",
+                    salary_min=140000,
+                    salary_max=180000,
+                    description="Build the next generation of social media...",
+                    requirements=[
+                        JobRequirement(skill="JavaScript", level="senior", is_mandatory=True),
+                        JobRequirement(skill="React", level="mid", is_mandatory=True)
+                    ],
+                    benefits=["Health insurance", "401k", "Remote work"],
+                    job_url="https://careers.meta.com/jobs/456",
+                    posted_date=datetime.now(),
+                    match_score=85.0,
+                    source="Meta Careers"
+                )
             ],
-            "experience_years": 5,
-            "preferred_locations": [
-                {"city": "San Francisco", "state": "CA", "country": "USA", "remote_preference": "hybrid"},
-            ],
-            "salary_expectation": 120000
+            company_name="Meta",
+            total_jobs_found=1,
+            search_sources=["Meta Careers", "Indeed"]
+        )
+        
+        company_agent_state = {
+            "companies": ["Google", "Meta"],
+            "company_details": sample_company_details,
+            "candidate": sample_candidate,
+            "keywords": ["Python", "JavaScript"],
+            "max_results": 10
         }
-    
-    def test_create_candidate_profile(self):
-        """Test candidate profile creation from raw data."""
-        profile = self.service.create_candidate_profile(
-            name=self.candidate_data["name"],
-            email=self.candidate_data["email"],
-            skills=self.candidate_data["skills"],
-            experience_years=self.candidate_data["experience_years"],
-            preferred_locations=self.candidate_data["preferred_locations"],
-            salary_expectation=self.candidate_data["salary_expectation"]
-        )
         
-        assert isinstance(profile, CandidateProfile)
-        assert profile.name == "Test User"
-        assert profile.email == "test@example.com"
-        assert len(profile.skills) == 2
-        assert len(profile.preferred_locations) == 1
-        assert profile.salary_expectation == 120000
-    
-    @patch.object(JobFinderService, 'agent')
-    def test_find_jobs_agent_not_initialized(self, mock_agent):
-        """Test job search when agent is not initialized."""
-        mock_agent.return_value = None
-        
-        profile = self.service.create_candidate_profile(
-            name=self.candidate_data["name"],
-            email=self.candidate_data["email"],
-            skills=self.candidate_data["skills"],
-            experience_years=self.candidate_data["experience_years"],
-            preferred_locations=self.candidate_data["preferred_locations"],
-            salary_expectation=self.candidate_data["salary_expectation"]
-        )
-        
-        with pytest.raises(Exception, match="Job finder agent is not initialized"):
-            self.service.find_jobs(profile)
-    
-    def test_analyze_candidate_market_position(self):
-        """Test market position analysis."""
-        profile = self.service.create_candidate_profile(
-            name=self.candidate_data["name"],
-            email=self.candidate_data["email"],
-            skills=self.candidate_data["skills"],
-            experience_years=self.candidate_data["experience_years"],
-            preferred_locations=self.candidate_data["preferred_locations"],
-            salary_expectation=self.candidate_data["salary_expectation"]
-        )
-        
-        # Mock the agent to avoid actual API calls
-        with patch.object(self.service, 'agent') as mock_agent:
-            mock_agent.return_value = None
+        with patch.object(agent, 'ainvoke', new_callable=AsyncMock) as mock_ainvoke:
+            # Mock different responses for different companies
+            mock_ainvoke.side_effect = [google_jobs, meta_jobs]
             
-            analysis = self.service.analyze_candidate_market_position(profile)
+            result = await agent.get_active_jobs(company_agent_state)
             
-            assert "market_demand" in analysis
-            assert "average_salary" in analysis
-            assert "salary_percentile" in analysis
-            assert "skill_gaps" in analysis
-            assert "recommendations" in analysis
-
-
-class TestIntegration:
-    """Integration tests for the complete job finder system."""
+            # Verify the result
+            assert len(result) == 2
+            assert result[0].company == "Google"
+            assert result[0].title == "Senior Software Engineer - Python"
+            assert result[1].company == "Meta"
+            assert result[1].title == "Full Stack Engineer"
+            
+            # Verify LLM was called for each company
+            assert mock_ainvoke.call_count == 2
+            
+            # Verify the calls were made with correct parameters
+            calls = mock_ainvoke.call_args_list
+            assert "Google" in calls[0][0][0]  # First call should mention Google
+            assert "Meta" in calls[1][0][0]    # Second call should mention Meta
+            assert calls[0][1]['response_model'] == JobSearchResponse
+            assert calls[0][1]['system_prompt'] == agent.system_prompt
     
-    def test_agent_creation(self):
-        """Test agent creation with mock API key."""
-        with patch.dict('os.environ', {'OPENAI_API_KEY': 'test-key'}):
-            agent = create_job_finder_agent("test-key")
-            assert isinstance(agent, JobFinderOrchestratorAgent)
+    @pytest.mark.asyncio
+    async def test_get_active_jobs_fallback_on_error(self, agent, sample_candidate, sample_company_details):
+        """Test fallback behavior when LLM call fails"""
+        company_agent_state = {
+            "companies": ["Google"],
+            "company_details": sample_company_details,
+            "candidate": sample_candidate,
+            "keywords": ["Python"],
+            "max_results": 5
+        }
+        
+        with patch.object(agent, 'ainvoke', new_callable=AsyncMock) as mock_ainvoke:
+            mock_ainvoke.side_effect = Exception("LLM API error")
+            
+            result = await agent.get_active_jobs(company_agent_state)
+            
+            # Verify fallback response
+            assert len(result) == 1
+            assert result[0].company == "Google"
+            assert "Software Engineer" in result[0].title
+            assert result[0].source == "Google (fallback)"
+            assert result[0].match_score == 75.0
     
-    def test_data_model_validation(self):
-        """Test Pydantic model validation."""
-        # Valid skill
-        skill = Skill(name="Python", proficiency="expert", years_experience=5)
-        assert skill.name == "Python"
-        assert skill.proficiency == "expert"
+    @pytest.mark.asyncio
+    async def test_get_active_jobs_respects_max_results(self, agent, sample_candidate, sample_company_details):
+        """Test that the agent respects the max_results parameter"""
+        # Create mock response with many jobs
+        many_jobs = [
+            JobPosting(
+                title=f"Software Engineer {i}",
+                company="Google",
+                location="Mountain View, CA",
+                salary_range="$120,000-$160,000",
+                salary_min=120000,
+                salary_max=160000,
+                description=f"Job description {i}",
+                requirements=[],
+                benefits=[],
+                job_url=f"https://google.com/jobs/{i}",
+                posted_date=datetime.now(),
+                match_score=90.0 - i,
+                source="Google Careers"
+            )
+            for i in range(10)  # More than max_results=5
+        ]
         
-        # Valid location
-        location = Location(city="San Francisco", state="CA", country="USA")
-        assert location.city == "San Francisco"
-        assert location.remote_preference == "hybrid"  # default value
-        
-        # Valid job posting
-        job = JobPosting(
-            title="Python Developer",
-            company="Tech Corp",
-            location="San Francisco, CA",
-            description="Python developer role",
-            job_url="https://example.com/job",
-            source="LinkedIn"
+        mock_response = JobSearchResponse(
+            jobs=many_jobs,
+            company_name="Google",
+            total_jobs_found=10,
+            search_sources=["Google Careers"]
         )
-        assert job.title == "Python Developer"
-        assert job.match_score is None  # not set initially
-
-
-if __name__ == "__main__":
-    # Run tests
-    pytest.main([__file__, "-v"]) 
+        
+        company_agent_state = {
+            "companies": ["Google"],
+            "company_details": sample_company_details,
+            "candidate": sample_candidate,
+            "keywords": ["Python"],
+            "max_results": 5
+        }
+        
+        with patch.object(agent, 'ainvoke', new_callable=AsyncMock) as mock_ainvoke:
+            mock_ainvoke.return_value = mock_response
+            
+            result = await agent.get_active_jobs(company_agent_state)
+            
+            # Verify that only max_results jobs are returned
+            assert len(result) == 5
+            assert result[0].title == "Software Engineer 0"  # Highest match score
+            assert result[4].title == "Software Engineer 4"  # Lower match score
+    
+    @pytest.mark.asyncio
+    async def test_get_active_jobs_empty_companies(self, agent, sample_candidate):
+        """Test behavior when no companies are provided"""
+        company_agent_state = {
+            "companies": [],
+            "company_details": [],
+            "candidate": sample_candidate,
+            "keywords": ["Python"],
+            "max_results": 10
+        }
+        
+        result = await agent.get_active_jobs(company_agent_state)
+        
+        # Should return empty list when no companies
+        assert result == []
+    
+    def test_system_prompt_content(self, agent):
+        """Test that the system prompt contains expected content"""
+        prompt = agent.system_prompt.lower()
+        
+        # Check for key concepts
+        assert "recruiter" in prompt
+        assert "active job postings" in prompt
+        assert "company websites" in prompt
+        assert "job boards" in prompt
+        assert "linkedin" in prompt
+        assert "indeed" in prompt
+        assert "glassdoor" in prompt
+        assert "direct links" in prompt
+        assert "candidate profile" in prompt 
