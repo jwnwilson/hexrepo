@@ -13,6 +13,7 @@ from datetime import datetime
 
 from pydantic import BaseModel, Field, ConfigDict
 from pydantic_ai import Agent
+from config import config
 
 logger = logging.getLogger(__name__)
 
@@ -21,7 +22,7 @@ logger = logging.getLogger(__name__)
 # Data Models
 # =============================================================================
 
-class Sakill(BaseModel):
+class Skill(BaseModel):
     """Represents a skill with proficiency level."""
     name: str = Field(..., description="Name of the skill")
     proficiency: str = Field(..., description="Proficiency level: beginner, intermediate, expert")
@@ -54,21 +55,11 @@ class CompanySearchResponse(BaseModel):
     search_criteria: Dict[str, Any] = Field(..., description="Criteria used for the search")
     total_companies_found: int = Field(..., description="Total number of companies found")
 
-
-class JobSearchResponse(BaseModel):
-    """Response model for job search at a specific company."""
-    jobs: List[JobPosting] = Field(..., description="List of active job postings found")
-    company_name: str = Field(..., description="Name of the company searched")
-    total_jobs_found: int = Field(..., description="Total number of jobs found for this company")
-    search_sources: List[str] = Field(..., description="Sources that were searched")
-
-
 class JobRequirement(BaseModel):
     """Represents a job requirement."""
     skill: str = Field(..., description="Required skill")
     level: str = Field(..., description="Required level: entry, mid, senior, lead")
     is_mandatory: bool = Field(True, description="Whether this is a mandatory requirement")
-
 
 class JobPosting(BaseModel):
     """Represents a job posting."""
@@ -86,6 +77,12 @@ class JobPosting(BaseModel):
     match_score: Optional[float] = Field(None, description="Match score (0-100)")
     source: str = Field(..., description="Source of the job posting")
 
+class JobSearchResponse(BaseModel):
+    """Response model for job search at a specific company."""
+    jobs: List[JobPosting] = Field(..., description="List of active job postings found")
+    company_name: str = Field(..., description="Name of the company searched")
+    total_jobs_found: int = Field(..., description="Total number of jobs found for this company")
+    search_sources: List[str] = Field(..., description="Sources that were searched")
 
 class CandidateProfile(BaseModel):
     """Represents a candidate's profile."""
@@ -126,6 +123,7 @@ class CompanyFinderAgent(Agent):
     
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self.output_type = CompanySearchResponse
         self.system_prompt = """You are an expert recruiter specializing in finding the highest paying companies closest to a candidate's preferred location. Your goal is to identify companies that:
 
 1. Are located in or near the candidate's preferred locations
@@ -217,10 +215,9 @@ Return a comprehensive list of companies that would be most attractive to the ca
         
         # Call LLM to get company recommendations
         try:
-            response = await self.ainvoke(
-                prompt,
-                response_model=CompanySearchResponse,
-                system_prompt=self.system_prompt
+            breakpoint()
+            response: CompanySearchResponse = await self.run(
+                prompt
             )
             
             # Ensure we don't exceed max_results
@@ -260,6 +257,7 @@ class JobFinderAgent(Agent):
     
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self.output_type = JobSearchResponse
         self.system_prompt = """You are an expert recruiter specializing in finding active job postings from company websites and job boards. Your goal is to identify and extract detailed information about job opportunities that match the candidate's profile.
 
 When searching for jobs, you should:
@@ -373,12 +371,9 @@ Focus on finding high-quality, relevant job opportunities that would be attracti
             
             try:
                 # Call LLM to search for jobs at this company
-                response = await self.ainvoke(
+                response: JobSearchResponse = await self.run(
                     search_prompt,
-                    response_model=JobSearchResponse,
-                    system_prompt=self.system_prompt
                 )
-                
                 # Add jobs from this company to the total list
                 all_jobs.extend(response.jobs)
                 
@@ -465,8 +460,10 @@ class JobFinderOrchestratorAgent(Agent):
     
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.company_finder: CompanyFinderAgent = CompanyFinderAgent()
-        self.job_finder: JobFinderAgent = JobFinderAgent()
+        model = kwargs.get("model", config.DEFAULT_MODEL)
+        self.model = model
+        self.company_finder: CompanyFinderAgent = CompanyFinderAgent(model=model)
+        self.job_finder: JobFinderAgent = JobFinderAgent(model=model)
 
     async def find_jobs(self, request: JobSearchRequest) -> JobSearchResult:
         """
