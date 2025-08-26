@@ -1,6 +1,8 @@
-from ninja import Router
 import logfire
+from ninja import Router
+
 from config import config
+
 from .controllers.job_finder_controller import router as job_finder_router
 
 # configure logfire
@@ -22,10 +24,10 @@ def get_job_finder_9000(request):
         "version": "1.0.0",
         "endpoints": {
             "job_search": "/jobs/search",
-            "recommendations": "/jobs/recommendations", 
+            "recommendations": "/jobs/recommendations",
             "market_analysis": "/jobs/market-analysis",
             "health_check": "/jobs/health",
             "skills": "/jobs/skills",
-            "locations": "/jobs/locations"
-        }
+            "locations": "/jobs/locations",
+        },
     }
