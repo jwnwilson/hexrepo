@@ -35,9 +35,6 @@ Setup the following env vars directly or run:
 
 # To Do
 
-- Job finder 9000
-    - Add logfire
-    - replace scraper with direct company scrape
 - Aipet
     - Add game menu and exit / logout button
     - Setup auth token auto refresh

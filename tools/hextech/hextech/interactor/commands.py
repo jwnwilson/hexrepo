@@ -95,7 +95,8 @@ def create_library():
 @cli_setup
 def create_project():
     project_name: str = typer.prompt("Please Enter project folder name")
-    os.system("rm -r templates/project/.venv 2> /dev/null || echo > /dev/null")
+    os.system("rm -r templates/fastapi_project/.venv 2> /dev/null || echo > /dev/null")
+    os.system("rm -r templates/ninja_project/.venv 2> /dev/null || echo > /dev/null")
     template_choice = typer.prompt(
         "Which project template would you like to use? \n  1.fastapi\n  2.django_ninja\n",
         default="1"
