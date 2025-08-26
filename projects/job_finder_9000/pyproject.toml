@@ -33,6 +33,7 @@ dependencies = [
     "hexrepo-db",
     "hexrepo-api",
     "hexrepo-log",
+    "logfire[fastapi]>=4.3.6",
 ]
 
 [dependency-groups]

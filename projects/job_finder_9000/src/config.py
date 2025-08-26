@@ -58,6 +58,7 @@ class Config(BaseSettings):
 
     OPENAI_API_KEY: str = os.environ.get("OPENAI_API_KEY")
     DEFAULT_MODEL: str = os.environ.get("DEFAULT_MODEL", "gpt-5-nano")
+    LOGFIRE_WRITE_TOKEN: str = os.environ.get("LOGFIRE_WRITE_TOKEN")
 
 
 config = Config()  # type: ignore

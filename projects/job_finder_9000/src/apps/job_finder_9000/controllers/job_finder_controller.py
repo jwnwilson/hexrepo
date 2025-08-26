@@ -10,6 +10,7 @@ from typing import Dict, Any
 from datetime import datetime
 
 from django.conf import settings
+import logfire
 from ninja import Router
 from ninja.errors import HttpError
 
@@ -41,80 +42,64 @@ def search_jobs(request, payload: JobSearchRequestSchema):
     This endpoint searches for jobs across multiple sources and returns
     the best matches based on skills, location, and salary preferences.
     """
-    try:
-        # Create candidate profile from request
-        candidate_profile = job_finder_service.create_candidate_profile(
-            name=payload.name,
-            email=payload.email,
-            skills=[skill.dict() for skill in payload.skills],
-            experience_years=payload.experience_years,
-            preferred_locations=[loc.dict() for loc in payload.preferred_locations],
-            salary_expectation=payload.salary_expectation,
-            job_preferences=payload.job_preferences
-        )
-        
-        # Perform job search
-        result = job_finder_service.find_jobs(
-            candidate_profile=candidate_profile,
-            max_results=payload.max_results,
-            include_remote=payload.include_remote,
-            salary_threshold=payload.salary_threshold,
-            use_cache=payload.use_cache
-        )
-        
-        # Convert result to schema
-        jobs_data = []
-        for job in result.jobs:
-            job_data = {
-                "title": job.title,
-                "company": job.company,
-                "location": job.location,
-                "salary_range": job.salary_range,
-                "salary_min": job.salary_min,
-                "salary_max": job.salary_max,
-                "description": job.description,
-                "requirements": [
-                    {
-                        "skill": req.skill,
-                        "level": req.level,
-                        "is_mandatory": req.is_mandatory
-                    }
-                    for req in job.requirements
-                ],
-                "benefits": job.benefits,
-                "job_url": job.job_url,
-                "posted_date": job.posted_date,
-                "match_score": job.match_score,
-                "source": job.source
+    with logfire.span(f"search_jobs_request"):
+        try:
+            # Create candidate profile from request
+            candidate_profile = job_finder_service.create_candidate_profile(
+                name=payload.name,
+                email=payload.email,
+                skills=[skill.dict() for skill in payload.skills],
+                experience_years=payload.experience_years,
+                preferred_locations=[loc.dict() for loc in payload.preferred_locations],
+                salary_expectation=payload.salary_expectation,
+                job_preferences=payload.job_preferences
+            )
+            
+            # Perform job search
+            result = job_finder_service.find_jobs(
+                candidate_profile=candidate_profile,
+                max_results=payload.max_results,
+                include_remote=payload.include_remote,
+                salary_threshold=payload.salary_threshold,
+                use_cache=payload.use_cache
+            )
+            
+            # Convert result to schema
+            jobs_data = []
+            for job in result.jobs:
+                job_data = {
+                    "title": job.title,
+                    "job_url": job.job_url,
+                    "match_score": job.match_score,
+                }
+                jobs_data.append(job_data)
+            
+            search_result_data = {
+                "jobs": jobs_data,
+                "total_found": result.total_found,
+                "search_duration": result.search_duration,
+                "sources_searched": result.sources_searched,
+                "summary": result.summary
             }
-            jobs_data.append(job_data)
-        
-        search_result_data = {
-            "jobs": jobs_data,
-            "total_found": result.total_found,
-            "search_duration": result.search_duration,
-            "sources_searched": result.sources_searched,
-            "summary": result.summary
-        }
-        
-        return 200, JobSearchSuccessSchema(
-            success=True,
-            message="Job search completed successfully",
-            data=search_result_data
-        )
-        
-    except ValueError as e:
-        logger.error(f"Validation error in job search: {e}")
-        return 400, ErrorSchema(
-            error="Validation Error",
-            detail=str(e)
-        )
-    except Exception as e:
-        logger.error(f"Error in job search: {e}")
-        return 500, ErrorSchema(
-            error="Internal Server Error",
-            detail="An error occurred while searching for jobs"
-        )
+            
+            return 200, JobSearchSuccessSchema(
+                success=True,
+                message="Job search completed successfully",
+                data=search_result_data
+            )
+            
+        except ValueError as e:
+            logger.error(f"Validation error in job search: {e}")
+            return 400, ErrorSchema(
+                error="Validation Error",
+                detail=str(e)
+            )
+        except Exception as e:
+            logger.error(f"Error in job search: {e}")
+            return 500, ErrorSchema(
+                error="Internal Server Error",
+                detail="An error occurred while searching for jobs"
+            )
 
 
 @router.post("/recommendations", response={200: RecommendationsSuccessSchema, 400: ErrorSchema, 500: ErrorSchema})

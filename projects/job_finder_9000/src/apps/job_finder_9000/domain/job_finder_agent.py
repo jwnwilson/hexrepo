@@ -11,6 +11,7 @@ import logging
 from typing import List, Dict, Any, Optional
 from datetime import datetime
 
+import logfire
 from pydantic import BaseModel, Field, ConfigDict
 from pydantic_ai import Agent
 from config import config
@@ -42,12 +43,7 @@ class CompanySearchResult(BaseModel):
     company_name: str = Field(..., description="Name of the company")
     location: str = Field(..., description="Company location")
     industry: str = Field(..., description="Company industry")
-    company_size: str = Field(..., description="Company size (startup, mid-size, enterprise)")
-    average_salary: Optional[int] = Field(None, description="Average salary for the role in this company")
     hiring_status: str = Field(..., description="Current hiring status (active, limited, not hiring)")
-    remote_friendly: bool = Field(False, description="Whether the company supports remote work")
-    reasoning: str = Field(..., description="Reason why this company was selected")
-
 
 class CompanySearchResponse(BaseModel):
     """Response model for company search."""
@@ -64,18 +60,8 @@ class JobRequirement(BaseModel):
 class JobPosting(BaseModel):
     """Represents a job posting."""
     title: str = Field(..., description="Job title")
-    company: str = Field(..., description="Company name")
-    location: str = Field(..., description="Job location")
-    salary_range: Optional[str] = Field(None, description="Salary range if available")
-    salary_min: Optional[int] = Field(None, description="Minimum salary in USD")
-    salary_max: Optional[int] = Field(None, description="Maximum salary in USD")
-    description: str = Field(..., description="Job description")
-    requirements: List[JobRequirement] = Field(default_factory=list, description="Job requirements")
-    benefits: List[str] = Field(default_factory=list, description="Job benefits")
     job_url: str = Field(..., description="URL to the job posting")
-    posted_date: Optional[datetime] = Field(None, description="When the job was posted")
     match_score: Optional[float] = Field(None, description="Match score (0-100)")
-    source: str = Field(..., description="Source of the job posting")
 
 class JobSearchResponse(BaseModel):
     """Response model for job search at a specific company."""
@@ -98,7 +84,7 @@ class CandidateProfile(BaseModel):
 class JobSearchRequest(BaseModel):
     """Represents a job search request."""
     candidate: CandidateProfile = Field(..., description="Candidate profile")
-    max_results: int = Field(50, description="Maximum number of jobs to return")
+    max_results: int = Field(5, description="Maximum number of jobs to return")
     include_remote: bool = Field(True, description="Include remote jobs")
     salary_threshold: Optional[int] = Field(None, description="Minimum salary threshold")
 
@@ -122,12 +108,14 @@ class CompanyFinderAgent:
         self.system_prompt = """You are an expert recruiter specializing in finding the highest paying companies closest to a candidate's preferred location.
 You should prioritize companies based on:
 - Geographic proximity to preferred locations
-- Salary competitiveness and benefits
+- Highest Salary and benefits
 """
         self.agent = Agent(
+            name="CompanyFinderAgent",
             model=kwargs.get("model", config.DEFAULT_MODEL),
             output_type=CompanySearchResponse,
-            system_prompt=self.system_prompt
+            system_prompt=self.system_prompt,
+            retries=3
         )
 
     async def search_companies(self, company_agent_state: Dict[str, Any]) -> CompanySearchResponse:
@@ -135,7 +123,7 @@ You should prioritize companies based on:
         keywords = company_agent_state.get("keywords", [])
         candidate = company_agent_state.get("candidate")
         include_remote = company_agent_state.get("include_remote", True)
-        max_results = company_agent_state.get("max_results", 20)
+        max_results = company_agent_state.get("max_results", 5)
         
         # Prepare context for LLM
         context = {
@@ -151,7 +139,7 @@ You should prioritize companies based on:
         
         # Create prompt for LLM
         prompt = f"""
-        Based on the following candidate profile and search criteria, identify the best companies to search for job opportunities:
+        Based on the following candidate profile and search criteria, search the internet and identify the best companies to search for job opportunities:
 
         Candidate Profile:
         - Skills: {', '.join(context['candidate_skills'])}
@@ -164,17 +152,13 @@ You should prioritize companies based on:
         
         # Call LLM to get company recommendations
         try:
-            response = await self.agent.run(
-                prompt
-            )
-            breakpoint()
-            output = response.output
-            # Ensure we don't exceed max_results
-            if len(output.companies) > max_results:
-                output.companies = output.companies[:max_results]
-                output.total_companies_found = len(output.companies)
-            
-            return output
+            with logfire.span(f"search_companies_prompt"):
+                response = await self.agent.run(
+                    prompt,
+
+                )
+                output = response.output
+                return output
             
         except Exception as e:
             logger.error(f"Error searching for companies: {e}")
@@ -197,9 +181,11 @@ When searching for jobs, you should:
 
 Focus on finding high-quality, relevant job opportunities that would be attractive to the candidate based on their specific profile and preferences."""
         self.agent = Agent(
+            name="JobFinderAgent",
             model=kwargs.get("model", config.DEFAULT_MODEL),
             output_type=JobSearchResponse,
-            system_prompt=self.system_prompt
+            system_prompt=self.system_prompt,
+            retries=3
         )
 
     async def get_active_jobs(self, company_agent_state: Dict[str, Any]) -> List[JobPosting]:
@@ -223,7 +209,6 @@ Focus on finding high-quality, relevant job opportunities that would be attracti
                 "company_name": company_name,
                 "company_location": company_detail.location if company_detail else "Unknown",
                 "company_industry": company_detail.industry if company_detail else "Technology",
-                "company_size": company_detail.company_size if company_detail else "mid-size",
                 "candidate_skills": [skill.name for skill in candidate.skills] if candidate else keywords,
                 "candidate_experience": candidate.experience_years if candidate else 0,
                 "preferred_locations": [loc.city for loc in candidate.preferred_locations] if candidate else [],
@@ -258,35 +243,17 @@ Focus on finding high-quality, relevant job opportunities that would be attracti
             """
             
             try:
-                # Call LLM to search for jobs at this company
-                response: JobSearchResponse = await self.agent.run(
-                    search_prompt,
-                )
-                # Add jobs from this company to the total list
-                all_jobs.extend(response.jobs)
-                
+                with logfire.span(f"get_active_jobs_prompt"):
+                    # Call LLM to search for jobs at this company
+                    response: JobSearchResponse = await self.agent.run(
+                        search_prompt,
+                    )
+                    output = response.output
+                    # Add jobs from this company to the total list
+                    all_jobs.extend(output.jobs)
             except Exception as e:
                 logger.error(f"Error searching for jobs at {company_name}: {e}")
-                # Create fallback job posting if LLM call fails
-                fallback_job = JobPosting(
-                    title=f"Software Engineer - {search_context['candidate_skills'][0] if search_context['candidate_skills'] else 'General'}",
-                    company=company_name,
-                    location=search_context['company_location'],
-                    salary_range=f"${80000}-${120000}",
-                    salary_min=80000,
-                    salary_max=120000,
-                    description=f"Software engineering position at {company_name} requiring {', '.join(search_context['candidate_skills'])} skills.",
-                    requirements=[
-                        JobRequirement(skill=skill, level="mid", is_mandatory=True)
-                        for skill in search_context['candidate_skills'][:3]
-                    ],
-                    benefits=["Health insurance", "401k", "Remote work options"],
-                    job_url=f"https://{company_name.lower().replace(' ', '').replace('.', '')}.com/careers",
-                    posted_date=datetime.now(),
-                    match_score=75.0,
-                    source=f"{company_name} (fallback)"
-                )
-                all_jobs.append(fallback_job)
+                raise
         
         # Limit total results and sort by match score
         all_jobs.sort(key=lambda x: x.match_score or 0, reverse=True)
@@ -298,40 +265,14 @@ Focus on finding high-quality, relevant job opportunities that would be attracti
         """
         active_jobs = company_agent_state.get("active_jobs", [])
         candidate = company_agent_state.get("candidate")
-        salary_threshold = company_agent_state.get("salary_threshold")
         
         if not candidate:
             return active_jobs
         
-        filtered_jobs = []
-        
-        for job in active_jobs:
-            # Filter by salary threshold
-            if salary_threshold and job.salary_min and job.salary_min < salary_threshold:
-                continue
-                
-            # Filter by candidate salary expectation
-            if candidate.salary_expectation and job.salary_max and job.salary_max < candidate.salary_expectation * 0.8:
-                continue
-            
-            # Filter by location preferences
-            location_match = False
-            for pref_location in candidate.preferred_locations:
-                if (pref_location.city.lower() in job.location.lower() or
-                    (pref_location.state and pref_location.state.lower() in job.location.lower()) or
-                    (pref_location.remote_preference == "remote" and "remote" in job.location.lower())):
-                    location_match = True
-                    break
-            
-            if not location_match:
-                continue
-            
-            filtered_jobs.append(job)
-        
         # Sort by match score (highest first)
-        filtered_jobs.sort(key=lambda x: x.match_score or 0, reverse=True)
+        active_jobs.sort(key=lambda x: x.match_score or 0, reverse=True)
         
-        return filtered_jobs
+        return active_jobs
 
 
 # =============================================================================
@@ -361,82 +302,78 @@ class JobFinderOrchestrator:
         Returns:
             Job search results with ranked job postings
         """
-        start_time = datetime.now()
-        
-        # Extract search parameters
-        candidate = request.candidate
-        max_results = request.max_results
-        include_remote = request.include_remote
-        
-        # Generate search keywords from skills
-        keywords = [skill.name for skill in candidate.skills]
-        
-        # Get preferred locations
-        locations = [loc.city for loc in candidate.preferred_locations]
-        if not locations:
-            company_agent_state["include_remote"] = include_remote
+        with logfire.span(f"find_jobs"):
+            start_time = datetime.now()
+            
+            # Extract search parameters
+            candidate = request.candidate
+            max_results = request.max_results
+            include_remote = request.include_remote
+            
+            # Generate search keywords from skills
+            keywords = [skill.name for skill in candidate.skills]
+            
+            # Get preferred locations
+            locations = [loc.city for loc in candidate.preferred_locations]
+            if not locations:
+                company_agent_state["include_remote"] = include_remote
 
-        company_agent_state = {
-            "locations": locations,
-            "include_remote": include_remote,
-            "keywords": keywords,
-            "companies": [],
-            "active_jobs": [],
-            "filtered_jobs": [],
-            "max_results": max_results,
-            "candidate": candidate,
-        }
-        
-        # Search for high paying companies in the preferred locations
-        company_search_response = await self.company_finder.search_companies(company_agent_state)
-        company_agent_state["companies"] = [company.company_name for company in company_search_response.companies]
-        company_agent_state["company_details"] = company_search_response.companies
+            company_agent_state = {
+                "locations": locations,
+                "include_remote": include_remote,
+                "keywords": keywords,
+                "companies": [],
+                "active_jobs": [],
+                "filtered_jobs": [],
+                "max_results": max_results,
+                "candidate": candidate,
+            }
+            
+            # Search for high paying companies in the preferred locations
+            company_search_response = await self.company_finder.search_companies(company_agent_state)
+            company_agent_state["companies"] = [company.company_name for company in company_search_response.companies]
+            company_agent_state["company_details"] = company_search_response.companies
 
-        # Get active jobs from the high paying companies
-        company_agent_state["active_jobs"] = await self.job_finder.get_active_jobs(company_agent_state)
+            # Get active jobs from the high paying companies
+            company_agent_state["active_jobs"] = await self.job_finder.get_active_jobs(company_agent_state)
 
-        # Filter jobs by candidate skills and salary expectation
-        company_agent_state["filtered_jobs"] = filtered_jobs = await self.job_finder.filter_jobs(company_agent_state)
-        
-        # Calculate search duration
-        end_time = datetime.now()
-        search_duration = (end_time - start_time).total_seconds()
-        
-        # Generate summary
-        summary = self._generate_search_summary(filtered_jobs, candidate, search_duration)
-        
-        return JobSearchResult(
-            jobs=filtered_jobs,
-            total_found=len(filtered_jobs),
-            search_duration=search_duration,
-            sources_searched=company_agent_state["companies"],
-            summary=summary
-        )
+            # Filter jobs by candidate skills and salary expectation
+            company_agent_state["filtered_jobs"] = filtered_jobs = await self.job_finder.filter_jobs(company_agent_state)
+            
+            # Calculate search duration
+            end_time = datetime.now()
+            search_duration = (end_time - start_time).total_seconds()
+            
+            # Generate summary
+            summary = self._generate_search_summary(filtered_jobs, candidate, search_duration)
+            
+            return JobSearchResult(
+                jobs=filtered_jobs,
+                total_found=len(filtered_jobs),
+                search_duration=search_duration,
+                sources_searched=company_agent_state["companies"],
+                summary=summary
+            )
     
     def _generate_search_summary(self, jobs: List[JobPosting], candidate: CandidateProfile, duration: float) -> str:
         """Generate a summary of the job search results."""
         if not jobs:
             return f"No suitable jobs found for {candidate.name} in {duration:.2f} seconds."
         
-        avg_salary = sum(job.salary_min or 0 for job in jobs if job.salary_min) / len([j for j in jobs if j.salary_min])
-        avg_match_score = sum(job.match_score or 0 for job in jobs) / len(jobs)
-        
         top_jobs = jobs[:3]
-        top_companies = [job.company for job in top_jobs]
+        top_companies = [job.title for job in top_jobs]
         
         summary = f"""
         Found {len(jobs)} suitable jobs for {candidate.name} in {duration:.2f} seconds.
         
         Top opportunities:
-        - Average salary: ${avg_salary:,.0f}
-        - Average match score: {avg_match_score:.1f}%
-        - Top companies: {', '.join(top_companies)}
+        - Top Jobs: {', '.join(top_companies)}
         
         Best matches:
         """
         
         for i, job in enumerate(top_jobs, 1):
-            summary += f"{i}. {job.title} at {job.company} ({job.match_score}% match)\n"
+            summary += f"{i}. {job.title} at {job.title} ({job.match_score}% match)\n"
         
         return summary.strip()
 
@@ -460,7 +397,7 @@ def create_job_finder_agent(openai_api_key: str) -> JobFinderOrchestrator:
     os.environ["OPENAI_API_KEY"] = openai_api_key
     
     return JobFinderOrchestrator(
-        model="gpt-4",
+        model=config.DEFAULT_MODEL,
         model_settings={
             "temperature": 0.1,
             "max_tokens": 4000
@@ -496,7 +433,7 @@ async def example_usage():
     # Create search request
     request = JobSearchRequest(
         candidate=candidate,
-        max_results=20,
+        max_results=5,
         include_remote=True,
         salary_threshold=80000
     )

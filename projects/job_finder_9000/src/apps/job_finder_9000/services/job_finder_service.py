@@ -42,7 +42,6 @@ class JobFinderService:
         """Initialize the job finder agent with configuration."""
         try:
             # Get OpenAI API key from settings
-            breakpoint()
             openai_api_key = config.OPENAI_API_KEY
             if not openai_api_key:
                 logger.warning("OpenAI API key not found in settings. Agent will not be initialized.")

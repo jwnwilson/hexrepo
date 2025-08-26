@@ -1,6 +1,11 @@
 from ninja import Router
-
+import logfire
+from config import config
 from .controllers.job_finder_controller import router as job_finder_router
+
+# configure logfire
+logfire.configure(token=config.LOGFIRE_WRITE_TOKEN)
+logfire.instrument_pydantic_ai()
 
 # Main router
 router = Router(tags=["Job_finder_9000"])

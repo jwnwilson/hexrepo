@@ -54,7 +54,7 @@ class JobSearchRequestSchema(Schema):
     preferred_locations: List[LocationSchema] = Field(..., description="Preferred job locations")
     salary_expectation: Optional[int] = Field(None, ge=0, description="Expected salary in USD")
     job_preferences: Optional[Dict[str, Any]] = Field(default_factory=dict, description="Additional job preferences")
-    max_results: int = Field(20, ge=1, le=100, description="Maximum number of jobs to return")
+    max_results: int = Field(5, ge=1, le=100, description="Maximum number of jobs to return")
     include_remote: bool = Field(True, description="Include remote jobs")
     salary_threshold: Optional[int] = Field(None, ge=0, description="Minimum salary threshold")
     use_cache: bool = Field(True, description="Use cached results if available")
@@ -68,7 +68,7 @@ class JobRecommendationsRequestSchema(Schema):
     experience_years: int = Field(..., ge=0, description="Total years of experience")
     preferred_locations: List[LocationSchema] = Field(..., description="Preferred job locations")
     salary_expectation: Optional[int] = Field(None, ge=0, description="Expected salary in USD")
-    max_results: int = Field(10, ge=1, le=50, description="Maximum number of recommendations")
+    max_results: int = Field(5, ge=1, le=50, description="Maximum number of recommendations")
 
 
 class MarketAnalysisRequestSchema(Schema):
@@ -95,18 +95,9 @@ class JobRequirementSchema(Schema):
 class JobPostingSchema(Schema):
     """Schema for job postings."""
     title: str = Field(..., description="Job title")
-    company: str = Field(..., description="Company name")
-    location: str = Field(..., description="Job location")
-    salary_range: Optional[str] = Field(None, description="Salary range if available")
-    salary_min: Optional[int] = Field(None, description="Minimum salary in USD")
-    salary_max: Optional[int] = Field(None, description="Maximum salary in USD")
-    description: str = Field(..., description="Job description")
-    requirements: List[JobRequirementSchema] = Field(default_factory=list, description="Job requirements")
-    benefits: List[str] = Field(default_factory=list, description="Job benefits")
+    location: str = Field(default="", description="Job location")
     job_url: str = Field(..., description="URL to the job posting")
-    posted_date: Optional[datetime] = Field(None, description="When the job was posted")
     match_score: Optional[float] = Field(None, description="Match score (0-100)")
-    source: str = Field(..., description="Source of the job posting")
 
 
 class JobSearchResultSchema(Schema):
