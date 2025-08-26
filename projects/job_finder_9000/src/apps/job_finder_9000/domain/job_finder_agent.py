@@ -116,52 +116,21 @@ class JobSearchResult(BaseModel):
 # Specialized Agents
 # =============================================================================        
 
-class CompanyFinderAgent(Agent):
-    """Agent responsible for finding companies."""
-    
-    model_config = ConfigDict(extra="forbid")
-    
+class CompanyFinderAgent:
+    """Agent responsible for finding companies."""    
     def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.output_type = CompanySearchResponse
-        self.system_prompt = """You are an expert recruiter specializing in finding the highest paying companies closest to a candidate's preferred location. Your goal is to identify companies that:
-
-1. Are located in or near the candidate's preferred locations
-2. Pay above-market salaries for the candidate's skill set
-3. Are actively hiring for positions matching the candidate's experience
-4. Offer the work arrangement (remote/hybrid/on-site) the candidate prefers
-
+        self.system_prompt = """You are an expert recruiter specializing in finding the highest paying companies closest to a candidate's preferred location.
 You should prioritize companies based on:
-- Salary competitiveness and benefits
 - Geographic proximity to preferred locations
-- Company reputation and stability
-- Growth potential and career advancement opportunities
-- Work-life balance and company culture
-
-When analyzing companies, consider:
-- Industry trends and market demand
-- Company size and funding status
-- Recent hiring activity and job postings
-- Employee reviews and satisfaction ratings
-- Compensation transparency and equity offerings
-
-Return a comprehensive list of companies that would be most attractive to the candidate based on their skills, experience, location preferences, and salary expectations."""
+- Salary competitiveness and benefits
+"""
+        self.agent = Agent(
+            model=kwargs.get("model", config.DEFAULT_MODEL),
+            output_type=CompanySearchResponse,
+            system_prompt=self.system_prompt
+        )
 
     async def search_companies(self, company_agent_state: Dict[str, Any]) -> CompanySearchResponse:
-        """
-        Search for high-paying companies in the preferred locations using LLM analysis.
-        
-        Args:
-            company_agent_state: State containing search parameters including:
-                - locations: List of preferred locations
-                - keywords: List of skill keywords
-                - candidate: Candidate profile
-                - include_remote: Whether to include remote companies
-                - max_results: Maximum number of companies to return
-                
-        Returns:
-            CompanySearchResponse with list of companies to search for jobs
-        """
         locations = company_agent_state.get("locations", [])
         keywords = company_agent_state.get("keywords", [])
         candidate = company_agent_state.get("candidate")
@@ -185,79 +154,35 @@ Return a comprehensive list of companies that would be most attractive to the ca
         Based on the following candidate profile and search criteria, identify the best companies to search for job opportunities:
 
         Candidate Profile:
-        - Name: {context['candidate_name']}
         - Skills: {', '.join(context['candidate_skills'])}
         - Years of Experience: {context['candidate_experience']}
         - Preferred Locations: {', '.join(context['preferred_locations'])}
         - Salary Expectation: {f"${context['salary_expectation']:,}" if context['salary_expectation'] else "Not specified"}
-        - Remote Preference: {', '.join(context['remote_preference'])}
-        - Include Remote Companies: {context['include_remote']}
 
-        Please identify up to {context['max_companies']} companies that:
-        1. Are located in or near the preferred locations
-        2. Pay competitive salaries for the candidate's skill set
-        3. Are actively hiring for relevant positions
-        4. Match the candidate's work arrangement preferences
-        5. Have a good reputation and growth potential
-
-        For each company, provide:
-        - Company name
-        - Location
-        - Industry
-        - Company size (startup, mid-size, enterprise)
-        - Estimated average salary for the role
-        - Current hiring status
-        - Remote work support
-        - Reasoning for selection
-
-        Focus on companies that would be most attractive to this candidate based on their specific profile and preferences.
+        Please identify up to {context['max_companies']} companies.
         """
         
         # Call LLM to get company recommendations
         try:
-            breakpoint()
-            response: CompanySearchResponse = await self.run(
+            response = await self.agent.run(
                 prompt
             )
-            
+            breakpoint()
+            output = response.output
             # Ensure we don't exceed max_results
-            if len(response.companies) > max_results:
-                response.companies = response.companies[:max_results]
-                response.total_companies_found = len(response.companies)
+            if len(output.companies) > max_results:
+                output.companies = output.companies[:max_results]
+                output.total_companies_found = len(output.companies)
             
-            return response
+            return output
             
         except Exception as e:
             logger.error(f"Error searching for companies: {e}")
-            # Return fallback companies if LLM call fails
-            fallback_companies = [
-                CompanySearchResult(
-                    company_name="Tech Company A",
-                    location=locations[0] if locations else "San Francisco, CA",
-                    industry="Technology",
-                    company_size="mid-size",
-                    average_salary=120000,
-                    hiring_status="active",
-                    remote_friendly=True,
-                    reasoning="Fallback company due to LLM error"
-                )
-            ]
-            
-            return CompanySearchResponse(
-                companies=fallback_companies,
-                search_criteria=context,
-                total_companies_found=len(fallback_companies)
-            )
+            raise
 
-
-class JobFinderAgent(Agent):
-    """Agent responsible for finding jobs."""
-    
-    model_config = ConfigDict(extra="forbid")
-    
+class JobFinderAgent:
+    """Agent responsible for finding jobs."""    
     def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.output_type = JobSearchResponse
         self.system_prompt = """You are an expert recruiter specializing in finding active job postings from company websites and job boards. Your goal is to identify and extract detailed information about job opportunities that match the candidate's profile.
 
 When searching for jobs, you should:
@@ -266,35 +191,18 @@ When searching for jobs, you should:
 2. **Check Job Boards**: Search major job boards like LinkedIn, Indeed, Glassdoor, and company-specific job sites
 3. **Verify Job Status**: Ensure jobs are currently active and accepting applications
 4. **Extract Complete Information**: Gather all relevant details including:
-   - Job title and description
-   - Salary information (if available)
-   - Required skills and experience levels
-   - Benefits and perks
-   - Application deadlines
-   - Work arrangement (remote/hybrid/on-site)
-
-5. **Match Candidate Profile**: Prioritize jobs that align with:
-   - Candidate's skills and experience level
-   - Preferred locations and work arrangements
-   - Salary expectations
-   - Career goals and preferences
-
+5. **Match Candidate Profile**: Prioritize jobs that align with candidate attributes
 6. **Provide Direct Links**: Always include direct links to the actual job postings for easy application
-
 7. **Validate Information**: Ensure all extracted information is accurate and up-to-date
 
 Focus on finding high-quality, relevant job opportunities that would be attractive to the candidate based on their specific profile and preferences."""
+        self.agent = Agent(
+            model=kwargs.get("model", config.DEFAULT_MODEL),
+            output_type=JobSearchResponse,
+            system_prompt=self.system_prompt
+        )
 
     async def get_active_jobs(self, company_agent_state: Dict[str, Any]) -> List[JobPosting]:
-        """
-        Get active jobs from the high paying companies using LLM-powered search.
-        
-        Args:
-            company_agent_state: State containing company information and search parameters
-            
-        Returns:
-            List of JobPosting objects with direct links to company job postings
-        """
         companies = company_agent_state.get("companies", [])
         company_details = company_agent_state.get("company_details", [])
         candidate = company_agent_state.get("candidate")
@@ -331,7 +239,6 @@ Focus on finding high-quality, relevant job opportunities that would be attracti
             - Name: {search_context['company_name']}
             - Location: {search_context['company_location']}
             - Industry: {search_context['company_industry']}
-            - Size: {search_context['company_size']}
 
             Candidate Profile:
             - Skills: {', '.join(search_context['candidate_skills'])}
@@ -347,31 +254,12 @@ Focus on finding high-quality, relevant job opportunities that would be attracti
             4. Glassdoor job postings for {company_name}
             5. Other relevant job boards
 
-            For each job found, provide:
-            - Job title
-            - Company name
-            - Job location
-            - Salary range (if available)
-            - Job description
-            - Required skills and experience levels
-            - Benefits offered
-            - Direct link to the job posting
-            - Posted date (if available)
-            - Source of the job posting
-
-            Focus on jobs that:
-            - Are currently active and accepting applications
-            - Match the candidate's skills and experience
-            - Are in preferred locations or offer desired work arrangements
-            - Have competitive salaries
-            - Have direct application links
-
             Return up to 5 most relevant job postings for this company, along with the search sources used.
             """
             
             try:
                 # Call LLM to search for jobs at this company
-                response: JobSearchResponse = await self.run(
+                response: JobSearchResponse = await self.agent.run(
                     search_prompt,
                 )
                 # Add jobs from this company to the total list
@@ -450,20 +338,18 @@ Focus on finding high-quality, relevant job opportunities that would be attracti
 # Main Orchestrator Agent
 # =============================================================================
 
-class JobFinderOrchestratorAgent(Agent):
+class JobFinderOrchestrator:
     """
     Main orchestrator agent that coordinates all specialized agents to find
     the best job opportunities for candidates.
     """
     
-    model_config = ConfigDict(extra="forbid")
     
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        model = kwargs.get("model", config.DEFAULT_MODEL)
-        self.model = model
-        self.company_finder: CompanyFinderAgent = CompanyFinderAgent(model=model)
-        self.job_finder: JobFinderAgent = JobFinderAgent(model=model)
+    def __init__(self, model: str | None = None, model_settings: dict | None = None):
+        self.model_settings = model_settings or {}
+        self.model = model or config.DEFAULT_MODEL
+        self.company_finder: Agent = CompanyFinderAgent(model=model)
+        self.job_finder: Agent = JobFinderAgent(model=model)
 
     async def find_jobs(self, request: JobSearchRequest) -> JobSearchResult:
         """
@@ -559,7 +445,7 @@ class JobFinderOrchestratorAgent(Agent):
 # Factory Functions
 # =============================================================================
 
-def create_job_finder_agent(openai_api_key: str) -> JobFinderOrchestratorAgent:
+def create_job_finder_agent(openai_api_key: str) -> JobFinderOrchestrator:
     """
     Create and configure a job finder orchestrator agent.
     
@@ -573,7 +459,7 @@ def create_job_finder_agent(openai_api_key: str) -> JobFinderOrchestratorAgent:
     import os
     os.environ["OPENAI_API_KEY"] = openai_api_key
     
-    return JobFinderOrchestratorAgent(
+    return JobFinderOrchestrator(
         model="gpt-4",
         model_settings={
             "temperature": 0.1,

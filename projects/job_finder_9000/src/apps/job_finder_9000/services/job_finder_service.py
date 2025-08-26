@@ -42,6 +42,7 @@ class JobFinderService:
         """Initialize the job finder agent with configuration."""
         try:
             # Get OpenAI API key from settings
+            breakpoint()
             openai_api_key = config.OPENAI_API_KEY
             if not openai_api_key:
                 logger.warning("OpenAI API key not found in settings. Agent will not be initialized.")
@@ -53,6 +54,7 @@ class JobFinderService:
         except Exception as e:
             logger.error(f"Failed to initialize job finder agent: {e}")
             self.agent = None
+            raise
     
     def _get_cache_key(self, candidate_id: str, search_params: Dict[str, Any]) -> str:
         """Generate a cache key for job search results."""

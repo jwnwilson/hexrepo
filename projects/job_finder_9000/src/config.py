@@ -57,7 +57,7 @@ class Config(BaseSettings):
     TESTING: bool = "pytest" in sys.argv[0]
 
     OPENAI_API_KEY: str = os.environ.get("OPENAI_API_KEY")
-    DEFAULT_MODEL: str = os.environ.get("DEFAULT_MODEL", "gpt-4o-mini")
+    DEFAULT_MODEL: str = os.environ.get("DEFAULT_MODEL", "gpt-5-nano")
 
 
 config = Config()  # type: ignore
