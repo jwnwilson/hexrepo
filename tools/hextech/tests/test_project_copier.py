@@ -10,7 +10,7 @@ from .utils import copy_project_dependencies
 @pytest.fixture
 def template_path():
     """Return the path to the template directory."""
-    return Path(__file__).parent.parent.parent.parent / "templates" / "project"
+    return Path(__file__).parent.parent.parent.parent / "templates" / "fastapi_project"
 
 
 @pytest.fixture

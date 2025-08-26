@@ -4,6 +4,7 @@ from typing import List, Optional
 
 import copier
 import typer
+import shutil
 from typing_extensions import Annotated
 
 from hextech.config import HexrepoConfig, get_or_create_config
@@ -94,7 +95,8 @@ def create_library():
 @cli_setup
 def create_project():
     project_name: str = typer.prompt("Please Enter project folder name")
-    os.system("rm -r templates/project/.venv 2> /dev/null || echo > /dev/null")
+    os.system("rm -r templates/fastapi_project/.venv 2> /dev/null || echo > /dev/null")
+    os.system("rm -r templates/ninja_project/.venv 2> /dev/null || echo > /dev/null")
     template_choice = typer.prompt(
         "Which project template would you like to use? \n  1.fastapi\n  2.django_ninja\n",
         default="1"
@@ -118,6 +120,10 @@ def create_project():
         )
         # Setup infra for service
         if prompt_setup_project_infra():
+            # Delete the .git folder from the newly created project directory
+            git_dir = os.path.join(project_name, ".git")
+            if os.path.exists(git_dir):
+                shutil.rmtree(git_dir)
             with chdir(project_name):
                 typer.echo("Setting up initial infrastructure...")
                 run_system_command("make tf_setup ENVIROMENT=default")

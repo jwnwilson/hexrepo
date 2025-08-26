@@ -3,7 +3,7 @@ authors = [
     {name = "Noel Wilson", email = "jwnwilson@hotmail.co.uk"},
 ]
 requires-python = "<4.0,>=3.12"
-name = "job_finder_9000_be"
+name = "job_finder_9000"
 version = "0.1.0"
 description = "AI pet BE"
 readme = "README.md"
@@ -25,10 +25,15 @@ dependencies = [
     "sqlalchemy-continuum>=1.4.2",
     "psycopg[binary]==3.2.6",
     "sentry-sdk[fastapi]>=2.25.1",
+    "pydantic-ai>=0.0.1",
+    "openai>=1.0.0",
+    "aiohttp>=3.9.0",
+    "beautifulsoup4>=4.12.0",
     "hexrepo-cloud",
     "hexrepo-db",
     "hexrepo-api",
     "hexrepo-log",
+    "logfire[fastapi]>=4.3.6",
 ]
 
 [dependency-groups]
