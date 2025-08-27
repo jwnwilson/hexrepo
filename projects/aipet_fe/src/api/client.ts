@@ -1,4 +1,5 @@
 import { currentApiConfig } from './config';
+
 // API Client for aipet_be backend
 export interface ApiResponse<T = any> {
   data?: T;
@@ -59,15 +60,33 @@ export interface PasswordResetConfirmRequest {
   new_password: string;
 }
 
-
-
 class ApiClient {
   private baseUrl: string;
   private token: string | null = null;
+  private csrfToken: string | null = null;
 
   constructor(baseUrl?: string) {
     this.baseUrl = baseUrl || currentApiConfig.BASE_URL;
     this.token = localStorage.getItem('access_token');
+    this.csrfToken = localStorage.getItem('csrf_token');
+  }
+
+  // Method to fetch CSRF token from the API
+  private async fetchCsrfToken(): Promise<string | null> {
+    try {
+      const response = await fetch(`${this.baseUrl}/csrf/token`, {
+        method: 'GET',
+        credentials: 'include', // Include cookies for session-based CSRF
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        return data.csrf_token;
+      }
+    } catch (error) {
+      console.warn('Failed to fetch CSRF token:', error);
+    }
+    return null;
   }
 
   private async request<T>(
@@ -85,10 +104,16 @@ class ApiClient {
       headers.Authorization = `Bearer ${this.token}`;
     }
 
+    // Add CSRF token if available
+    if (this.csrfToken) {
+      headers['X-CSRFToken'] = this.csrfToken;
+    }
+
     try {
       const response = await fetch(url, {
         ...options,
         headers,
+        credentials: 'include', // Include cookies for session-based CSRF
       });
 
       const data = await response.json();
@@ -130,6 +155,13 @@ class ApiClient {
       this.token = response.data.access;
       localStorage.setItem('access_token', response.data.access);
       localStorage.setItem('refresh_token', response.data.refresh);
+      
+      // Fetch and store CSRF token after successful login
+      const csrfToken = await this.fetchCsrfToken();
+      if (csrfToken) {
+        this.csrfToken = csrfToken;
+        localStorage.setItem('csrf_token', csrfToken);
+      }
     }
 
     return response;
@@ -137,8 +169,10 @@ class ApiClient {
 
   async logout(): Promise<void> {
     this.token = null;
+    this.csrfToken = null;
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
+    localStorage.removeItem('csrf_token');
   }
 
   async verifyEmail(token: string): Promise<ApiResponse<{ message: string; verified: boolean }>> {

@@ -10,6 +10,7 @@ import { KeyboardEventTypes } from "@babylonjs/core/Events/keyboardEvents";
 import { SpriteManager } from "@babylonjs/core/Sprites/spriteManager";
 import { Sprite } from "@babylonjs/core/Sprites/sprite";
 import { Need } from "./need";
+import { apiClient } from "../api/client";
 
 export interface PetNeeds {
   hungry: number;      // 0-100 (100 = very hungry)
@@ -117,9 +118,30 @@ export class Pet {
   }
 
   private _startPetThinking(): void {
-    setInterval(() => {
+    setInterval(async () => {
       console.log(`${this.name} is thinking...`);
-    }, 5000);
+      
+      try {
+        // Get pet recommendations from the API
+        const response = await apiClient.getPetRecommendations({
+          hungry: this.needs.hungry,
+          tiredness: this.needs.tiredness,
+          boredom: this.needs.boredom,
+          toilet: this.needs.toilet
+        });
+        
+        if (response.data) {
+          console.log(`${this.name} AI recommendation:`, response.data);
+          console.log(`Action: ${response.data.action}`);
+          console.log(`Reasoning: ${response.data.reasoning}`);
+          console.log(`Priority: ${response.data.priority}`);
+        } else if (response.error) {
+          console.error(`Failed to get recommendations for ${this.name}:`, response.error);
+        }
+      } catch (error) {
+        console.error(`Error getting pet recommendations for ${this.name}:`, error);
+      }
+    }, 30000);
   }
 
   private _updatePetAppearance(): void {
