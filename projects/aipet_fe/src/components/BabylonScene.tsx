@@ -9,7 +9,7 @@ import HavokPhysics from "@babylonjs/havok";
 
 import MainScene from "../playground/main-scene";
 import LogoutButton from "./LogoutButton";
-import ThankYouModal from "./ThankYouModal";
+import DemoModal from "./DemoModal";
 
 interface BabylonSceneProps {
   className?: string;
@@ -157,7 +157,7 @@ const BabylonScene: React.FC<BabylonSceneProps> = ({ className = "" }) => {
         }}
       />
       <LogoutButton />
-      <ThankYouModal isOpen={showModal} onClose={() => setShowModal(false)} />
+      <DemoModal isOpen={showModal} onClose={() => setShowModal(false)} />
     </div>
   );
 };

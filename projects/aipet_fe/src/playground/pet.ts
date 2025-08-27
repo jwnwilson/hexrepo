@@ -139,8 +139,16 @@ export class Pet {
     }
   }
 
+  private _clearAllIntervals(): void {
+    // Clear all tracked intervals
+    for (const [name, interval] of this.intervals.entries()) {
+      clearInterval(interval);
+      console.log(`${this.name}: Cleared interval: ${name}`);
+    }
+    this.intervals.clear();
+  }
+
   private _startPetThinking(): void {
-    if (!this.petThinkingEnabled) return;
     // Clear existing interval if it exists
     this._clearInterval('petThinking');
     
@@ -558,7 +566,7 @@ export class Pet {
     // Set up demo timeout to disable pet thinking after the specified time
     setTimeout(() => {
       console.log(`${this.name}: Demo timeout reached (${this.demoTimeoutMs}ms), disabling pet thinking`);
-      this.petThinkingEnabled = false;
+      this._clearAllIntervals();
     }, this.demoTimeoutMs);
   }
 

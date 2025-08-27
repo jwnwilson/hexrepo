@@ -5,7 +5,7 @@ interface ThankYouModalProps {
   onClose: () => void;
 }
 
-const ThankYouModal: React.FC<ThankYouModalProps> = ({ isOpen, onClose }) => {
+const DemoModal: React.FC<ThankYouModalProps> = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   return (
@@ -42,7 +42,7 @@ const ThankYouModal: React.FC<ThankYouModalProps> = ({ isOpen, onClose }) => {
           color: '#666',
           lineHeight: '1.5'
         }}>
-          We hope you enjoyed exploring our 3D experience. Feel free to continue exploring or check out more of our features.
+          We hope you enjoyed exploring our AI Pet, the Pet has gone to sleep now.
         </p>
         <button
           onClick={onClose}
@@ -71,4 +71,4 @@ const ThankYouModal: React.FC<ThankYouModalProps> = ({ isOpen, onClose }) => {
   );
 };
 
-export default ThankYouModal; 
+export default DemoModal; 
