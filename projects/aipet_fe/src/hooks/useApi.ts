@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { apiClient, ApiResponse, PetNeedsRequest, PetActionRecommendation } from '../api/client';
+import { apiClient, ApiResponse } from '../api/client';
 
 export interface UseApiState<T> {
   data: T | null;
@@ -62,53 +62,7 @@ export const useApi = <T>() => {
   };
 };
 
-// Specialized hook for pet recommendations
-export const usePetRecommendations = () => {
-  const [recommendations, setRecommendations] = useState<PetActionRecommendation | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
-  const getRecommendations = useCallback(async (petNeeds: PetNeedsRequest, model?: string) => {
-    setLoading(true);
-    setError(null);
-    
-    try {
-      const response = await apiClient.getPetRecommendations(petNeeds, model);
-      
-      if (response.error) {
-        setError(response.error);
-        return null;
-      }
-      
-      if (response.data) {
-        setRecommendations(response.data);
-        return response.data;
-      }
-      
-      return null;
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to get recommendations';
-      setError(errorMessage);
-      return null;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  const reset = useCallback(() => {
-    setRecommendations(null);
-    setLoading(false);
-    setError(null);
-  }, []);
-
-  return {
-    recommendations,
-    loading,
-    error,
-    getRecommendations,
-    reset,
-  };
-};
 
 // Hook for authentication status
 export const useAuthStatus = () => {

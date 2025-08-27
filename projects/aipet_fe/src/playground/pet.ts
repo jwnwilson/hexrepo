@@ -47,6 +47,7 @@ export class Pet {
     
     this._createPet(position);
     this._startNeedsDecay();
+    this._startPetThinking();
     this._createKeyboardControls();
   }
 
@@ -113,6 +114,12 @@ export class Pet {
       this._updatePetAppearance();
       this._updateStatusDisplay();
     }, 1000); // Update every second
+  }
+
+  private _startPetThinking(): void {
+    setInterval(() => {
+      console.log(`${this.name} is thinking...`);
+    }, 5000);
   }
 
   private _updatePetAppearance(): void {
