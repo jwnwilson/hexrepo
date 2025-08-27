@@ -36,7 +36,6 @@ Setup the following env vars directly or run:
 # To Do
 
 - Aipet
-    - Add thank you for looking at this demo screen after X requests
     - Replace cubes with simple 3D models and add basic textures
     - Add a skybox
     - Setup infra / terraform
