@@ -1,14 +1,9 @@
 import logging
-from typing import Literal, Tuple
-
+from typing import List, Literal, Tuple
 import logfire
 from pydantic import BaseModel, Field
 from pydantic_ai import Agent
 from pydantic_ai.run import AgentRunResult
-
-logfire.configure(token="pylf_v1_eu_XTHBY13Y5Kv8GLgf9DFZfjNsBb12c8jyRmYtxFsQ2y6W")
-logfire.instrument_pydantic_ai()
-
 from config import config  # noqa: E402
 
 logger = logging.getLogger(__name__)
@@ -54,7 +49,11 @@ class PetNeeds(BaseModel):
 
 class PetActionRecommendation(BaseModel):
     """Complete recommendation response for pet actions."""
-    movement: Tuple[float, float, float] | None = Field(description="Direction to move the pet")
+    movement: List[float] = Field(
+        description="Direction to move the pet as [x, y, z] coordinates",
+        min_items=3,
+        max_items=3
+    )
     action: Actions | None = Field(description="Action to take")
     reasoning: str = Field(description="Reasoning for the action")
 
@@ -72,6 +71,7 @@ class AipetAgent:
             output_type=PetActionRecommendation,
             system_prompt=self._get_system_message(),
             retries=2,
+            name="aipet"
         )
 
         return agent

@@ -1,11 +1,17 @@
 from typing import Optional
 
+import logfire
 from ninja import Router
 
+from config import config
 from apps.aipet.agents.aipet_agent import PetActionRecommendation
 from apps.core.auth import JWTAuthAsync, SessionAuthAsync
 
 from .services.aipet import AipetService, SceneData
+
+# configure logfire
+logfire.configure(token=config.LOGFIRE_WRITE_TOKEN)
+logfire.instrument_pydantic_ai()
 
 router = Router(
     tags=["Aipet"],

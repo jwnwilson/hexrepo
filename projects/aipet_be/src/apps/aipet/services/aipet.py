@@ -1,4 +1,5 @@
 import logging
+import logfire
 from typing import Optional
 
 from ..agents.aipet_agent import AipetAgent, PetActionRecommendation, SceneData
@@ -18,13 +19,14 @@ class AipetService:
         """
         Get AI-powered recommendations for pet care based on current needs.
         """
-        try:
-            # Get recommendations from the AI agent
-            recommendations = await self.agent.get_recommendations(scene_data)
+        with logfire.span(name="get_pet_recommendations"):
+            try:
+                # Get recommendations from the AI agent
+                recommendations = await self.agent.get_recommendations(scene_data)
 
-            logger.info(f"Generated recommendations for scene_data: {scene_data}")
-            return recommendations
+                logger.info(f"Generated recommendations for scene_data: {scene_data}")
+                return recommendations
 
-        except Exception as e:
-            logger.error(f"Error in AipetService.get_pet_recommendations: {e}")
-            raise
+            except Exception as e:
+                logger.error(f"Error in AipetService.get_pet_recommendations: {e}")
+                raise
