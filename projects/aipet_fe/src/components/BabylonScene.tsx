@@ -8,6 +8,7 @@ import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import HavokPhysics from "@babylonjs/havok";
 
 import MainScene from "../playground/main-scene";
+import LogoutButton from "./LogoutButton";
 
 interface BabylonSceneProps {
   className?: string;
@@ -41,7 +42,7 @@ const BabylonScene: React.FC<BabylonSceneProps> = ({ className = "" }) => {
 
       new MainScene(scene, canvas, engine);
 
-      config(scene);
+      config(scene, engine);
       renderer(engine, scene);
     };
 
@@ -96,7 +97,7 @@ const BabylonScene: React.FC<BabylonSceneProps> = ({ className = "" }) => {
       };
     };
 
-    const config = (scene: Scene): void => {
+    const config = (scene: Scene, engine: Engine | WebGPUEngine): void => {
       // Axes
       new AxesViewer();
 
@@ -112,11 +113,11 @@ const BabylonScene: React.FC<BabylonSceneProps> = ({ className = "" }) => {
     };
 
     // Initialize the scene
-    initWebGPU();
-
-    // Store references for cleanup
-    engineRef.current = engine;
-    sceneRef.current = scene;
+    initWebGPU().then(() => {
+      // Store references for cleanup after initialization
+      engineRef.current = engine;
+      sceneRef.current = scene;
+    });
 
     // Cleanup function
     return () => {
@@ -132,15 +133,18 @@ const BabylonScene: React.FC<BabylonSceneProps> = ({ className = "" }) => {
   }, []);
 
   return (
-    <canvas
-      ref={canvasRef}
-      className={className}
-      style={{
-        width: '100%',
-        height: '100%',
-        outline: 'none'
-      }}
-    />
+    <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+      <canvas
+        ref={canvasRef}
+        className={className}
+        style={{
+          width: '100%',
+          height: '100%',
+          outline: 'none'
+        }}
+      />
+      <LogoutButton />
+    </div>
   );
 };
 
