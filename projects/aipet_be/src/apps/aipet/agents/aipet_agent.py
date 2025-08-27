@@ -1,6 +1,7 @@
 import logging
-from typing import List
+from typing import List, Literal, Tuple
 
+from apps.aipet.services.aipet import SceneData
 import logfire
 from pydantic import BaseModel, Field
 from pydantic_ai import Agent
@@ -13,7 +14,7 @@ from config import config  # noqa: E402
 
 logger = logging.getLogger(__name__)
 
-
+Actions = Literal["move", "feed", "play", "toilet", "sleep"]
 class PetNeeds(BaseModel):
     """Pet needs data structure matching the frontend PetNeeds interface."""
 
@@ -31,36 +32,11 @@ class PetNeeds(BaseModel):
     )
 
 
-class RecommendedAction(BaseModel):
-    """Recommended action for the pet based on its needs."""
-
-    action: str = Field(description="The recommended action to take")
-    priority: int = Field(
-        ge=1, le=5, description="Priority level 1-5 (5 = highest priority)"
-    )
-    reasoning: str = Field(description="Explanation of why this action is recommended")
-    target_need: str = Field(description="Which need this action addresses")
-    estimated_effect: int = Field(
-        ge=0, le=100, description="Estimated effect on the need (0-100)"
-    )
-
-
 class PetActionRecommendation(BaseModel):
     """Complete recommendation response for pet actions."""
-
-    primary_action: RecommendedAction = Field(
-        description="The most important action to take"
-    )
-    secondary_actions: List[RecommendedAction] = Field(
-        description="Additional actions to consider"
-    )
-    overall_health_score: int = Field(
-        ge=0, le=100, description="Overall pet health score based on needs"
-    )
-    urgent_needs: List[str] = Field(
-        description="List of needs that require immediate attention"
-    )
-
+    movement: Tuple[float, float, float] | None = Field(description="Direction to move the pet")
+    action: Actions | None = Field(description="Action to take")
+    reasoning: str = Field(description="Reasoning for the action")
 
 class AipetAgent:
     """AI agent for processing pet needs and recommending actions."""
@@ -82,7 +58,7 @@ class AipetAgent:
 
     def _get_system_message(self) -> str:
         """Get the system message for the pet care agent."""
-        return """You are an expert pet care AI assistant. Your job is to analyze a pet's needs and recommend appropriate actions.
+        return """You are an AI Pet. Your job is to analyze your needs, the scene around you and return movements and actions to satisfy your needs.
 
 Pet needs are provided on a scale of 0-100 where:
 - 0 = need is fully satisfied
@@ -94,59 +70,48 @@ Available needs to monitor:
 - boredom: Need for stimulation/play
 - toilet: Need to relieve themselves
 
+You can only use a need if your (the pet) position is within 1 unit of the need object.
+
+Available data to analyse:
+- pet position: (x, y, z)
+- objects in the scene for each need with a position (x, y, z)
+
 When analyzing needs:
-1. Prioritize urgent needs (80+ on the scale)
-2. Consider the pet's overall well-being
-3. Recommend specific, actionable steps
-4. Provide reasoning for your recommendations
-5. Estimate the effectiveness of each action
+1. Prioritize urgent needs (80+ on the scale) then the highest need after that
+2. Return a move toward an object that will satisfy an urgent need
+3. Return an action to take if you are close enough to the object to satisfy the need
+4. Provide reasoning for your actions
+"""
 
-Available actions you can recommend:
-- Feed the pet (addresses hunger)
-- Give water (addresses thirst/hunger)
-- Play with toys (addresses boredom)
-- Take for a walk (addresses exercise, boredom, toilet)
-- Let outside/toilet (addresses toilet needs)
-- Provide rest/sleep area (addresses tiredness)
-- Groom the pet (addresses boredom, bonding)
-- Training session (addresses boredom, mental stimulation)
-
-Always provide a primary action (highest priority) and secondary actions (additional considerations)."""
-
-    def _format_needs_message(self, pet_needs: PetNeeds) -> str:
+    def _format_needs_message(self, scene_data: SceneData) -> str:
         """Format pet needs into a message for the AI agent."""
-        return f"""Please analyze the following pet needs and recommend appropriate actions:
+        msg = f"""Please analyze the following pet needs and recommend appropriate actions:
 
 Current Pet Needs:
-- Hunger: {pet_needs.hungry}/100
-- Tiredness: {pet_needs.tiredness}/100  
-- Boredom: {pet_needs.boredom}/100
-- Toilet: {pet_needs.toilet}/100
+- Hunger: {scene_data.pet_data.hungry}/100
+- Tiredness: {scene_data.pet_data.tiredness}/100  
+- Boredom: {scene_data.pet_data.boredom}/100
+- Toilet: {scene_data.pet_data.toilet}/100
+- Position: {scene_data.pet_data.position}
 
-Please provide a comprehensive recommendation including:
-1. Primary action (most urgent need)
-2. Secondary actions (additional considerations)
-3. Overall health assessment
-4. Any urgent needs requiring immediate attention"""
+Current Scene:
+"""
+        for obj in scene_data.scene_data:
+            msg += f"- {obj.type}: {obj.position}\n"
+        return msg
 
-    async def get_recommendations(self, pet_needs: PetNeeds) -> PetActionRecommendation:
+    async def get_recommendations(self, scene_data: SceneData) -> PetActionRecommendation:
         """
         Get action recommendations based on pet needs.
-
-        Args:
-            pet_needs: PetNeeds object containing the current need levels
-
-        Returns:
-            PetActionRecommendation with primary and secondary actions
         """
         with logfire.span("Getting pet recommendations"):
             try:
                 logfire.info(
-                    "Getting pet recommendations", model=self.model, pet_needs=pet_needs
+                    "Getting pet recommendations", model=self.model, scene_data=scene_data
                 )
 
                 # Create a user message describing the pet's needs
-                user_message = self._format_needs_message(pet_needs)
+                user_message = self._format_needs_message(scene_data)
 
                 # Get recommendations from the agent
                 response: AgentRunResult = await self.agent.run(user_message)
@@ -154,13 +119,10 @@ Please provide a comprehensive recommendation including:
 
                 logfire.info(
                     "Successfully generated recommendations",
-                    primary_action=recommendation.primary_action.action,
-                    primary_priority=recommendation.primary_action.priority,
-                    overall_health_score=recommendation.overall_health_score,
-                    urgent_needs_count=len(recommendation.urgent_needs),
+                    recommendation=recommendation
                 )
 
-                logger.info(f"Generated recommendations for pet needs: {pet_needs}")
+                logger.info(f"Generated recommendations for pet needs: {scene_data}")
                 return recommendation
 
             except Exception as e:
@@ -168,10 +130,7 @@ Please provide a comprehensive recommendation including:
                     "Error getting pet recommendations",
                     error=str(e),
                     error_type=type(e).__name__,
-                    hungry=pet_needs.hungry,
-                    tiredness=pet_needs.tiredness,
-                    boredom=pet_needs.boredom,
-                    toilet=pet_needs.toilet,
+                    scene_data=scene_data,
                 )
                 logger.error(f"Error getting pet recommendations: {e}")
                 raise

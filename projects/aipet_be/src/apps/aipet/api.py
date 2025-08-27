@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Literal, Optional, Tuple
 
 from ninja import Router
 from pydantic import BaseModel
@@ -11,14 +11,6 @@ from .services.aipet import AipetService
 router = Router(
     tags=["Aipet"],
 )
-
-
-# Request/Response models for pet recommendations
-class PetNeedsRequest(BaseModel):
-    hungry: int
-    tiredness: int
-    boredom: int
-    toilet: int
 
 
 @router.post("/recommendations", auth=[SessionAuthAsync(), JWTAuthAsync()])
@@ -36,10 +28,7 @@ async def get_pet_recommendations(
 
     # Get recommendations
     recommendations = await service.get_pet_recommendations(
-        hungry=pet_needs.hungry,
-        tiredness=pet_needs.tiredness,
-        boredom=pet_needs.boredom,
-        toilet=pet_needs.toilet,
+        pet_needs
     )
 
     return recommendations
