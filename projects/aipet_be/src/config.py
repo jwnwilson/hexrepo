@@ -62,4 +62,5 @@ class Config(BaseSettings):
     AI_TIMEOUT: int = int(os.environ.get("AI_TIMEOUT", "30"))
     LOGFIRE_WRITE_TOKEN: str = os.environ.get("LOGFIRE_WRITE_TOKEN", "")
 
+
 config = Config()  # type: ignore

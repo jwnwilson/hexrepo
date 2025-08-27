@@ -1,15 +1,18 @@
 import logging
 from typing import List, Literal, Tuple
+
 import logfire
 from pydantic import BaseModel, Field
 from pydantic_ai import Agent
 from pydantic_ai.run import AgentRunResult
+
 from config import config  # noqa: E402
 
 logger = logging.getLogger(__name__)
 
 Actions = Literal["feed", "play", "toilet", "sleep"]
 ObjectTypes = Literal["pet", "food", "toy", "bed", "toilet", "other"]
+
 
 # Request/Response models for pet recommendations
 class SceneObject(BaseModel):
@@ -49,13 +52,15 @@ class PetNeeds(BaseModel):
 
 class PetActionRecommendation(BaseModel):
     """Complete recommendation response for pet actions."""
+
     movement: List[float] = Field(
         description="Direction to move the pet as [x, y, z] coordinates",
         min_items=3,
-        max_items=3
+        max_items=3,
     )
     action: Actions = Field(description="Action to take")
     reasoning: str = Field(description="Reasoning for the action")
+
 
 class AipetAgent:
     """AI agent for processing pet needs and recommending actions."""
@@ -71,7 +76,7 @@ class AipetAgent:
             output_type=PetActionRecommendation,
             system_prompt=self._get_system_message(),
             retries=2,
-            name="aipet"
+            name="aipet",
         )
 
         return agent
@@ -120,14 +125,18 @@ Current Scene:
             msg += f"- {obj.type}: {obj.position}\n"
         return msg
 
-    async def get_recommendations(self, scene_data: SceneData) -> PetActionRecommendation:
+    async def get_recommendations(
+        self, scene_data: SceneData
+    ) -> PetActionRecommendation:
         """
         Get action recommendations based on pet needs.
         """
         with logfire.span("Getting pet recommendations"):
             try:
                 logfire.info(
-                    "Getting pet recommendations", model=self.model, scene_data=scene_data
+                    "Getting pet recommendations",
+                    model=self.model,
+                    scene_data=scene_data,
                 )
 
                 # Create a user message describing the pet's needs
@@ -139,7 +148,7 @@ Current Scene:
 
                 logfire.info(
                     "Successfully generated recommendations",
-                    recommendation=recommendation
+                    recommendation=recommendation,
                 )
 
                 logger.info(f"Generated recommendations for pet needs: {scene_data}")

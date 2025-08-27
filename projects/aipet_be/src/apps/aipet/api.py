@@ -3,9 +3,9 @@ from typing import Optional
 import logfire
 from ninja import Router
 
-from config import config
 from apps.aipet.agents.aipet_agent import PetActionRecommendation
 from apps.core.auth import JWTAuthAsync, SessionAuthAsync
+from config import config
 
 from .services.aipet import AipetService, SceneData
 
@@ -32,8 +32,6 @@ async def get_pet_recommendations(
     service = AipetService(model=model)
 
     # Get recommendations
-    recommendations = await service.get_pet_recommendations(
-        scene_data
-    )
+    recommendations = await service.get_pet_recommendations(scene_data)
 
     return recommendations

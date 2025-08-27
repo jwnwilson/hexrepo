@@ -1,6 +1,7 @@
 import logging
-import logfire
 from typing import Optional
+
+import logfire
 
 from ..agents.aipet_agent import AipetAgent, PetActionRecommendation, SceneData
 
