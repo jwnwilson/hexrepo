@@ -10,7 +10,7 @@ import { KeyboardEventTypes } from "@babylonjs/core/Events/keyboardEvents";
 import { SpriteManager } from "@babylonjs/core/Sprites/spriteManager";
 import { Sprite } from "@babylonjs/core/Sprites/sprite";
 import { Need } from "./need";
-import { apiClient, SceneData, SceneObject, PetData, ObjectTypes } from "../api/client";
+import { apiClient, SceneData, SceneObject, PetData, ObjectTypes, ApiResponse, PetActionRecommendation } from "../api/client";
 
 export interface PetNeeds {
   hungry: number;      // 0-100 (100 = very hungry)
@@ -169,13 +169,10 @@ export class Pet {
         };
 
         // Get pet recommendations from the API
-        const response = await apiClient.getPetRecommendations(sceneData);
+        const response: ApiResponse<PetActionRecommendation> = await apiClient.getPetRecommendations(sceneData);
         
         if (response.data) {
-          console.log(`${this.name} AI recommendation:`, response.data);
-          console.log(`Action: ${response.data.action}`);
-          console.log(`Movement: ${response.data.movement}`);
-          console.log(`Reasoning: ${response.data.reasoning}`);
+          this._handle_pet_recommendations(response.data);
         } else if (response.error) {
           console.error(`Failed to get recommendations for ${this.name}:`, response.error);
         }
@@ -186,6 +183,72 @@ export class Pet {
     
     // Store the interval for tracking
     this.intervals.set('petThinking', interval);
+  }
+
+  private _handle_pet_recommendations(pet_recommendation: PetActionRecommendation): void {
+    console.log(`${this.name} AI recommendation:`, pet_recommendation);
+    
+    // Apply movement force if recommendation includes movement
+    if (pet_recommendation.movement && this.meshAggregate && this.mesh) {
+      const [x, y, z] = pet_recommendation.movement;
+      const movementVector = new Vector3(x, y, z);
+      
+      // Apply initial impulse
+      this.meshAggregate.body.applyImpulse(movementVector, this.mesh.position);
+      
+      // Set up continuous force application for 5 seconds
+      const forceInterval = setInterval(() => {
+        if (this.meshAggregate && this.mesh) {
+          // Apply a smaller continuous force to maintain movement
+          const continuousForce = movementVector.scale(0.1);
+          this.meshAggregate.body.applyForce(continuousForce, this.mesh.position);
+        }
+      }, 1000); // Apply force every 100ms
+      
+      // Stop applying force after 5 seconds
+      setTimeout(() => {
+        clearInterval(forceInterval);
+        console.log(`${this.name} movement recommendation completed`);
+      }, 5000);
+    }
+    
+    // Handle action recommendation if provided
+    if (pet_recommendation.action) {
+      console.log(`${this.name} will perform action: ${pet_recommendation.action}`);
+      
+      // Perform the action immediately
+      this._performAction(pet_recommendation.action);
+      
+      // Set up periodic action triggering for 5 seconds
+      const actionInterval = setInterval(() => {
+        this._performAction(pet_recommendation.action!);
+      }, 2000); // Trigger action every 2 seconds
+      
+      // Stop periodic actions after 5 seconds
+      setTimeout(() => {
+        clearInterval(actionInterval);
+        console.log(`${this.name} action recommendation completed`);
+      }, 5000);
+    }
+  }
+  
+  private _performAction(action: string): void {
+    switch (action) {
+      case "feed":
+        this.feed();
+        break;
+      case "play":
+        this.play();
+        break;
+      case "toilet":
+        this.toilet();
+        break;
+      case "sleep":
+        this.sleep();
+        break;
+      default:
+        console.warn(`Unknown action: ${action}`);
+    }
   }
 
   private _updatePetAppearance(): void {

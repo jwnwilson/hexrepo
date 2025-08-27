@@ -19,7 +19,7 @@ class AipetService:
         """
         Get AI-powered recommendations for pet care based on current needs.
         """
-        with logfire.span(name="get_pet_recommendations"):
+        with logfire.span("get_pet_recommendations"):
             try:
                 # Get recommendations from the AI agent
                 recommendations = await self.agent.get_recommendations(scene_data)

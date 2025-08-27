@@ -54,7 +54,7 @@ class PetActionRecommendation(BaseModel):
         min_items=3,
         max_items=3
     )
-    action: Actions | None = Field(description="Action to take")
+    action: Actions = Field(description="Action to take")
     reasoning: str = Field(description="Reasoning for the action")
 
 class AipetAgent:
@@ -99,7 +99,7 @@ Available data to analyse:
 When analyzing needs:
 1. Prioritize urgent needs (80+ on the scale) then the highest need after that
 2. Return a move toward an object that will satisfy an urgent need
-3. Return an action to take if you are close enough to the object to satisfy the need
+3. Return an action to take to satisfy the need
 4. Provide reasoning for your actions
 """
 
@@ -134,7 +134,6 @@ Current Scene:
                 user_message = self._format_needs_message(scene_data)
 
                 # Get recommendations from the agent
-                breakpoint()
                 response: AgentRunResult = await self.agent.run(user_message)
                 recommendation: PetActionRecommendation = response.output
 
