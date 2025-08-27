@@ -37,15 +37,11 @@ Setup the following env vars directly or run:
 
 - Aipet
     - Add game menu and exit / logout button
-    - Setup auth token auto refresh
-    - Setup llm endpoint
-        - Pass pet / scene info to llm to make a decision and return an action
-        - Setup API client and make llm request with jwt token
-    - Add logfire
-        - Add cost tracking to logfire dashboard
-        - Add endpoint and user info to logfire
+    - Add thank you for looking at this demo screen after X requests
     - Setup infra / terraform
+    - Deploy aipet to ECS + cloudfront
     - Deploy App - Kubernetes with k3 / rancher
+    - Setup auth token auto refresh
     - Improve pet logic
         - Maintain llm context
         - Multiple pets
