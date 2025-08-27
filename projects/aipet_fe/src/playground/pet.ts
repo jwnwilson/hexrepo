@@ -29,6 +29,8 @@ export class Pet {
   private name: string;
   private needObjects: Need[] = [];
   private proximityThreshold: number = 3.0; // Distance threshold for need interaction
+  private demoTimeoutMs: number;
+  private petThinkingEnabled: boolean = true;
   
   // Track intervals to prevent duplicates and enable cleanup
   private intervals: Map<string, NodeJS.Timeout> = new Map();
@@ -48,11 +50,13 @@ export class Pet {
       boredom: 40,
       toilet: 20
     };
+    this.demoTimeoutMs = parseInt(import.meta.env.VITE_DEMO_TIMEOUT_MS || '120000', 10);
     
     this._createPet(position);
     this._startNeedsDecay();
     this._startPetThinking();
     this._createKeyboardControls();
+    this._startDemoTimeout();
   }
 
   private _createPet(position: Vector3): void {
@@ -136,6 +140,7 @@ export class Pet {
   }
 
   private _startPetThinking(): void {
+    if (!this.petThinkingEnabled) return;
     // Clear existing interval if it exists
     this._clearInterval('petThinking');
     
@@ -547,6 +552,14 @@ export class Pet {
         break;
       }
     });
+  }
+
+  private _startDemoTimeout(): void {
+    // Set up demo timeout to disable pet thinking after the specified time
+    setTimeout(() => {
+      console.log(`${this.name}: Demo timeout reached (${this.demoTimeoutMs}ms), disabling pet thinking`);
+      this.petThinkingEnabled = false;
+    }, this.demoTimeoutMs);
   }
 
   // Cleanup method

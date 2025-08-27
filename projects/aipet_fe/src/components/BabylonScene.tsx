@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { Scene } from "@babylonjs/core/scene";
 import { AxesViewer } from "@babylonjs/core/Debug/axesViewer";
@@ -9,6 +9,7 @@ import HavokPhysics from "@babylonjs/havok";
 
 import MainScene from "../playground/main-scene";
 import LogoutButton from "./LogoutButton";
+import ThankYouModal from "./ThankYouModal";
 
 interface BabylonSceneProps {
   className?: string;
@@ -18,6 +19,18 @@ const BabylonScene: React.FC<BabylonSceneProps> = ({ className = "" }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const engineRef = useRef<Engine | WebGPUEngine | null>(null);
   const sceneRef = useRef<Scene | null>(null);
+  const [showModal, setShowModal] = useState(false);
+  // Load demo timeout from environment variable (defaults to 2 minutes)
+  const DEMO_TIMEOUT_MS = parseInt(import.meta.env.VITE_DEMO_TIMEOUT_MS || '120000', 10);
+
+  // Show modal after configured timeout
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowModal(true);
+    }, DEMO_TIMEOUT_MS);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -144,6 +157,7 @@ const BabylonScene: React.FC<BabylonSceneProps> = ({ className = "" }) => {
         }}
       />
       <LogoutButton />
+      <ThankYouModal isOpen={showModal} onClose={() => setShowModal(false)} />
     </div>
   );
 };

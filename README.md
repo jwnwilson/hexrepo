@@ -36,8 +36,9 @@ Setup the following env vars directly or run:
 # To Do
 
 - Aipet
-    - Add game menu and exit / logout button
     - Add thank you for looking at this demo screen after X requests
+    - Replace cubes with simple 3D models and add basic textures
+    - Add a skybox
     - Setup infra / terraform
     - Deploy aipet to ECS + cloudfront
     - Deploy App - Kubernetes with k3 / rancher
