@@ -1,7 +1,6 @@
 import logging
-from typing import List, Literal, Tuple
+from typing import Literal, Tuple
 
-from apps.aipet.services.aipet import SceneData
 import logfire
 from pydantic import BaseModel, Field
 from pydantic_ai import Agent
@@ -15,6 +14,27 @@ from config import config  # noqa: E402
 logger = logging.getLogger(__name__)
 
 Actions = Literal["move", "feed", "play", "toilet", "sleep"]
+ObjectTypes = Literal["pet", "food", "toy", "bed", "toilet", "other"]
+
+# Request/Response models for pet recommendations
+class SceneObject(BaseModel):
+    type: ObjectTypes
+    position: Tuple[float, float, float]
+
+
+class PetData(SceneObject):
+    type: ObjectTypes = "pet"
+    hungry: int
+    tiredness: int
+    boredom: int
+    toilet: int
+
+
+class SceneData(BaseModel):
+    scene_data: list[SceneObject]
+    pet_data: PetData
+
+
 class PetNeeds(BaseModel):
     """Pet needs data structure matching the frontend PetNeeds interface."""
 

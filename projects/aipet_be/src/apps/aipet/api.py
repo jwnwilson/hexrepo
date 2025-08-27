@@ -1,12 +1,11 @@
-from typing import Literal, Optional, Tuple
+from typing import Optional
 
 from ninja import Router
-from pydantic import BaseModel
 
 from apps.aipet.agents.aipet_agent import PetActionRecommendation
 from apps.core.auth import JWTAuthAsync, SessionAuthAsync
 
-from .services.aipet import AipetService
+from .services.aipet import AipetService, SceneData
 
 router = Router(
     tags=["Aipet"],
@@ -15,7 +14,7 @@ router = Router(
 
 @router.post("/recommendations", auth=[SessionAuthAsync(), JWTAuthAsync()])
 async def get_pet_recommendations(
-    request, pet_needs: PetNeedsRequest, model: Optional[str] = None
+    request, scene_data: SceneData, model: Optional[str] = None
 ) -> PetActionRecommendation:
     """
     Get AI-powered recommendations for pet care based on current needs.
@@ -28,7 +27,7 @@ async def get_pet_recommendations(
 
     # Get recommendations
     recommendations = await service.get_pet_recommendations(
-        pet_needs
+        scene_data
     )
 
     return recommendations

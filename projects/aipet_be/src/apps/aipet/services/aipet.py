@@ -1,32 +1,9 @@
 import logging
-from typing import Literal, Optional, Tuple
+from typing import Optional
 
-from pydantic import BaseModel
-
-from ..agents.aipet_agent import AipetAgent, PetActionRecommendation, PetNeeds
+from ..agents.aipet_agent import AipetAgent, PetActionRecommendation, SceneData
 
 logger = logging.getLogger(__name__)
-
-
-ObjectTypes = Literal["pet", "food", "toy", "bed", "toilet", "other"]
-
-# Request/Response models for pet recommendations
-class SceneObject(BaseModel):
-    type: ObjectTypes
-    position: Tuple[float, float, float]
-
-
-class PetData(SceneObject):
-    type: ObjectTypes = "pet"
-    hungry: int
-    tiredness: int
-    boredom: int
-    toilet: int
-
-
-class SceneData(BaseModel):
-    scene_data: list[SceneObject]
-    pet_data: PetData
 
 
 class AipetService:

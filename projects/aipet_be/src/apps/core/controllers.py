@@ -1,4 +1,5 @@
-from typing import Dict, Any
+from typing import Any, Dict
+
 from django.http import HttpRequest
 from django.middleware.csrf import get_token
 from ninja import Schema
