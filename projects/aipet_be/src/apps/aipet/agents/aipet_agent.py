@@ -13,7 +13,7 @@ from config import config  # noqa: E402
 
 logger = logging.getLogger(__name__)
 
-Actions = Literal["move", "feed", "play", "toilet", "sleep"]
+Actions = Literal["feed", "play", "toilet", "sleep"]
 ObjectTypes = Literal["pet", "food", "toy", "bed", "toilet", "other"]
 
 # Request/Response models for pet recommendations
@@ -24,10 +24,10 @@ class SceneObject(BaseModel):
 
 class PetData(SceneObject):
     type: ObjectTypes = "pet"
-    hungry: int
-    tiredness: int
-    boredom: int
-    toilet: int
+    hungry: float
+    tiredness: float
+    boredom: float
+    toilet: float
 
 
 class SceneData(BaseModel):
@@ -134,6 +134,7 @@ Current Scene:
                 user_message = self._format_needs_message(scene_data)
 
                 # Get recommendations from the agent
+                breakpoint()
                 response: AgentRunResult = await self.agent.run(user_message)
                 recommendation: PetActionRecommendation = response.output
 

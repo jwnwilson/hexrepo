@@ -33,18 +33,32 @@ export interface LoginResponse {
   username: string;
 }
 
-export interface PetNeedsRequest {
+// Scene data interfaces matching the backend
+export type ObjectTypes = "pet" | "food" | "toy" | "bed" | "toilet" | "other";
+export type Actions = "feed" | "play" | "toilet" | "sleep";
+
+export interface SceneObject {
+  type: ObjectTypes;
+  position: [number, number, number];
+}
+
+export interface PetData extends SceneObject {
+  type: ObjectTypes;
   hungry: number;
   tiredness: number;
   boredom: number;
   toilet: number;
 }
 
+export interface SceneData {
+  scene_data: SceneObject[];
+  pet_data: PetData;
+}
+
 export interface PetActionRecommendation {
-  action: string;
+  movement: [number, number, number] | null;
+  action: Actions | null;
   reasoning: string;
-  priority: 'high' | 'medium' | 'low';
-  estimated_duration?: number;
 }
 
 export interface VerificationRequest {
@@ -204,13 +218,13 @@ class ApiClient {
 
   // AI Pet methods
   async getPetRecommendations(
-    petNeeds: PetNeedsRequest,
+    sceneData: SceneData,
     model?: string
   ): Promise<ApiResponse<PetActionRecommendation>> {
     const params = model ? `?model=${encodeURIComponent(model)}` : '';
     return this.request<PetActionRecommendation>(`/aipet/recommendations${params}`, {
       method: 'POST',
-      body: JSON.stringify(petNeeds),
+      body: JSON.stringify(sceneData),
     });
   }
 

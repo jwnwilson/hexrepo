@@ -1,17 +1,17 @@
 import { useState, useCallback } from 'react';
-import { apiClient, PetNeedsRequest, PetActionRecommendation } from '../api/client';
+import { apiClient, SceneData, PetActionRecommendation } from '../api/client';
 
 export const usePetRecommendations = () => {
   const [recommendations, setRecommendations] = useState<PetActionRecommendation | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const getRecommendations = useCallback(async (petNeeds: PetNeedsRequest, model?: string) => {
+  const getRecommendations = useCallback(async (sceneData: SceneData, model?: string) => {
     setLoading(true);
     setError(null);
     
     try {
-      const response = await apiClient.getPetRecommendations(petNeeds, model);
+      const response = await apiClient.getPetRecommendations(sceneData, model);
       
       if (response.error) {
         setError(response.error);

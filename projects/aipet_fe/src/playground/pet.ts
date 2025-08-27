@@ -10,7 +10,7 @@ import { KeyboardEventTypes } from "@babylonjs/core/Events/keyboardEvents";
 import { SpriteManager } from "@babylonjs/core/Sprites/spriteManager";
 import { Sprite } from "@babylonjs/core/Sprites/sprite";
 import { Need } from "./need";
-import { apiClient } from "../api/client";
+import { apiClient, SceneData, SceneObject, PetData, ObjectTypes } from "../api/client";
 
 export interface PetNeeds {
   hungry: number;      // 0-100 (100 = very hungry)
@@ -29,6 +29,9 @@ export class Pet {
   private name: string;
   private needObjects: Need[] = [];
   private proximityThreshold: number = 3.0; // Distance threshold for need interaction
+  
+  // Track intervals to prevent duplicates and enable cleanup
+  private intervals: Map<string, NodeJS.Timeout> = new Map();
 
   constructor(
     private scene: Scene, 
@@ -105,8 +108,11 @@ export class Pet {
   }
 
   private _startNeedsDecay(): void {
+    // Clear existing interval if it exists
+    this._clearInterval('needsDecay');
+    
     // Simulate pet needs increasing over time
-    setInterval(() => {
+    const interval = setInterval(() => {
       this.needs.hungry = Math.min(100, this.needs.hungry + 0.5);
       this.needs.tiredness = Math.min(100, this.needs.tiredness + 0.3);
       this.needs.boredom = Math.min(100, this.needs.boredom + 0.4);
@@ -115,33 +121,71 @@ export class Pet {
       this._updatePetAppearance();
       this._updateStatusDisplay();
     }, 1000); // Update every second
+    
+    // Store the interval for tracking
+    this.intervals.set('needsDecay', interval);
+    console.log(`${this.name}: Started needs decay interval`);
+  }
+
+  private _clearInterval(name: string): void {
+    const existingInterval = this.intervals.get(name);
+    if (existingInterval) {
+      clearInterval(existingInterval);
+      this.intervals.delete(name);
+    }
   }
 
   private _startPetThinking(): void {
-    setInterval(async () => {
+    // Clear existing interval if it exists
+    this._clearInterval('petThinking');
+    
+    const interval = setInterval(async () => {
       console.log(`${this.name} is thinking...`);
       
       try {
-        // Get pet recommendations from the API
-        const response = await apiClient.getPetRecommendations({
+        // Convert pet needs and scene objects to scene data format
+        const petData: PetData = {
+          type: "pet",
+          position: this.mesh ? [this.mesh.position.x, this.mesh.position.y, this.mesh.position.z] : [0, 0, 0],
           hungry: this.needs.hungry,
           tiredness: this.needs.tiredness,
           boredom: this.needs.boredom,
           toilet: this.needs.toilet
+        };
+
+        // Convert need objects to scene objects
+        const sceneObjects: SceneObject[] = this.needObjects.map(need => {
+          const position = need.getPosition();
+          const objectType = need.getObjectType();
+          return {
+            type: objectType as ObjectTypes,
+            position: [position.x, position.y, position.z]
+          };
         });
+
+        const sceneData: SceneData = {
+          scene_data: sceneObjects,
+          pet_data: petData
+        };
+
+        // Get pet recommendations from the API
+        const response = await apiClient.getPetRecommendations(sceneData);
         
         if (response.data) {
           console.log(`${this.name} AI recommendation:`, response.data);
           console.log(`Action: ${response.data.action}`);
+          console.log(`Movement: ${response.data.movement}`);
           console.log(`Reasoning: ${response.data.reasoning}`);
-          console.log(`Priority: ${response.data.priority}`);
         } else if (response.error) {
           console.error(`Failed to get recommendations for ${this.name}:`, response.error);
         }
       } catch (error) {
         console.error(`Error getting pet recommendations for ${this.name}:`, error);
       }
-    }, 30000);
+    }, 15000);
+    
+    // Store the interval for tracking
+    this.intervals.set('petThinking', interval);
   }
 
   private _updatePetAppearance(): void {
@@ -444,6 +488,9 @@ export class Pet {
 
   // Cleanup method
   public dispose(): void {
+    // Clear all intervals
+    this._clearAllIntervals();
+    
     if (this.mesh) {
       this.mesh.dispose();
     }
