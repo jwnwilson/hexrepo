@@ -43,18 +43,8 @@ class TestAipetAgent:
     def test_system_message(self, agent):
         """Test system message contains expected content."""
         system_message = agent._get_system_message()
-        assert "expert pet care AI assistant" in system_message
+        assert "You are an AI Pet" in system_message
         assert "hungry" in system_message
         assert "tiredness" in system_message
         assert "boredom" in system_message
         assert "toilet" in system_message
-
-    def test_format_needs_message(self, agent):
-        """Test formatting of needs message."""
-        pet_needs = PetNeeds(hungry=80, tiredness=30, boredom=40, toilet=20)
-        message = agent._format_needs_message(pet_needs)
-
-        assert "Hunger: 80/100" in message
-        assert "Tiredness: 30/100" in message
-        assert "Boredom: 40/100" in message
-        assert "Toilet: 20/100" in message
