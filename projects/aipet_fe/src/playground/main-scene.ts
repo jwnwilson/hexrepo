@@ -51,15 +51,11 @@ export default class MainScene {
     this.ground = new Ground(this.scene);
     this._createPet();
     await this._place_needs();
-    // Pass the needs to the pet after they are created
-    if (this.pet) {
-      this.pet.setNeedObjects(this.needs);
-    }
   }
 
   private _createPet(): void {
     // Create a Pet instance with needs
-    this.pet = new Pet(this.scene, "Buddy", new Vector3(0, 3, 0));
+    this.pet = new Pet(this, "Bunny", new Vector3(0, 3, 0));
   }
 
   // Method to get the ground instance (which contains the pet)
@@ -77,12 +73,13 @@ export default class MainScene {
     return this.needs;
   }
 
+  getScene(): Scene {
+    return this.scene;
+  }
+
   // Method to add a new need and update the pet
   addNeed(need: Need): void {
     this.needs.push(need);
-    if (this.pet) {
-      this.pet.setNeedObjects(this.needs);
-    }
   }
 
   // Method to remove a need and update the pet
@@ -91,9 +88,6 @@ export default class MainScene {
     if (index !== -1) {
       const removedNeed = this.needs.splice(index, 1)[0];
       removedNeed.dispose();
-      if (this.pet) {
-        this.pet.setNeedObjects(this.needs);
-      }
     }
   }
 

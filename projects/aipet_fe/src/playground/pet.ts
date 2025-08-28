@@ -11,6 +11,7 @@ import { SpriteManager } from "@babylonjs/core/Sprites/spriteManager";
 import { Sprite } from "@babylonjs/core/Sprites/sprite";
 import { Need } from "./need";
 import { apiClient, SceneData, SceneObject, PetData, ObjectTypes, ApiResponse, PetActionRecommendation } from "../api/client";
+import MainScene from "./main-scene";
 
 export interface PetNeeds {
   hungry: number;      // 0-100 (100 = very hungry)
@@ -27,23 +28,21 @@ export class Pet {
   private shadowMesh: Mesh | null = null;
   private needs: PetNeeds;
   private name: string;
-  private needObjects: Need[] = [];
   private proximityThreshold: number = 3.0; // Distance threshold for need interaction
   private demoTimeoutMs: number;
-  private petThinkingEnabled: boolean = true;
-  
+  private mainScene: MainScene;
+  private scene: Scene;
   // Track intervals to prevent duplicates and enable cleanup
   private intervals: Map<string, NodeJS.Timeout> = new Map();
 
   constructor(
-    private scene: Scene, 
+    scene: MainScene, 
     name: string = "Pet", 
     position: Vector3 = new Vector3(0, 2, 0),
-    needObjects: Need[] = []
   ) {
-    this.scene = scene;
+    this.mainScene = scene;
+    this.scene = scene.getScene();
     this.name = name;
-    this.needObjects = needObjects;
     this.needs = {
       hungry: 50,
       tiredness: 30,
@@ -167,7 +166,7 @@ export class Pet {
         };
 
         // Convert need objects to scene objects
-        const sceneObjects: SceneObject[] = this.needObjects.map(need => {
+        const sceneObjects: SceneObject[] = this.mainScene.getNeeds().map(need => {
           const position = need.getPosition();
           const objectType = need.getObjectType();
           return {
@@ -317,9 +316,6 @@ export class Pet {
       <strong>Most Urgent:</strong> ${urgentNeed.need} (${urgentNeed.value.toFixed(1)})<br/>
       <strong>Nearby Needs:</strong> ${nearbyText}<br/>
       <strong>Proximity Range:</strong> ${this.proximityThreshold.toFixed(1)}m<br/>
-      <br/>
-      <strong>Controls:</strong><br/>
-      WASD - Move | SPACE - Jump | F - Feed | P - Play | Z - Sleep | T - Toilet
     `;
   }
 
@@ -329,7 +325,7 @@ export class Pet {
     const petPosition = this.mesh.position;
     const nearby: Need[] = [];
     
-    for (const need of this.needObjects) {
+    for (const need of this.mainScene.getNeeds()) {
       const distance = Vector3.Distance(petPosition, need.getPosition());
       if (distance <= this.proximityThreshold) {
         nearby.push(need);
@@ -345,7 +341,7 @@ export class Pet {
     
     const petPosition = this.mesh.position;
     
-    for (const need of this.needObjects) {
+    for (const need of this.mainScene.getNeeds()) {
       const needName = need.getName().toLowerCase();
       if (needName.includes(needType.toLowerCase())) {
         const distance = Vector3.Distance(petPosition, need.getPosition());
@@ -364,7 +360,7 @@ export class Pet {
     let closestNeed: Need | null = null;
     let closestDistance = Infinity;
     
-    for (const need of this.needObjects) {
+    for (const need of this.mainScene.getNeeds()) {
       const needName = need.getName().toLowerCase();
       if (needName.includes(needType.toLowerCase())) {
         const distance = Vector3.Distance(petPosition, need.getPosition());
@@ -450,26 +446,12 @@ export class Pet {
     return this.name;
   }
 
-  public getNeeds(): PetNeeds {
-    return { ...this.needs };
-  }
-
   public getMesh(): Mesh | null {
     return this.mesh;
   }
 
   public getPhysicsBody(): PhysicsAggregate | null {
     return this.meshAggregate;
-  }
-
-  // Method to update the need objects
-  public setNeedObjects(needObjects: Need[]): void {
-    this.needObjects = needObjects;
-  }
-
-  // Method to get current need objects
-  public getNeedObjects(): Need[] {
-    return [...this.needObjects];
   }
 
   // Method to set proximity threshold
@@ -479,7 +461,7 @@ export class Pet {
 
   // Method to get the most urgent need
   public getMostUrgentNeed(): { need: keyof PetNeeds; value: number } {
-    const needs = this.getNeeds();
+    const needs = this.needs;
     let maxNeed: keyof PetNeeds = 'hungry';
     let maxValue = needs.hungry;
 
