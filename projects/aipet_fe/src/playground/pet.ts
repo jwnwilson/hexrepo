@@ -265,18 +265,6 @@ export class Pet {
 
   private _updatePetAppearance(): void {
     if (!this.mesh || !this.mesh.material) return;
-
-    const material = this.mesh.material as StandardMaterial;
-    
-    // Change color based on needs - redder when needs are higher
-    const needsAverage = (this.needs.hungry + this.needs.tiredness + this.needs.boredom + this.needs.toilet) / 4;
-    const intensity = needsAverage / 100;
-    
-    material.diffuseColor = new Color3(
-      0.8 + (intensity * 0.2), // More red when needs are high
-      0.6 - (intensity * 0.3), // Less green when needs are high
-      0.4 - (intensity * 0.3)  // Less blue when needs are high
-    );
   }
 
   private _updateStatusDisplay(): void {
