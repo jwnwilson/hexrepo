@@ -17,10 +17,10 @@ data "aws_region" "current" {}
 locals {
     account_id = data.aws_caller_identity.current.account_id
     region = data.aws_region.current.name
-    db_url            = "postgresql+psycopg://postgres:{password}@${module.common_postgres.db_instance_endpoint}/${var.project}"
-    db_ro_url         = module.common_postgres.db_instance_ro_endpoint != null ? "postgresql+psycopg://postgres:{password}@${module.common_postgres.db_instance_ro_endpoint}/${var.project}" : "postgresql+psycopg://postgres:{password}@${module.common_postgres.db_instance_endpoint}/${var.project}"
-    api_subdomain     = "common-${terraform.workspace}"
-    api_subdomain_ecs = "common-${terraform.workspace}-ecs"
+    db_url            = "postgresql+psycopg://postgres:{password}@${module.postgres.db_instance_endpoint}/${var.project}"
+    db_ro_url         = module.postgres.db_instance_ro_endpoint != null ? "postgresql+psycopg://postgres:{password}@${module.postgres.db_instance_ro_endpoint}/${var.project}" : "postgresql+psycopg://postgres:{password}@${module.postgres.db_instance_endpoint}/${var.project}"
+    api_subdomain     = "${var.project}-${terraform.workspace}"
+    api_subdomain_ecs = "${var.project}-${terraform.workspace}-ecs"
     app_url           = "https://${local.api_subdomain}.${var.domain}"
     common_env_vars = {
       ENVIRONMENT             = terraform.workspace
@@ -77,7 +77,7 @@ data "aws_ecr_repository" "ecr_repo" {
   name                 = "hexrepo-${var.project}"
 }
 
-module "common_alb" {
+module "alb" {
   source = "../../../../../../infra/tf/aws/modules/alb"
 
   project            = var.project
@@ -102,7 +102,7 @@ module "aipet_be_ecs_api" {
   vpc_id             = data.aws_vpc.hexrepo.id
   private_subnet_ids = data.aws_subnets.private.ids
   security_group_ids = [module.postgres.db_security_group_id]
-  target_group_arn   = module.common_alb.target_group_arn
+  target_group_arn   = module.alb.target_group_arn
   # This costs money
   container_insights = "disabled"
   min_capacity       = 0
@@ -125,18 +125,18 @@ module "postgres" {
   source = "../../../../../../infra/tf/aws/modules/rds"
 
   environment       = terraform.workspace
-  project           = "aipet_be"
+  project           = var.project
   vpc_id            = data.aws_vpc.hexrepo.id
   username          = "postgres"
 }
 
 data "aws_secretsmanager_secret" "db_secret" {
-  arn = module.aipet_be_postgres.db_password_secret_arn
+  arn = module.postgres.db_password_secret_arn
 }
 
 module "main_bucket" {
   source = "../../../../../../infra/tf/aws/modules/s3"
 
-  project     = "aipet_be"
-  name        = "aipet_be"
+  project     = var.project
+  name        = "aipet"
 }

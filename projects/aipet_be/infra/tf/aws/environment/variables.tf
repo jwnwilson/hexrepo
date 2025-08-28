@@ -11,7 +11,7 @@ variable "aws_secret_key" {
 }
 
 variable "project" {
-  default = "aipet_be"
+  default = "aipet"
 }
 
 variable "docker_tag_container" {
@@ -23,14 +23,14 @@ variable "docker_tag_serverless" {
 }
 
 variable "domain" {
-  default = ""
+  default = "jwnwilson.co.uk"
 }
 
 variable "api_subdomain" {
-  default = "aipet_be"
+  default = "aipet"
 }
 
 variable "api_repo" {
   description = "Name of container image repository"
-  default     = "aipet_be_api"
+  default     = "aipet_api"
 }
