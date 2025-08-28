@@ -6,14 +6,15 @@ import type { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { Vector3 } from "@babylonjs/core";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
+import { SceneLoader } from "@babylonjs/core/Loading/sceneLoader";
 
 export interface NeedProperties {
-  size: number;           // Size of the cube
-  color: Color3;          // Color of the cube
+  size: number;           // Size of the cube/GLTF model
+  color: Color3;          // Color of the cube (applied to GLTF if no material)
   mass: number;           // Physics mass
-  isStatic: boolean;      // Whether the cube is static (immovable)
-  isVisible: boolean;     // Whether the cube is visible
-  objectType?: string;    // Type of object (food, toy, bed, toilet, other)
+  isStatic: boolean;      // Whether the object is static (immovable)
+  isVisible: boolean;     // Whether the object is visible
+  objectType?: string;    // Type of object (food, bed, other) - determines GLTF file to load
 }
 
 export class Need {
@@ -22,6 +23,15 @@ export class Need {
   private material: StandardMaterial | null = null;
   private properties: NeedProperties;
   private name: string;
+  private isReady: boolean = false;
+  private readyPromise: Promise<void>;
+
+  // Mapping of object types to GLTF files
+  private static readonly GLTF_MAPPING: Record<string, string> = {
+    food: "/model/food/scene.gltf",
+    bed: "/model/bed/scene.gltf",
+    // Add more mappings as needed
+  };
 
   constructor(
     private scene: Scene, 
@@ -42,10 +52,76 @@ export class Need {
       ...properties
     };
     
-    this._createNeed(position);
+    this.readyPromise = this._createNeed(position);
   }
 
-  private _createNeed(position: Vector3): void {
+  private async _createNeed(position: Vector3): Promise<void> {
+    const objectType = this.properties.objectType || "other";
+    const gltfPath = Need.GLTF_MAPPING[objectType];
+
+    if (gltfPath) {
+      // Try to load GLTF file
+      try {
+        await this._loadGLTFModel(gltfPath, position);
+        this.isReady = true;
+        return;
+      } catch (error) {
+        console.warn(`Failed to load GLTF model for ${objectType}:`, error);
+        // Fall back to box creation
+      }
+    }
+
+    // Fall back to creating a box
+    this._createBoxMesh(position);
+    this.isReady = true;
+  }
+
+  private async _loadGLTFModel(gltfPath: string, position: Vector3): Promise<void> {
+    const result = await SceneLoader.ImportMeshAsync("", "", gltfPath, this.scene);
+    console.log("loaded", result);
+    
+    if (result.meshes.length === 0) {
+      throw new Error("No meshes found in GLTF file");
+    }
+    
+    // Use the first mesh as the main mesh
+    this.mesh = result.meshes[0] as Mesh;
+    this.mesh.name = this.name;
+    this.mesh.position = position;
+    this.mesh.isVisible = this.properties.isVisible;
+
+    // Scale the mesh according to the size property
+    const scale = this.properties.size;
+    this.mesh.scaling = new Vector3(scale, scale, scale);
+
+    // Create material if the mesh doesn't have one
+    if (!this.mesh.material) {
+      this.material = new StandardMaterial(`${this.name}Material`, this.scene);
+      this.material.diffuseColor = this.properties.color;
+      this.material.specularColor = new Color3(0.1, 0.1, 0.1);
+      this.material.emissiveColor = new Color3(0, 0, 0);
+      this.mesh.material = this.material;
+    } else {
+      // Store reference to existing material
+      this.material = this.mesh.material as StandardMaterial;
+    }
+
+    // Add physics if not static
+    if (!this.properties.isStatic) {
+      this.meshAggregate = new PhysicsAggregate(
+        this.mesh, 
+        PhysicsShapeType.BOX, 
+        { 
+          mass: this.properties.mass, 
+          restitution: 0.3, 
+          friction: 0.8
+        }, 
+        this.scene
+      );
+    }
+  }
+
+  private _createBoxMesh(position: Vector3): void {
     // Create cube mesh
     this.mesh = MeshBuilder.CreateBox(
       this.name, 
@@ -164,6 +240,15 @@ export class Need {
 
   public getObjectType(): string {
     return this.properties.objectType || "other";
+  }
+
+  // Async methods for handling GLTF loading
+  public async waitForReady(): Promise<void> {
+    return this.readyPromise;
+  }
+
+  public isNeedReady(): boolean {
+    return this.isReady;
   }
 
   // Utility methods

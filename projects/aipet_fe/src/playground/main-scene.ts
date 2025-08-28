@@ -11,7 +11,9 @@ import { WebGPUEngine } from "@babylonjs/core/Engines/webgpuEngine";
 import { Ground } from "./ground";
 import { Pet } from "./pet";
 import { Need } from "./need";
+import { registerBuiltInLoaders } from "@babylonjs/loaders/dynamic";
 
+registerBuiltInLoaders();
 export default class MainScene {
   private camera: ArcRotateCamera;
   private ground: Ground | null = null;
@@ -94,10 +96,10 @@ export default class MainScene {
   private async _place_needs(): Promise<void> {
     try {
       // Fetch the JSON file containing need configurations
-      const response = await fetch('/public/needs-config.json');
+      const response = await fetch('/needs-config.json');
       if (!response.ok) {
         console.warn('Could not load needs configuration file, using default needs');
-        this._createDefaultNeeds();
+        await this._createDefaultNeeds();
         return;
       }
 
@@ -108,7 +110,7 @@ export default class MainScene {
       this.needs = [];
 
       // Create needs based on the configuration
-      needsConfig.needs.forEach((needConfig: any) => {
+      for (const needConfig of needsConfig.needs) {
         const need = new Need(
           this.scene,
           needConfig.name,
@@ -122,17 +124,18 @@ export default class MainScene {
             objectType: needConfig.objectType || "other"
           }
         );
+        await need.waitForReady();
         this.needs.push(need);
-      });
+      }
 
       console.log(`Placed ${this.needs.length} needs on the ground`);
     } catch (error) {
       console.error('Error loading needs configuration:', error);
-      this._createDefaultNeeds();
+      await this._createDefaultNeeds();
     }
   }
 
-  private _createDefaultNeeds(): void {
+  private async _createDefaultNeeds(): Promise<void> {
     // Create some default needs if the JSON file is not available
     const defaultNeeds = [
       {
@@ -141,15 +144,17 @@ export default class MainScene {
         size: 1,
         color: { r: 1, g: 0, b: 0 }, // Red
         mass: 1,
-        isStatic: false
+        isStatic: false,
+        objectType: "food"
       },
       {
-        name: "WaterNeed", 
+        name: "BedNeed", 
         position: { x: -5, y: 0.5, z: 0 },
         size: 1,
         color: { r: 0, g: 0, b: 1 }, // Blue
         mass: 1,
-        isStatic: false
+        isStatic: false,
+        objectType: "bed"
       },
       {
         name: "ToyNeed",
@@ -157,11 +162,12 @@ export default class MainScene {
         size: 1.5,
         color: { r: 1, g: 1, b: 0 }, // Yellow
         mass: 2,
-        isStatic: false
+        isStatic: false,
+        objectType: "other"
       }
     ];
 
-    defaultNeeds.forEach(needConfig => {
+    for (const needConfig of defaultNeeds) {
       const need = new Need(
         this.scene,
         needConfig.name,
@@ -171,11 +177,13 @@ export default class MainScene {
           color: new Color3(needConfig.color.r, needConfig.color.g, needConfig.color.b),
           mass: needConfig.mass,
           isStatic: needConfig.isStatic,
-          isVisible: true
+          isVisible: true,
+          objectType: needConfig.objectType
         }
       );
+      await need.waitForReady();
       this.needs.push(need);
-    });
+    }
 
     console.log('Created default needs');
   }
