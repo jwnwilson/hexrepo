@@ -18,7 +18,7 @@ variable "aws_secret_key" {
 }
 
 variable "project" {
-  default = "aipet_be"
+  default = "aipet"
 }
 
 variable "docker_tag" {
@@ -27,5 +27,5 @@ variable "docker_tag" {
 
 variable "api_repo" {
   description = "Name of container image repository"
-  default     = "aipet_be_api"
+  default     = "aipet_api"
 }
