@@ -199,6 +199,7 @@ export class Pet {
 
   private _handle_pet_recommendations(pet_recommendation: PetActionRecommendation): void {
     console.log(`${this.name} AI recommendation:`, pet_recommendation);
+    const thinkingInterval: number = 5000;
     
     // Apply movement force if recommendation includes movement
     if (pet_recommendation.movement && this.meshAggregate && this.mesh) {
@@ -212,16 +213,16 @@ export class Pet {
       const forceInterval = setInterval(() => {
         if (this.meshAggregate && this.mesh) {
           // Apply a smaller continuous force to maintain movement
-          const continuousForce = movementVector.scale(0.1);
+          const continuousForce = movementVector.scale(0.2);
           this.meshAggregate.body.applyForce(continuousForce, this.mesh.position);
         }
-      }, 1000); // Apply force every 100ms
+      }, 500); // Apply force every 100ms
       
       // Stop applying force after 5 seconds
       setTimeout(() => {
         clearInterval(forceInterval);
         console.log(`${this.name} movement recommendation completed`);
-      }, 5000);
+      }, thinkingInterval);
     }
     
     // Handle action recommendation if provided
@@ -234,13 +235,13 @@ export class Pet {
       // Set up periodic action triggering for 5 seconds
       const actionInterval = setInterval(() => {
         this._performAction(pet_recommendation.action!);
-      }, 2000); // Trigger action every 2 seconds
+      }, 1000); // Trigger action every 1 seconds
       
       // Stop periodic actions after 5 seconds
       setTimeout(() => {
         clearInterval(actionInterval);
         console.log(`${this.name} action recommendation completed`);
-      }, 5000);
+      }, thinkingInterval);
     }
   }
   
