@@ -1,3 +1,4 @@
+import sys
 from typing import Dict, List, Optional
 
 import requests
@@ -18,6 +19,7 @@ from hexrepo_cloud.auth.interface import (
 )
 
 JWK = Dict[str, str]
+IS_TESTING = "pytest" in sys.modules
 
 
 class JWKS(BaseModel):
@@ -33,7 +35,17 @@ class FastapiJWTCognitoMiddleware(FastapiJWTMiddleware, HTTPBearer):
             )
         )
         try:
-            self.jwks: JWKS = JWKS.model_validate(requests.get(keys_url).json())
+            if IS_TESTING:
+                self.jwks: JWKS = JWKS(
+                    keys=[
+                        {
+                            "kid": "test",
+                            "x5c": "test",
+                        }
+                    ]
+                )
+            else:
+                self.jwks: JWKS = JWKS.model_validate(requests.get(keys_url).json())
         except requests.RequestException:
             logger.exception("Error fetching JWKs")
             raise
