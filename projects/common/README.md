@@ -1,1 +1,0 @@
-# Fastapi Example Project

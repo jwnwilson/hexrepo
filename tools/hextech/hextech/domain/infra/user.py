@@ -6,7 +6,7 @@ from hextech.domain.system import run_system_command
 
 
 def create_user_with_permissions(config: HexrepoConfig, env: str) -> None:
-    project: str = "common"
+    project: str = "fastapi_admin"
     if config.cloud_provider == "aws" and env != "local":
         # Start bastion
         with managed_bastion_ssh(config, env, project):
@@ -22,7 +22,7 @@ def create_user_with_permissions(config: HexrepoConfig, env: str) -> None:
 
 
 def create_user_permissions(config: HexrepoConfig, env: str) -> None:
-    project: str = "common"
+    project: str = "fastapi_admin"
     if config.cloud_provider == "aws" and env != "local":
         # Start bastion
         with managed_bastion_ssh(config, env, project):
