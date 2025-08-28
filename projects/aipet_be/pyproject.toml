@@ -32,6 +32,7 @@ dependencies = [
     "hexrepo-db",
     "hexrepo-api",
     "hexrepo-log",
+    "pydantic-ai-slim[google]>=0.7.2",
 ]
 
 [dependency-groups]

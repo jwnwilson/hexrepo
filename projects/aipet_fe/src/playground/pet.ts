@@ -192,7 +192,7 @@ export class Pet {
       } catch (error) {
         console.error(`Error getting pet recommendations for ${this.name}:`, error);
       }
-    }, 15000);
+    }, 5000);
     
     // Store the interval for tracking
     this.intervals.set('petThinking', interval);
