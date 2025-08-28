@@ -4,6 +4,7 @@ from ninja_jwt.authentication import JWTAuth
 
 from apps.aipet.api import router as aipet_router
 from apps.aipet.controllers import AipetController
+from apps.core.controllers import CsrfController
 from apps.login.controllers.login import NinjaJWTController, SignupController
 
 api = NinjaExtraAPI(
@@ -16,4 +17,5 @@ api = NinjaExtraAPI(
 api.register_controllers(NinjaJWTController)
 api.register_controllers(AipetController)
 api.register_controllers(SignupController)
+api.register_controllers(CsrfController)
 api.add_router("aipet", aipet_router)

@@ -10,6 +10,7 @@ import { KeyboardEventTypes } from "@babylonjs/core/Events/keyboardEvents";
 import { SpriteManager } from "@babylonjs/core/Sprites/spriteManager";
 import { Sprite } from "@babylonjs/core/Sprites/sprite";
 import { Need } from "./need";
+import { apiClient, SceneData, SceneObject, PetData, ObjectTypes, ApiResponse, PetActionRecommendation } from "../api/client";
 
 export interface PetNeeds {
   hungry: number;      // 0-100 (100 = very hungry)
@@ -28,6 +29,11 @@ export class Pet {
   private name: string;
   private needObjects: Need[] = [];
   private proximityThreshold: number = 3.0; // Distance threshold for need interaction
+  private demoTimeoutMs: number;
+  private petThinkingEnabled: boolean = true;
+  
+  // Track intervals to prevent duplicates and enable cleanup
+  private intervals: Map<string, NodeJS.Timeout> = new Map();
 
   constructor(
     private scene: Scene, 
@@ -44,10 +50,13 @@ export class Pet {
       boredom: 40,
       toilet: 20
     };
+    this.demoTimeoutMs = parseInt(import.meta.env.VITE_DEMO_TIMEOUT_MS || '120000', 10);
     
     this._createPet(position);
     this._startNeedsDecay();
+    this._startPetThinking();
     this._createKeyboardControls();
+    this._startDemoTimeout();
   }
 
   private _createPet(position: Vector3): void {
@@ -103,8 +112,11 @@ export class Pet {
   }
 
   private _startNeedsDecay(): void {
+    // Clear existing interval if it exists
+    this._clearInterval('needsDecay');
+    
     // Simulate pet needs increasing over time
-    setInterval(() => {
+    const interval = setInterval(() => {
       this.needs.hungry = Math.min(100, this.needs.hungry + 0.5);
       this.needs.tiredness = Math.min(100, this.needs.tiredness + 0.3);
       this.needs.boredom = Math.min(100, this.needs.boredom + 0.4);
@@ -113,6 +125,143 @@ export class Pet {
       this._updatePetAppearance();
       this._updateStatusDisplay();
     }, 1000); // Update every second
+    
+    // Store the interval for tracking
+    this.intervals.set('needsDecay', interval);
+    console.log(`${this.name}: Started needs decay interval`);
+  }
+
+  private _clearInterval(name: string): void {
+    const existingInterval = this.intervals.get(name);
+    if (existingInterval) {
+      clearInterval(existingInterval);
+      this.intervals.delete(name);
+    }
+  }
+
+  private _clearAllIntervals(): void {
+    // Clear all tracked intervals
+    for (const [name, interval] of this.intervals.entries()) {
+      clearInterval(interval);
+      console.log(`${this.name}: Cleared interval: ${name}`);
+    }
+    this.intervals.clear();
+  }
+
+  private _startPetThinking(): void {
+    // Clear existing interval if it exists
+    this._clearInterval('petThinking');
+    
+    const interval = setInterval(async () => {
+      console.log(`${this.name} is thinking...`);
+      
+      try {
+        // Convert pet needs and scene objects to scene data format
+        const petData: PetData = {
+          type: "pet",
+          position: this.mesh ? [this.mesh.position.x, this.mesh.position.y, this.mesh.position.z] : [0, 0, 0],
+          hungry: this.needs.hungry,
+          tiredness: this.needs.tiredness,
+          boredom: this.needs.boredom,
+          toilet: this.needs.toilet
+        };
+
+        // Convert need objects to scene objects
+        const sceneObjects: SceneObject[] = this.needObjects.map(need => {
+          const position = need.getPosition();
+          const objectType = need.getObjectType();
+          return {
+            type: objectType as ObjectTypes,
+            position: [position.x, position.y, position.z]
+          };
+        });
+
+        const sceneData: SceneData = {
+          scene_data: sceneObjects,
+          pet_data: petData
+        };
+
+        // Get pet recommendations from the API
+        const response: ApiResponse<PetActionRecommendation> = await apiClient.getPetRecommendations(sceneData);
+        
+        if (response.data) {
+          this._handle_pet_recommendations(response.data);
+        } else if (response.error) {
+          console.error(`Failed to get recommendations for ${this.name}:`, response.error);
+        }
+      } catch (error) {
+        console.error(`Error getting pet recommendations for ${this.name}:`, error);
+      }
+    }, 15000);
+    
+    // Store the interval for tracking
+    this.intervals.set('petThinking', interval);
+  }
+
+  private _handle_pet_recommendations(pet_recommendation: PetActionRecommendation): void {
+    console.log(`${this.name} AI recommendation:`, pet_recommendation);
+    
+    // Apply movement force if recommendation includes movement
+    if (pet_recommendation.movement && this.meshAggregate && this.mesh) {
+      const [x, y, z] = pet_recommendation.movement;
+      const movementVector = new Vector3(x, y, z);
+      
+      // Apply initial impulse
+      this.meshAggregate.body.applyImpulse(movementVector, this.mesh.position);
+      
+      // Set up continuous force application for 5 seconds
+      const forceInterval = setInterval(() => {
+        if (this.meshAggregate && this.mesh) {
+          // Apply a smaller continuous force to maintain movement
+          const continuousForce = movementVector.scale(0.1);
+          this.meshAggregate.body.applyForce(continuousForce, this.mesh.position);
+        }
+      }, 1000); // Apply force every 100ms
+      
+      // Stop applying force after 5 seconds
+      setTimeout(() => {
+        clearInterval(forceInterval);
+        console.log(`${this.name} movement recommendation completed`);
+      }, 5000);
+    }
+    
+    // Handle action recommendation if provided
+    if (pet_recommendation.action) {
+      console.log(`${this.name} will perform action: ${pet_recommendation.action}`);
+      
+      // Perform the action immediately
+      this._performAction(pet_recommendation.action);
+      
+      // Set up periodic action triggering for 5 seconds
+      const actionInterval = setInterval(() => {
+        this._performAction(pet_recommendation.action!);
+      }, 2000); // Trigger action every 2 seconds
+      
+      // Stop periodic actions after 5 seconds
+      setTimeout(() => {
+        clearInterval(actionInterval);
+        console.log(`${this.name} action recommendation completed`);
+      }, 5000);
+    }
+  }
+  
+  private _performAction(action: string): void {
+    switch (action) {
+      case "feed":
+        this.feed();
+        break;
+      case "play":
+        this.play();
+        break;
+      case "toilet":
+        this.toilet();
+        break;
+      case "sleep":
+        this.sleep();
+        break;
+      default:
+        console.warn(`Unknown action: ${action}`);
+    }
   }
 
   private _updatePetAppearance(): void {
@@ -413,8 +562,19 @@ export class Pet {
     });
   }
 
+  private _startDemoTimeout(): void {
+    // Set up demo timeout to disable pet thinking after the specified time
+    setTimeout(() => {
+      console.log(`${this.name}: Demo timeout reached (${this.demoTimeoutMs}ms), disabling pet thinking`);
+      this._clearAllIntervals();
+    }, this.demoTimeoutMs);
+  }
+
   // Cleanup method
   public dispose(): void {
+    // Clear all intervals
+    this._clearAllIntervals();
+    
     if (this.mesh) {
       this.mesh.dispose();
     }

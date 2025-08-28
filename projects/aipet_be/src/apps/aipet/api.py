@@ -1,29 +1,26 @@
 from typing import Optional
 
+import logfire
 from ninja import Router
-from pydantic import BaseModel
 
 from apps.aipet.agents.aipet_agent import PetActionRecommendation
 from apps.core.auth import JWTAuthAsync, SessionAuthAsync
+from config import config
 
-from .services.aipet import AipetService
+from .services.aipet import AipetService, SceneData
+
+# configure logfire
+logfire.configure(token=config.LOGFIRE_WRITE_TOKEN)
+logfire.instrument_pydantic_ai()
 
 router = Router(
     tags=["Aipet"],
 )
 
 
-# Request/Response models for pet recommendations
-class PetNeedsRequest(BaseModel):
-    hungry: int
-    tiredness: int
-    boredom: int
-    toilet: int
-
-
 @router.post("/recommendations", auth=[SessionAuthAsync(), JWTAuthAsync()])
 async def get_pet_recommendations(
-    request, pet_needs: PetNeedsRequest, model: Optional[str] = None
+    request, scene_data: SceneData, model: Optional[str] = None
 ) -> PetActionRecommendation:
     """
     Get AI-powered recommendations for pet care based on current needs.
@@ -35,11 +32,6 @@ async def get_pet_recommendations(
     service = AipetService(model=model)
 
     # Get recommendations
-    recommendations = await service.get_pet_recommendations(
-        hungry=pet_needs.hungry,
-        tiredness=pet_needs.tiredness,
-        boredom=pet_needs.boredom,
-        toilet=pet_needs.toilet,
-    )
+    recommendations = await service.get_pet_recommendations(scene_data)
 
     return recommendations

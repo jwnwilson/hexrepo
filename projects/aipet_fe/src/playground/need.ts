@@ -13,6 +13,7 @@ export interface NeedProperties {
   mass: number;           // Physics mass
   isStatic: boolean;      // Whether the cube is static (immovable)
   isVisible: boolean;     // Whether the cube is visible
+  objectType?: string;    // Type of object (food, toy, bed, toilet, other)
 }
 
 export class Need {
@@ -159,6 +160,10 @@ export class Need {
 
   public getMaterial(): StandardMaterial | null {
     return this.material;
+  }
+
+  public getObjectType(): string {
+    return this.properties.objectType || "other";
   }
 
   // Utility methods

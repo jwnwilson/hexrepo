@@ -124,7 +124,8 @@ export default class MainScene {
             color: new Color3(needConfig.color.r, needConfig.color.g, needConfig.color.b),
             mass: needConfig.mass || 1,
             isStatic: needConfig.isStatic || false,
-            isVisible: needConfig.isVisible !== undefined ? needConfig.isVisible : true
+            isVisible: needConfig.isVisible !== undefined ? needConfig.isVisible : true,
+            objectType: needConfig.objectType || "other"
           }
         );
         this.needs.push(need);
@@ -183,5 +184,21 @@ export default class MainScene {
     });
 
     console.log('Created default needs');
+  }
+
+  // Cleanup method to dispose of all resources
+  public dispose(): void {
+    // Dispose of the pet (this will clear all intervals)
+    if (this.pet) {
+      this.pet.dispose();
+      this.pet = null;
+    }
+
+    // Dispose of all needs
+    this.needs.forEach(need => need.dispose());
+    this.needs = [];
+
+    // Note: Ground doesn't have a dispose method, so we just set it to null
+    this.ground = null;
   }
 }

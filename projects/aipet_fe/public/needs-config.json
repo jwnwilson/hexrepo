@@ -15,7 +15,8 @@
       },
       "mass": 1,
       "isStatic": false,
-      "isVisible": true
+      "isVisible": true,
+      "objectType": "food"
     },
     {
       "name": "WaterNeed",
@@ -32,7 +33,8 @@
       },
       "mass": 1,
       "isStatic": false,
-      "isVisible": true
+      "isVisible": true,
+      "objectType": "food"
     },
     {
       "name": "ToyNeed",
@@ -49,7 +51,8 @@
       },
       "mass": 2,
       "isStatic": false,
-      "isVisible": true
+      "isVisible": true,
+      "objectType": "toy"
     },
     {
       "name": "SleepNeed",
@@ -66,7 +69,8 @@
       },
       "mass": 3,
       "isStatic": true,
-      "isVisible": true
+      "isVisible": true,
+      "objectType": "bed"
     },
     {
       "name": "ExerciseNeed",
@@ -83,7 +87,8 @@
       },
       "mass": 1.5,
       "isStatic": false,
-      "isVisible": true
+      "isVisible": true,
+      "objectType": "toy"
     }
   ]
 } 
