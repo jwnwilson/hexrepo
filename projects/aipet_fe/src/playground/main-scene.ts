@@ -28,7 +28,7 @@ export default class MainScene {
   }
 
   _setCamera(scene: Scene): void {
-    this.camera = new ArcRotateCamera("camera", Tools.ToRadians(120), Tools.ToRadians(40), 20, Vector3.Zero(), scene);
+    this.camera = new ArcRotateCamera("camera", Tools.ToRadians(120), Tools.ToRadians(50), 30, Vector3.Zero(), scene);
     this.camera.attachControl(this.canvas, true);
     this.camera.setTarget(Vector3.Zero());
   }
