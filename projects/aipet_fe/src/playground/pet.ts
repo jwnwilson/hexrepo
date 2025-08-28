@@ -3,12 +3,15 @@ import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/";
 import type { Mesh } from "@babylonjs/core/Meshes/mesh";
-import { Vector3 } from "@babylonjs/core";
+import { Vector3, Matrix } from "@babylonjs/core";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { KeyboardEventTypes } from "@babylonjs/core/Events/keyboardEvents";
 import { SpriteManager } from "@babylonjs/core/Sprites/spriteManager";
 import { Sprite } from "@babylonjs/core/Sprites/sprite";
+import { AdvancedDynamicTexture } from "@babylonjs/gui/2D/advancedDynamicTexture";
+import { TextBlock } from "@babylonjs/gui/2D/controls/textBlock";
+import { Rectangle } from "@babylonjs/gui/2D/controls/rectangle";
 import { Need } from "./need";
 import { apiClient, SceneData, SceneObject, PetData, ObjectTypes, ApiResponse, PetActionRecommendation } from "../api/client";
 import MainScene from "./main-scene";
@@ -34,6 +37,11 @@ export class Pet {
   private scene: Scene;
   // Track intervals to prevent duplicates and enable cleanup
   private intervals: Map<string, NodeJS.Timeout> = new Map();
+  // Speech bubble properties
+  private speechBubble: AdvancedDynamicTexture | null = null;
+  private speechText: TextBlock | null = null;
+  private speechBackground: Rectangle | null = null;
+  private speechTimeout: NodeJS.Timeout | null = null;
 
   constructor(
     scene: MainScene, 
@@ -52,6 +60,7 @@ export class Pet {
     this.demoTimeoutMs = parseInt(import.meta.env.VITE_DEMO_TIMEOUT_MS || '120000', 10);
     
     this._createPet(position);
+    this._createSpeechBubble();
     this._startNeedsDecay();
     this._startPetThinking();
     this._createKeyboardControls();
@@ -110,6 +119,63 @@ export class Pet {
     this.shadowMesh.material = shadowMaterial;
   }
 
+  private _createSpeechBubble(): void {
+    this.speechBubble = AdvancedDynamicTexture.CreateFullscreenUI("UI");
+
+    this.speechBackground = new Rectangle();
+    this.speechBackground.width = 0.2;
+    this.speechBackground.height = "200px";
+    this.speechBackground.cornerRadius = 20;
+    this.speechBackground.color = "Black";
+    this.speechBackground.thickness = 4;
+    this.speechBackground.background = "white";
+    this.speechBubble.addControl(this.speechBackground);
+    this.speechBackground.linkWithMesh(this.mesh);   
+    this.speechBackground.linkOffsetY = -200;
+
+    this.speechText = new TextBlock();
+    this.speechText.text = "";
+    this.speechText.fontFamily = "Arial, sans-serif";
+    this.speechText.fontSize = 36;
+    this.speechText.textWrapping = true;
+
+    this.speechBackground.addControl(this.speechText);
+    this.speechBackground.isVisible = false;
+  }
+
+  private _showSpeech(text: string, duration: number = 3000): void {
+    if (!this.speechBackground || !this.speechText) return;
+    
+    // Clear any existing timeout
+    if (this.speechTimeout) {
+      clearTimeout(this.speechTimeout);
+    }
+    
+    // Update speech text
+    this.speechText.text = text;
+    this.currentSpeech = text;
+    
+    // Show the speech bubble
+    this.speechBackground.isVisible = true;
+    
+    // Hide after duration
+    this.speechTimeout = setTimeout(() => {
+      this._hideSpeech();
+    }, duration);
+  }
+
+  private _hideSpeech(): void {
+    if (!this.speechBackground) return;
+    
+    this.speechBackground.isVisible = false;
+    this.currentSpeech = "";
+    
+    if (this.speechTimeout) {
+      clearTimeout(this.speechTimeout);
+      this.speechTimeout = null;
+    }
+  }
+
   private _startNeedsDecay(): void {
     // Clear existing interval if it exists
     this._clearInterval('needsDecay');
@@ -153,6 +219,7 @@ export class Pet {
     
     const interval = setInterval(async () => {
       console.log(`${this.name} is thinking...`);
+      this._showSpeech("Hmm... what should I do?", 2000);
       
       try {
         // Convert pet needs and scene objects to scene data format
@@ -200,6 +267,11 @@ export class Pet {
   private _handle_pet_recommendations(pet_recommendation: PetActionRecommendation): void {
     console.log(`${this.name} AI recommendation:`, pet_recommendation);
     const thinkingInterval: number = 5000;
+    
+    // Show what the pet is going to do
+    if (pet_recommendation.action) {
+      this._showSpeech(`${pet_recommendation.reasoning}!`, 3000);
+    }
     
     // Apply movement force if recommendation includes movement
     if (pet_recommendation.movement && this.meshAggregate && this.mesh) {
@@ -369,15 +441,18 @@ export class Pet {
       const closestFood = this.findClosestNeed('food');
       if (closestFood) {
         console.log(`${this.name} needs to go to the food! It's at position ${closestFood.getPosition()}`);
+        this._showSpeech("I need to find food!", 2000);
         return;
       } else {
         console.log(`${this.name} can't find any food nearby!`);
+        this._showSpeech("I can't find any food!", 2000);
         return;
       }
     }
     
     this.needs.hungry = Math.max(0, this.needs.hungry - 30);
     console.log(`${this.name} has been fed! Hunger: ${this.needs.hungry}`);
+    this._showSpeech("Yummy! That was delicious!", 2000);
   }
 
   public sleep(): void {
@@ -385,15 +460,18 @@ export class Pet {
       const closestSleep = this.findClosestNeed('sleep') || this.findClosestNeed('bed');
       if (closestSleep) {
         console.log(`${this.name} needs to go to the sleep area! It's at position ${closestSleep.getPosition()}`);
+        this._showSpeech("I need to find a bed!", 2000);
         return;
       } else {
         console.log(`${this.name} can't find any sleep area nearby!`);
+        this._showSpeech("I can't find anywhere to sleep!", 2000);
         return;
       }
     }
     
     this.needs.tiredness = Math.max(0, this.needs.tiredness - 40);
     console.log(`${this.name} has slept! Tiredness: ${this.needs.tiredness}`);
+    this._showSpeech("Zzz... That was refreshing!", 2000);
   }
 
   public play(): void {
@@ -401,9 +479,11 @@ export class Pet {
       const closestToy = this.findClosestNeed('toy') || this.findClosestNeed('play');
       if (closestToy) {
         console.log(`${this.name} needs to go to the toy! It's at position ${closestToy.getPosition()}`);
+        this._showSpeech("I need to find a toy!", 2000);
         return;
       } else {
         console.log(`${this.name} can't find any toys nearby!`);
+        this._showSpeech("I can't find any toys!", 2000);
         return;
       }
     }
@@ -412,6 +492,7 @@ export class Pet {
     // Playing also increases tiredness slightly
     this.needs.tiredness = Math.min(100, this.needs.tiredness + 10);
     console.log(`${this.name} has played! Boredom: ${this.needs.boredom}, Tiredness: ${this.needs.tiredness}`);
+    this._showSpeech("Wheee! This is fun!", 2000);
   }
 
   public toilet(): void {
@@ -419,15 +500,18 @@ export class Pet {
       const closestToilet = this.findClosestNeed('toilet') || this.findClosestNeed('bathroom');
       if (closestToilet) {
         console.log(`${this.name} needs to go to the toilet! It's at position ${closestToilet.getPosition()}`);
+        this._showSpeech("I need to find a bathroom!", 2000);
         return;
       } else {
         console.log(`${this.name} can't find any toilet nearby!`);
+        this._showSpeech("I can't find a bathroom!", 2000);
         return;
       }
     }
     
     this.needs.toilet = Math.max(0, this.needs.toilet - 50);
     console.log(`${this.name} used the toilet! Toilet need: ${this.needs.toilet}`);
+    this._showSpeech("Ah, much better!", 2000);
   }
 
   // Getters
@@ -546,6 +630,11 @@ export class Pet {
     // Clear all intervals
     this._clearAllIntervals();
     
+    // Clear speech timeout
+    if (this.speechTimeout) {
+      clearTimeout(this.speechTimeout);
+    }
+    
     if (this.mesh) {
       this.mesh.dispose();
     }
@@ -554,6 +643,9 @@ export class Pet {
     }
     if (this.shadowMesh) {
       this.shadowMesh.dispose();
+    }
+    if (this.speechBubble) {
+      this.speechBubble.dispose();
     }
     
     // Remove status display

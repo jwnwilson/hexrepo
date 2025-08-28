@@ -80,7 +80,6 @@ export class Need {
 
   private async _loadGLTFModel(gltfPath: string, position: Vector3): Promise<void> {
     const result = await SceneLoader.ImportMeshAsync("", "", gltfPath, this.scene);
-    console.log("loaded", result);
     
     if (result.meshes.length === 0) {
       throw new Error("No meshes found in GLTF file");
