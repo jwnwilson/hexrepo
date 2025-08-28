@@ -40,17 +40,17 @@
       "name": "ToyNeed",
       "position": {
         "x": 0,
-        "y": 0,
+        "y": 0.5,
         "z": 5
       },
-      "size": 1.5,
+      "size": 3,
       "color": {
         "r": 1,
         "g": 1,
         "b": 0
       },
       "mass": 2,
-      "isStatic": false,
+      "isStatic": true,
       "isVisible": true,
       "objectType": "toy"
     },
@@ -79,16 +79,34 @@
         "y": 0.5,
         "z": 8
       },
-      "size": 1.2,
+      "size": 2,
       "color": {
         "r": 0,
         "g": 1,
         "b": 0
       },
       "mass": 1.5,
-      "isStatic": false,
+      "isStatic": true,
       "isVisible": true,
-      "objectType": "other"
+      "objectType": "toy"
+    },
+    {
+      "name": "ToiletNeed",
+      "position": {
+        "x": -8,
+        "y": 0,
+        "z": -8
+      },
+      "size": 2,
+      "color": {
+        "r": 0,
+        "g": 1,
+        "b": 0
+      },
+      "mass": 1.5,
+      "isStatic": true,
+      "isVisible": true,
+      "objectType": "toilet"
     }
   ]
 } 

@@ -30,6 +30,8 @@ export class Need {
   private static readonly GLTF_MAPPING: Record<string, string> = {
     food: "/model/food/scene.gltf",
     bed: "/model/bed/scene.gltf",
+    toy: "/model/toy/scene.gltf",
+    toilet: "/model/toilet/scene.gltf",
     // Add more mappings as needed
   };
 
