@@ -36,8 +36,6 @@ Setup the following env vars directly or run:
 # To Do
 
 - Aipet
-    - Replace cubes with simple 3D models and add basic textures
-    - Add a skybox
     - Setup infra / terraform
     - Deploy aipet to ECS + cloudfront
     - Deploy App - Kubernetes with k3 / rancher

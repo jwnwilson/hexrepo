@@ -3,86 +3,86 @@
     {
       "bufferView": 2,
       "componentType": 5126,
-      "count": 2058,
+      "count": 2386,
       "max": [
-        0.800000011920929,
-        1.600000023841858,
-        0.8999999761581421
+        0.19142013788223267,
+        0.1600000560283661,
+        0.3350093364715576
       ],
       "min": [
-        -0.800000011920929,
-        -1.600000023841858,
-        0.0
+        -0.19142013788223267,
+        -0.0012459384743124247,
+        -0.3350093960762024
       ],
       "type": "VEC3"
     },
     {
       "bufferView": 2,
-      "byteOffset": 24696,
+      "byteOffset": 28632,
       "componentType": 5126,
-      "count": 2058,
+      "count": 2386,
       "max": [
-        1.0,
-        1.0,
-        1.0
+        0.9964873790740967,
+        0.9965000152587891,
+        0.9938415288925171
       ],
       "min": [
-        -1.0,
-        -1.0,
-        -1.0
+        -0.9964873790740967,
+        -0.9986083507537842,
+        -0.9938415288925171
       ],
       "type": "VEC3"
     },
     {
       "bufferView": 1,
       "componentType": 5126,
-      "count": 2058,
+      "count": 2386,
       "max": [
-        0.40820300579071045,
-        0.5
+        0.9764392971992493,
+        0.9727070331573486
       ],
       "min": [
-        0.33007800579071045,
-        0.5
+        0.02356063574552536,
+        0.02356060966849327
       ],
       "type": "VEC2"
     },
     {
       "bufferView": 0,
       "componentType": 5125,
-      "count": 4056,
+      "count": 10404,
       "type": "SCALAR"
     }
   ],
   "asset": {
     "extras": {
-      "author": "JDanielHE (https://sketchfab.com/JDanielHE)",
+      "author": "GeniusPilot2016 (https://sketchfab.com/GeniusPilot2016)",
       "license": "CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)",
-      "source": "https://sketchfab.com/3d-models/bed-minecraft-223dd9d625504f56b71e63eaff52d1fe",
-      "title": "Bed Minecraft"
+      "source": "https://sketchfab.com/3d-models/pet-food-and-water-bowl-78eb7cc639dc4c3ba7d1de4e1712df15",
+      "title": "Pet Food and Water Bowl"
     },
-    "generator": "Sketchfab-12.67.0",
+    "generator": "Sketchfab-15.36.0",
     "version": "2.0"
   },
   "bufferViews": [
     {
       "buffer": 0,
-      "byteLength": 16224,
+      "byteLength": 41616,
       "name": "floatBufferViews",
       "target": 34963
     },
     {
       "buffer": 0,
-      "byteLength": 16464,
-      "byteOffset": 16224,
+      "byteLength": 19088,
+      "byteOffset": 41616,
       "byteStride": 8,
       "name": "floatBufferViews",
       "target": 34962
     },
     {
       "buffer": 0,
-      "byteLength": 49392,
-      "byteOffset": 32688,
+      "byteLength": 57264,
+      "byteOffset": 60704,
       "byteStride": 12,
       "name": "floatBufferViews",
       "target": 34962
@@ -90,25 +90,23 @@
   ],
   "buffers": [
     {
-      "byteLength": 82080,
+      "byteLength": 117968,
       "uri": "scene.bin"
-    }
-  ],
-  "images": [
-    {
-      "uri": "textures/palette_baseColor.png"
     }
   ],
   "materials": [
     {
       "doubleSided": true,
-      "name": "palette",
+      "name": "plastic",
       "pbrMetallicRoughness": {
-        "baseColorTexture": {
-          "index": 0
-        },
-        "metallicFactor": 0.16507873188228367,
-        "roughnessFactor": 0.1085521047005129
+        "baseColorFactor": [
+          0.214975,
+          0.8,
+          0.667945,
+          1.0
+        ],
+        "metallicFactor": 0.0,
+        "roughnessFactor": 0.5
       }
     }
   ],
@@ -158,19 +156,59 @@
       "children": [
         2
       ],
-      "name": "Bed.obj.cleaner.materialmerger.gles"
+      "name": "root"
+    },
+    {
+      "children": [
+        3
+      ],
+      "matrix": [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        2.220446049250313e-16,
+        1.0,
+        0.0,
+        0.0,
+        -1.0,
+        2.220446049250313e-16,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "name": "GLTF_SceneRootNode"
+    },
+    {
+      "children": [
+        4
+      ],
+      "matrix": [
+        8.429369480200677e-08,
+        0.0,
+        -0.9999999999999966,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.9999999999999966,
+        0.0,
+        8.429369480200677e-08,
+        0.0,
+        0.5,
+        0.0,
+        0.5,
+        1.0
+      ],
+      "name": "Cube_2"
     },
     {
       "mesh": 0,
-      "name": "Object_2"
-    }
-  ],
-  "samplers": [
-    {
-      "magFilter": 9729,
-      "minFilter": 9987,
-      "wrapS": 10497,
-      "wrapT": 10497
+      "name": "Object_4"
     }
   ],
   "scene": 0,
@@ -180,12 +218,6 @@
       "nodes": [
         0
       ]
-    }
-  ],
-  "textures": [
-    {
-      "sampler": 0,
-      "source": 0
     }
   ]
 }

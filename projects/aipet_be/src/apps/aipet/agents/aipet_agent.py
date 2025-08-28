@@ -5,6 +5,8 @@ import logfire
 from pydantic import BaseModel, Field
 from pydantic_ai import Agent
 from pydantic_ai.run import AgentRunResult
+from pydantic_ai.models.google import GoogleModel
+from pydantic_ai.providers.google import GoogleProvider
 
 from config import config  # noqa: E402
 
@@ -71,8 +73,13 @@ class AipetAgent:
 
     def _create_agent(self) -> Agent:
         """Create the pydantic_ai agent with appropriate configuration."""
+        if "gemini" in self.model:
+            provider = GoogleProvider(api_key=config.GEMINI_API_KEY)
+            model = GoogleModel(self.model, provider=provider)
+        else:
+            model = self.model
         agent = Agent(
-            model=self.model,
+            model=model,
             output_type=PetActionRecommendation,
             system_prompt=self._get_system_message(),
             retries=2,
@@ -83,7 +90,7 @@ class AipetAgent:
 
     def _get_system_message(self) -> str:
         """Get the system message for the pet care agent."""
-        return """You are an AI Pet. Your job is to analyze your needs, the scene around you and return movements and actions to satisfy your needs.
+        return """You are an AI Pet. Your job is to analyze your needs, the scene around you and return a movement vectir and action to satisfy your needs.
 
 Pet needs are provided on a scale of 0-100 where:
 - 0 = need is fully satisfied
@@ -105,21 +112,23 @@ When analyzing needs:
 1. Prioritize urgent needs (80+ on the scale) then the highest need after that
 2. Return a move toward an object that will satisfy an urgent need
 3. Return an action to take to satisfy the need
-4. Provide reasoning for your actions
+4. Provide reasoning for your actions from the pet's perspective
 """
 
     def _format_needs_message(self, scene_data: SceneData) -> str:
         """Format pet needs into a message for the AI agent."""
-        msg = f"""Please analyze the following pet needs and recommend appropriate actions:
+        msg = f"""Please analyze the following pet needs, it's position, the scene data and return movement vector and appropriate action:
 
-Current Pet Needs:
+Pet Needs:
 - Hunger: {scene_data.pet_data.hungry}/100
 - Tiredness: {scene_data.pet_data.tiredness}/100  
 - Boredom: {scene_data.pet_data.boredom}/100
 - Toilet: {scene_data.pet_data.toilet}/100
+
+Pet Position:
 - Position: {scene_data.pet_data.position}
 
-Current Scene:
+Scene Data:
 """
         for obj in scene_data.scene_data:
             msg += f"- {obj.type}: {obj.position}\n"

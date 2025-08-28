@@ -42,6 +42,11 @@ export class Ground {
     const wallThickness = 0.5;
     const halfSize = groundSize / 2;
 
+    // Create floor material for walls
+    const wallMaterial = new StandardMaterial("wallMaterial", this.scene);
+    const floorTexture = new Texture("/texture/floor.png", this.scene);
+    wallMaterial.diffuseTexture = floorTexture;
+
     // Create four walls around the ground
     const wallPositions = [
       // North wall
@@ -67,6 +72,9 @@ export class Ground {
 
       wall.position = wallData.position;
       wall.rotation = wallData.rotation;
+
+      // Apply floor material to the wall
+      wall.material = wallMaterial;
 
       // Add physics to the wall
       const wallAggregate = new PhysicsAggregate(

@@ -58,6 +58,7 @@ class Config(BaseSettings):
 
     # OpenRouter settings
     OPENAI_API_KEY: str = os.environ.get("OPENAI_API_KEY", "")
+    GEMINI_API_KEY: str = os.environ.get("GEMINI_API_KEY", "")
     AI_DEFAULT_MODEL: str = os.environ.get("AI_DEFAULT_MODEL", "gpt-5-nano")
     AI_TIMEOUT: int = int(os.environ.get("AI_TIMEOUT", "30"))
     LOGFIRE_WRITE_TOKEN: str = os.environ.get("LOGFIRE_WRITE_TOKEN", "")

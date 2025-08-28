@@ -73,8 +73,8 @@ const Login: React.FC<LoginProps> = ({ onNavigate }) => {
     <div className="auth-container">
       <div className="auth-card">
         <div className="auth-header">
-          <h1>Welcome Back</h1>
-          <p>Sign in to your account</p>
+          <h1>Welcome to AI Pet</h1>
+          <p>Sign in to interact with your AI pet</p>
         </div>
 
         <form onSubmit={handleSubmit} className="auth-form">

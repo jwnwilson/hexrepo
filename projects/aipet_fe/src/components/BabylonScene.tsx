@@ -112,7 +112,7 @@ const BabylonScene: React.FC<BabylonSceneProps> = ({ className = "" }) => {
 
     const config = (scene: Scene, engine: Engine | WebGPUEngine): void => {
       // Axes
-      new AxesViewer();
+      // new AxesViewer();
 
       // Inspector and other stuff
       bindEvent(scene, engine);
