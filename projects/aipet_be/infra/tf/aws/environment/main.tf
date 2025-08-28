@@ -138,5 +138,5 @@ module "main_bucket" {
   source = "../../../../../../infra/tf/aws/modules/s3"
 
   project     = var.project
-  name        = "aipet_files"
+  name        = "aipet-files"
 }
