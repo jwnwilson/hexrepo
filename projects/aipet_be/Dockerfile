@@ -1,5 +1,7 @@
 FROM python:3.12-alpine
 
+RUN apk add --no-cache gcc musl-dev make protobuf-dev
+
 ARG PROJECT
 WORKDIR /code/project
 ENV WORKERS=2
