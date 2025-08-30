@@ -10,7 +10,8 @@ from config import config
 from .services.aipet import AipetService, SceneData
 
 # configure logfire
-logfire.configure(token=config.LOGFIRE_WRITE_TOKEN)
+if config.LOGFIRE_WRITE_TOKEN:
+    logfire.configure(token=config.LOGFIRE_WRITE_TOKEN)
 logfire.instrument_pydantic_ai()
 
 router = Router(
