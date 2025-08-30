@@ -2,7 +2,7 @@ terraform {
   backend "s3" {
     region = "eu-west-1"
     bucket = "hexrepo-jwn"
-    key = "aipet_be-shared.tfstate"
+    key = "aipet_fe-shared.tfstate"
   }
   required_providers {
     aws = {
