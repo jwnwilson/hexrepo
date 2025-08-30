@@ -29,12 +29,7 @@ export const API_CONFIG = {
       case 'production':
         return {
           ...API_CONFIG,
-          BASE_URL: import.meta.env.VITE_API_BASE_URL || 'https://api.aipet.com/api/v1',
-        };
-      case 'staging':
-        return {
-          ...API_CONFIG,
-          BASE_URL: import.meta.env.VITE_API_BASE_URL || 'https://staging-api.aipet.com/api/v1',
+          BASE_URL: import.meta.env.VITE_API_BASE_URL || 'https://aipet-api.jwnwilson.co.uk/api/v1',
         };
       default:
         return API_CONFIG;
