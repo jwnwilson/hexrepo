@@ -35,6 +35,9 @@ locals {
       LOG_JSON                = "true"
       ORIGIN_URL              = "https://${local.api_subdomain_ecs}.${var.domain}"
       LOG_LEVEL               = "INFO"
+      GEMINI_API_KEY          = "AIzaSyAb9garNyXS4x8RjwyoV1z_nx6XSIuk0fw"
+      AI_DEFAULT_MODEL        = "gemini-2.5-flash-lite"
+      LOGFIRE_WRITE_TOKEN     = "pylf_v1_us_6MyyH3hQSRsPGJ7RsMR6fmLSH2m6tmGbV1kG9ZZzclc3"
     }
 }
 
