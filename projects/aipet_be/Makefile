@@ -21,6 +21,9 @@ venv:
 build:
 	docker compose build
 
+collectstatic:
+	$(DJANGO_MANAGE_PY) collectstatic --noinput
+
 # DB management
 
 db: docker_stop
@@ -135,7 +138,7 @@ tf_refresh: tf_workspace
 tf_output: tf_workspace
 	@cd infra/tf/aws/environment && terraform output -json
 
-deploy: build tf_workspace
+deploy: build tf_workspace collectstatic
 	hextech deploy-projects $(ENVIRONMENT) --no-input --projects=aipet_be
 
 bastion: venv

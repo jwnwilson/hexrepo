@@ -33,6 +33,7 @@ dependencies = [
     "hexrepo-db",
     "hexrepo-api",
     "hexrepo-log",
+    "whitenoise>=6.9.0",
 ]
 
 [dependency-groups]
