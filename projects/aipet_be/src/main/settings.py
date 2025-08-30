@@ -68,7 +68,7 @@ SECRET_KEY = os.getenv(
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG", "True").lower() in ("true", "1", "yes")
 
-ALLOWED_HOSTS = ["0.0.0.0", "localhost", "127.0.0.1"]
+ALLOWED_HOSTS = ["0.0.0.0", "localhost", "127.0.0.1", "aipet-default-ecs.jwnwilson.co.uk"]
 
 # Application definition
 INSTALLED_APPS = [

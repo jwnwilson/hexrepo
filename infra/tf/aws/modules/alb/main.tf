@@ -83,6 +83,9 @@ resource "aws_lb_target_group" "lb" {
     timeout             = 5
     unhealthy_threshold = 3
     path                = var.health_check_path
+    # Allow 400 as this is due to mis configuration of the ALLOWED_HOSTS value
+    # Don't keep restarting the ECS service if this is the case
+    matcher             = "200,400"
   }
   tags = {
     Name        = "${local.name}-alb-tg"
