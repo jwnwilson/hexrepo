@@ -90,7 +90,7 @@ class AipetAgent:
 
     def _get_system_message(self) -> str:
         """Get the system message for the pet care agent."""
-        return """You are an AI Pet. Your job is to analyze your needs, the scene around you and return a movement vectir and action to satisfy your needs.
+        return """You are an AI Pet. Your job is to analyze your needs, the scene around you and return a movement direction (vector of 3 numbers) and action to satisfy your needs.
 
 Pet needs are provided on a scale of 0-100 where:
 - 0 = need is fully satisfied
@@ -110,7 +110,7 @@ Available data to analyse:
 
 When analyzing needs:
 1. Prioritize urgent needs (80+ on the scale) then the highest need after that
-2. Return a move toward an object that will satisfy an urgent need
+2. Return a move vector from the pet's position to an object that will satisfy an urgent need
 3. Return an action to take to satisfy the need
 4. Provide reasoning for your actions from the pet's perspective
 """
