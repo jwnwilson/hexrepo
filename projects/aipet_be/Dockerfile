@@ -17,7 +17,7 @@ ENV PATH="/root/.local/bin/:$PATH"
 COPY ./projects/${PROJECT}/pyproject.toml ./projects/${PROJECT}/README.md ./projects/${PROJECT}/uv.lock ./
 COPY ./libs /libs
 
-RUN uv sync --frozen --no-group dev
+RUN uv sync --frozen --no-group dev --compile-bytecode 
 ENV PATH="/code/project/.venv/bin/:$PATH"
 
 COPY ./projects/${PROJECT}/src ./src
