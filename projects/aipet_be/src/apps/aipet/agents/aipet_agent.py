@@ -4,9 +4,9 @@ from typing import List, Literal, Tuple
 import logfire
 from pydantic import BaseModel, Field
 from pydantic_ai import Agent
-from pydantic_ai.run import AgentRunResult
 from pydantic_ai.models.google import GoogleModel
 from pydantic_ai.providers.google import GoogleProvider
+from pydantic_ai.run import AgentRunResult
 
 from config import config  # noqa: E402
 

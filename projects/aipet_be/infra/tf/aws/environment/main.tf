@@ -91,6 +91,7 @@ module "alb" {
   domain_name        = var.domain
   subdomain_name     = local.api_subdomain_ecs
   enabled            = true
+  health_check_path  = "/api/v1/health"
 }
 
 module "aipet_be_ecs_api" {

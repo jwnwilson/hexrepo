@@ -37,9 +37,12 @@ Setup the following env vars directly or run:
 
 - Aipet
     - Setup infra / terraform
-        - Fix aipet docker build - use multistage build to reduce size
-        - Look at using different base image
+        - Finish ALB + ECS setup and verify pipeline deployment
+        - Create superuser
+        - Deploy FE
+        - use multistage docker build to reduce size
     - Deploy aipet to ECS + cloudfront
+    - Setup GA / mixpannel
     - Deploy App - Kubernetes with k3 / rancher
     - Setup auth token auto refresh
     - Improve pet logic

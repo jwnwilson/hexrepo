@@ -12,11 +12,9 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 import os
 from pathlib import Path
-from urllib.parse import ParseResult, urlparse, unquote
+from urllib.parse import ParseResult, unquote, urlparse
 
 from dotenv import load_dotenv
-
-from hexrepo_db.sql.config import get_sql_db_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -31,6 +29,9 @@ env_file = f"{env_name}.env"
 env_path = env_dir / env_file
 if env_path.exists():
     load_dotenv(env_path)
+
+
+from hexrepo_db.sql.config import get_sql_db_url  # noqa
 
 
 def parse_database_url(url: str | None) -> dict:

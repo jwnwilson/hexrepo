@@ -82,6 +82,7 @@ resource "aws_lb_target_group" "lb" {
     port                = "traffic-port"
     timeout             = 5
     unhealthy_threshold = 3
+    path                = var.health_check_path
   }
   tags = {
     Name        = "${local.name}-alb-tg"
