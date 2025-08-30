@@ -1,0 +1,56 @@
+# This workflow will install Python dependencies, run tests and lint with a single version of Python
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
+
+name: Projects Test & Deploy
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - projects/**
+  pull_request:
+    branches: [ main ]
+    paths:
+      - projects/**
+
+env:
+  # Setting an environment variable with the value of a configuration variable
+  TF_VAR_AWS_ACCOUNT: ${{ vars.AWS_ACCOUNT }}
+  TF_VAR_AWS_DEFAULT_REGION: ${{ vars.AWS_DEFAULT_REGION }}
+  TF_VAR_AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  TF_VAR_AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+
+jobs:
+  deploy:
+    strategy:
+      matrix:
+        project:
+          - "projects/aipet_fe"
+        env:
+          - "default"
+    runs-on: ubuntu-latest
+    environment: prod
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup node
+        uses: pnpm/action-setup@v4
+        with:
+          version: 8
+      - name: Install
+        working-directory: ${{ matrix.project }}
+        run: npm i -g pnpm && pnpm i && pnpm build
+      - name: Setup AWS CLI
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+      - name: Sync files to S3 bucket
+        working-directory: ${{ matrix.project }}
+        run: |
+          aws s3 sync dist s3://aipet.jwnwilson.co.uk --delete
+      - name: Invalidate CloudFront cache
+        run: |
+          aws cloudfront create-invalidation --distribution-id ${{ vars.DISTRIBUTION_ID }} --paths '/*'

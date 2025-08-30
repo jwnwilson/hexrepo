@@ -153,7 +153,6 @@ export class Pet {
     
     // Update speech text
     this.speechText.text = text;
-    this.currentSpeech = text;
     
     // Show the speech bubble
     this.speechBackground.isVisible = true;
@@ -168,7 +167,6 @@ export class Pet {
     if (!this.speechBackground) return;
     
     this.speechBackground.isVisible = false;
-    this.currentSpeech = "";
     
     if (this.speechTimeout) {
       clearTimeout(this.speechTimeout);
