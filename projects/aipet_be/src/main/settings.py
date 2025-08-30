@@ -126,14 +126,6 @@ WSGI_APPLICATION = "main.wsgi.application"
 DATABASE_URL = get_sql_db_url()
 DATABASES = {"default": parse_database_url(DATABASE_URL)}
 
-
-STORAGES = {
-    "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
-    },
-}
-
-
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
 
@@ -170,6 +162,13 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 STATIC_ROOT = REPO_DIR / "staticfiles"
+
+STORAGES = {
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
