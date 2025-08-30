@@ -14,6 +14,13 @@ api = NinjaExtraAPI(
     auth=[SessionAuth(), JWTAuth()],
 )
 
+
+# Healthcheck endpoint
+@api.get("/health", auth=None)
+def healthcheck(request):
+    return {"status": "ok", "message": "AI Pet API"}
+
+
 api.register_controllers(NinjaJWTController)
 api.register_controllers(AipetController)
 api.register_controllers(SignupController)

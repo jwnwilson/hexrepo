@@ -21,7 +21,7 @@ class Config(BaseSettings):
     READ_REPLICA_ENABLED: bool = (
         os.environ.get("READ_REPLICA_ENABLED", "false") == "true"
     )
-    DB_URL: str = os.environ["DB_URL"]
+    DB_URL: str = os.environ.get("DB_URL", "")
     DB_RO_URL: str = os.environ.get("DB_RO_URL", "")
 
     @property

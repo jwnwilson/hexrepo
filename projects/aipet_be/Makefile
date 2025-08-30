@@ -21,6 +21,9 @@ venv:
 build:
 	docker compose build
 
+collectstatic:
+	$(DJANGO_MANAGE_PY) collectstatic --noinput
+
 # DB management
 
 db: docker_stop
@@ -76,11 +79,11 @@ run_docker:
 
 test: venv db
 	@echo "Running unit tests"
-	uv run pytest
+	IS_TESTING=true uv run pytest
 
 coverage:
 	@echo "Running unit tests"	
-	uv run pytest --cov-report html	
+	IS_TESTING=true uv run pytest --cov-report html	
 
 lint:
 	@TARGET_DIRS="src" bash ../../tools/bash_scripts/lint.sh 
@@ -135,7 +138,7 @@ tf_refresh: tf_workspace
 tf_output: tf_workspace
 	@cd infra/tf/aws/environment && terraform output -json
 
-deploy: build tf_workspace
+deploy: build tf_workspace collectstatic
 	hextech deploy-projects $(ENVIRONMENT) --no-input --projects=aipet_be
 
 bastion: venv

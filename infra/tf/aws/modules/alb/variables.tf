@@ -57,3 +57,9 @@ variable "subdomain_name" {
   type        = string
   default     = "ecs"
 }
+
+variable "health_check_path" {
+  description = "Path to health check endpoint"
+  type        = string
+  default     = "/"
+}

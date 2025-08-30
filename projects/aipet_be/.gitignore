@@ -2,6 +2,7 @@
 .terraform
 .terraform.lock.hcl
 tfapply
+staticfiles/
 
 # python
 # Byte-compiled / optimized / DLL files

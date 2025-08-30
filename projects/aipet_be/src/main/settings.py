@@ -12,13 +12,14 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 import os
 from pathlib import Path
-from urllib.parse import ParseResult, urlparse, unquote
+from urllib.parse import ParseResult, unquote, urlparse
 
 from dotenv import load_dotenv
 
-from hexrepo_db.sql.config import get_sql_db_url
+from config import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
+REPO_DIR = Path(__file__).resolve().parent.parent.parent
 BASE_DIR = Path(__file__).resolve().parent.parent
 PROJECT_PATH = Path(__file__).resolve()
 SITE_ROOT = PROJECT_PATH.parent
@@ -31,6 +32,9 @@ env_file = f"{env_name}.env"
 env_path = env_dir / env_file
 if env_path.exists():
     load_dotenv(env_path)
+
+
+from hexrepo_db.sql.config import get_sql_db_url  # noqa
 
 
 def parse_database_url(url: str | None) -> dict:
@@ -67,7 +71,12 @@ SECRET_KEY = os.getenv(
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG", "True").lower() in ("true", "1", "yes")
 
-ALLOWED_HOSTS = ["0.0.0.0", "localhost", "127.0.0.1"]
+ALLOWED_HOSTS = [
+    "0.0.0.0",
+    "localhost",
+    "127.0.0.1",
+    "aipet-default-ecs.jwnwilson.co.uk",
+]
 
 # Application definition
 INSTALLED_APPS = [
@@ -88,6 +97,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -120,9 +130,11 @@ WSGI_APPLICATION = "main.wsgi.application"
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 # Get database URL from environment variable
-DATABASE_URL = get_sql_db_url()
+if not config.IS_TESTING:
+    DATABASE_URL = get_sql_db_url()
+else:
+    DATABASE_URL = config.DB_URL
 DATABASES = {"default": parse_database_url(DATABASE_URL)}
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -159,6 +171,14 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = "static/"
+STATIC_ROOT = REPO_DIR / "staticfiles"
+
+STORAGES = {
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
