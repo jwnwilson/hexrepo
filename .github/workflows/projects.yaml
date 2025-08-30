@@ -30,7 +30,7 @@ jobs:
         project:
         # - "projects/example"
         - "projects/monitor"
-        - "projects/common"
+        - "projects/fastapi_admin"
         - "projects/aipet_be"
         env:
           - "default"
@@ -78,7 +78,8 @@ jobs:
         project:
         # - "projects/example"
         - "projects/monitor"
-        - "projects/common"
+        - "projects/fastapi_admin"
+        - "projects/aipet_be"
         env:
           - "default"
     runs-on: ubuntu-latest
@@ -136,7 +137,8 @@ jobs:
         project:
           # - "projects/example"
           - "projects/monitor"
-          - "projects/common"
+          - "projects/fastapi_admin"
+          - "projects/aipet_be"
         env:
           - "default"
     runs-on: ubuntu-latest

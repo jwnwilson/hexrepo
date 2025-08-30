@@ -39,7 +39,7 @@ resource "random_password" "master" {
   special          = true
   min_special      = 2
   min_numeric      = 2
-  override_special = "!@_+"
+  override_special = "!#$&*()-=+[]{}<>:?"
 }
 
 resource "aws_secretsmanager_secret" "password" {

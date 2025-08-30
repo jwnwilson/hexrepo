@@ -111,7 +111,7 @@ tf_setup: tf_init
 
 tf_plan:
 	@echo "Planning Terraform infra"
-	cd infra/tf/aws/shared  && terraform plan
+	cd infra/tf/aws/shared && terraform plan
 	cd infra/tf/aws/environment && terraform plan
 
 tf_apply:

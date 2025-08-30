@@ -1,4 +1,6 @@
 **/.venv
+**/.pdm-build
+**/.ruff_cache
 **/.pytest_cache
 **/__pycache__
 **/.coverage

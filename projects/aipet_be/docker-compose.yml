@@ -12,7 +12,7 @@ services:
     image: "aipet_be"
     build: 
       context: ../../
-      dockerfile: infra/docker/django-ninja.Dockerfile
+      dockerfile: projects/aipet_be/Dockerfile
       args:
           PROJECT: aipet_be
     # Run this contain as if it's in the terminal, useful for debugging
@@ -64,11 +64,6 @@ services:
     env_file:
       - env/docker.env
     image: "aipet_be"
-    build: 
-      context: ../../
-      dockerfile: infra/docker/django-ninja.Dockerfile
-      args:
-          PROJECT: aipet_be
     volumes:
       - ../../libs:/libs
       - ./src:/code/src
@@ -76,6 +71,7 @@ services:
     depends_on:
       - redis
       - db
+      - api
 
   celery-beat:
     container_name: aipet_be_celery_beat
@@ -83,11 +79,6 @@ services:
     env_file:
       - env/docker.env
     image: "aipet_be"
-    build: 
-      context: ../../
-      dockerfile: infra/docker/django-ninja.Dockerfile
-      args:
-          PROJECT: aipet_be
     volumes:
       - ../../libs:/libs
       - ./src:/code/src
@@ -95,6 +86,7 @@ services:
     depends_on:
       - redis
       - db
+      - api
 
 volumes:
   postgres_db:
