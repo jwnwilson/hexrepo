@@ -24,7 +24,7 @@ class Config(BaseSettings):
     with environment variables.
     """
 
-    IS_TESTING: bool = "pytest" in sys.argv[0]
+    IS_TESTING: bool = os.environ.get("IS_TESTING", "false") == "true"
 
     # Current environment
     PROJECT: str = os.environ.get("PROJECT", "aipet_be")
