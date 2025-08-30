@@ -16,35 +16,28 @@ tf_workspace:
 
 tf_init:
 	@echo "Initializing Terraform infra"
-	@rm -rf ./infra/tf/aws/shared/.terraform
 	@rm -rf ./infra/tf/aws/environment/.terraform
-	cd infra/tf/aws/shared  && terraform init -input=false -upgrade
 	cd infra/tf/aws/environment  && terraform init -input=false -upgrade
 
 tf_setup: tf_init
 	@echo "Applying Inital project Terraform infra"
-	cd infra/tf/aws/shared && terraform workspace select -or-create=true default
 	cd infra/tf/aws/shared && terraform apply
 
 tf_plan:
 	@echo "Planning Terraform infra"
-	cd infra/tf/aws/shared && terraform plan
 	cd infra/tf/aws/environment && terraform plan
 
 tf_apply:
 	@echo "Applying Terraform infra"
-	cd infra/tf/aws/shared && terraform apply
 	cd infra/tf/aws/environment  && terraform apply
 
 tf_apply_no_input:
 	@echo "Applying Terraform infra"
-	cd infra/tf/aws/shared && terraform apply -auto-approve
 	cd infra/tf/aws/environment && terraform apply -auto-approve
 
 tf_destroy:
 	@echo "Destroying Terraform infra"
 	cd infra/tf/aws/environment  && terraform destroy
-	cd infra/tf/aws/shared  && terraform destroy
 
 tf_refresh: tf_workspace
 	@cd infra/tf/aws/environment && terraform refresh
