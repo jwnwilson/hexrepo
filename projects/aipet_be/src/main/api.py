@@ -1,7 +1,6 @@
 from ninja.security import SessionAuth
 from ninja_extra import NinjaExtraAPI
 from ninja_jwt.authentication import JWTAuth
-from ninja import Router
 
 from apps.aipet.api import router as aipet_router
 from apps.aipet.controllers import AipetController
@@ -14,6 +13,7 @@ api = NinjaExtraAPI(
     urls_namespace="aipet",
     auth=[SessionAuth(), JWTAuth()],
 )
+
 
 # Healthcheck endpoint
 @api.get("/health", auth=None)

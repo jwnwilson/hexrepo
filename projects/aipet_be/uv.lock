@@ -1124,7 +1124,7 @@ wheels = [
 
 [[package]]
 name = "hexrepo-api"
-version = "0.1.25"
+version = "0.1.26"
 source = { editable = "../../libs/api" }
 dependencies = [
     { name = "aws-xray-sdk" },
@@ -1160,7 +1160,7 @@ dev = [
 
 [[package]]
 name = "hexrepo-cloud"
-version = "0.3.32"
+version = "0.3.33"
 source = { editable = "../../libs/cloud" }
 dependencies = [
     { name = "boto3-stubs", extra = ["essential"] },
@@ -1191,7 +1191,7 @@ dev = [
 
 [[package]]
 name = "hexrepo-db"
-version = "0.1.36"
+version = "0.1.37"
 source = { editable = "../../libs/db" }
 dependencies = [
     { name = "boto3" },
@@ -1232,7 +1232,7 @@ sql = [
 
 [[package]]
 name = "hexrepo-log"
-version = "0.1.16"
+version = "0.1.17"
 source = { editable = "../../libs/log" }
 dependencies = [
     { name = "fastapi" },

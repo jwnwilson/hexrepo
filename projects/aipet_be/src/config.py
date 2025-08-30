@@ -24,6 +24,8 @@ class Config(BaseSettings):
     with environment variables.
     """
 
+    IS_TESTING = "pytest" in sys.argv[0]
+
     # Current environment
     PROJECT: str = os.environ.get("PROJECT", "aipet_be")
     CLOUD_PROVIDER: str = os.environ.get("CLOUD_PROVIDER", "local")
