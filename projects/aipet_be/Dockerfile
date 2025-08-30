@@ -1,6 +1,4 @@
-FROM python:3.12-alpine
-
-RUN apk add --no-cache gcc musl-dev make protobuf-dev
+FROM python:3.12-slim
 
 ARG PROJECT
 WORKDIR /code/project
@@ -9,6 +7,7 @@ ENV PYTHONPATH=/code/project/src
 EXPOSE 8000
 
 # Download the latest installer
+RUN apt update && apt install -y curl
 ADD https://astral.sh/uv/install.sh /uv-installer.sh
 # Run the installer then remove it
 RUN sh /uv-installer.sh && rm /uv-installer.sh

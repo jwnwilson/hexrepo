@@ -38,6 +38,7 @@ Setup the following env vars directly or run:
 - Aipet
     - Setup infra / terraform
         - Fix aipet docker build - use multistage build to reduce size
+        - Look at using different base image
     - Deploy aipet to ECS + cloudfront
     - Deploy App - Kubernetes with k3 / rancher
     - Setup auth token auto refresh
