@@ -20,7 +20,7 @@ locals {
     db_url            = "postgresql+psycopg://postgres:{password}@${module.postgres.db_instance_endpoint}/${var.project}"
     db_ro_url         = module.postgres.db_instance_ro_endpoint != null ? "postgresql+psycopg://postgres:{password}@${module.postgres.db_instance_ro_endpoint}/${var.project}" : "postgresql+psycopg://postgres:{password}@${module.postgres.db_instance_endpoint}/${var.project}"
     api_subdomain     = "${var.project}-${terraform.workspace}"
-    api_subdomain_ecs = "${var.project}-${terraform.workspace}-ecs"
+    api_subdomain_ecs = "${var.project}-api"
     app_url           = "https://${local.api_subdomain}.${var.domain}"
     common_env_vars = {
       ENVIRONMENT             = terraform.workspace

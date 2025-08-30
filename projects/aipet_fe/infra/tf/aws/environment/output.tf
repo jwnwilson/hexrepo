@@ -38,17 +38,3 @@ output "domain_name" {
   value       = local.domain_name
 }
 
-output "route53_zone_id" {
-  description = "The ID of the Route53 hosted zone"
-  value       = module.route53.zone_id
-}
-
-output "route53_zone_name" {
-  description = "The name of the Route53 hosted zone"
-  value       = module.route53.zone_name
-}
-
-output "route53_name_servers" {
-  description = "The name servers for the Route53 hosted zone"
-  value       = module.route53.name_servers
-}

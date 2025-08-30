@@ -48,10 +48,8 @@ module "main_bucket" {
 }
 
 # Route53 hosted zone
-module "route53" {
-  source = "../../../../../../infra/tf/aws/modules/route53"
-
-  domain = var.domain
+data "aws_route53_zone" "hexrepo" {
+  name = var.domain
 }
 
 # CloudFront module
@@ -75,7 +73,7 @@ module "cloudfront" {
 
 # Route53 A record for CloudFront
 resource "aws_route53_record" "cloudfront_alias" {
-  zone_id = module.route53.zone_id
+  zone_id = data.aws_route53_zone.hexrepo.zone_id
   name    = local.domain_name
   type    = "A"
 

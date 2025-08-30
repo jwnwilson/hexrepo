@@ -75,7 +75,7 @@ ALLOWED_HOSTS = [
     "0.0.0.0",
     "localhost",
     "127.0.0.1",
-    "aipet-default-ecs.jwnwilson.co.uk",
+    "aipet-api.jwnwilson.co.uk",
 ]
 
 # Application definition
@@ -194,7 +194,7 @@ AUTH_USER_MODEL = "login.User"
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 DEFAULT_FROM_EMAIL = "noreply@aipet.com"
 FRONTEND_VERIFY_URL = os.getenv(
-    "FRONTEND_VERIFY_URL", "http://localhost:8000/api/v1/auth/verify"
+    "FRONTEND_VERIFY_URL", "https://aipet.jwnwilson.co.uk/api/v1/auth/verify"
 )
 
 # For production, use SMTP backend:
@@ -220,11 +220,13 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:8080",  # React development server
     "http://127.0.0.1:8080",
     "http://localhost:8088",  # React development server
+    "https://aipet.jwnwilson.co.uk",
 ]
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:8080",  # React development server
     "http://127.0.0.1:8080",
     "http://localhost:8088",  # React development server
+    "https://aipet.jwnwilson.co.uk",
 ]
 
 # Allow credentials (cookies, authorization headers, etc.)
