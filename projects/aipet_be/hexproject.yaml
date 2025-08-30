@@ -1,5 +1,4 @@
 deployments:
-
   - hextech-aipet_be:
     container_image: aipet_be
     image_type: container

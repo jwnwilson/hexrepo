@@ -12,9 +12,11 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 import os
 from pathlib import Path
-from urllib.parse import ParseResult, urlparse
+from urllib.parse import ParseResult, urlparse, unquote
 
 from dotenv import load_dotenv
+
+from hexrepo_db.sql.config import get_sql_db_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -47,7 +49,7 @@ def parse_database_url(url: str | None) -> dict:
         "ENGINE": "django.db.backends.postgresql",
         "NAME": parsed.path.lstrip("/"),
         "USER": parsed.username,
-        "PASSWORD": parsed.password,
+        "PASSWORD": unquote(parsed.password) if parsed.password else None,
         "HOST": parsed.hostname,
         "PORT": parsed.port,
         "ATOMIC_REQUESTS": False,
@@ -118,8 +120,7 @@ WSGI_APPLICATION = "main.wsgi.application"
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 # Get database URL from environment variable
-DATABASE_URL = os.getenv("DB_URL", "")
-
+DATABASE_URL = get_sql_db_url()
 DATABASES = {"default": parse_database_url(DATABASE_URL)}
 
 

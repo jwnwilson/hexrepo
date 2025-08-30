@@ -74,7 +74,7 @@ data "aws_subnets" "public" {
 }
 
 data "aws_ecr_repository" "ecr_repo" {
-  name                 = "hexrepo-${var.project}"
+  name                 = "hexrepo-${var.project}_be"
 }
 
 module "alb" {
@@ -90,7 +90,7 @@ module "alb" {
   container_port     = 8000
   domain_name        = var.domain
   subdomain_name     = local.api_subdomain_ecs
-  enabled            = false
+  enabled            = true
 }
 
 module "aipet_be_ecs_api" {

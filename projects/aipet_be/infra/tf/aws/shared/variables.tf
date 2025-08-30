@@ -18,7 +18,7 @@ variable "aws_secret_key" {
 }
 
 variable "project" {
-  default = "aipet"
+  default = "aipet_be"
 }
 
 variable "docker_tag" {
