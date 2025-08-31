@@ -83,6 +83,7 @@ jobs:
           - "default"
     runs-on: ubuntu-latest
     environment: prod
+    if: github.ref == 'refs/heads/main' && needs.plan_infra.result == 'success'
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -105,4 +106,4 @@ jobs:
           aws s3 sync dist s3://aipet.jwnwilson.co.uk --delete
       - name: Invalidate CloudFront cache
         run: |
-          aws cloudfront create-invalidation --distribution-id ${{ vars.DISTRIBUTION_ID }} --paths '/*'
+          aws cloudfront create-invalidation --distribution-id "E3R7FW4S4YM0MT" --paths '/*'
