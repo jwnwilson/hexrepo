@@ -1,3 +1,5 @@
+database_migrations:
+  db_name: aipet
 deployments:
   - hextech-aipet_be:
     container_image: aipet_be

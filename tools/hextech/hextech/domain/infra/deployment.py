@@ -3,6 +3,8 @@ import subprocess
 from contextlib import chdir
 from typing import Dict, List, Optional
 
+import yaml
+
 import typer
 
 from hextech.config import HexrepoConfig
@@ -246,6 +248,17 @@ def get_terrform_output(env: str, project: str) -> str:
 def migrate_db(config: HexrepoConfig, env: str, project: str):
     project_root: str = find_repo_root()
     with chdir(project_root):
+        with open("hexproject.yaml") as f:
+            project_config = yaml.safe_load(f)
+
+        try:
+            db_name: str = project_config["database_migrations"]["db_name"]
+        except KeyError:
+            typer.echo(
+                f"No database migrations found for project {project}, using project name as db name"
+            )
+            db_name = project
+
         if config.cloud_provider == "aws" and env != "local":
             if not db_exists(config, project, env):
                 typer.echo(
@@ -259,7 +272,7 @@ def migrate_db(config: HexrepoConfig, env: str, project: str):
                     secret_name = tf_output["db_secret_name"]["value"]
                     db_url = (
                         "postgresql+psycopg://postgres:{password}@127.0.0.1:5432/"
-                        + project
+                        + db_name
                     )
 
                     # Run migration with secret name set
