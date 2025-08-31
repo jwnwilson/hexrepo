@@ -226,12 +226,14 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:8080",
     "http://localhost:8088",  # React development server
     "https://aipet.jwnwilson.co.uk",
+    "https://aipet-api.jwnwilson.co.uk",
 ]
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:8080",  # React development server
     "http://127.0.0.1:8080",
     "http://localhost:8088",  # React development server
     "https://aipet.jwnwilson.co.uk",
+    "https://aipet-api.jwnwilson.co.uk",
 ]
 
 # Allow credentials (cookies, authorization headers, etc.)
