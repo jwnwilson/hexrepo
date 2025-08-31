@@ -18,6 +18,7 @@ dependencies = [
     "uvicorn<1.0.0,>=0.32.0",
     "gevent<25.0.0,>=24.10.3",
     "gunicorn>=23.0.0",
+    "daphne>=4.2.1",
     "celery>=5.4.0",
     "redis>=5.0.0",
     "requests<3.0.0,>=2.32.3",

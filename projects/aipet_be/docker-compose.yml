@@ -29,7 +29,7 @@ services:
       - db
 
   db:
-    container_name: aipet_be_db
+    container_name: aipet_db
     restart: unless-stopped
     image: postgres:15
     volumes:
@@ -37,7 +37,7 @@ services:
       - ./tools:/code/tools
       - postgres_db:/var/lib/postgresql/data
     environment:
-      - POSTGRES_MULTIPLE_DATABASES=aipet_be_db,test_db
+      - POSTGRES_MULTIPLE_DATABASES=aipet,test_db
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password
     env_file:
