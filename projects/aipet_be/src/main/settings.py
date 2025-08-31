@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 import os
 from pathlib import Path
 from urllib.parse import ParseResult, unquote, urlparse
+from socket import gethostbyname
+from socket import gethostname
 
 from dotenv import load_dotenv
 
@@ -76,6 +78,8 @@ ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
     "aipet-api.jwnwilson.co.uk",
+    # To enable healthcheck which uses the private IP address of the container
+    gethostbyname(gethostname())
 ]
 
 # Application definition
