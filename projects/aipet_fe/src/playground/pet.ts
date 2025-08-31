@@ -137,6 +137,7 @@ export class Pet {
     this.speechText.text = "";
     this.speechText.fontFamily = "Arial, sans-serif";
     this.speechText.fontSize = 36;
+    this.speechText.lineSpacing = 5;
     this.speechText.textWrapping = true;
 
     this.speechBackground.addControl(this.speechText);

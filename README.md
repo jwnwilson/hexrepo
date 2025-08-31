@@ -36,7 +36,6 @@ Setup the following env vars directly or run:
 # To Do
 
 - Aipet
-    - Verify pipeline deployments for AIPET FE and BE
     - Setup GA / mixpannel
     - Deploy App - Kubernetes with k3 / rancher
     - Setup auth token auto refresh
