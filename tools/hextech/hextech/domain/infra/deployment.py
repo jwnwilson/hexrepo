@@ -247,18 +247,19 @@ def get_terrform_output(env: str, project: str) -> str:
 
 def migrate_db(config: HexrepoConfig, env: str, project: str):
     project_root: str = find_repo_root()
+    db_name: str = project
     with chdir(project_root):
-        with open("hexproject.yaml") as f:
-            project_config = yaml.safe_load(f)
+        with chdir(f"projects/{project}"):
+            with open("hexproject.yaml") as f:
+                project_config = yaml.safe_load(f)
+            try:
+                db_name: str = project_config["database_migrations"]["db_name"]
+            except KeyError:
+                typer.echo(
+                    f"No database migrations found for project {project}, using project name as db name"
+                )
 
-        try:
-            db_name: str = project_config["database_migrations"]["db_name"]
-        except KeyError:
-            typer.echo(
-                f"No database migrations found for project {project}, using project name as db name"
-            )
-            db_name = project
-
+    with chdir(project_root):
         if config.cloud_provider == "aws" and env != "local":
             if not db_exists(config, project, env):
                 typer.echo(
