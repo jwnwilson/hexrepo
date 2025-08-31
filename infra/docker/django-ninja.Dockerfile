@@ -20,6 +20,6 @@ ENV PATH="/code/project/.venv/bin/:$PATH"
 
 COPY ./projects/${PROJECT}/src ./src
 COPY ./projects/${PROJECT}/env ./env
+COPY ./projects/${PROJECT}/staticfiles ./staticfiles
 
-CMD ["sh", "-c", "gunicorn --access-logfile - --error-logfile - --log-level debug --forwarded-allow-ips=* --bind 0.0.0.0:8000 -w ${WORKERS} -k gevent main.wsgi:application"]
-
+CMD ["sh", "-c", "daphne -b 0.0.0.0 -p 8000 main.asgi:application"]
