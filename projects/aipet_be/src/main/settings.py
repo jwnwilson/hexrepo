@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 import os
 from pathlib import Path
 from urllib.parse import ParseResult, unquote, urlparse
+from socket import gethostbyname
+from socket import gethostname
 
 from dotenv import load_dotenv
 
@@ -75,11 +77,14 @@ ALLOWED_HOSTS = [
     "0.0.0.0",
     "localhost",
     "127.0.0.1",
-    "aipet-default-ecs.jwnwilson.co.uk",
+    "aipet-api.jwnwilson.co.uk",
+    # To enable healthcheck which uses the private IP address of the container
+    gethostbyname(gethostname())
 ]
 
 # Application definition
 INSTALLED_APPS = [
+    "daphne",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -124,13 +129,13 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "main.wsgi.application"
-
+ASGI_APPLICATION = "main.asgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 # Get database URL from environment variable
-if not config.IS_TESTING:
+if not config.IS_TESTING and not DEBUG:
     DATABASE_URL = get_sql_db_url()
 else:
     DATABASE_URL = config.DB_URL
@@ -194,7 +199,7 @@ AUTH_USER_MODEL = "login.User"
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 DEFAULT_FROM_EMAIL = "noreply@aipet.com"
 FRONTEND_VERIFY_URL = os.getenv(
-    "FRONTEND_VERIFY_URL", "http://localhost:8000/api/v1/auth/verify"
+    "FRONTEND_VERIFY_URL", "https://aipet.jwnwilson.co.uk/api/v1/auth/verify"
 )
 
 # For production, use SMTP backend:
@@ -220,11 +225,15 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:8080",  # React development server
     "http://127.0.0.1:8080",
     "http://localhost:8088",  # React development server
+    "https://aipet.jwnwilson.co.uk",
+    "https://aipet-api.jwnwilson.co.uk",
 ]
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:8080",  # React development server
     "http://127.0.0.1:8080",
     "http://localhost:8088",  # React development server
+    "https://aipet.jwnwilson.co.uk",
+    "https://aipet-api.jwnwilson.co.uk",
 ]
 
 # Allow credentials (cookies, authorization headers, etc.)
@@ -252,3 +261,57 @@ CORS_ALLOW_METHODS = [
     "POST",
     "PUT",
 ]
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'filters': {
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse',
+        },
+        'require_debug_true': {
+            '()': 'django.utils.log.RequireDebugTrue',
+        },
+    },
+    'formatters': {
+        'django.server': {
+            '()': 'django.utils.log.ServerFormatter',
+            'format': '[%(server_time)s] %(message)s',
+        }
+    },
+    'handlers': {
+        'console': {
+            'level': 'INFO',
+            'filters': ['require_debug_true'],
+            'class': 'logging.StreamHandler',
+        },
+        # Custom handler which we will use with logger 'django'.
+        # We want errors/warnings to be logged when DEBUG=False
+        'console_on_not_debug': {
+            'level': 'WARNING',
+            'filters': ['require_debug_false'],
+            'class': 'logging.StreamHandler',
+        },
+        'django.server': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'django.server',
+        },
+        'mail_admins': {
+            'level': 'ERROR',
+            'filters': ['require_debug_false'],
+            'class': 'django.utils.log.AdminEmailHandler'
+        }
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console', 'mail_admins', 'console_on_not_debug'],
+            'level': 'INFO',
+        },
+        'django.server': {
+            'handlers': ['django.server'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+    }
+}

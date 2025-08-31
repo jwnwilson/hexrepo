@@ -82,7 +82,7 @@ export class Pet {
     );
 
     // Create sprite manager and sprite
-    this.spriteManager = new SpriteManager("petSpriteManager", "/public/texture/bunny.png", 1, { width: 32, height: 32 }, this.scene);
+    this.spriteManager = new SpriteManager("petSpriteManager", "/texture/bunny.png", 1, { width: 32, height: 32 }, this.scene);
     this.sprite = new Sprite("petSprite", this.spriteManager);
     this.sprite.playAnimation(0, 4, true, 100);
     this.sprite.position = position;
@@ -153,7 +153,6 @@ export class Pet {
     
     // Update speech text
     this.speechText.text = text;
-    this.currentSpeech = text;
     
     // Show the speech bubble
     this.speechBackground.isVisible = true;
@@ -168,7 +167,6 @@ export class Pet {
     if (!this.speechBackground) return;
     
     this.speechBackground.isVisible = false;
-    this.currentSpeech = "";
     
     if (this.speechTimeout) {
       clearTimeout(this.speechTimeout);

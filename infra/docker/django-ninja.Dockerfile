@@ -21,5 +21,5 @@ ENV PATH="/code/project/.venv/bin/:$PATH"
 COPY ./projects/${PROJECT}/src ./src
 COPY ./projects/${PROJECT}/env ./env
 
-CMD ["sh", "-c", "gunicorn --forwarded-allow-ips=* --bind 0.0.0.0:8000 -w ${WORKERS} -k gevent main.wsgi:application"]
+CMD ["sh", "-c", "gunicorn --access-logfile - --error-logfile - --log-level debug --forwarded-allow-ips=* --bind 0.0.0.0:8000 -w ${WORKERS} -k gevent main.wsgi:application"]
 

@@ -36,12 +36,9 @@ Setup the following env vars directly or run:
 # To Do
 
 - Aipet
-    - Setup infra / terraform
-        - Finish ALB + ECS setup and verify pipeline deployment
-        - Create superuser
-        - Deploy FE
-        - use multistage docker build to reduce size
-    - Deploy aipet to ECS + cloudfront
+    - Fix no logs in cloudwatch
+        - Deploy potential gunicorn setting fix
+    - Verify pipeline deployments for AIPET FE and BE
     - Setup GA / mixpannel
     - Deploy App - Kubernetes with k3 / rancher
     - Setup auth token auto refresh

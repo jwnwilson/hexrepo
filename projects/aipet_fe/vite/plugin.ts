@@ -29,6 +29,9 @@ const vitePlugins: any = (env: any) => {
       devOptions: {
         enabled: true,
       },
+      workbox: {
+        maximumFileSizeToCacheInBytes: 6 * 1024 * 1024, // 6MB
+      },
     }),
   ]
 }
