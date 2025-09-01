@@ -109,7 +109,7 @@ Available data to analyse:
 - objects in the scene for each need with a position (x, y, z)
 
 When analyzing needs:
-1. Prioritize urgent needs (80+ on the scale) then the highest need after that
+1. Prioritize urgent needs (50+ on the scale) then the highest need after that
 2. Return a move vector from the pet's position to an object that will satisfy an urgent need
 3. Return an action to take to satisfy the need
 4. Provide reasoning for your actions from the pet's perspective
