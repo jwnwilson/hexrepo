@@ -36,6 +36,10 @@ Setup the following env vars directly or run:
 # To Do
 
 - Aipet
+    - Prep easy to access demo
+        - Disable Auth for now
+        - Add cute error message for rate limiting (Sorry I'm tired)
+        - Make pet more dynamic and debug it not moving
     - Setup GA / mixpannel
     - Deploy App - Kubernetes with k3 / rancher
     - Setup auth token auto refresh
