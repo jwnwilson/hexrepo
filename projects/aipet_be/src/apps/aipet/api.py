@@ -19,7 +19,7 @@ router = Router(
 )
 
 
-@router.post("/recommendations", auth=[])
+@router.post("/recommendations", auth=None)
 async def get_pet_recommendations(
     request, scene_data: SceneData, model: Optional[str] = None
 ) -> PetActionRecommendation:
