@@ -10,6 +10,9 @@ interface AuthProviderProps {
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
+  
+  // Check if authentication is disabled for testing
+  const isAuthDisabled = import.meta.env.VITE_DISABLE_AUTH === 'true';
 
   const login = async (email: string, password: string) => {
     try {
@@ -80,6 +83,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   // Check for existing user on mount
   useEffect(() => {
+    if (isAuthDisabled) {
+      // Set a mock user when auth is disabled for testing
+      const mockUser: User = {
+        username: 'test@example.com',
+      };
+      setUser(mockUser);
+      return;
+    }
+    
     const savedUser = localStorage.getItem('user');
     if (savedUser) {
       try {
@@ -89,7 +101,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         localStorage.removeItem('user');
       }
     }
-  }, []);
+  }, [isAuthDisabled]);
 
   const value: AuthContextType = {
     user,

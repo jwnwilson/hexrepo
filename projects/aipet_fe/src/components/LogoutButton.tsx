@@ -9,6 +9,9 @@ const LogoutButton: React.FC<LogoutButtonProps> = ({
   className = "", 
   style = {} 
 }) => {
+  // Check if authentication is disabled for testing
+  const isAuthDisabled = import.meta.env.VITE_DISABLE_AUTH === 'true';
+  
   const handleLogout = () => {
     const confirmed = window.confirm('Are you sure you want to logout? This will clear all your data and refresh the page.');
     if (confirmed) {
@@ -35,6 +38,11 @@ const LogoutButton: React.FC<LogoutButtonProps> = ({
     boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
     ...style
   };
+
+  // Don't render the logout button if authentication is disabled
+  if (isAuthDisabled) {
+    return null;
+  }
 
   return (
     <button

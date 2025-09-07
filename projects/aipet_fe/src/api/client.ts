@@ -78,11 +78,16 @@ class ApiClient {
   private baseUrl: string;
   private token: string | null = null;
   private csrfToken: string | null = null;
+  private isAuthDisabled: boolean;
 
   constructor(baseUrl?: string) {
     this.baseUrl = baseUrl || currentApiConfig.BASE_URL;
-    this.token = localStorage.getItem('access_token');
-    this.csrfToken = localStorage.getItem('csrf_token');
+    this.isAuthDisabled = import.meta.env.VITE_DISABLE_AUTH === 'true';
+    
+    if (!this.isAuthDisabled) {
+      this.csrfToken = localStorage.getItem('csrf_token');
+      this.token = localStorage.getItem('access_token');
+    }
   }
 
   // Method to fetch CSRF token from the API
@@ -114,11 +119,14 @@ class ApiClient {
       ...(options.headers as Record<string, string>),
     };
 
-    if (this.token) {
+    if (this.token && !this.isAuthDisabled) {
       headers.Authorization = `Bearer ${this.token}`;
     }
 
-    // Add CSRF token if available
+    // Add CSRF token if available and auth is not disabled
+    if (!this.csrfToken) {
+      this.csrfToken = await this.fetchCsrfToken();
+    }
     if (this.csrfToken) {
       headers['X-CSRFToken'] = this.csrfToken;
     }
@@ -165,7 +173,7 @@ class ApiClient {
       body: JSON.stringify(request),
     });
 
-    if (response.data) {
+    if (response.data && !this.isAuthDisabled) {
       this.token = response.data.access;
       localStorage.setItem('access_token', response.data.access);
       localStorage.setItem('refresh_token', response.data.refresh);
@@ -182,11 +190,13 @@ class ApiClient {
   }
 
   async logout(): Promise<void> {
-    this.token = null;
-    this.csrfToken = null;
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('refresh_token');
-    localStorage.removeItem('csrf_token');
+    if (!this.isAuthDisabled) {
+      this.token = null;
+      this.csrfToken = null;
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('refresh_token');
+      localStorage.removeItem('csrf_token');
+    }
   }
 
   async verifyEmail(token: string): Promise<ApiResponse<{ message: string; verified: boolean }>> {
@@ -239,7 +249,7 @@ class ApiClient {
   }
 
   isAuthenticated(): boolean {
-    return !!this.token;
+    return this.isAuthDisabled || !!this.token;
   }
 
   // Refresh token method (if needed)

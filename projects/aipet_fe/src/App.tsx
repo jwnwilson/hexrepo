@@ -20,15 +20,17 @@ const StrictModeWrapper: React.FC<{ children: React.ReactNode; enableStrictMode:
 };
 
 const AppContent: React.FC = () => {
-  const [currentPage, setCurrentPage] = useState<Page>('login');
+  // Check if authentication is disabled for testing
+  const isAuthDisabled = import.meta.env.VITE_DISABLE_AUTH === 'true';
+  const [currentPage, setCurrentPage] = useState<Page>(isAuthDisabled ? 'app' : 'login');
   const { isAuthenticated } = useAuth();
 
   // Check for valid login on initial load
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isAuthenticated || isAuthDisabled) {
       setCurrentPage('app');
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, isAuthDisabled]);
 
   const renderPage = () => {
     switch (currentPage) {
