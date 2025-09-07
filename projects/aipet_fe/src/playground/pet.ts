@@ -122,9 +122,10 @@ export class Pet {
   private _createSpeechBubble(): void {
     this.speechBubble = AdvancedDynamicTexture.CreateFullscreenUI("UI");
 
+    
     this.speechBackground = new Rectangle();
-    this.speechBackground.width = 0.2;
-    this.speechBackground.height = "200px";
+    this.speechBackground.width = "300px";
+    this.speechBackground.height = "300px";
     this.speechBackground.cornerRadius = 20;
     this.speechBackground.color = "Black";
     this.speechBackground.thickness = 4;
@@ -132,11 +133,13 @@ export class Pet {
     this.speechBubble.addControl(this.speechBackground);
     this.speechBackground.linkWithMesh(this.mesh);   
     this.speechBackground.linkOffsetY = -200;
-
+    
+    // const font = "65px Arial";
     this.speechText = new TextBlock();
     this.speechText.text = "";
     this.speechText.fontFamily = "Arial, sans-serif";
-    this.speechText.fontSize = 36;
+    this.speechText.fontSize = 40;
+    // this.speechText.setAttribute('style', `font: ${font} !important`);
     this.speechText.lineSpacing = 5;
     this.speechText.textWrapping = true;
 
