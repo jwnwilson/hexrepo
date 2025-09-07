@@ -38,6 +38,10 @@ Setup the following env vars directly or run:
 - Aipet
     - Prep easy to access demo
         - Make pet more dynamic and debug it not moving
+            - Return destination for pet to go to
+            - Have server calculate a direction
+            - LLM to return a speed
+            - LLM can return jump 
         - Disable Auth for now
         - Add cute error message for rate limiting (Sorry I'm tired)
     - Setup GA / mixpannel

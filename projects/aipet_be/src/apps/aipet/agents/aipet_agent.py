@@ -1,4 +1,5 @@
 import logging
+import math
 from typing import List, Literal, Tuple
 
 import logfire
@@ -55,8 +56,20 @@ class PetNeeds(BaseModel):
 class PetActionRecommendation(BaseModel):
     """Complete recommendation response for pet actions."""
 
+    goal_position: List[float] = Field(
+        description="Goal position to move the pet to as [x, y, z] coordinates",
+        min_items=3,
+        max_items=3,
+    )
+    action: Actions = Field(description="Action to take")
+    reasoning: str = Field(description="Reasoning for the action")
+
+
+class PetActions(BaseModel):
+    """Complete recommendation response for pet actions."""
+
     movement: List[float] = Field(
-        description="Direction to move the pet as [x, y, z] coordinates",
+        description="Direction to move the pet to as [x, y, z] coordinates",
         min_items=3,
         max_items=3,
     )
@@ -90,7 +103,7 @@ class AipetAgent:
 
     def _get_system_message(self) -> str:
         """Get the system message for the pet care agent."""
-        return """You are an AI Pet. Your job is to analyze your needs, the scene around you and return a movement direction (vector of 3 numbers) and action to satisfy your needs.
+        return """You are an AI Pet. Your job is to analyze your needs, the scene around you and return a location you want to go to (position vector of 3 numbers) and action to satisfy your needs.
 
 Pet needs are provided on a scale of 0-100 where:
 - 0 = need is fully satisfied
@@ -136,7 +149,7 @@ Scene Data:
 
     async def get_recommendations(
         self, scene_data: SceneData
-    ) -> PetActionRecommendation:
+    ) -> PetActions:
         """
         Get action recommendations based on pet needs.
         """
@@ -160,8 +173,22 @@ Scene Data:
                     recommendation=recommendation,
                 )
 
+                # Calculate the direction to move the pet
+                direction = [
+                    recommendation.goal_position[0] - scene_data.pet_data.position[0],
+                    recommendation.goal_position[1] - scene_data.pet_data.position[1],
+                    recommendation.goal_position[2] - scene_data.pet_data.position[2],
+                ]
+
+                # Normalize the direction
+                # direction = [x / math.sqrt(sum(x**2 for x in direction)) for x in direction]
+
                 logger.info(f"Generated recommendations for pet needs: {scene_data}")
-                return recommendation
+                return PetActions(
+                    movement=direction,
+                    action=recommendation.action,
+                    reasoning=recommendation.reasoning,
+                )
 
             except Exception as e:
                 logfire.error(

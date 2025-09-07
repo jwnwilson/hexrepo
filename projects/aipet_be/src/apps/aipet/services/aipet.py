@@ -3,7 +3,7 @@ from typing import Optional
 
 import logfire
 
-from ..agents.aipet_agent import AipetAgent, PetActionRecommendation, SceneData
+from ..agents.aipet_agent import AipetAgent, PetActionRecommendation, SceneData, PetActions
 
 logger = logging.getLogger(__name__)
 
@@ -16,14 +16,14 @@ class AipetService:
 
     async def get_pet_recommendations(
         self, scene_data: SceneData
-    ) -> PetActionRecommendation:
+    ) -> PetActions:
         """
         Get AI-powered recommendations for pet care based on current needs.
         """
         with logfire.span("get_pet_recommendations"):
             try:
                 # Get recommendations from the AI agent
-                recommendations = await self.agent.get_recommendations(scene_data)
+                recommendations: PetActions = await self.agent.get_recommendations(scene_data)
 
                 logger.info(f"Generated recommendations for scene_data: {scene_data}")
                 return recommendations

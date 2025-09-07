@@ -71,7 +71,6 @@ services:
     depends_on:
       - redis
       - db
-      - api
 
   celery-beat:
     container_name: aipet_be_celery_beat
