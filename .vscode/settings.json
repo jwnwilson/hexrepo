@@ -9,5 +9,14 @@
         "${workspaceFolder}/libs/log",
         "${workspaceFolder}/libs/api",
         "${workspaceFolder}/libs/task",
+    ],
+    "cursorpyright.analysis.autoSearchPaths": true,
+    "cursorpyright.analysis.extraPaths": [
+        "${workspaceFolder}/tools/hextech/hextech",
+        "${workspaceFolder}/libs/cloud",
+        "${workspaceFolder}/libs/db",
+        "${workspaceFolder}/libs/log",
+        "${workspaceFolder}/libs/api",
+        "${workspaceFolder}/libs/task"
     ]
 }
