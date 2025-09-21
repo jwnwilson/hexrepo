@@ -6,7 +6,7 @@ metadata:
 spec:
   ingressClassName: ngrok
   rules:
-    - host: "nonlimitative-vina-subquinquefid.ngrok-free.app"
+    - host: "rancher.jwnwilson.co.uk"
       http:
         paths:
           - path: /
