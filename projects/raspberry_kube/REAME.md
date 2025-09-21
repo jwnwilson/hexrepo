@@ -20,7 +20,7 @@
     - https://docs.k3s.io/quick-start
     - `curl -sfL https://get.k3s.io | K3S_NODE_NAME=rasp-kube-master sh -`
 2. Get master node token with:
-    - `cat /var/lib/rancher/k3s/server/node-token`
+    - `sudo cat /var/lib/rancher/k3s/server/node-token`
 2. Install worker K3 nodes (for each worker change node name number):
     `curl -sfL https://get.k3s.io | K3S_URL=https://<master-ip>:6443 K3S_TOKEN=<master-node-token> K3S_NODE_NAME=rasp-worker-01 sh -`
 
