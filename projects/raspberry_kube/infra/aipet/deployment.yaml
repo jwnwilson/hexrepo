@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aipet
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: aipet
+  template:
+    metadata:
+      labels:
+        app: aipet
+    spec:
+      containers:
+      - name: aipet-container
+        image: 675468650888.dkr.ecr.eu-west-1.amazonaws.com/hexrepo-aipet_be:20250907225635
+        ports:
+        - containerPort: 8000

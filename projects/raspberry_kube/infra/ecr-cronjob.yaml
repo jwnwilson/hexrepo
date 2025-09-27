@@ -1,0 +1,31 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: ecr-secret-cron
+spec:
+  schedule: "0 * * * *"
+  successfulJobsHistoryLimit: 1
+  suspend: false
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: ecr-secret-cron-container
+            image: alpine/k8s:1.27.4
+            imagePullPolicy: IfNotPresent
+            envFrom:
+              - secretRef:
+                  name: ecr-secret-helper
+            command:
+              - /bin/sh
+              - -c
+              - |-
+                kubectl create secret docker-registry regcred \
+                  --save-config \
+                  --dry-run=client \
+                  --docker-server=${ECR_REGISTRY} \
+                  --docker-username=AWS \
+                  --docker-password=`aws ecr get-login-password` \
+                  -o yaml | kubectl apply -f -
+          restartPolicy: Never

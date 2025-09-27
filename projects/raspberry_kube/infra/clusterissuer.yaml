@@ -1,0 +1,17 @@
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: jwnwilson@hotmail.co.uk
+    privateKeySecretRef:
+      name: letsencrypt
+    solvers:
+    - selector:
+        dnsNames:
+        - '*.jwnwilson.co.uk'
+      http01:
+        ingress:
+          class: nginx

@@ -39,7 +39,9 @@ Confirm nodes are live on master with:
 
 Note: Tried ngrok and removing as cost is too high.
 
-1.
+1 Setup digital ocean and follow these docs:
+https://docs.inlets.dev/tutorial/kubernetes-ingress/#install-the-inlets-operator
+
 
 ## Cert Manager setup
 
@@ -47,3 +49,10 @@ Note: Tried ngrok and removing as cost is too high.
 
 1. Document inlet setup 
 
+## ECR auth setup
+export USERNAME=noelwilson
+export IP=192.168.1.49
+scp ./ecr-credential-provider $USERNAME@$IP:/tmp
+ssh $USERNAME@$IP "chmod +x /tmp/ecr-credential-provider"
+ssh $USERNAME@$IP "mv /tmp/ecr-credential-provider /var/lib/rancher/credentialprovider/bin/ecr-credential-provider" 
+kubectl apply -f ./infra/credential-provider-config.yaml
