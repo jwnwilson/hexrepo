@@ -56,3 +56,28 @@ scp ./ecr-credential-provider $USERNAME@$IP:/tmp
 ssh $USERNAME@$IP "chmod +x /tmp/ecr-credential-provider"
 ssh $USERNAME@$IP "mv /tmp/ecr-credential-provider /var/lib/rancher/credentialprovider/bin/ecr-credential-provider" 
 kubectl apply -f ./infra/credential-provider-config.yaml
+
+
+## ECR setup
+
+Setup cron job to refresh docker access token for aws ecr.
+Guide here: https://cjihrig.com/refreshing_k8s_docker_secrets_via_cron
+
+Private ECR setup:
+1.Gave admin permissions to default service account
+```
+kubectl create clusterrolebinding permissive-binding \
+  --clusterrole=cluster-admin \
+  --user=admin \
+  --user=kubelet \
+  --group=system:serviceaccounts
+```
+2. Setup aws auth, run: add_aws_ecr_creds.sh
+3. Setup ECR auth, run: docker_auth.sh
+
+
+clusterrolebinding.rbac.authorization.k8s.io/permissive-binding created
+
+
+
+

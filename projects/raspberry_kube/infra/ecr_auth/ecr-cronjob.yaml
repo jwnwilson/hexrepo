@@ -1,0 +1,38 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: ecr-secret-cron
+spec:
+  schedule: "0 * * * *"
+  successfulJobsHistoryLimit: 1
+  suspend: false
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: ecr-secret-cron-container
+            image: alpine/k8s:1.27.4
+            imagePullPolicy: IfNotPresent
+            envFrom:
+              - secretRef:
+                  name: ecr-secret-helper
+            command:
+              - /bin/sh
+              - -c
+              - |-
+                #!/bin/bash
+                ACCOUNT=675468650888
+                REGION=$AWS_DEFAULT_REGION
+                SECRET_NAME=docker-auth
+                EMAIL=jwnwilson@hotmail.co.uk
+
+                TOKEN=$(aws ecr --region $REGION get-authorization-token --output text --query 'authorizationData[].authorizationToken' | base64 -d | cut -d: -f2) 
+
+                kubectl delete secret --ignore-not-found $SECRET_NAME
+                kubectl create secret docker-registry $SECRET_NAME \
+                --docker-server=https://${ACCOUNT}.dkr.ecr.${REGION}.amazonaws.com/ \
+                --docker-username=AWS \
+                --docker-password="${TOKEN}" \
+                --docker-email="${EMAIL}"
+          restartPolicy: Never
