@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: aipet-container
-        image: 675468650888.dkr.ecr.eu-west-1.amazonaws.com/hexrepo-aipet_be:20250907224611
+        image: 675468650888.dkr.ecr.eu-west-1.amazonaws.com/hexrepo-aipet_be:20250901225226
         ports:
         - containerPort: 8000
       imagePullSecrets:

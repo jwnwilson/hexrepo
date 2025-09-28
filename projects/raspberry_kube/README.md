@@ -74,6 +74,11 @@ kubectl create clusterrolebinding permissive-binding \
 ```
 2. Setup aws auth, run: add_aws_ecr_creds.sh
 3. Setup ECR auth, run: docker_auth.sh
+4. Add following to deployment.yaml
+```
+imagePullSecrets:
+    - name: docker-auth
+```
 
 
 clusterrolebinding.rbac.authorization.k8s.io/permissive-binding created

@@ -23,7 +23,7 @@ spec:
               - |-
                 #!/bin/bash
                 ACCOUNT=675468650888
-                REGION=$AWS_DEFAULT_REGION
+                REGION=eu-west-1
                 SECRET_NAME=docker-auth
                 EMAIL=jwnwilson@hotmail.co.uk
 
