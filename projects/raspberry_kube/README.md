@@ -45,18 +45,6 @@ https://docs.inlets.dev/tutorial/kubernetes-ingress/#install-the-inlets-operator
 
 ## Cert Manager setup
 
-# To do
-
-1. Document inlet setup 
-
-## ECR auth setup
-export USERNAME=noelwilson
-export IP=192.168.1.49
-scp ./ecr-credential-provider $USERNAME@$IP:/tmp
-ssh $USERNAME@$IP "chmod +x /tmp/ecr-credential-provider"
-ssh $USERNAME@$IP "mv /tmp/ecr-credential-provider /var/lib/rancher/credentialprovider/bin/ecr-credential-provider" 
-kubectl apply -f ./infra/credential-provider-config.yaml
-
 
 ## ECR setup
 
@@ -79,9 +67,6 @@ kubectl create clusterrolebinding permissive-binding \
 imagePullSecrets:
     - name: docker-auth
 ```
-
-
-clusterrolebinding.rbac.authorization.k8s.io/permissive-binding created
 
 
 

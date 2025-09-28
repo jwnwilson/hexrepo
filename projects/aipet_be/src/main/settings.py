@@ -78,6 +78,7 @@ ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
     "aipet-api.jwnwilson.co.uk",
+    "aipet-kube.jwnwilson.co.uk",
     # To enable healthcheck which uses the private IP address of the container
     gethostbyname(gethostname())
 ]
