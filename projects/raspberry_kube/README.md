@@ -44,6 +44,8 @@ https://docs.inlets.dev/tutorial/kubernetes-ingress/#install-the-inlets-operator
 
 
 ## Cert Manager setup
+1. Add annotation:
+cert-manager.io/issuer: "letsencrypt-prod"
 
 
 ## ECR setup
