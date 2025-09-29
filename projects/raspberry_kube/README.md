@@ -44,7 +44,8 @@ https://docs.inlets.dev/tutorial/kubernetes-ingress/#install-the-inlets-operator
 
 
 ## Cert Manager setup
-1. Add annotation:
+1. Setup deployment <- servie <- ingress
+1. On Ingress add annotation:
 cert-manager.io/issuer: "letsencrypt-prod"
 
 
