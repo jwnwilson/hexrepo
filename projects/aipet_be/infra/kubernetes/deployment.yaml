@@ -1,0 +1,116 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aipet
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: aipet
+  template:
+    metadata:
+      labels:
+        app: aipet
+    spec:
+      containers:
+      - name: aipet-container
+        image: 675468650888.dkr.ecr.eu-west-1.amazonaws.com/hexrepo-aipet_be:20250907225635
+        ports:
+        - containerPort: 8000
+          name: http
+        env:
+        # Database Configuration
+        - name: DB_URL
+          value: "postgresql+psycopg://postgres:password@db:5432/aipet"
+        - name: DB_RO_URL
+          value: "postgresql+psycopg://postgres:password@db:5432/aipet"
+        - name: DB_PASSWORD_SECRET_NAME
+          value: "aipet-default-db-password"
+        - name: DB_SQL_LOGGING
+          value: "false"
+        - name: DB_SSL_CONNECTION
+          value: "false"
+        
+        # Application Configuration
+        - name: ENVIRONMENT
+          value: "kubernetes"
+        - name: PROJECT
+          value: "aipet_be"
+        - name: CLOUD_PROVIDER
+          value: "aws"
+        - name: REGION
+          value: "eu-west-1"
+        - name: API_PREFIX
+          value: "/api/v1"
+        - name: HOST
+          value: "0.0.0.0"
+        - name: PORT
+          value: "8000"
+        - name: ALLOWED_ORIGINS
+          value: "*"
+        
+        # Security Configuration
+        - name: SECRET_KEY
+          value: "django-insecure-17w_61abp)n_5!mrw8(wwj_#9igoq^#j$pgy*sq$z-4ir)f=r7"
+        - name: JWT_SECRET
+          value: "53070c0d-f176-47ca-a252-5f06eb38907e"
+        - name: SESSION_SECRET
+          value: "b01282a3-36a5-4d90-b681-5c61402f3207"
+        - name: CLIENT_ID
+          value: "test"
+        - name: USER_POOL_ID
+          value: "test"
+        
+        # Task Queue Configuration
+        - name: TASK_QUEUE
+          value: "aipet_be-tasks"
+        - name: CELERY_BROKER_URL
+          value: "redis://redis:6379/0"
+        - name: CELERY_RESULT_BACKEND
+          value: "redis://redis:6379/0"
+        
+        # AI Configuration
+        - name: OPENAI_API_KEY
+          value: "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"
+        - name: GEMINI_API_KEY
+          value: "AIzaSyAb9garNyXS4x8RjwyoV1z_nx6XSIuk0fw"
+        - name: AI_DEFAULT_MODEL
+          value: "gemini-2.5-flash-lite"
+        - name: AI_TIMEOUT
+          value: "30"
+        - name: LOGFIRE_WRITE_TOKEN
+          value: "pylf_v1_us_6MyyH3hQSRsPGJ7RsMR6fmLSH2m6tmGbV1kG9ZZzclc3"
+        
+        # Debug Configuration
+        - name: DEBUG
+          value: "True"
+        - name: IS_TESTING
+          value: "false"
+        
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+        
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          successThreshold: 1
+          failureThreshold: 3
+        
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          successThreshold: 1
+          failureThreshold: 3
