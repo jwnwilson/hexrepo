@@ -8,9 +8,9 @@ set -euo pipefail
 # Configuration
 NODE_IPS=(
     "192.168.1.49"
-    "192.168.1.6" 
-    "192.168.1.12"
-    "192.168.1.13"
+    "192.168.1.65" 
+    "192.168.1.73"
+    "192.168.1.6"
 )
 
 SSH_USER="${SSH_USER:-noelwilson}"

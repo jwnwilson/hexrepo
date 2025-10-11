@@ -36,6 +36,9 @@ Setup the following env vars directly or run:
 # To Do
 
 - Aipet
+    - Setup multiplayer server in aipet_be
+        - Create logic to spin up server process that will communicate via websocket
+        - Create a scene data structure that can hold all scene data
     - Prep easy to access demo
         - Make pet more dynamic and debug it not moving
             - LLM to return a speed
