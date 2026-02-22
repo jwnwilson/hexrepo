@@ -340,3 +340,269 @@ class SQLRepository(Repository):
             query = query.offset(offset).limit(page_size)
 
         return query
+
+
+class AsyncDefaultQuery[ModelDTO: BaseModel](DefaultQuery[ModelDTO]):
+    async def update_relationships(
+        self,
+        db_obj: Union[Row[Any], BaseSQLModel],
+        dto: ModelDTO,
+        create: bool = False,
+    ) -> Row[Any] | BaseSQLModel:
+        from sqlalchemy import inspect
+        from sqlalchemy import select as sa_select
+
+        # Detect relationship names from the mapper, not by accessing the attributes
+        mapper = inspect(db_obj.__class__)
+        relationships: List[str] = [
+            rel.key for rel in mapper.relationships if rel.key in dto.model_fields
+        ]
+
+        if not create and relationships:
+            # Eagerly load all relationships we need before accessing them
+            await self.session.refresh(db_obj, attribute_names=relationships)
+
+        for relationship in relationships:
+            try:
+                dto_ids: List[str] = [str(r["id"]) for r in getattr(dto, relationship)]
+            except KeyError:
+                msg: str = (
+                    f"Invalid relationship data: {relationships}, missing 'id' key"
+                )
+                logger.error(msg)
+                raise ValueError(msg)
+
+            db_ids: List[str] = (
+                [] if create else [str(r.id) for r in getattr(db_obj, relationship)]
+            )
+
+            if set(db_ids) != set(dto_ids):
+                relationship_table = getattr(db_obj.__class__, relationship)
+                relationship_model: BaseSQLModel = (
+                    relationship_table.property.mapper.class_
+                )
+                result = await self.session.execute(
+                    sa_select(relationship_model).where(
+                        relationship_model.id.in_(dto_ids)
+                    )
+                )
+                new_relationships = result.scalars().all()
+                setattr(db_obj, relationship, new_relationships)
+
+        return db_obj
+
+
+class AsyncSQLRepository[ModelDTO: BaseModel, UpdateModelDTO: BaseModel](
+    Repository[ModelDTO, UpdateModelDTO]
+):
+    model: Any = BaseSQLModel
+    query_logic: Type[AsyncDefaultQuery[ModelDTO]] = AsyncDefaultQuery[ModelDTO]
+    # Apply .unique() to queries with eager loading to avoid duplicates
+    unique_query: bool = False
+
+    def __init__(
+        self,
+        session: AsyncSession,
+        model_dto: Optional[Type[ModelDTO]] = None,
+        required_filters: Optional[Dict[str, Any]] = None,
+    ):
+        self._session: AsyncSession = session
+        self._required_filters = required_filters
+        if model_dto:
+            self.model_dto: Type[ModelDTO] = model_dto
+        if not self.model_dto:
+            raise RuntimeError(
+                f"Missing model_dto for class: {self.__class__.__name__}"
+            )
+        self.query: AsyncDefaultQuery[ModelDTO] = self.query_logic(
+            self.model, self.model_dto, self.session, default_filters=required_filters
+        )
+
+    @property
+    def session(self) -> AsyncSession:
+        return self._session
+
+    async def _query_single(self, id: UUID) -> Any:
+        try:
+            query: Select[Any] = self.query.query_single(id)
+            query_exec = await self.session.execute(query)
+            if self.unique_query:
+                query_exec = query_exec.unique()
+            results = query_exec.one_or_none()
+        except MultipleResultsFound:
+            logger.warning(
+                f"Model: {self.model.__name__}, ID: {id}, multiple records found"
+            )
+            results = None
+        if not results:
+            raise RecordNotFound(
+                f"Model: {self.model.__name__}, Record: {id}, not found"
+            )
+        return results[0]
+
+    async def _get_total(self, filters: Optional[Dict[str, Any]] = None) -> int:
+        query: Select[Any] = self.query.query_total()
+        if filters:
+            query = self._filter(query, filters)
+        return int(await self.session.scalar(query))
+
+    async def _query_to_dto(self, query: Select[Any]) -> List[ModelDTO]:
+        query_result = await self.session.execute(query)
+        if self.unique_query:
+            query_result = query_result.unique()
+        return [self._model_to_dto(row) for row in query_result.scalars()]
+
+    def _model_to_dto(self, row: Union[BaseSQLModel, Row[Any]]) -> ModelDTO:
+        return self.model_dto(**row.__dict__)
+
+    def _filter(
+        self,
+        query: Select[Any],
+        filters: Dict[str, Any],
+    ) -> Select[Any]:
+        for key in filters:
+            if key.endswith("__in"):
+                model_attr = getattr(self.model, key.split("__")[0])
+                query = query.filter(model_attr.in_(filters[key]))
+            elif "." in key:
+                model_attr = getattr(self.model, key.split(".")[0])
+                attr_name = key.split(".")[1]
+                filter_kwargs = {attr_name: filters[key]}
+                query = query.filter(model_attr.any(**filter_kwargs))
+            elif key.endswith("__like"):
+                model_attr = getattr(self.model, key.split("__")[0])
+                query = query.where(model_attr.ilike(f"%{filters[key]}%"))
+            elif key.endswith("__isnull"):
+                model_attr = getattr(self.model, key.split("__")[0])
+                if filters[key]:
+                    query = query.where(model_attr.is_(None))
+                else:
+                    query = query.where(model_attr.isnot(None))
+            elif key.endswith("__notnull"):
+                model_attr = getattr(self.model, key.split("__")[0])
+                if filters[key]:
+                    query = query.where(model_attr.isnot(None))
+                else:
+                    query = query.where(model_attr.is_(None))
+            elif key.endswith("__gt"):
+                model_attr = getattr(self.model, key.split("__")[0])
+                query = query.where(model_attr > filters[key])
+            elif key.endswith("__gte"):
+                model_attr = getattr(self.model, key.split("__")[0])
+                query = query.where(model_attr >= filters[key])
+            elif key.endswith("__lt"):
+                model_attr = getattr(self.model, key.split("__")[0])
+                query = query.where(model_attr < filters[key])
+            elif key.endswith("__lte"):
+                model_attr = getattr(self.model, key.split("__")[0])
+                query = query.where(model_attr <= filters[key])
+            elif key.endswith("__ne"):
+                model_attr = getattr(self.model, key.split("__")[0])
+                query = query.where(model_attr != filters[key])
+            else:
+                query = query.where(getattr(self.model, key) == filters[key])
+        return query
+
+    def _order(
+        self,
+        query: Select[Any],
+        order_by: Optional[str] = None,
+    ) -> Select[Any]:
+        if order_by is not None:
+            direction = desc if order_by.startswith("-") else asc
+            query = query.order_by(direction(order_by.lstrip("-")))
+            return query
+        else:
+            return query
+
+    def _update_db_model_attrs(
+        self, db_obj: Row[Any], obj_in: ModelDTO, merge_objects: bool
+    ) -> None:
+        for key, value in obj_in.model_dump(exclude_unset=True).items():
+            if key == "id":
+                continue
+            if type(getattr(db_obj, key)) is InstrumentedList:
+                continue
+            current_value = getattr(db_obj, key, None)
+            is_object_attr = isinstance(current_value, dict) and isinstance(value, dict)
+            if is_object_attr and merge_objects:
+                merged_value: Dict[str, Any] = {**current_value, **value}  # type: ignore
+                setattr(db_obj, key, merged_value)
+            else:
+                setattr(db_obj, key, getattr(obj_in, key))
+
+    async def create(self, obj_in: ModelDTO) -> BaseModel:
+        db_obj: Any = self.query.parse_dto(obj_in)
+        await self.query.update_relationships(db_obj, obj_in, create=True)
+        try:
+            self.session.add(db_obj)
+            await self.session.flush()
+        except SQLIntegrityError as err:
+            logger.warning(
+                f"DB integrity Error creating: {self.__class__.__name__}, er: {err}"
+            )
+            await self.session.rollback()
+            raise IntegrityError(err.orig)
+        await self.session.refresh(db_obj)
+        return self._model_to_dto(db_obj)
+
+    async def read(self, id: UUID) -> BaseModel:
+        query_result = await self._query_single(id)
+        try:
+            return self._model_to_dto(query_result)
+        except IndexError:
+            raise RecordNotFound(
+                f"Model: {self.model.__name__}, Record: {id}, not found"
+            )
+
+    async def read_multi(
+        self,
+        filters: Optional[Dict[str, Any]] = None,
+        page_size: int = 100,
+        page_number: int = 1,
+        order_by: str = "-created_at",
+    ) -> PaginatedData[ModelDTO]:
+        query = self.query.query_multi()
+        if filters:
+            query = self._filter(query, filters)
+        query = self._order(query, order_by)
+        total = await self._get_total(filters)
+        query = self.paginate(query, page_number, page_size)
+        results: List[ModelDTO] = await self._query_to_dto(query)
+        return PaginatedData[ModelDTO](
+            results=results, total=total, page_size=page_size, page_number=page_number
+        )
+
+    async def update(
+        self, id: UUID, obj_in: UpdateModelDTO, merge_objects: bool = False
+    ) -> BaseModel:
+        existing_obj: Row[Any] = await self._query_single(id)
+        self._update_db_model_attrs(existing_obj, obj_in, merge_objects)
+        await self.query.update_relationships(existing_obj, obj_in)
+        try:
+            await self.session.flush()
+        except IntegrityError as err:
+            logger.warning(
+                f"DB integrity Error updating: {self.__class__.__name__}: {id}, er: {err}"
+            )
+            await self.session.rollback()
+            raise IntegrityError(err)
+        await self.session.refresh(existing_obj)
+        return self._model_to_dto(existing_obj)
+
+    async def delete(self, id: UUID) -> None:
+        result = await self._query_single(id)
+        await self.session.delete(result)
+        await self.session.flush()
+
+    def _get_offset(self, page_size: int, page_number: int) -> int:
+        return (page_number - 1) * page_size
+
+    def paginate(
+        self, query: Select[Any], page_number: int, page_size: int
+    ) -> Select[Any]:
+        if page_size > 0 and page_number >= 1:
+            offset: int = self._get_offset(page_size, page_number)
+            query = query.offset(offset).limit(page_size)
+        return query
+
