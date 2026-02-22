@@ -8,7 +8,7 @@ from fastapi import APIRouter, Depends, HTTPException, Response
 from fastapi.types import DecoratedCallable
 from hexrepo_cloud.auth.interface import AuthAdapter
 from hexrepo_db.exception import IntegrityError, InvalidArgument, RecordNotFound
-from jcore_db.interface import UOW, AsyncUOW, PaginatedData, Repository
+from hexrepo_db.interface import UOW, AsyncUOW, PaginatedData, Repository
 from pydantic import BaseModel
 
 logger = getLogger()
