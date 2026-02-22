@@ -4,8 +4,6 @@ import logfire
 from ninja import Router
 
 from apps.aipet.agents.aipet_agent import PetActionRecommendation
-from apps.core.auth import JWTAuthAsync, SessionAuthAsync
-from ninja.security import SessionAuth
 from config import config
 
 from .services.aipet import AipetService, SceneData

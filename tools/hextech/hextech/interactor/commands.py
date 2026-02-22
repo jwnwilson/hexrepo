@@ -1,10 +1,10 @@
 import os
+import shutil
 from contextlib import chdir
 from typing import List, Optional
 
 import copier
 import typer
-import shutil
 from typing_extensions import Annotated
 
 from hextech.config import HexrepoConfig, get_or_create_config
@@ -99,7 +99,7 @@ def create_project():
     os.system("rm -r templates/ninja_project/.venv 2> /dev/null || echo > /dev/null")
     template_choice = typer.prompt(
         "Which project template would you like to use? \n  1.fastapi\n  2.django_ninja\n",
-        default="1"
+        default="1",
     )
     # Validate the choice
     if template_choice.lower() not in ["1", "2"]:
@@ -113,10 +113,11 @@ def create_project():
     with chdir("projects"):
         # Run copier command to copy template
         copier.run_copy(
-            template_path, f"./{project_name}",
+            template_path,
+            f"./{project_name}",
             data={
                 "project_name": project_name,
-            }
+            },
         )
         # Setup infra for service
         if prompt_setup_project_infra():

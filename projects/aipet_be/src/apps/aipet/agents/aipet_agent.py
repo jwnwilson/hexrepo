@@ -1,5 +1,4 @@
 import logging
-import math
 from typing import List, Literal, Tuple
 
 import logfire
@@ -147,9 +146,7 @@ Scene Data:
             msg += f"- {obj.type}: {obj.position}\n"
         return msg
 
-    async def get_recommendations(
-        self, scene_data: SceneData
-    ) -> PetActions:
+    async def get_recommendations(self, scene_data: SceneData) -> PetActions:
         """
         Get action recommendations based on pet needs.
         """

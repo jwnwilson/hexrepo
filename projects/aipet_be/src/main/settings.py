@@ -12,9 +12,8 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 import os
 from pathlib import Path
+from socket import gethostbyname, gethostname
 from urllib.parse import ParseResult, unquote, urlparse
-from socket import gethostbyname
-from socket import gethostname
 
 from dotenv import load_dotenv
 
@@ -79,7 +78,7 @@ ALLOWED_HOSTS = [
     "127.0.0.1",
     "aipet-api.jwnwilson.co.uk",
     # To enable healthcheck which uses the private IP address of the container
-    gethostbyname(gethostname())
+    gethostbyname(gethostname()),
 ]
 
 # Application definition
@@ -263,55 +262,55 @@ CORS_ALLOW_METHODS = [
 ]
 
 LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'filters': {
-        'require_debug_false': {
-            '()': 'django.utils.log.RequireDebugFalse',
+    "version": 1,
+    "disable_existing_loggers": False,
+    "filters": {
+        "require_debug_false": {
+            "()": "django.utils.log.RequireDebugFalse",
         },
-        'require_debug_true': {
-            '()': 'django.utils.log.RequireDebugTrue',
+        "require_debug_true": {
+            "()": "django.utils.log.RequireDebugTrue",
         },
     },
-    'formatters': {
-        'django.server': {
-            '()': 'django.utils.log.ServerFormatter',
-            'format': '[%(server_time)s] %(message)s',
+    "formatters": {
+        "django.server": {
+            "()": "django.utils.log.ServerFormatter",
+            "format": "[%(server_time)s] %(message)s",
         }
     },
-    'handlers': {
-        'console': {
-            'level': 'INFO',
-            'filters': ['require_debug_true'],
-            'class': 'logging.StreamHandler',
+    "handlers": {
+        "console": {
+            "level": "INFO",
+            "filters": ["require_debug_true"],
+            "class": "logging.StreamHandler",
         },
         # Custom handler which we will use with logger 'django'.
         # We want errors/warnings to be logged when DEBUG=False
-        'console_on_not_debug': {
-            'level': 'WARNING',
-            'filters': ['require_debug_false'],
-            'class': 'logging.StreamHandler',
+        "console_on_not_debug": {
+            "level": "WARNING",
+            "filters": ["require_debug_false"],
+            "class": "logging.StreamHandler",
         },
-        'django.server': {
-            'level': 'INFO',
-            'class': 'logging.StreamHandler',
-            'formatter': 'django.server',
+        "django.server": {
+            "level": "INFO",
+            "class": "logging.StreamHandler",
+            "formatter": "django.server",
         },
-        'mail_admins': {
-            'level': 'ERROR',
-            'filters': ['require_debug_false'],
-            'class': 'django.utils.log.AdminEmailHandler'
-        }
+        "mail_admins": {
+            "level": "ERROR",
+            "filters": ["require_debug_false"],
+            "class": "django.utils.log.AdminEmailHandler",
+        },
     },
-    'loggers': {
-        'django': {
-            'handlers': ['console', 'mail_admins', 'console_on_not_debug'],
-            'level': 'INFO',
+    "loggers": {
+        "django": {
+            "handlers": ["console", "mail_admins", "console_on_not_debug"],
+            "level": "INFO",
         },
-        'django.server': {
-            'handlers': ['django.server'],
-            'level': 'INFO',
-            'propagate': False,
+        "django.server": {
+            "handlers": ["django.server"],
+            "level": "INFO",
+            "propagate": False,
         },
-    }
+    },
 }

@@ -3,9 +3,8 @@ import subprocess
 from contextlib import chdir
 from typing import Dict, List, Optional
 
-import yaml
-
 import typer
+import yaml
 
 from hextech.config import HexrepoConfig
 from hextech.domain.infra.bastion import db_exists, managed_bastion_ssh
