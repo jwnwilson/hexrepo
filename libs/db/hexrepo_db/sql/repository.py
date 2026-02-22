@@ -6,17 +6,15 @@ from pydantic import BaseModel
 from sqlalchemy import Row, Select, asc, desc, func, select
 from sqlalchemy.exc import IntegrityError as SQLIntegrityError
 from sqlalchemy.exc import MultipleResultsFound
-from sqlalchemy.orm import Session
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import Session
 from sqlalchemy.orm.collections import InstrumentedList
 
 from ..exception import IntegrityError, RecordNotFound
 from ..interface import (
-    ModelDTO,
     ModelDTOType,
     PaginatedData,
     Repository,
-    UpdateModelDTO,
 )
 from .interface import BaseSQLModel, Query, SQLModelType
 
@@ -116,21 +114,29 @@ class DefaultQuery[ModelDTO: BaseModel](Query[ModelDTO]):
         return db_obj
 
 
-class SQLRepository(Repository):
+class SQLRepository[ModelDTO: BaseModel, UpdateModelDTO: BaseModel](
+    Repository[ModelDTO, UpdateModelDTO]
+):
     model: Any = BaseSQLModel
-    model_dto: ModelDTOType = BaseModel
-    query_logic: Type[Query] = DefaultQuery
+    query_logic: Type[DefaultQuery[ModelDTO]] = DefaultQuery[ModelDTO]
     # Apply .unique() to queries with eager loading to avoid duplicates
     unique_query: bool = False
 
     def __init__(
         self,
         session: Session,
+        model_dto: Optional[Type[ModelDTO]] = None,
         required_filters: Optional[Dict[str, Any]] = None,
     ):
         self._session: Session = session
         self._required_filters = required_filters
-        self.query: Query = self.query_logic(
+        if model_dto:
+            self.model_dto: Type[ModelDTO] = model_dto
+        if not self.model_dto:
+            raise RuntimeError(
+                f"Missing model_dto for class: {self.__class__.__name__}"
+            )
+        self.query: Query[ModelDTO] = self.query_logic(
             self.model, self.model_dto, self.session, default_filters=required_filters
         )
 
@@ -163,13 +169,13 @@ class SQLRepository(Repository):
             query = self._filter(query, filters)
         return int(self.session.scalar(query))
 
-    def _query_to_dto(self, query: Select[Any]) -> List[BaseModel]:
+    def _query_to_dto(self, query: Select[Any]) -> List[ModelDTO]:
         query_result = self.session.execute(query)
         if self.unique_query:
             query_result = query_result.unique()
         return [self._model_to_dto(row) for row in query_result.scalars()]
 
-    def _model_to_dto(self, row: Union[BaseSQLModel, Row[Any]]) -> BaseModel:
+    def _model_to_dto(self, row: Union[BaseSQLModel, Row[Any]]) -> ModelDTO:
         return self.model_dto(**row.__dict__)
 
     def _filter(
@@ -301,8 +307,8 @@ class SQLRepository(Repository):
         query = self._order(query, order_by)
         total = self._get_total(filters)
         query = self.paginate(query, page_number, page_size)
-        results: List[BaseModel] = self._query_to_dto(query)
-        return PaginatedData(
+        results: List[ModelDTO] = self._query_to_dto(query)
+        return PaginatedData[ModelDTO](
             results=results, total=total, page_size=page_size, page_number=page_number
         )
 
@@ -605,4 +611,3 @@ class AsyncSQLRepository[ModelDTO: BaseModel, UpdateModelDTO: BaseModel](
             offset: int = self._get_offset(page_size, page_number)
             query = query.offset(offset).limit(page_size)
         return query
-

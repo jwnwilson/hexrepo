@@ -1,11 +1,18 @@
 import contextlib
-from typing import Any, AsyncGenerator, AsyncIterator, Dict, Generator, Iterator, Optional
+from typing import (
+    Any,
+    AsyncGenerator,
+    AsyncIterator,
+    Dict,
+    Generator,
+    Iterator,
+    Optional,
+)
 
 from loguru import logger
 from sqlalchemy import NullPool, create_engine, event
 from sqlalchemy.engine.base import Connection, Engine
 from sqlalchemy.exc import InvalidRequestError
-from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.ext.asyncio import (
     AsyncConnection,
     AsyncEngine,
@@ -13,6 +20,7 @@ from sqlalchemy.ext.asyncio import (
     async_sessionmaker,
     create_async_engine,
 )
+from sqlalchemy.orm import Session, sessionmaker
 
 from hexrepo_db.config import config
 

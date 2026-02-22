@@ -6,7 +6,7 @@ from pydantic import BaseModel
 from sqlalchemy import Row, Select
 from sqlalchemy.orm import Session
 
-from ..interface import ModelDTO, ModelDTOType
+from ..interface import ModelDTOType
 from .models.base_model import Base
 
 BaseSQLModel = TypeVar("BaseSQLModel", bound=Base)
