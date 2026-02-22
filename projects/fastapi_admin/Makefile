@@ -43,7 +43,7 @@ db_downgrade:
 	bash -c "uv run alembic downgrade -1"
 
 db_create_migration:
-	bash -c "env $$(cat env/local.env|xargs) uv run alembic revision --autogenerate -m \"DB migration\""
+	bash -c 'read -p "Describe migration: " slug && env $$(cat env/local.env|xargs) uv run alembic revision --autogenerate -m "$$slug"'
 
 docker_stop:
 	@-bash -c "docker ps -aq | xargs docker stop | xargs docker rm"
