@@ -1,6 +1,6 @@
 import contextlib
-from abc import ABC
-from typing import Any, Dict, Generator, Generic, Optional, Type, TypeVar
+from abc import ABC, abstractmethod
+from typing import Any, AsyncContextManager, Dict, Generator, Generic, Optional, Self, Type, TypeVar
 from uuid import UUID
 
 from pydantic import BaseModel
@@ -65,6 +65,26 @@ class UOW(ABC):
 
     def drop_all(self) -> None:
         raise NotImplementedError
+
+
+class AsyncUOW(ABC):
+    def __init__(self, db_url: str, required_filters: Optional[Dict[str, str]] = None):
+        self._db_url: str = db_url
+        self._required_filters: Optional[Dict[str, str]] = required_filters
+
+    def set_required_filters(self, required_filters: Dict[str, str]) -> None:
+        self._required_filters = required_filters
+
+    @abstractmethod
+    def transaction(self) -> AsyncContextManager[Self]: ...
+
+    # Used for testing
+    @abstractmethod
+    async def create_all(self) -> None: ...
+
+    @abstractmethod
+    async def drop_all(self) -> None: ...
+
 
 
 class ExampleUOW(UOW):
