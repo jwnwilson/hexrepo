@@ -23,7 +23,7 @@ from .interface import BaseSQLModel, Query, SQLModelType
 logger = logging.getLogger()
 
 
-class DefaultQuery(Query):
+class DefaultQuery[ModelDTO: BaseModel](Query[ModelDTO]):
     def __init__(
         self,
         model: SQLModelType,
