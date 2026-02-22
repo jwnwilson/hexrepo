@@ -8,7 +8,7 @@ from fastapi import APIRouter, Depends, HTTPException, Response
 from fastapi.types import DecoratedCallable
 from hexrepo_cloud.auth.interface import AuthAdapter
 from hexrepo_db.exception import IntegrityError, InvalidArgument, RecordNotFound
-from hexrepo_db.interface import UOW, PaginatedData, Repository
+from jcore_db.interface import UOW, AsyncUOW, PaginatedData, Repository
 from pydantic import BaseModel
 
 logger = getLogger()
@@ -254,3 +254,183 @@ class CrudRouter(APIRouter):
     ) -> Callable[[DecoratedCallable], DecoratedCallable]:
         self.remove_api_route(path, ["DELETE"])
         return super().delete(path, *args, **kwargs)
+
+
+class AsyncCrudRouter(APIRouter):
+    """
+    Async version of CrudRouter. All route handler functions are coroutines,
+    making them compatible with async UOW / repository implementations.
+
+    Usage is identical to CrudRouter — just swap in async db_dependency callables
+    and an async UOW.
+    """
+
+    def __init__(
+        self,
+        db_dependency: Callable[[], AsyncUOW],
+        repository: str,
+        response_schema: Type[BaseModel],
+        methods: List[str],
+        create_schema: Type[BaseModel],
+        update_schema: Type[BaseModel],
+        db_dependency_ro: Callable | None = None,
+        prefix: Optional[str] = None,
+        tags: Optional[List[Union[str, Enum]]] = None,
+        auth_adaptor: Optional[Callable[[], AuthAdapter]] = None,
+        **kwargs: Any,
+    ):
+        self.db_dependency: Callable[[], UOW] = db_dependency
+        self.db_dependency_ro: Callable | None = db_dependency_ro
+        self.auth_adaptor: Optional[Callable[[], AuthAdapter]] = auth_adaptor
+        self.repository: str = repository
+        self.methods = methods or ["READ"]
+
+        self.response_schema: Type[BaseModel] = response_schema
+        self.create_schema: Type[BaseModel] = create_schema
+        self.update_schema: Type[BaseModel] = update_schema
+
+        prefix = prefix or ""
+
+        super().__init__(prefix=prefix, tags=tags, redirect_slashes=True, **kwargs)
+        self._setup_routes()
+
+    def _dependencies(self) -> Optional[Callable]:
+        if self.auth_adaptor:
+            return [Depends(self.auth_adaptor)]
+        return []
+
+    def _setup_routes(self) -> None:
+        if "CREATE" in self.methods:
+            assert self.create_schema
+            self.add_api_route(
+                "/",
+                self._create(),
+                methods=["POST"],
+                response_model=self.response_schema,
+                dependencies=self._dependencies(),
+            )
+        if "READ" in self.methods:
+            self.add_api_route(
+                "/{id}",
+                self._read(),
+                methods=["GET"],
+                response_model=self.response_schema,
+                dependencies=self._dependencies(),
+            )
+
+            self.add_api_route(
+                "/",
+                self._read_multi(),
+                methods=["GET"],
+                response_model=PaginatedData[self.response_schema],  # type: ignore
+                dependencies=self._dependencies(),
+            )
+        if "UPDATE" in self.methods:
+            assert self.update_schema
+            self.add_api_route(
+                "/{id}",
+                self._update(),
+                methods=["PATCH"],
+                response_model=self.response_schema,
+                dependencies=self._dependencies(),
+            )
+        if "DELETE" in self.methods:
+            self.add_api_route(
+                "/{id}",
+                self._delete(),
+                methods=["DELETE"],
+                status_code=204,
+                response_class=Response,
+                dependencies=self._dependencies(),
+            )
+
+    @property
+    def router(self) -> APIRouter:
+        return self
+
+    def _create(self) -> Callable[[Any], Any]:
+        async def create_record(
+            obj_in: self.create_schema,  # type: ignore
+            uow: AsyncUOW = Depends(self.db_dependency),
+        ) -> self.response_schema:  # type: ignore
+            try:
+                repository: Repository = getattr(uow, self.repository)
+                result = await repository.create(obj_in)
+            except IntegrityError as e:
+                raise HTTPException(status_code=400, detail=str(e))
+            else:
+                return result
+
+        return create_record
+
+    def _read(self) -> Callable[[Any], Any]:
+        async def read_record(
+            id: UUID,
+            uow: AsyncUOW = Depends(
+                self.db_dependency_ro if self.db_dependency_ro else self.db_dependency
+            ),
+        ) -> self.response_schema:  # type: ignore
+            try:
+                repository: Repository = getattr(uow, self.repository)
+                result: BaseModel = await repository.read(id)
+            except RecordNotFound as e:
+                raise HTTPException(status_code=404, detail=str(e))
+            else:
+                return result
+
+        return read_record
+
+    def _read_multi(self) -> Callable[[AsyncUOW], Any]:
+        async def read_multiple_records(
+            uow: AsyncUOW = Depends(
+                self.db_dependency_ro if self.db_dependency_ro else self.db_dependency
+            ),
+            filters: str = "{}",
+            page_size: int = 0,
+            page_number: int = 1,
+            order_by: str = "-created_at",
+        ) -> PaginatedData:  # type: ignore
+            repository: Repository = getattr(uow, self.repository)
+            try:
+                parsed_filters: Dict[str, Any] = json.loads(filters)
+                return await repository.read_multi(
+                    filters=parsed_filters,
+                    page_size=page_size,
+                    page_number=page_number,
+                    order_by=order_by,
+                )
+            except InvalidArgument as err:
+                raise HTTPException(status_code=400, detail=str(err))
+
+        return read_multiple_records
+
+    def _update(self) -> Callable[[UUID, Any, AsyncUOW], Any]:
+        async def update_record(
+            id: UUID,
+            obj_in: self.update_schema,  # type: ignore
+            uow: AsyncUOW = Depends(self.db_dependency),
+        ) -> self.response_schema:  # type: ignore
+            try:
+                repository: Repository = getattr(uow, self.repository)
+                result = await repository.update(id, obj_in)
+            except RecordNotFound as e:
+                raise HTTPException(status_code=404, detail=str(e))
+            except IntegrityError as e:
+                raise HTTPException(status_code=400, detail=str(e))
+            else:
+                return result
+
+        return update_record
+
+    def _delete(self) -> Callable[[UUID, AsyncUOW], None]:
+        async def delete_record(
+            id: UUID,
+            uow: AsyncUOW = Depends(self.db_dependency),
+        ) -> None:
+            try:
+                repository: Repository = getattr(uow, self.repository)
+                return await repository.delete(id)
+            except RecordNotFound as e:
+                raise HTTPException(status_code=404, detail=str(e))
+
+        return delete_record

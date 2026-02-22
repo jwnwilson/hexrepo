@@ -7,6 +7,7 @@ from sqlalchemy import Row, Select, asc, desc, func, select
 from sqlalchemy.exc import IntegrityError as SQLIntegrityError
 from sqlalchemy.exc import MultipleResultsFound
 from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm.collections import InstrumentedList
 
 from ..exception import IntegrityError, RecordNotFound
