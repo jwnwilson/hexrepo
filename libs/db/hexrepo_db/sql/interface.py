@@ -2,6 +2,7 @@ from abc import ABC
 from typing import Any, Type, TypeVar, Union
 from uuid import UUID
 
+from pydantic import BaseModel
 from sqlalchemy import Row, Select
 from sqlalchemy.orm import Session
 
@@ -12,7 +13,7 @@ BaseSQLModel = TypeVar("BaseSQLModel", bound=Base)
 SQLModelType = Type[Base]
 
 
-class Query(ABC):
+class Query[ModelDTO: BaseModel](ABC):
     def __init__(self, model: SQLModelType, model_dto: ModelDTOType, session: Session):
         self.model: SQLModelType = model
         self.model_dto: ModelDTOType = model_dto
@@ -35,7 +36,7 @@ class Query(ABC):
         raise NotImplementedError
 
     def update_relationships(
-        self, db_obj: Union[Row[Any], BaseSQLModel], dto: ModelDTO
+        self, db_obj: Union[Row[Any], BaseSQLModel], dto: ModelDTO, create: bool = False
     ) -> Any:
         # logic to update relationships during update logic
         raise NotImplementedError
