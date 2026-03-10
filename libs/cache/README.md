@@ -1,0 +1,18 @@
+# Cache Library
+
+### Docker compose
+
+```
+cache:
+    container_name: core_cache
+    image: redis:6.2-alpine
+    restart: always
+    ports:
+      - '6379:6379'
+    command: redis-server --save 20 1 --loglevel warning
+    volumes: 
+      - cache:/data
+
+volumes:
+  cache:
+```

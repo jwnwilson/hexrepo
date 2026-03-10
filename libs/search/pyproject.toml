@@ -1,0 +1,46 @@
+[project]
+authors = [
+    {name = "Noel Wilson", email = "jwnwilson@hotmail.co.uk"},
+]
+requires-python = "<4.0,>=3.12"
+name = "hexrepo-cache"
+version = "0.1.0"
+description = ""
+readme = "README.md"
+dependencies = [
+    "redis>=7.3.0"
+]
+
+[dependency-groups]
+dev = [
+    "pytest<9.0.0,>=8.3.3",
+    "mypy<2.0.0,>=1.13.0",
+    "ruff>=0.8.4",
+    "httpx<1.0.0,>=0.27.2",
+    "pytest-dotenv<1.0.0,>=0.5.2",
+    "pytest-cov<7.0.0,>=6.0.0",
+    "pytest-xdist<4.0.0,>=3.6.1",
+    "gevent<25.0.0,>=24.10.3",
+]
+
+[tool.pdm.build]
+includes = []
+[build-system]
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
+
+[tool.pytest.ini_options]
+addopts = "-vv --cov --cov-report xml --cov-report term-missing --cov-fail-under=15"
+asyncio_mode = "auto"
+testpaths = ["tests"]
+env_files = ["env/local.env"]
+
+[tool.coverage.run]
+concurrency = ["gevent"]
+omit = ["tests/*"]
+source = ["hexrepo_cache"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+no_implicit_reexport = false
