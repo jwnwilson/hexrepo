@@ -75,6 +75,20 @@ celery:
 localstack:
 	docker compose up -d localstack
 
+# Temporal commands
+temporal: db
+	docker compose up -d temporal-admin-tools temporal-ui 
+
+temporal_worker: temporal venv
+	@-bash -c "echo waiting for temporal to initialise" && sleep 10
+	PYTHONPATH=src uv run python -m app.interactor.event.temporal.worker
+
+temporal_ingestion_workflow: venv
+	PYTHONPATH=src uv run python -m app.interactor.cli.trigger_ingestion \
+	--input-file "./data/input/test_data_1million_rows.csv"
+	--batch-size 100000
+
+
 # Host API locally, connect to cloud db. Still requires manual setting of DB_PASSWORD_SECRET_NAME in bastion.env
 run_bastion: bastion venv
 	PYTHONPATH=src uv run uvicorn app.interactor.api.fastapi.main:app --reload --env-file env/local.env
