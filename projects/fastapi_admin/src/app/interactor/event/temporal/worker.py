@@ -20,7 +20,8 @@ async def main():
     worker = Worker(
         client,
         task_queue="file-processing-queue",
-        workflows=[ProcessFileWorkflow, IngestionWorkflow],
+        # workflows=[ProcessFileWorkflow, IngestionWorkflow],
+        workflows=[],
         activities=[
             get_chunk_offsets,
             validate_wallets,
