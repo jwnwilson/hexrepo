@@ -123,18 +123,18 @@ services:
     depends_on:
       - temporal
       - cache
-      - pg
+      - db
 
   temporal:
     image: temporalio/auto-setup:latest
     depends_on:
-      - pg
+      - db
     environment:
       - DB=postgres12
       - DB_PORT=5432
       - POSTGRES_USER=postgres
       - POSTGRES_PWD=password
-      - POSTGRES_SEEDS=pg
+      - POSTGRES_SEEDS=db
       - DYNAMIC_CONFIG_FILE_PATH=config/dynamicconfig/development-sql.yaml
       - TEMPORAL_ADDRESS=temporal:7233
       - TEMPORAL_CLI_ADDRESS=temporal:7233

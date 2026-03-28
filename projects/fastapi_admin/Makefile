@@ -76,7 +76,7 @@ localstack:
 	docker compose up -d localstack
 
 # Temporal commands
-temporal: db
+temporal:
 	docker compose up -d temporal-admin-tools temporal-ui 
 
 temporal_worker: temporal venv

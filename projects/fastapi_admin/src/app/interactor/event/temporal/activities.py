@@ -11,10 +11,10 @@ from loguru import logger
 from pydantic import ValidationError
 from temporalio import activity
 from tqdm.asyncio import tqdm as atqdm
+from hexrepo_cache.redis import CacheInterface, RedisCache
+from hexrepo_search.elastisearch import ElasticsearchClient
+from hexrepo_db.sql.uow import BaseSqlUOW
 
-from app.adaptor.cache import CacheInterface, RedisCache
-from app.adaptor.db.sql.uow import CoreAsyncSqlUOW
-from app.adaptor.search.elastisearch import ElasticsearchClient
 from app.config import config
 from app.domain.ingestion.activity_logic import write_records
 from app.domain.ingestion.file_conversion import convert_to_jsonl as convert_to_jsonl_fn
@@ -107,7 +107,7 @@ async def load_wallet_data(
     activity.logger.info(f"Loading file {file_path} into db)")
 
     # Create db session and transaction
-    uow = CoreAsyncSqlUOW(db_url=config.DB_PG_URL, required_filters=None)
+    uow = BaseSqlUOW(db_url=config.DB_PG_URL, required_filters=None)
     async with uow.transaction():
         # This needs to be moved to db adaptor
         connection = await uow.session.connection()
