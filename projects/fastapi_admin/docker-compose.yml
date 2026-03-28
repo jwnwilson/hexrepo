@@ -98,7 +98,97 @@ services:
       - localstack:/var/lib/localstack
       - "/var/run/docker.sock:/var/run/docker.sock"
 
+  cache:
+    container_name: core_cache
+    image: redis:6.2-alpine
+    restart: always
+    ports:
+      - '6379:6379'
+    command: redis-server --save 20 1 --loglevel warning
+    volumes: 
+      - cache:/data
+
+  temporal-worker:
+    platform: "linux/amd64"
+    env_file:
+      - env/docker.env
+    image: "core_api:${DOCKER_TAG:-latest}"
+    # Run this container as if it's in the terminal, useful for debugging
+    tty: true
+    # Mount local files into the container so we can update files inside the container
+    volumes:
+      - ../../libs:/libs
+      - ./src:/code/src
+    command: "python -m app.interactor.event.temporal.worker"
+    depends_on:
+      - temporal
+      - cache
+      - db
+
+  temporal:
+    image: temporalio/auto-setup:latest
+    depends_on:
+      - db
+    environment:
+      - DB=postgres12
+      - DB_PORT=5432
+      - POSTGRES_USER=postgres
+      - POSTGRES_PWD=password
+      - POSTGRES_SEEDS=db
+      - DYNAMIC_CONFIG_FILE_PATH=config/dynamicconfig/development-sql.yaml
+      - TEMPORAL_ADDRESS=temporal:7233
+      - TEMPORAL_CLI_ADDRESS=temporal:7233
+    ports:
+      # gRPC port for workers and clients
+      - "7233:7233"
+    expose:
+      - "7233"
+    volumes:
+      - ./temporal_config:/etc/temporal/config/dynamicconfig
+
+  temporal-ui:
+    image: temporalio/ui:latest
+    depends_on:
+      - temporal
+    environment:
+      - TEMPORAL_ADDRESS=temporal:7233
+      - TEMPORAL_CORS_ORIGINS=http://localhost:3000
+    ports:
+      - "8080:8080"
+    expose:
+      - "8080"
+
+  temporal-admin-tools:
+    image: temporalio/admin-tools:latest
+    depends_on:
+      - temporal
+    environment:
+      - TEMPORAL_ADDRESS=temporal:7233
+    stdin_open: true
+    tty: true
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.13.0
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+      - xpack.security.enabled=false   # set to true in production
+    ports:
+      - "9200:9200"
+    expose:
+      - "9200"
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9200"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 volumes:
   postgres_db:
   localstack:
+  cache:
+  es_data:
+

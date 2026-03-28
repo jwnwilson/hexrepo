@@ -35,7 +35,7 @@ class FastapiJWTCognitoMiddleware(FastapiJWTMiddleware, HTTPBearer):
             )
         )
         try:
-            if IS_TESTING:
+            if IS_TESTING or config.ENVIRONMENT == "dev":
                 self.jwks: JWKS = JWKS(
                     keys=[
                         {

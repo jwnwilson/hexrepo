@@ -30,6 +30,12 @@ dependencies = [
     "hexrepo-api",
     "hexrepo-task",
     "hexrepo-log",
+    "temporalio>=1.24.0",
+    "aiofiles>=25.1.0",
+    "orjson>=3.11.7",
+    "tqdm>=4.67.3",
+    "hexrepo-cache",
+    "hexrepo-search",
 ]
 
 [dependency-groups]
@@ -77,3 +83,5 @@ hexrepo-db = { path = "../../libs/db", editable = true }
 hexrepo-cloud = { path = "../../libs/cloud", editable = true }
 hexrepo-task = { path = "../../libs/task", editable = true }
 hexrepo-log = { path = "../../libs/log", editable = true }
+hexrepo-cache = { path = "../../libs/cache", editable = true }
+hexrepo-search = { path = "../../libs/search", editable = true }
