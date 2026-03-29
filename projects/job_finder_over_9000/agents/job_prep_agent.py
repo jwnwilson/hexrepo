@@ -10,7 +10,9 @@ For the top-ranked jobs, creates tailored application materials:
 
 import anyio
 from pathlib import Path
-from claude_agent_sdk import query, ClaudeAgentOptions, ResultMessage
+from claude_agent_sdk import ClaudeAgentOptions
+
+from .utils import stream_agent
 
 ROOT_DIR = Path(__file__).parent.parent
 
@@ -89,10 +91,8 @@ Make sure all directories exist before writing files. Use Bash to create directo
 Research each company thoroughly using web search before writing the materials.
 """
 
-    print(f"📝 Job Prep Agent starting (preparing top {top_n} jobs)...")
-
-    result_text = ""
-    async for message in query(
+    return await stream_agent(
+        name="Job Prep Agent",
         prompt=prompt,
         options=ClaudeAgentOptions(
             cwd=str(ROOT_DIR),
@@ -101,12 +101,7 @@ Research each company thoroughly using web search before writing the materials.
             max_turns=max_turns,
             model=model,
         ),
-    ):
-        if isinstance(message, ResultMessage):
-            result_text = message.result
-            print("✅ Job Prep Agent complete")
-
-    return result_text
+    )
 
 
 if __name__ == "__main__":

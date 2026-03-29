@@ -7,7 +7,9 @@ against the candidate's requirements. Outputs a ranked list to output/ranked_job
 
 import anyio
 from pathlib import Path
-from claude_agent_sdk import query, ClaudeAgentOptions, ResultMessage
+from claude_agent_sdk import ClaudeAgentOptions
+
+from .utils import stream_agent
 
 ROOT_DIR = Path(__file__).parent.parent
 
@@ -91,10 +93,8 @@ Format the output file as markdown:
 Put the most promising jobs first. Be honest in scoring — a lower-ranked job that's a great fit is more useful than an inflated score.
 """
 
-    print("🔎 Job Review Agent starting...")
-
-    result_text = ""
-    async for message in query(
+    return await stream_agent(
+        name="Job Review Agent",
         prompt=prompt,
         options=ClaudeAgentOptions(
             cwd=str(ROOT_DIR),
@@ -103,12 +103,7 @@ Put the most promising jobs first. Be honest in scoring — a lower-ranked job t
             max_turns=max_turns,
             model=model,
         ),
-    ):
-        if isinstance(message, ResultMessage):
-            result_text = message.result
-            print("✅ Job Review Agent complete")
-
-    return result_text
+    )
 
 
 if __name__ == "__main__":

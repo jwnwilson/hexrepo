@@ -7,7 +7,9 @@ Outputs a list of potential jobs to output/job_candidates.md for review.
 
 import anyio
 from pathlib import Path
-from claude_agent_sdk import query, ClaudeAgentOptions, ResultMessage
+from claude_agent_sdk import ClaudeAgentOptions
+
+from .utils import stream_agent
 
 ROOT_DIR = Path(__file__).parent.parent
 
@@ -73,10 +75,8 @@ Focus on quality over quantity. Only include jobs that genuinely match the requi
 Make sure the output directory exists before writing.
 """
 
-    print("🔍 Job Search Agent starting...")
-
-    result_text = ""
-    async for message in query(
+    return await stream_agent(
+        name="Job Search Agent",
         prompt=prompt,
         options=ClaudeAgentOptions(
             cwd=str(ROOT_DIR),
@@ -85,12 +85,7 @@ Make sure the output directory exists before writing.
             max_turns=max_turns,
             model=model,
         ),
-    ):
-        if isinstance(message, ResultMessage):
-            result_text = message.result
-            print("✅ Job Search Agent complete")
-
-    return result_text
+    )
 
 
 if __name__ == "__main__":
