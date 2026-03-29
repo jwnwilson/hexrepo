@@ -7,11 +7,16 @@ Runs the three-stage multiagent job finding pipeline:
   3. Job Prep Agent     — creates tailored application materials
 
 Usage:
-    python main.py                  # Run full pipeline
+    python main.py                  # Run full pipeline (Opus, full scope)
+    python main.py --cheap          # Run with Haiku + reduced scope (for testing)
     python main.py --stage search   # Run only job search
     python main.py --stage review   # Run only job review
     python main.py --stage prep     # Run only job prep
     python main.py --top 3          # Prep materials for top 3 jobs (default: 5)
+
+Cost modes:
+    Default  — claude-opus-4-6, 15 candidates, top 5 prep
+    --cheap  — claude-haiku-4-5, 5 candidates, top 1 prep, reduced turns
 """
 
 import argparse
@@ -19,7 +24,6 @@ import anyio
 from pathlib import Path
 from rich.console import Console
 from rich.panel import Panel
-from rich.progress import Progress, SpinnerColumn, TextColumn
 
 from agents import run_job_search_agent, run_job_review_agent, run_job_prep_agent
 
@@ -33,12 +37,35 @@ def ensure_output_dirs() -> None:
     (ROOT_DIR / "output" / "prep").mkdir(exist_ok=True)
 
 
-async def run_pipeline(stage: str | None = None, top_n: int = 5) -> None:
+CHEAP_CONFIG = {
+    "model": "claude-haiku-4-5",
+    "max_candidates": 5,
+    "top_n": 1,
+    "search_turns": 15,
+    "review_turns": 15,
+    "prep_turns": 20,
+}
+
+DEFAULT_CONFIG = {
+    "model": "claude-opus-4-6",
+    "max_candidates": 15,
+    "top_n": 5,
+    "search_turns": 50,
+    "review_turns": 60,
+    "prep_turns": 100,
+}
+
+
+async def run_pipeline(stage: str | None = None, top_n: int | None = None, cheap: bool = False) -> None:
     """Run the full pipeline or a specific stage."""
     ensure_output_dirs()
 
+    cfg = CHEAP_CONFIG if cheap else DEFAULT_CONFIG
+    effective_top_n = top_n if top_n is not None else cfg["top_n"]
+
+    mode_label = "[yellow]CHEAP MODE[/yellow] (haiku)" if cheap else "[green]FULL MODE[/green] (opus)"
     console.print(Panel.fit(
-        "[bold cyan]Job Finder Over 9000[/bold cyan]\n"
+        f"[bold cyan]Job Finder Over 9000[/bold cyan]  {mode_label}\n"
         "[dim]Multiagent job search pipeline[/dim]",
         border_style="cyan"
     ))
@@ -50,9 +77,13 @@ async def run_pipeline(stage: str | None = None, top_n: int = 5) -> None:
     # Stage 1: Job Search
     if run_search:
         console.print("\n[bold yellow]Stage 1/3: Job Search Agent[/bold yellow]")
-        console.print("[dim]Searching the web for matching job opportunities...[/dim]")
-        result = await run_job_search_agent()
-        console.print(f"[green]✓[/green] Job candidates saved to [cyan]output/job_candidates.md[/cyan]")
+        console.print(f"[dim]Searching for up to {cfg['max_candidates']} jobs ({cfg['model']})...[/dim]")
+        result = await run_job_search_agent(
+            model=cfg["model"],
+            max_turns=cfg["search_turns"],
+            max_candidates=cfg["max_candidates"],
+        )
+        console.print("[green]✓[/green] Job candidates saved to [cyan]output/job_candidates.md[/cyan]")
         if result:
             console.print(f"[dim]{result[:200]}...[/dim]" if len(result) > 200 else f"[dim]{result}[/dim]")
 
@@ -67,9 +98,12 @@ async def run_pipeline(stage: str | None = None, top_n: int = 5) -> None:
             return
 
         console.print("\n[bold yellow]Stage 2/3: Job Review Agent[/bold yellow]")
-        console.print("[dim]Validating jobs are open and ranking by match score...[/dim]")
-        result = await run_job_review_agent()
-        console.print(f"[green]✓[/green] Ranked jobs saved to [cyan]output/ranked_jobs.md[/cyan]")
+        console.print(f"[dim]Validating jobs are open and ranking by match score ({cfg['model']})...[/dim]")
+        result = await run_job_review_agent(
+            model=cfg["model"],
+            max_turns=cfg["review_turns"],
+        )
+        console.print("[green]✓[/green] Ranked jobs saved to [cyan]output/ranked_jobs.md[/cyan]")
         if result:
             console.print(f"[dim]{result[:200]}...[/dim]" if len(result) > 200 else f"[dim]{result}[/dim]")
 
@@ -84,9 +118,13 @@ async def run_pipeline(stage: str | None = None, top_n: int = 5) -> None:
             return
 
         console.print(f"\n[bold yellow]Stage 3/3: Job Prep Agent[/bold yellow]")
-        console.print(f"[dim]Creating tailored materials for top {top_n} jobs...[/dim]")
-        result = await run_job_prep_agent(top_n=top_n)
-        console.print(f"[green]✓[/green] Prep materials saved to [cyan]output/prep/[/cyan]")
+        console.print(f"[dim]Creating tailored materials for top {effective_top_n} jobs ({cfg['model']})...[/dim]")
+        result = await run_job_prep_agent(
+            top_n=effective_top_n,
+            model=cfg["model"],
+            max_turns=cfg["prep_turns"],
+        )
+        console.print("[green]✓[/green] Prep materials saved to [cyan]output/prep/[/cyan]")
         if result:
             console.print(f"[dim]{result[:200]}...[/dim]" if len(result) > 200 else f"[dim]{result}[/dim]")
 
@@ -110,12 +148,17 @@ def main() -> None:
     parser.add_argument(
         "--top",
         type=int,
-        default=5,
-        help="Number of top jobs to prepare materials for (default: 5)",
+        default=None,
+        help="Number of top jobs to prepare materials for (default: 5, or 1 in --cheap mode)",
+    )
+    parser.add_argument(
+        "--cheap",
+        action="store_true",
+        help="Use claude-haiku-4-5 with reduced scope for cheap testing",
     )
     args = parser.parse_args()
 
-    anyio.run(run_pipeline, args.stage, args.top)
+    anyio.run(run_pipeline, args.stage, args.top, args.cheap)
 
 
 if __name__ == "__main__":

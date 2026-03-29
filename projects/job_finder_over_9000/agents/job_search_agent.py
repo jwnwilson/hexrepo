@@ -12,10 +12,21 @@ from claude_agent_sdk import query, ClaudeAgentOptions, ResultMessage
 ROOT_DIR = Path(__file__).parent.parent
 
 
-async def run_job_search_agent() -> str:
+async def run_job_search_agent(
+    model: str = "claude-opus-4-6",
+    max_turns: int = 50,
+    max_candidates: int = 15,
+) -> str:
     """
     Search for jobs online based on requirements and CV.
-    Returns a summary of results.
+
+    Args:
+        model: Claude model to use. Use "claude-haiku-4-5" for cheap testing.
+        max_turns: Maximum agent turns (reduce to cut cost).
+        max_candidates: Number of job candidates to find.
+
+    Returns:
+        Summary of results.
     """
     requirements_path = ROOT_DIR / "data" / "requirements.md"
     cv_path = ROOT_DIR / "data" / "cv.md"
@@ -43,7 +54,7 @@ Follow these steps:
    - Key requirements
    - Direct URL to the job posting
    - Date posted (to verify it's recent / still open)
-5. Aim to find 15-25 relevant job candidates
+5. Aim to find {max_candidates} relevant job candidates
 6. Write all results to: {output_path}
 
 Format the output file as markdown with this structure for each job:
@@ -71,8 +82,8 @@ Make sure the output directory exists before writing.
             cwd=str(ROOT_DIR),
             allowed_tools=["Read", "Write", "Bash", "WebSearch", "WebFetch"],
             permission_mode="acceptEdits",
-            max_turns=50,
-            model="claude-opus-4-6",
+            max_turns=max_turns,
+            model=model,
         ),
     ):
         if isinstance(message, ResultMessage):

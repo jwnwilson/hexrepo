@@ -12,10 +12,19 @@ from claude_agent_sdk import query, ClaudeAgentOptions, ResultMessage
 ROOT_DIR = Path(__file__).parent.parent
 
 
-async def run_job_review_agent() -> str:
+async def run_job_review_agent(
+    model: str = "claude-opus-4-6",
+    max_turns: int = 60,
+) -> str:
     """
     Validate and rank job candidates against requirements.
-    Returns a summary of results.
+
+    Args:
+        model: Claude model to use. Use "claude-haiku-4-5" for cheap testing.
+        max_turns: Maximum agent turns (reduce to cut cost).
+
+    Returns:
+        Summary of results.
     """
     requirements_path = ROOT_DIR / "data" / "requirements.md"
     cv_path = ROOT_DIR / "data" / "cv.md"
@@ -91,8 +100,8 @@ Put the most promising jobs first. Be honest in scoring — a lower-ranked job t
             cwd=str(ROOT_DIR),
             allowed_tools=["Read", "Write", "Bash", "WebSearch", "WebFetch"],
             permission_mode="acceptEdits",
-            max_turns=60,
-            model="claude-opus-4-6",
+            max_turns=max_turns,
+            model=model,
         ),
     ):
         if isinstance(message, ResultMessage):

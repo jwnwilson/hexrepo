@@ -15,12 +15,18 @@ from claude_agent_sdk import query, ClaudeAgentOptions, ResultMessage
 ROOT_DIR = Path(__file__).parent.parent
 
 
-async def run_job_prep_agent(top_n: int = 5) -> str:
+async def run_job_prep_agent(
+    top_n: int = 5,
+    model: str = "claude-opus-4-6",
+    max_turns: int = 100,
+) -> str:
     """
     Generate tailored application materials for the top N ranked jobs.
 
     Args:
         top_n: Number of top jobs to prepare materials for (default: 5)
+        model: Claude model to use. Use "claude-haiku-4-5" for cheap testing.
+        max_turns: Maximum agent turns (reduce to cut cost).
 
     Returns:
         Summary of materials generated.
@@ -92,8 +98,8 @@ Research each company thoroughly using web search before writing the materials.
             cwd=str(ROOT_DIR),
             allowed_tools=["Read", "Write", "Bash", "WebSearch", "WebFetch"],
             permission_mode="acceptEdits",
-            max_turns=100,
-            model="claude-opus-4-6",
+            max_turns=max_turns,
+            model=model,
         ),
     ):
         if isinstance(message, ResultMessage):
