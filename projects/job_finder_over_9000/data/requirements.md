@@ -1,35 +1,38 @@
 # Job Requirements
 
 ## Role Types
+- Founding Engineer
 - Senior Software Engineer
 - Staff Engineer
 - Principal Engineer
 - Engineering Manager
+- Head of Engineering
 
 ## Technologies / Skills
 - Python (FastAPI, Django)
+- Celery / Temporal
 - TypeScript / Node.js
 - Kubernetes / Docker
 - AWS / GCP / Azure
 - PostgreSQL
 - Redis
 - Microservices architecture
+- Pyspark / databricks
 
 ## Location Preferences
 - Remote (preferred)
-- Hybrid (London UK acceptable)
-- On-site (London UK only)
+- Hybrid (preferred, London UK acceptable)
 
 ## Salary Range
-- Minimum: £90,000
-- Target: £110,000–£140,000
-- Open to equity-heavy packages at startups
+- Minimum: £130,000
+- Target: £130,000–£150,000
+- Current: £150,000
 
 ## Company Preferences
 - Prefer: Product companies, B2B SaaS, fintech, health tech
 - Avoid: Pure outsourcing / body shop agencies
 - Company size: 50–2000 employees (sweet spot)
-- Stage: Series B+ or profitable
+- Stage: Any
 
 ## Culture & Values
 - Remote-first culture
@@ -39,6 +42,4 @@
 - Interesting technical challenges
 
 ## Exclusions
-- No gambling / crypto (unless DeFi infrastructure)
-- No defense / weapons
 - No pure front-end only roles
