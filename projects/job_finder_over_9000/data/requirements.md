@@ -1,5 +1,11 @@
 # Job Requirements
 
+## Location / Time posted Preferences
+- Location: London ONLY 
+- Hybrid (London)
+- Remote (London Based)
+- Post date: prefer less than 2 weeks old 
+
 ## Role Types
 - Founding Engineer
 - Senior Software Engineer
@@ -19,21 +25,15 @@
 - Microservices architecture
 - Pyspark / databricks
 
-## Location / Time posted Preferences
-- Remote (preferred)
-- Hybrid (preferred, London UK acceptable)
-- Location: London
-- Post date: prefer less than 2 weeks old 
-
 ## Salary Range
 - Minimum: £130,000
 - Target: £130,000–£150,000
 - Current: £150,000
 
 ## Company Preferences
-- Prefer: Product companies, B2B SaaS, fintech, health tech
-- Avoid: Pure outsourcing / body shop agencies
-- Company size: 50–2000 employees (sweet spot)
+- Prefer: Product companies, B2B SaaS, fintech, health tech, startups
+- Avoid: Pure outsourcing / body shop agencies, avoid FANG or big name companies, they will be the hardest to get my CV read.
+- Company size: 10–1000 employees (sweet spot)
 - Stage: Any
 
 ## Culture & Values
@@ -44,5 +44,7 @@
 - Interesting technical challenges
 
 ## Exclusions
+- Roles not using Python
 - No pure front-end only roles
 - Job posting older than 4 weeks
+- Remote jobs not based in the UK

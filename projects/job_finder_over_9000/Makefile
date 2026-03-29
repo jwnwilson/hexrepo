@@ -6,6 +6,10 @@ VENV := .venv
 MKFILE_DIR := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 VENV_DIR = $(MKFILE_DIR)$(VENV)
 
+# Load .env if it exists
+-include .env
+export
+
 # Setup
 
 venv: ## Install dependencies

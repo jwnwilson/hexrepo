@@ -17,6 +17,7 @@ ROOT_DIR = Path(__file__).parent.parent
 async def run_job_search_agent(
     model: str = "claude-opus-4-6",
     max_turns: int = 50,
+    min_candidates: int = 10,
     max_candidates: int = 15,
 ) -> AgentResult:
     """
@@ -25,7 +26,8 @@ async def run_job_search_agent(
     Args:
         model: Claude model to use. Use "claude-haiku-4-5" for cheap testing.
         max_turns: Maximum agent turns (reduce to cut cost).
-        max_candidates: Number of job candidates to find.
+        min_candidates: Minimum number of candidates to find before stopping.
+        max_candidates: Target maximum number of candidates.
 
     Returns:
         AgentResult with result text and token usage.
@@ -34,13 +36,21 @@ async def run_job_search_agent(
     cv_path = ROOT_DIR / "data" / "cv.md"
     output_path = ROOT_DIR / "output" / "job_candidates.md"
 
+    liked_jobs_path = ROOT_DIR / "data" / "liked_jobs.md"
+    liked_jobs_instruction = (
+        f"2a. Read the previously liked jobs history at: {liked_jobs_path}\n"
+        "    Use it to understand what kinds of roles have appealed in the past — "
+        "prioritise similar companies, role types, and tech stacks in your search.\n"
+        if liked_jobs_path.exists() else ""
+    )
+
     prompt = f"""You are a job search specialist. Your task is to find real, currently open job positions.
 
 Follow these steps:
 
 1. Read the job requirements file at: {requirements_path}
 2. Read the CV file at: {cv_path}
-3. Search the web for open job positions that match the requirements. Search multiple sources:
+{liked_jobs_instruction}3. Search the web for open job positions that match the requirements. Search multiple sources:
    - LinkedIn Jobs
    - levels.fyi
    - Glassdoor
@@ -56,7 +66,7 @@ Follow these steps:
    - Key requirements
    - Direct URL to the job posting
    - Date posted (to verify it's recent / still open)
-5. Aim to find {max_candidates} relevant job candidates
+5. Find at least {min_candidates} relevant job candidates, aiming for up to {max_candidates}
 6. Write all results to: {output_path}
 
 Format the output file as markdown with this structure for each job:
@@ -71,7 +81,7 @@ Format the output file as markdown with this structure for each job:
 
 ---
 
-Focus on quality over quantity. Only include jobs that genuinely match the requirements.
+Only include jobs that match the requirements.
 Make sure the output directory exists before writing.
 """
 

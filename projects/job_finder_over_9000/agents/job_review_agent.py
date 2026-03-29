@@ -17,6 +17,7 @@ ROOT_DIR = Path(__file__).parent.parent
 async def run_job_review_agent(
     model: str = "claude-opus-4-6",
     max_turns: int = 60,
+    candidates_path: Path | None = None,
 ) -> AgentResult:
     """
     Validate and rank job candidates against requirements.
@@ -24,13 +25,16 @@ async def run_job_review_agent(
     Args:
         model: Claude model to use. Use "claude-haiku-4-5" for cheap testing.
         max_turns: Maximum agent turns (reduce to cut cost).
+        candidates_path: Path to candidates file (defaults to output/job_candidates.md).
+                         Pass output/selected_jobs.md to review only user-selected jobs.
 
     Returns:
         AgentResult with result text and token usage.
     """
     requirements_path = ROOT_DIR / "data" / "requirements.md"
     cv_path = ROOT_DIR / "data" / "cv.md"
-    candidates_path = ROOT_DIR / "output" / "job_candidates.md"
+    if candidates_path is None:
+        candidates_path = ROOT_DIR / "output" / "job_candidates.md"
     output_path = ROOT_DIR / "output" / "ranked_jobs.md"
 
     prompt = f"""You are a senior recruitment specialist and career coach. Your task is to validate and rank job candidates.
