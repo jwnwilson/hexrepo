@@ -9,7 +9,7 @@ import anyio
 from pathlib import Path
 from claude_agent_sdk import ClaudeAgentOptions
 
-from .utils import stream_agent
+from .utils import AgentResult, stream_agent
 
 ROOT_DIR = Path(__file__).parent.parent
 
@@ -18,7 +18,7 @@ async def run_job_search_agent(
     model: str = "claude-opus-4-6",
     max_turns: int = 50,
     max_candidates: int = 15,
-) -> str:
+) -> AgentResult:
     """
     Search for jobs online based on requirements and CV.
 
@@ -28,7 +28,7 @@ async def run_job_search_agent(
         max_candidates: Number of job candidates to find.
 
     Returns:
-        Summary of results.
+        AgentResult with result text and token usage.
     """
     requirements_path = ROOT_DIR / "data" / "requirements.md"
     cv_path = ROOT_DIR / "data" / "cv.md"

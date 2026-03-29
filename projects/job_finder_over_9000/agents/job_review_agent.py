@@ -9,7 +9,7 @@ import anyio
 from pathlib import Path
 from claude_agent_sdk import ClaudeAgentOptions
 
-from .utils import stream_agent
+from .utils import AgentResult, stream_agent
 
 ROOT_DIR = Path(__file__).parent.parent
 
@@ -17,7 +17,7 @@ ROOT_DIR = Path(__file__).parent.parent
 async def run_job_review_agent(
     model: str = "claude-opus-4-6",
     max_turns: int = 60,
-) -> str:
+) -> AgentResult:
     """
     Validate and rank job candidates against requirements.
 
@@ -26,7 +26,7 @@ async def run_job_review_agent(
         max_turns: Maximum agent turns (reduce to cut cost).
 
     Returns:
-        Summary of results.
+        AgentResult with result text and token usage.
     """
     requirements_path = ROOT_DIR / "data" / "requirements.md"
     cv_path = ROOT_DIR / "data" / "cv.md"

@@ -25,7 +25,8 @@ from pathlib import Path
 from rich.console import Console
 from rich.panel import Panel
 
-from agents import run_job_search_agent, run_job_review_agent, run_job_prep_agent
+from agents import run_job_search_agent, run_job_review_agent, run_job_prep_agent, print_total_usage
+from agents.utils import HitLimit
 
 ROOT_DIR = Path(__file__).parent
 console = Console()
@@ -74,18 +75,19 @@ async def run_pipeline(stage: str | None = None, top_n: int | None = None, cheap
     run_review = stage in (None, "review")
     run_prep = stage in (None, "prep")
 
+    stage_usages = []
+    
     # Stage 1: Job Search
     if run_search:
         console.print("\n[bold yellow]Stage 1/3: Job Search Agent[/bold yellow]")
         console.print(f"[dim]Searching for up to {cfg['max_candidates']} jobs ({cfg['model']})...[/dim]")
-        result = await run_job_search_agent(
+        agent_result = await run_job_search_agent(
             model=cfg["model"],
             max_turns=cfg["search_turns"],
             max_candidates=cfg["max_candidates"],
         )
+        stage_usages.append(("Job Search", agent_result.usage))
         console.print("[green]✓[/green] Job candidates saved to [cyan]output/job_candidates.md[/cyan]")
-        if result:
-            console.print(f"[dim]{result[:200]}...[/dim]" if len(result) > 200 else f"[dim]{result}[/dim]")
 
     # Stage 2: Job Review
     if run_review:
@@ -99,13 +101,12 @@ async def run_pipeline(stage: str | None = None, top_n: int | None = None, cheap
 
         console.print("\n[bold yellow]Stage 2/3: Job Review Agent[/bold yellow]")
         console.print(f"[dim]Validating jobs are open and ranking by match score ({cfg['model']})...[/dim]")
-        result = await run_job_review_agent(
+        agent_result = await run_job_review_agent(
             model=cfg["model"],
             max_turns=cfg["review_turns"],
         )
+        stage_usages.append(("Job Review", agent_result.usage))
         console.print("[green]✓[/green] Ranked jobs saved to [cyan]output/ranked_jobs.md[/cyan]")
-        if result:
-            console.print(f"[dim]{result[:200]}...[/dim]" if len(result) > 200 else f"[dim]{result}[/dim]")
 
     # Stage 3: Job Prep
     if run_prep:
@@ -119,15 +120,17 @@ async def run_pipeline(stage: str | None = None, top_n: int | None = None, cheap
 
         console.print(f"\n[bold yellow]Stage 3/3: Job Prep Agent[/bold yellow]")
         console.print(f"[dim]Creating tailored materials for top {effective_top_n} jobs ({cfg['model']})...[/dim]")
-        result = await run_job_prep_agent(
+        agent_result = await run_job_prep_agent(
             top_n=effective_top_n,
             model=cfg["model"],
             max_turns=cfg["prep_turns"],
         )
+        stage_usages.append(("Job Prep", agent_result.usage))
         console.print("[green]✓[/green] Prep materials saved to [cyan]output/prep/[/cyan]")
-        if result:
-            console.print(f"[dim]{result[:200]}...[/dim]" if len(result) > 200 else f"[dim]{result}[/dim]")
 
+    console.print()
+    if len(stage_usages) > 1:
+        print_total_usage(stage_usages)
     console.print(Panel.fit(
         "[bold green]Pipeline complete![/bold green]\n\n"
         "Check the [cyan]output/[/cyan] directory for results:\n"
@@ -158,7 +161,10 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    anyio.run(run_pipeline, args.stage, args.top, args.cheap)
+    try:
+        anyio.run(run_pipeline, args.stage, args.top, args.cheap)
+    except HitLimit as err:
+        console.print(err)
 
 
 if __name__ == "__main__":

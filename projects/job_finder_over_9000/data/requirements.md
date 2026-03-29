@@ -19,9 +19,11 @@
 - Microservices architecture
 - Pyspark / databricks
 
-## Location Preferences
+## Location / Time posted Preferences
 - Remote (preferred)
 - Hybrid (preferred, London UK acceptable)
+- Location: London
+- Post date: prefer less than 2 weeks old 
 
 ## Salary Range
 - Minimum: £130,000
@@ -43,3 +45,4 @@
 
 ## Exclusions
 - No pure front-end only roles
+- Job posting older than 4 weeks
