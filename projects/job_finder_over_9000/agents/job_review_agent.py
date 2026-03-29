@@ -36,6 +36,7 @@ async def run_job_review_agent(
     if candidates_path is None:
         candidates_path = ROOT_DIR / "output" / "job_candidates.md"
     output_path = ROOT_DIR / "output" / "ranked_jobs.md"
+    avoid_path = ROOT_DIR / "data" / "avoid_jobs.md"
 
     prompt = f"""You are a senior recruitment specialist and career coach. Your task is to validate and rank job candidates.
 
@@ -62,6 +63,9 @@ Follow these steps:
    - No longer open / expired
    - Clear mismatches on requirements
    - Excluded company types (from requirements)
+   For each removed job, record it in the avoid list at: {avoid_path}
+   Append to the file if it exists, create it if not. Use this format for each entry:
+   - **[Job Title] — [Company Name]** | URL: [url] | Reason: [why it was removed]
 
 6. Rank the remaining jobs by total score (highest first)
 

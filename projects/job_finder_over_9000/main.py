@@ -8,22 +8,23 @@ Runs the three-stage multiagent job finding pipeline:
   4. Job Prep Agent     — creates tailored application materials
 
 Usage:
-    python main.py                  # Run full pipeline (Opus, full scope)
+    python main.py                  # Run full pipeline (auto-resumes from last checkpoint)
+    python main.py --fresh          # Re-run full pipeline from scratch
     python main.py --cheap          # Run with Haiku + reduced scope (for testing)
     python main.py --stage search   # Run only job search
     python main.py --stage select   # Run only selection step
     python main.py --stage review   # Run only job review
-    python main.py --stage prep     # Run only job prep
-    python main.py --top 3          # Prep materials for top 3 jobs (default: 5)
+    python main.py --stage prep     # Run only job prep (skips companies already prepped)
+    python main.py --status         # Show pipeline status and exit
 
 Cost modes:
-    Default  — claude-opus-4-6, 15 candidates, top 5 prep
-    --cheap  — claude-haiku-4-5, 5 candidates, top 1 prep, reduced turns
+    Default  — claude-opus-4-6, 15 candidates
+    --cheap  — claude-haiku-4-5, 5 candidates, reduced turns
 """
 
 import argparse
 import re
-from datetime import date
+from datetime import date, datetime
 import anyio
 from pathlib import Path
 from rich.console import Console
@@ -62,6 +63,55 @@ DEFAULT_CONFIG = {
     "prep_turns": 100,
 }
 
+# Ordered pipeline stages with their output file/dir markers
+STAGES = [
+    {"key": "search",  "label": "Search",    "output": ROOT_DIR / "output" / "job_candidates.md"},
+    {"key": "select",  "label": "Selection", "output": ROOT_DIR / "output" / "selected_jobs.md"},
+    {"key": "review",  "label": "Review",    "output": ROOT_DIR / "output" / "ranked_jobs.md"},
+    {"key": "prep",    "label": "Prep",      "output": ROOT_DIR / "output" / "prep"},
+]
+
+
+def _stage_complete(stage: dict) -> bool:
+    """Return True if a stage's output already exists."""
+    path: Path = stage["output"]
+    if path.suffix == "":  # directory
+        return path.is_dir() and any(path.glob("*.md"))
+    return path.exists()
+
+
+def _file_mtime(path: Path) -> str:
+    """Return a short human-readable modification time for a file/dir."""
+    target = path
+    if path.is_dir():
+        files = sorted(path.glob("*.md"), key=lambda f: f.stat().st_mtime, reverse=True)
+        if not files:
+            return ""
+        target = files[0]
+    try:
+        ts = datetime.fromtimestamp(target.stat().st_mtime)
+        return ts.strftime("%d %b %H:%M")
+    except OSError:
+        return ""
+
+
+def print_pipeline_status() -> None:
+    """Print a summary of which pipeline stages are complete."""
+    lines = []
+    for s in STAGES:
+        done = _stage_complete(s)
+        if done:
+            ts = _file_mtime(s["output"])
+            lines.append(f"  [green]✓[/green] {s['label']:<12} [dim]{ts}[/dim]")
+        else:
+            lines.append(f"  [dim]○[/dim] {s['label']:<12} [dim]not started[/dim]")
+    console.print(Panel(
+        "\n".join(lines),
+        title="[bold]Pipeline Status[/bold]",
+        border_style="cyan",
+        padding=(0, 1),
+    ))
+
 
 def _parse_job_blocks(candidates_path: Path) -> list[tuple[str, str]]:
     """
@@ -70,7 +120,6 @@ def _parse_job_blocks(candidates_path: Path) -> list[tuple[str, str]]:
     Returns list of (display_label, markdown_block).
     """
     text = candidates_path.read_text()
-    # Split on level-2 headers that mark each job
     raw_blocks = re.split(r"(?=^## )", text, flags=re.MULTILINE)
     jobs = []
     for block in raw_blocks:
@@ -164,12 +213,15 @@ def select_jobs(candidates_path: Path) -> Path | None:
     return selected_path
 
 
-async def run_pipeline(stage: str | None = None, top_n: int | None = None, cheap: bool = False) -> None:
+async def run_pipeline(
+    stage: str | None = None,
+    cheap: bool = False,
+    fresh: bool = False,
+) -> None:
     """Run the full pipeline or a specific stage."""
     ensure_output_dirs()
 
     cfg = CHEAP_CONFIG if cheap else DEFAULT_CONFIG
-    effective_top_n = top_n if top_n is not None else cfg["top_n"]
 
     mode_label = "[yellow]CHEAP MODE[/yellow] (haiku)" if cheap else "[green]FULL MODE[/green] (opus)"
     console.print(Panel.fit(
@@ -178,16 +230,36 @@ async def run_pipeline(stage: str | None = None, top_n: int | None = None, cheap
         border_style="cyan"
     ))
 
-    run_search = stage in (None, "search")
-    run_select = stage in (None, "select")
-    run_review = stage in (None, "review")
-    run_prep = stage in (None, "prep")
+    # Show current pipeline status before running
+    print_pipeline_status()
+
+    # When running the full pipeline, auto-skip completed stages unless --fresh
+    # When a specific --stage is given, always run it (user explicitly requested)
+    full_pipeline = stage is None
+
+    def should_run(key: str) -> bool:
+        if stage is not None:
+            return stage == key
+        if fresh:
+            return True
+        stage_def = next(s for s in STAGES if s["key"] == key)
+        return not _stage_complete(stage_def)
+
+    if full_pipeline and not fresh:
+        pending = [s["label"] for s in STAGES if not _stage_complete(s)]
+        if not pending:
+            console.print("\n[green]All stages complete.[/green] Use [cyan]--fresh[/cyan] to re-run.\n")
+            return
+        console.print(
+            f"\n[dim]Resuming from:[/dim] [bold]{pending[0]}[/bold]"
+            f"  [dim](use --fresh to re-run from scratch)[/dim]\n"
+        )
 
     stage_usages = []
 
     # Stage 1: Job Search
-    if run_search:
-        console.print("\n[bold yellow]Stage 1: Job Search Agent[/bold yellow]")
+    if should_run("search"):
+        console.print("[bold yellow]Stage 1: Job Search Agent[/bold yellow]")
         console.print(f"[dim]Searching for up to {cfg['max_candidates']} jobs ({cfg['model']})...[/dim]")
         agent_result = await run_job_search_agent(
             model=cfg["model"],
@@ -196,39 +268,41 @@ async def run_pipeline(stage: str | None = None, top_n: int | None = None, cheap
             max_candidates=cfg["max_candidates"],
         )
         stage_usages.append(("Job Search", agent_result.usage))
-        console.print("[green]✓[/green] Job candidates saved to [cyan]output/job_candidates.md[/cyan]")
+        console.print("[green]✓[/green] Job candidates saved to [cyan]output/job_candidates.md[/cyan]\n")
+    elif full_pipeline:
+        console.print("[dim]Stage 1: Search — skipping (output/job_candidates.md exists)[/dim]")
 
-    # Selection Step: user picks which candidates to keep
+    # Selection Step
     candidates_path = ROOT_DIR / "output" / "job_candidates.md"
     selected_path = ROOT_DIR / "output" / "selected_jobs.md"
 
-    if run_select:
-        if not candidates_path.exists() and stage == "select":
+    if should_run("select"):
+        if not candidates_path.exists():
             console.print(
                 "[red]Error:[/red] output/job_candidates.md not found. "
                 "Run the search stage first: python main.py --stage search"
             )
             return
-        console.print("\n[bold yellow]Selection: Choose your candidates[/bold yellow]")
+        console.print("[bold yellow]Selection: Choose your candidates[/bold yellow]")
         result = select_jobs(candidates_path)
-        if result is None and stage in (None, "select"):
-            # User selected none — stop the pipeline
+        if result is None:
             return
-        if result is not None:
-            selected_path = result
+        selected_path = result
+        console.print()
+    elif full_pipeline:
+        console.print("[dim]Selection — skipping (output/selected_jobs.md exists)[/dim]")
 
     # Stage 2: Job Review
-    if run_review:
-        # Prefer selected jobs if available, fall back to all candidates
+    if should_run("review"):
         review_input = selected_path if selected_path.exists() else candidates_path
-        if not review_input.exists() and stage == "review":
+        if not review_input.exists():
             console.print(
                 "[red]Error:[/red] No candidates file found. "
-                "Run search + selection first: python main.py --stage search"
+                "Run search and selection first."
             )
             return
 
-        console.print("\n[bold yellow]Stage 2: Job Review Agent[/bold yellow]")
+        console.print("[bold yellow]Stage 2: Job Review Agent[/bold yellow]")
         input_label = "selected_jobs.md" if review_input == selected_path else "job_candidates.md"
         console.print(f"[dim]Validating and ranking jobs from {input_label} ({cfg['model']})...[/dim]")
         agent_result = await run_job_review_agent(
@@ -237,19 +311,21 @@ async def run_pipeline(stage: str | None = None, top_n: int | None = None, cheap
             candidates_path=review_input,
         )
         stage_usages.append(("Job Review", agent_result.usage))
-        console.print("[green]✓[/green] Ranked jobs saved to [cyan]output/ranked_jobs.md[/cyan]")
+        console.print("[green]✓[/green] Ranked jobs saved to [cyan]output/ranked_jobs.md[/cyan]\n")
+    elif full_pipeline:
+        console.print("[dim]Stage 2: Review — skipping (output/ranked_jobs.md exists)[/dim]")
 
     # Stage 3: Job Prep
-    if run_prep:
+    if should_run("prep"):
         ranked_path = ROOT_DIR / "output" / "ranked_jobs.md"
-        if not ranked_path.exists() and stage == "prep":
+        if not ranked_path.exists():
             console.print(
                 "[red]Error:[/red] output/ranked_jobs.md not found. "
                 "Run the review stage first: python main.py --stage review"
             )
             return
 
-        console.print(f"\n[bold yellow]Stage 3: Job Prep Agent[/bold yellow]")
+        console.print("[bold yellow]Stage 3: Job Prep Agent[/bold yellow]")
         console.print(f"[dim]Creating tailored materials for top {effective_top_n} jobs ({cfg['model']})...[/dim]")
         agent_result = await run_job_prep_agent(
             top_n=effective_top_n,
@@ -257,20 +333,16 @@ async def run_pipeline(stage: str | None = None, top_n: int | None = None, cheap
             max_turns=cfg["prep_turns"],
         )
         stage_usages.append(("Job Prep", agent_result.usage))
-        console.print("[green]✓[/green] Prep materials saved to [cyan]output/prep/[/cyan]")
+        console.print("[green]✓[/green] Prep materials saved to [cyan]output/prep/[/cyan]\n")
+    elif full_pipeline:
+        console.print("[dim]Stage 3: Prep — skipping (output/prep/ has files)[/dim]")
 
     console.print()
     if len(stage_usages) > 1:
         print_total_usage(stage_usages)
-    console.print(Panel.fit(
-        "[bold green]Pipeline complete![/bold green]\n\n"
-        "Check the [cyan]output/[/cyan] directory for results:\n"
-        "  • [cyan]output/job_candidates.md[/cyan]   — all found jobs\n"
-        "  • [cyan]output/selected_jobs.md[/cyan]    — your selected jobs\n"
-        "  • [cyan]output/ranked_jobs.md[/cyan]      — scored & ranked jobs\n"
-        "  • [cyan]output/prep/[/cyan]                — tailored application materials",
-        border_style="green"
-    ))
+
+    # Final status panel
+    print_pipeline_status()
 
 
 def main() -> None:
@@ -291,10 +363,25 @@ def main() -> None:
         action="store_true",
         help="Use claude-haiku-4-5 with reduced scope for cheap testing",
     )
+    parser.add_argument(
+        "--fresh",
+        action="store_true",
+        help="Re-run all stages from scratch, ignoring existing output files",
+    )
+    parser.add_argument(
+        "--status",
+        action="store_true",
+        help="Show pipeline status and exit",
+    )
     args = parser.parse_args()
 
+    if args.status:
+        ensure_output_dirs()
+        print_pipeline_status()
+        return
+
     try:
-        anyio.run(run_pipeline, args.stage, args.top, args.cheap)
+        anyio.run(run_pipeline, args.stage, args.top, args.cheap, args.fresh)
     except HitLimit as err:
         console.print(err)
 

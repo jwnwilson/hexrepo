@@ -17,11 +17,20 @@ venv: ## Install dependencies
 
 # Full pipeline
 
-run: venv ## Run full pipeline (opus, full scope)
+status: venv ## Show pipeline status (which stages are complete)
+	uv run python main.py --status
+
+run: venv ## Run full pipeline, auto-resuming from last checkpoint (opus)
 	uv run python main.py
 
-run-cheap: venv ## Run full pipeline (haiku, reduced scope — for testing)
+run-fresh: venv ## Run full pipeline from scratch, ignoring existing output (opus)
+	uv run python main.py --fresh
+
+run-cheap: venv ## Run full pipeline, auto-resuming (haiku, reduced scope — for testing)
 	uv run python main.py --cheap
+
+run-select: venv ## Run only the selection step (pick from existing job_candidates.md)
+	uv run python main.py --stage select
 
 # Individual stages — full
 

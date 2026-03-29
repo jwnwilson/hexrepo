@@ -44,13 +44,21 @@ async def run_job_search_agent(
         if liked_jobs_path.exists() else ""
     )
 
+    avoid_jobs_path = ROOT_DIR / "data" / "avoid_jobs.md"
+    avoid_jobs_instruction = (
+        f"2b. Read the avoid list at: {avoid_jobs_path}\n"
+        "    Do not include any job posting that matches a URL or (company + title) "
+        "combination already in this list — these have previously been found invalid or disqualified.\n"
+        if avoid_jobs_path.exists() else ""
+    )
+
     prompt = f"""You are a job search specialist. Your task is to find real, currently open job positions.
 
 Follow these steps:
 
 1. Read the job requirements file at: {requirements_path}
 2. Read the CV file at: {cv_path}
-{liked_jobs_instruction}3. Search the web for open job positions that match the requirements. Search multiple sources:
+{liked_jobs_instruction}{avoid_jobs_instruction}3. Search the web for open job positions that match the requirements. Search multiple sources:
    - LinkedIn Jobs
    - levels.fyi
    - Glassdoor
