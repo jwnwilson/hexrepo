@@ -1,5 +1,31 @@
+import subprocess
+
 import pytest
 from pyspark.sql import SparkSession, Row
+
+
+def _java_runtime_usable() -> bool:
+    """PySpark always needs a working JDK on the machine running pytest (driver JVM), including local[*]."""
+    try:
+        proc = subprocess.run(
+            ["java", "-version"],
+            capture_output=True,
+            text=True,
+            timeout=15,
+        )
+    except (FileNotFoundError, subprocess.TimeoutExpired):
+        return False
+    return proc.returncode == 0
+
+
+def _require_java_for_pyspark() -> None:
+    if not _java_runtime_usable():
+        pytest.fail(
+            "PySpark tests need a working Java runtime on PATH. Jupyter in Docker includes Java; "
+            "`make test` uses your host Python/uv and must start the Spark driver JVM locally. "
+            "Run `make setup` to Install a JDK (e.g. `brew install temurin@17`) and ensure `java -version` succeeds.",
+            pytrace=False,
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -17,6 +43,8 @@ def spark() -> SparkSession:
     tests can also run without Docker (e.g. in CI).
     """
     import os
+
+    _require_java_for_pyspark()
 
     master = os.getenv("SPARK_MASTER", "local[*]")
 
@@ -63,6 +91,8 @@ def isolated_spark() -> SparkSession:
     must not share state with other tests.  Use the session-scoped `spark`
     fixture by default and reserve this for the rare cases that need it.
     """
+    _require_java_for_pyspark()
+
     session = (
         SparkSession.builder
         .master("local[2]")

@@ -4,7 +4,11 @@
 
 VENV := .venv
 MKFILE_DIR := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
-VENV_DIR = $(MKFILE_DIR)$(VENV)
+VENV_DIR = $(MKFILE_DIR)$(VENV)\
+
+
+setup:
+	brew install temurin@17
 
 # Setup commands
 venv:
