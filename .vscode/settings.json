@@ -1,7 +1,7 @@
 {
     "python.analysis.autoSearchPaths": true,
     "python.terminal.activateEnvironment": true,
-    "python.defaultInterpreterPath": "${workspaceFolder}/projects/aipet_be/.venv/bin/python",
+    "python.defaultInterpreterPath": "${workspaceFolder}/projects/job_finder_over_9000/.venv/bin/python",
     "python.analysis.extraPaths": [
         "${workspaceFolder}/tools/hextech/hextech",
         "${workspaceFolder}/libs/cloud",
